@@ -1,27 +1,26 @@
-﻿using Klyte.Commons.Extensions;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Utils;
-using System.Reflection;
+﻿using HarmonyLib;
+using ColossalFramework.UI;
 using UnityEngine;
-using static Klyte.Commons.Extensions.RedirectorUtils;
+using static Klyte.Commons.Extensions.Patcher;
 
 namespace Klyte.TransportLinesManager.UI
 {
-    internal class TLMLineCreationToolboxHooks : MonoBehaviour, IRedirectable
+    internal class TLMLineCreationToolboxHooks : MonoBehaviour, IPatcher
     {
-        public Redirector RedirectorInstance => new Redirector();
 
+        [HarmonyPatch(typeof(GeneratedScrollPanel), "OnClick")]
+        [HarmonyPrefix]
+        public static void PreOnClick(GeneratedScrollPanel __instance, UIComponent comp, UIMouseEventParameter p, ref TransportInfo __state)
+		{
+            TLMLineCreationToolbox.OnButtonClickedPre(ref __state);
+		}
 
-        public void Awake()
-        {
-            #region Line Draw Button Click
-            MethodInfo OnButtonClickedPre = typeof(TLMLineCreationToolbox).GetMethod("OnButtonClickedPre", allFlags);
-            MethodInfo OnButtonClickedPos = typeof(TLMLineCreationToolbox).GetMethod("OnButtonClickedPos", allFlags);
-
-            LogUtils.DoLog("Loading TLMLineCreationToolbox Hook");
-            RedirectorInstance.AddRedirect(typeof(GeneratedScrollPanel).GetMethod("OnClick", allFlags), OnButtonClickedPre, OnButtonClickedPos);
-            #endregion
-        }
+        [HarmonyPatch(typeof(GeneratedScrollPanel), "OnClick")]
+        [HarmonyPostfix]
+        public static void AfterOnClick(GeneratedScrollPanel __instance, UIComponent comp, UIMouseEventParameter p, ref TransportInfo __state)
+		{
+            TLMLineCreationToolbox.OnButtonClickedPos(ref __state);
+		}
 
     }
 }

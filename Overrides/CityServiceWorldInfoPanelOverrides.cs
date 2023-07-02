@@ -1,49 +1,71 @@
 ﻿using ColossalFramework;
-using Klyte.Commons.Extensions;
-using Klyte.Commons.Utils;
 using Klyte.TransportLinesManager.CommonsWindow;
-using Klyte.TransportLinesManager.Extensions;
+using HarmonyLib;
+using System.Collections.Generic;
+using System.Reflection.Emit;
 using System.Reflection;
-using UnityEngine;
+using Klyte.Commons.Utils;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.DataContainers;
+using Klyte.Commons.Extensions;
 
 namespace Klyte.TransportLinesManager.Overrides
 {
-    public class CityServiceWorldInfoPanelOverrides : MonoBehaviour, IRedirectable
+    [HarmonyPatch(typeof(CityServiceWorldInfoPanel))]
+    public static class CityServiceWorldInfoPanelOverrides
     {
-        public Redirector RedirectorInstance { get; set; }
-
-
-        #region Hooking
-
-        public void Awake()
+        [HarmonyPatch(typeof(CityServiceWorldInfoPanel), "OnLinesOverviewClicked")]
+        [HarmonyPrefix]
+        public static bool OnLinesOverviewClicked(CityServiceWorldInfoPanel __instance, ref InstanceID ___m_InstanceID)
         {
-            LogUtils.DoLog("Loading CityServiceWorldInfoPanel Overrides");
-            RedirectorInstance = KlyteMonoUtils.CreateElement<Redirector>(transform);
-            #region Net Manager Hooks
-            MethodInfo OnNodeChanged = GetType().GetMethod("OnGoToLines", RedirectorUtils.allFlags);
-
-            RedirectorInstance.AddRedirect(typeof(CityServiceWorldInfoPanel).GetMethod("OnLinesOverviewClicked", RedirectorUtils.allFlags), OnNodeChanged);
-            #endregion
-
-        }
-        #endregion
-
-
-        private static bool OnGoToLines(CityServiceWorldInfoPanel __instance)
-        {
-            InstanceID m_InstanceID = (InstanceID)typeof(CityServiceWorldInfoPanel).GetField("m_InstanceID", RedirectorUtils.allFlags).GetValue(__instance);
-            if (m_InstanceID.Type != InstanceType.Building || m_InstanceID.Building == 0)
+            if (___m_InstanceID.Type != InstanceType.Building || ___m_InstanceID.Building == 0)
             {
                 return false;
             }
-            ushort building = m_InstanceID.Building;
+            ushort building = ___m_InstanceID.Building;
             BuildingInfo info = Singleton<BuildingManager>.instance.m_buildings.m_buffer[building].Info;
-            if (info != null && info.m_buildingAI is TransportStationAI stationAI)
+            if (info != null)
             {
-                TLMPanel.Instance.OpenAt(TransportSystemDefinition.From(stationAI));
+                if(info.m_buildingAI is TransportStationAI stationAI)
+				{
+                    TLMPanel.Instance.OpenAt(TransportSystemDefinition.From(stationAI));
+				}
+                else if(info.m_buildingAI is DepotAI depotAI)
+				{
+                    TLMPanel.Instance.OpenAt(TransportSystemDefinition.From(depotAI));
+				}
             }
             return false;
         }
 
+        [HarmonyPatch(typeof(CityServiceWorldInfoPanel), "UpdateBindings")]
+        [HarmonyTranspiler]
+        private static IEnumerable<CodeInstruction> TranspileUpdateBindingsCSWIP(IEnumerable<CodeInstruction> instructions)
+        {
+            var inst = new List<CodeInstruction>(instructions);
+            MethodInfo CanAllowRegionalLines = typeof(CityServiceWorldInfoPanelOverrides).GetMethod("CanAllowVanillaRegionalLines", Patcher.allFlags);
+
+            for (int i = 0; i < inst.Count - 1; i++)
+            {
+                if (inst[i + 1].opcode == OpCodes.Ldnull
+                    && inst[i].opcode == OpCodes.Ldloc_S
+                    && inst[i].operand is LocalBuilder lb
+                    && lb.LocalIndex == 5
+                    )
+                {
+                    inst.RemoveAt(i + 1);
+                    inst.RemoveAt(i + 1);
+                    inst.InsertRange(i + 1, new List<CodeInstruction> {
+                        new CodeInstruction(OpCodes.Ldloc_0),
+                        new CodeInstruction(OpCodes.Call, CanAllowRegionalLines),
+                    });
+                    break;
+                }
+            }
+            LogUtils.PrintMethodIL(inst);
+            return inst;
+        }
+
+        private static bool CanAllowVanillaRegionalLines(TransportStationAI stationAI, ushort buildingId) => !(stationAI is null) && !TLMBuildingDataContainer.Instance.SafeGet(buildingId).TlmManagedRegionalLines;
     }
 }

@@ -1,20 +1,13 @@
-﻿using Klyte.Commons.Extensions;
-using Klyte.TransportLinesManager.Utils;
-using UnityEngine;
+﻿using Klyte.TransportLinesManager.Utils;
+using HarmonyLib;
 
 namespace Klyte.TransportLinesManager.Overrides
 {
-
-    public class ToolManagerOverrides : Redirector, IRedirectable
+    [HarmonyPatch(typeof(ToolManager))]
+    public static class ToolManagerOverrides
     {
-        public void Awake()
-        {
-            #region Hooks
-            System.Reflection.MethodInfo afterEndOverlayImpl = typeof(ToolManagerOverrides).GetMethod("AfterEndOverlayImpl", RedirectorUtils.allFlags);
-            AddRedirect(typeof(ToolManager).GetMethod("EndOverlayImpl", RedirectorUtils.allFlags), null, afterEndOverlayImpl);
-            #endregion 
-        }
-
+        [HarmonyPatch(typeof(ToolManager), "EndOverlayImpl")]
+        [HarmonyPostfix]
         public static void AfterEndOverlayImpl(RenderManager.CameraInfo cameraInfo)
         {
             if (WorldInfoPanel.AnyWorldInfoPanelOpen() && (WorldInfoPanel.GetCurrentInstanceID().Building > 0 || WorldInfoPanel.GetCurrentInstanceID().Type == (InstanceType)TLMInstanceType.BuildingLines))

@@ -1,38 +1,32 @@
 ﻿using ColossalFramework;
+using HarmonyLib;
 using Klyte.Commons.Extensions;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.DataContainers;
+using Klyte.TransportLinesManager.Data.Extensions;
+using Klyte.TransportLinesManager.Interfaces;
 using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.Xml;
 using System;
 using System.Reflection;
 using UnityEngine;
 
 namespace Klyte.TransportLinesManager.Overrides
 {
-    internal class PublicTransportAtRoadAIOverrides : Redirector, IRedirectable
+    [HarmonyPatch(typeof(VehicleAI))]
+    public static class VehicleAIOverrides
     {
-        public void Awake()
-        {
-            var src = typeof(VehicleAI).GetMethod("ArrivingToDestination", RedirectorUtils.allFlags);
-            var dest = GetType().GetMethod("PreArrivingToDestination", RedirectorUtils.allFlags);
-            var srcSS = typeof(VehicleAI).GetMethod("SimulationStep", RedirectorUtils.allFlags, null, new Type[] { typeof(ushort), typeof(Vehicle).MakeByRefType(), typeof(ushort), typeof(Vehicle).MakeByRefType(), typeof(int) }, null);
-            var destSS = GetType().GetMethod("PreSimulationStep", RedirectorUtils.allFlags);
-            LogUtils.DoLog($"pre detour: {src} => {dest}");
-            AddRedirect(src, dest);
-            LogUtils.DoLog($"pre detour SS: {srcSS} => {destSS}");
-            AddRedirect(srcSS, destSS);
-        }
 
-        private static MethodInfo BusAI_StartPathFind = typeof(BusAI).GetMethod("StartPathFind", RedirectorUtils.allFlags, null, new Type[] { typeof(ushort), typeof(Vehicle).MakeByRefType() }, null);
-        private static MethodInfo TramAI_StartPathFind = typeof(TramAI).GetMethod("StartPathFind", RedirectorUtils.allFlags, null, new Type[] { typeof(ushort), typeof(Vehicle).MakeByRefType() }, null);
-        private static MethodInfo TrolleyAI_StartPathFind = typeof(TrolleybusAI).GetMethod("StartPathFind", RedirectorUtils.allFlags, null, new Type[] { typeof(ushort), typeof(Vehicle).MakeByRefType() }, null);
+        private static MethodInfo BusAI_StartPathFind = typeof(BusAI).GetMethod("StartPathFind", Patcher.allFlags, null, new Type[] { typeof(ushort), typeof(Vehicle).MakeByRefType() }, null);
+        private static MethodInfo TramAI_StartPathFind = typeof(TramAI).GetMethod("StartPathFind", Patcher.allFlags, null, new Type[] { typeof(ushort), typeof(Vehicle).MakeByRefType() }, null);
+        private static MethodInfo TrolleyAI_StartPathFind = typeof(TrolleybusAI).GetMethod("StartPathFind", Patcher.allFlags, null, new Type[] { typeof(ushort), typeof(Vehicle).MakeByRefType() }, null);
+        private static MethodInfo BusAI_UnloadPassengers = typeof(BusAI).GetMethod("UnloadPassengers", Patcher.allFlags);
+        private static MethodInfo TramAI_UnloadPassengers = typeof(TramAI).GetMethod("UnloadPassengers", Patcher.allFlags);
+        private static MethodInfo TrolleybusAI_UnloadPassengers = typeof(TrolleybusAI).GetMethod("UnloadPassengers", Patcher.allFlags);
 
-        private static MethodInfo BusAI_UnloadPassengers = typeof(BusAI).GetMethod("UnloadPassengers", RedirectorUtils.allFlags);
-        private static MethodInfo TramAI_UnloadPassengers = typeof(TramAI).GetMethod("UnloadPassengers", RedirectorUtils.allFlags);
-        private static MethodInfo TrolleybusAI_UnloadPassengers = typeof(TrolleybusAI).GetMethod("UnloadPassengers", RedirectorUtils.allFlags);
-
-        public static void PreSimulationStep(ushort vehicleID, ref Vehicle vehicleData)
+        [HarmonyPatch(typeof(VehicleAI), "SimulationStep", new Type[] { typeof(ushort), typeof(Vehicle), typeof(ushort), typeof(Vehicle), typeof(int) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Normal })]
+        [HarmonyPrefix]
+        public static void SimulationStep(ushort vehicleID, ref Vehicle vehicleData)
         {
             if (vehicleData.m_transportLine != 0 && vehicleData.m_path == 0 && (vehicleData.m_flags & Vehicle.Flags.WaitingPath) != 0)
             {
@@ -41,7 +35,9 @@ namespace Klyte.TransportLinesManager.Overrides
             }
         }
 
-        public static bool PreArrivingToDestination(ushort vehicleID, ref Vehicle vehicleData, VehicleAI __instance)
+        [HarmonyPatch(typeof(VehicleAI), "ArrivingToDestination")]
+        [HarmonyPrefix]
+        public static bool ArrivingToDestination(ushort vehicleID, ref Vehicle vehicleData, VehicleAI __instance)
         {
             if (!(
                 (__instance is BusAI && TLMBaseConfigXML.CurrentContextConfig.ExpressBusesEnabled)
@@ -119,6 +115,31 @@ namespace Klyte.TransportLinesManager.Overrides
             return false;
         }
 
+        [HarmonyPatch(typeof(VehicleAI), "GetColor", new Type[] { typeof(ushort), typeof(Vehicle), typeof(InfoManager.InfoMode), typeof(InfoManager.SubInfoMode) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Normal, ArgumentType.Normal })]
+        [HarmonyPrefix]
+        public static bool PreGetColor(VehicleAI __instance, ushort vehicleID, ref Vehicle data, InfoManager.InfoMode infoMode, InfoManager.SubInfoMode subInfoMode, ref Color __result)
+        {
+            if (data.m_transportLine != 0 && infoMode == InfoManager.InfoMode.None)
+            {
+                var tsd = TransportSystemDefinition.GetDefinitionForLine(data.m_transportLine, false);
+                if (tsd.TransportType == TransportInfo.TransportType.EvacuationBus)
+                {
+                    return true;
+                }
+
+                ITLMTransportTypeExtension ext = tsd.GetTransportExtension();
+                uint prefix = TLMPrefixesUtils.GetPrefix(data.m_transportLine);
+
+                if (ext.IsUsingColorForModel(prefix) && ext.GetColor(prefix) != default)
+                {
+                    __result = ext.GetColor(prefix);
+                    return false;
+                }
+            }
+            return true;
+
+        }
+
         private static bool CheckDespawn(ushort vehicleID, ref Vehicle vehicleData, bool isEmpty = false)
         {
             if (vehicleData.m_transportLine != 0)
@@ -140,8 +161,6 @@ namespace Klyte.TransportLinesManager.Overrides
             }
             return false;
         }
-
-
 
         private static int GetQuantityPassengerUnloadOnNextStop(ushort vehicleId, ref Vehicle data, out bool full, out bool empty)
         {
@@ -202,6 +221,7 @@ namespace Klyte.TransportLinesManager.Overrides
             empty = passengers == 0;
             return passengers - serviceCounter;
         }
+        
         private static bool TransportArriveAtTarget(ref CitizenInstance citizenData, Vector3 stopPos, bool forceUnload)
         {
             PathManager instance = Singleton<PathManager>.instance;

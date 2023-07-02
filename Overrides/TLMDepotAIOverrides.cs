@@ -1,75 +1,38 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Math;
-using Klyte.Commons.Extensions;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
 using Klyte.TransportLinesManager.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static Klyte.Commons.Extensions.RedirectorUtils;
+using HarmonyLib;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Extensions;
 
 namespace Klyte.TransportLinesManager.Overrides
 {
-    public class TLMDepotAIOverrides : MonoBehaviour, IRedirectable
+    [HarmonyPatch(typeof(DepotAI))]
+    public static class TLMDepotAIOverrides
     {
-        private static TLMDepotAIOverrides Instance { get; set; }
-
-
-        #region Generation methods
-
-        private static VehicleInfo DoModelDraw(ushort lineId)
-        {
-            Interfaces.IBasicExtension extension = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
-            VehicleInfo randomInfo = extension.GetAModel(lineId);
-            return randomInfo;
-        }
-
-        public void SetRandomBuilding(TransportSystemDefinition tsd, ushort lineId, ref ushort currentId)
-        {
-            Interfaces.IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
-            List<ushort> allowedDepots = config.GetAllowedDepots(tsd, lineId);
-            if (allowedDepots.Count == 0)
-            {
-                if (TransportLinesManagerMod.DebugMode)
-                {
-                    LogUtils.DoLog("allowedDepots.Count --{0}-- == 0", allowedDepots.Count);
-                }
-                return;
-            }
-            var r = new Randomizer(new System.Random().Next());
-            if (TransportLinesManagerMod.DebugMode)
-            {
-                LogUtils.DoLog("DEPOT POSSIBLE VALUES FOR {2} LINE {1}: {0} ", string.Join(",", allowedDepots.Select(x => x.ToString()).ToArray()), lineId, tsd);
-            }
-
-            currentId = allowedDepots[r.Int32(0, allowedDepots.Count - 1)];
-            if (TransportLinesManagerMod.DebugMode)
-            {
-                LogUtils.DoLog("DEPOT FOR {2} LINE {1}: {0} ", currentId, lineId, tsd);
-            }
-        }
-        #endregion
-
-        #region Overrides
-
         private static readonly TransferManager.TransferReason[] m_managedReasons = new TransferManager.TransferReason[]   {
-                TransferManager.TransferReason.Tram,
-                TransferManager.TransferReason.PassengerTrain,
-                TransferManager.TransferReason.PassengerShip,
-                TransferManager.TransferReason.PassengerPlane,
-                TransferManager.TransferReason.MetroTrain,
-                TransferManager.TransferReason.Monorail,
-                TransferManager.TransferReason.CableCar,
-                TransferManager.TransferReason.Blimp,
-                TransferManager.TransferReason.Bus,
-                TransferManager.TransferReason.Ferry,
-                TransferManager.TransferReason.Trolleybus,
-                TransferManager.TransferReason.PassengerHelicopter,
-                TransferManager.TransferReason.TouristBus,
-            };
+            TransferManager.TransferReason.Tram,
+            TransferManager.TransferReason.PassengerTrain,
+            TransferManager.TransferReason.PassengerShip,
+            TransferManager.TransferReason.PassengerPlane,
+            TransferManager.TransferReason.MetroTrain,
+            TransferManager.TransferReason.Monorail,
+            TransferManager.TransferReason.CableCar,
+            TransferManager.TransferReason.Blimp,
+            TransferManager.TransferReason.Bus,
+            TransferManager.TransferReason.Ferry,
+            TransferManager.TransferReason.Trolleybus,
+            TransferManager.TransferReason.PassengerHelicopter,
+            TransferManager.TransferReason.TouristBus,
+        };
 
-        public static bool StartTransfer(DepotAI __instance, ushort buildingID, TransferManager.TransferReason reason, TransferManager.TransferOffer offer)
+        [HarmonyPatch(typeof(DepotAI), "StartTransfer")]
+        [HarmonyPrefix]
+        public static bool StartTransfer(DepotAI __instance, ushort buildingID, ref Building data, TransferManager.TransferReason reason, TransferManager.TransferOffer offer)
         {
             if (!m_managedReasons.Contains(reason) || offer.TransportLine == 0)
             {
@@ -78,7 +41,7 @@ namespace Klyte.TransportLinesManager.Overrides
 
             LogUtils.DoLog("START TRANSFER!!!!!!!!");
             TransportInfo m_transportInfo = __instance.m_transportInfo;
-            BuildingInfo m_info = __instance.m_info;
+            BuildingInfo m_info = data.Info;
 
             LogUtils.DoLog("m_info {0} | m_transportInfo {1} | Line: {2}", m_info.name, m_transportInfo.name, offer.TransportLine);
 
@@ -91,7 +54,7 @@ namespace Klyte.TransportLinesManager.Overrides
                     return true;
                 }
 
-                Instance.SetRandomBuilding(tsd, offer.TransportLine, ref buildingID);
+                SetRandomBuilding(tsd, offer.TransportLine, ref buildingID);
 
 
                 LogUtils.DoLog("randomVehicleInfo");
@@ -118,22 +81,36 @@ namespace Klyte.TransportLinesManager.Overrides
 
         }
 
-        // CommonBuildingAI
-
-        public Redirector RedirectorInstance => new Redirector();
-
-        #endregion
-
-        #region Hooking
-
-        public void Awake()
+        private static VehicleInfo DoModelDraw(ushort lineId)
         {
-            Instance = this;
-            LogUtils.DoLog("Loading Depot Hooks!");
-            RedirectorInstance.AddRedirect(typeof(DepotAI).GetMethod("StartTransfer", allFlags), typeof(TLMDepotAIOverrides).GetMethod("StartTransfer", allFlags));
+            Interfaces.IBasicExtension extension = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
+            VehicleInfo randomInfo = extension.GetAModel(lineId);
+            return randomInfo;
         }
 
-        #endregion
+        private static void SetRandomBuilding(TransportSystemDefinition tsd, ushort lineId, ref ushort currentId)
+        {
+            Interfaces.IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
+            List<ushort> allowedDepots = config.GetAllowedDepots(tsd, lineId);
+            if (allowedDepots.Count == 0)
+            {
+                if (TransportLinesManagerMod.DebugMode)
+                {
+                    LogUtils.DoLog("allowedDepots.Count --{0}-- == 0", allowedDepots.Count);
+                }
+                return;
+            }
+            var r = new Randomizer(new System.Random().Next());
+            if (TransportLinesManagerMod.DebugMode)
+            {
+                LogUtils.DoLog("DEPOT POSSIBLE VALUES FOR {2} LINE {1}: {0} ", string.Join(",", allowedDepots.Select(x => x.ToString()).ToArray()), lineId, tsd);
+            }
 
+            currentId = allowedDepots[r.Int32(0, allowedDepots.Count - 1)];
+            if (TransportLinesManagerMod.DebugMode)
+            {
+                LogUtils.DoLog("DEPOT FOR {2} LINE {1}: {0} ", currentId, lineId, tsd);
+            }
+        }
     }
 }

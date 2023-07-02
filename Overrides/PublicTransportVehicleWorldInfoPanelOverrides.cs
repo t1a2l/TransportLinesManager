@@ -1,41 +1,23 @@
 ﻿using ColossalFramework;
-using Klyte.Commons.Extensions;
-using Klyte.Commons.Utils;
 using Klyte.TransportLinesManager.CommonsWindow;
-using Klyte.TransportLinesManager.Extensions;
-using System.Reflection;
-using UnityEngine;
+using HarmonyLib;
+using Klyte.TransportLinesManager.Data.Base;
 
 namespace Klyte.TransportLinesManager.Overrides
 {
-    public class PublicTransportVehicleWorldInfoPanelOverrides : MonoBehaviour, IRedirectable
+    [HarmonyPatch(typeof(PublicTransportVehicleWorldInfoPanel))]
+    public class PublicTransportVehicleWorldInfoPanelOverrides
     {
-        public Redirector RedirectorInstance { get; set; }
 
-
-
-        #region Hooking
-
-        public void Awake()
+        [HarmonyPatch(typeof(PublicTransportVehicleWorldInfoPanel), "OnLinesOverviewClicked")]
+        [HarmonyPrefix]
+        public static bool OnGoToLines(PublicTransportVehicleWorldInfoPanel __instance, ref InstanceID ___m_InstanceID)
         {
-            LogUtils.DoLog("Loading PublicTransportVehicleWorldInfoPanel Overrides");
-            RedirectorInstance = KlyteMonoUtils.CreateElement<Redirector>(transform);
-            MethodInfo OnNodeChanged = GetType().GetMethod("OnGoToLines", RedirectorUtils.allFlags);
-
-            RedirectorInstance.AddRedirect(typeof(PublicTransportVehicleWorldInfoPanel).GetMethod("OnLinesOverviewClicked", RedirectorUtils.allFlags), OnNodeChanged);
-
-        }
-        #endregion
-
-
-        private static bool OnGoToLines(PublicTransportVehicleWorldInfoPanel __instance)
-        {
-            InstanceID m_InstanceID = (InstanceID)typeof(PublicTransportVehicleWorldInfoPanel).GetField("m_InstanceID", RedirectorUtils.allFlags).GetValue(__instance);
-            if (m_InstanceID.Type != InstanceType.Vehicle || m_InstanceID.Vehicle == 0)
+            if (___m_InstanceID.Type != InstanceType.Vehicle || ___m_InstanceID.Vehicle == 0)
             {
                 return false;
             }
-            ushort vehicle = m_InstanceID.Vehicle;
+            ushort vehicle = ___m_InstanceID.Vehicle;
             ushort firstVehicle = Singleton<VehicleManager>.instance.m_vehicles.m_buffer[vehicle].GetFirstVehicle(vehicle);
             if (firstVehicle != 0)
             {

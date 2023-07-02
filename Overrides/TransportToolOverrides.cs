@@ -1,8 +1,9 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.Threading;
-using Harmony;
+using HarmonyLib;
 using Klyte.Commons.Extensions;
 using Klyte.Commons.Utils;
+using Klyte.Commons.Utils.StructExtensions;
 using Klyte.TransportLinesManager.Utils;
 using System;
 using System.Collections.Generic;
@@ -10,46 +11,23 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
-using static Klyte.Commons.Extensions.RedirectorUtils;
 
 namespace Klyte.TransportLinesManager.Overrides
 {
-    internal class TransportToolOverrides : MonoBehaviour, IRedirectable
+    [HarmonyPatch(typeof(TransportTool))]
+    public static class TransportToolOverrides
     {
-        public void Awake()
+        private static readonly FieldInfo m_lineNumField = typeof(TransportTool).GetField("m_line", Patcher.allFlags);
+
+        private static readonly ItemClass.SubService[] checkableTransportTypes = new ItemClass.SubService[]
         {
+            ItemClass.SubService.PublicTransportBus,
+            ItemClass.SubService.PublicTransportTrolleybus,
+            ItemClass.SubService.PublicTransportTram
+        };
 
-            #region Automation Hooks
-            MethodInfo onEnable = typeof(TransportToolOverrides).GetMethod("OnEnable", allFlags);
-            MethodInfo onDisable = typeof(TransportToolOverrides).GetMethod("OnDisable", allFlags);
-            MethodInfo transpileOnToolUpdate = typeof(TransportToolOverrides).GetMethod("TranspileOnToolUpdate", allFlags);
-            MethodInfo AfterEveryAction = typeof(TransportToolOverrides).GetMethod("AfterEveryAction", allFlags);
-            MethodInfo AfterEveryActionZeroable = typeof(TransportToolOverrides).GetMethod("AfterEveryActionZeroable", allFlags);
-
-            LogUtils.DoLog($"Loading TransportToolOverrides Hook");
-            try
-            {
-                var tt = new TransportTool();
-                RedirectorInstance.AddRedirect(typeof(TransportTool).GetMethod("OnEnable", allFlags), null, onEnable);
-                RedirectorInstance.AddRedirect(typeof(TransportTool).GetMethod("OnDisable", allFlags), onDisable);
-                RedirectorInstance.AddRedirect(typeof(TransportTool).GetMethod("OnToolUpdate", allFlags), null, null, transpileOnToolUpdate);
-                RedirectorInstance.AddRedirect(typeof(TransportTool).GetMethod("NewLine", allFlags).Invoke(tt, new object[0]).GetType().GetMethod("MoveNext", RedirectorUtils.allFlags), AfterEveryAction);
-                RedirectorInstance.AddRedirect(typeof(TransportTool).GetMethod("AddStop", allFlags).Invoke(tt, new object[0]).GetType().GetMethod("MoveNext", RedirectorUtils.allFlags), AfterEveryAction);
-                RedirectorInstance.AddRedirect(typeof(TransportTool).GetMethod("RemoveStop", allFlags).Invoke(tt, new object[0]).GetType().GetMethod("MoveNext", RedirectorUtils.allFlags), AfterEveryActionZeroable);
-                RedirectorInstance.AddRedirect(typeof(TransportTool).GetMethod("CancelPrevStop", allFlags).Invoke(tt, new object[0]).GetType().GetMethod("MoveNext", RedirectorUtils.allFlags), AfterEveryActionZeroable);
-                RedirectorInstance.AddRedirect(typeof(TransportTool).GetMethod("CancelMoveStop", allFlags).Invoke(tt, new object[0]).GetType().GetMethod("MoveNext", RedirectorUtils.allFlags), AfterEveryActionZeroable);
-                RedirectorInstance.AddRedirect(typeof(TransportTool).GetMethod("MoveStop", allFlags).Invoke(tt, new object[] { false }).GetType().GetMethod("MoveNext", RedirectorUtils.allFlags), AfterEveryAction);
-                Destroy(tt);
-            }
-            catch (Exception e)
-            {
-                LogUtils.DoErrorLog("ERRO AO CARREGAR HOOKS: {0}\n{1}", e.Message, e.StackTrace);
-            }
-
-            #endregion
-
-        }
-
+        [HarmonyPatch(typeof(TransportTool), "OnEnable")]
+        [HarmonyPostfix]
         public static void OnEnable()
         {
             LogUtils.DoLog("OnEnableTransportTool");
@@ -57,6 +35,8 @@ namespace Klyte.TransportLinesManager.Overrides
             TLMController.Instance.SetCurrentSelectedId(0);
         }
 
+        [HarmonyPatch(typeof(TransportTool), "OnDisable")]
+        [HarmonyPrefix]
         public static void OnDisable()
         {
             LogUtils.DoLog("OnDisableTransportTool");
@@ -64,61 +44,14 @@ namespace Klyte.TransportLinesManager.Overrides
             TLMController.Instance.LineCreationToolbox?.SetVisible(false);
         }
 
-        private static IEnumerable<CodeInstruction> TranspileAfterEveryAction(IEnumerable<CodeInstruction> instructions)
-        {
-            var inst = new List<CodeInstruction>(instructions);
-            MethodInfo AfterEveryAction = typeof(TransportToolOverrides).GetMethod("AfterEveryAction", allFlags);
-            inst.RemoveAt(inst.Count - 1);
-            inst.AddRange(new List<CodeInstruction> {
-                        new CodeInstruction(OpCodes.Ldarg_0),
-                        new CodeInstruction(OpCodes.Call, AfterEveryAction),
-                        new CodeInstruction(OpCodes.Ret),
-                    });
-
-            LogUtils.PrintMethodIL(inst, true);
-            return inst;
-        }
-
-        private static readonly FieldInfo m_lineNumField = typeof(TransportTool).GetField("m_line", RedirectorUtils.allFlags);
-        public static void AfterEveryAction()
-        {
-            if (ToolManager.instance.m_properties?.CurrentTool is TransportTool tt)
-            {
-                ushort lineId = (ushort)m_lineNumField.GetValue(tt);
-                if (lineId > 0)
-                {
-                    new WaitForFixedUpdate();
-                    ThreadHelper.dispatcher.Dispatch(() =>
-                    {
-                        TLMController.Instance.LineCreationToolbox.SyncForm();
-                    });
-                }
-            }
-
-        }
-        public static void AfterEveryActionZeroable()
-        {
-            if (ToolManager.instance.m_properties?.CurrentTool is TransportTool)
-            {
-                ushort lineId = (ushort)m_lineNumField.GetValue(ToolManager.instance.m_properties.CurrentTool as TransportTool);
-                new WaitForFixedUpdate();
-                ThreadHelper.dispatcher.Dispatch(() =>
-                {
-                    TLMController.Instance.LineCreationToolbox.SyncForm();
-                });
-
-            }
-        }
-
-        public Redirector RedirectorInstance { get; } = new Redirector();
-
+        [HarmonyPatch(typeof(TransportTool), "OnToolUpdate")]
+        [HarmonyTranspiler]
         private static IEnumerable<CodeInstruction> TranspileOnToolUpdate(IEnumerable<CodeInstruction> instr)
         {
             bool transpiled = false;
             var instrList = instr.ToList();
             for (int i = 2; i < instrList.Count - 4; i++)
             {
-
                 if (instrList[i - 1].opcode == OpCodes.Ldc_I4_1
                     && instrList[i].opcode == OpCodes.Ldloc_S
                     && instrList[i].operand is LocalBuilder lb
@@ -136,9 +69,9 @@ namespace Klyte.TransportLinesManager.Overrides
                         new CodeInstruction(OpCodes.Ldloc_S, 4),
                         new CodeInstruction(OpCodes.Ldloc_S, 5),
                         new CodeInstruction(OpCodes.Ldarg_0),
-                        new CodeInstruction(OpCodes.Ldfld,typeof(TransportTool).GetField("m_line", allFlags)),
+                        new CodeInstruction(OpCodes.Ldfld,typeof(TransportTool).GetField("m_line", Patcher.allFlags)),
                         new CodeInstruction(OpCodes.Ldarg_0),
-                        new CodeInstruction(OpCodes.Ldfld,typeof(TransportTool).GetField("m_errors", allFlags)),
+                        new CodeInstruction(OpCodes.Ldfld,typeof(TransportTool).GetField("m_errors", Patcher.allFlags)),
                         new CodeInstruction(OpCodes.Ldarg_0),
                         new CodeInstruction(OpCodes.Call, typeof(TransportToolOverrides).GetMethod("ProcessTextTool"))
                     });
@@ -155,12 +88,51 @@ namespace Klyte.TransportLinesManager.Overrides
             return instrList;
         }
 
-        private static readonly ItemClass.SubService[] checkableTransportTypes = new ItemClass.SubService[]
+        private static IEnumerable<CodeInstruction> TranspileAfterEveryAction(IEnumerable<CodeInstruction> instructions)
         {
-            ItemClass.SubService.PublicTransportBus ,
-            ItemClass.SubService.PublicTransportTrolleybus,
-            ItemClass.SubService.PublicTransportTram
-        };
+            var inst = new List<CodeInstruction>(instructions);
+            MethodInfo AfterEveryAction = typeof(TransportToolOverrides).GetMethod("AfterEveryAction", Patcher.allFlags);
+            inst.RemoveAt(inst.Count - 1);
+            inst.AddRange(new List<CodeInstruction> {
+                        new CodeInstruction(OpCodes.Ldarg_0),
+                        new CodeInstruction(OpCodes.Call, AfterEveryAction),
+                        new CodeInstruction(OpCodes.Ret),
+                    });
+
+            LogUtils.PrintMethodIL(inst, true);
+            return inst;
+        }
+
+        public static void AfterEveryAction()
+        {
+            if (ToolManager.instance.m_properties?.CurrentTool is TransportTool tt)
+            {
+                ushort lineId = (ushort)m_lineNumField.GetValue(tt);
+                if (lineId > 0)
+                {
+                    new WaitForFixedUpdate();
+                    ThreadHelper.dispatcher.Dispatch(() =>
+                    {
+                        TLMController.Instance.LineCreationToolbox.SyncForm();
+                    });
+                }
+            }
+
+        }
+
+        public static void AfterEveryActionZeroable()
+        {
+            if (ToolManager.instance.m_properties?.CurrentTool is TransportTool)
+            {
+                ushort lineId = (ushort)m_lineNumField.GetValue(ToolManager.instance.m_properties.CurrentTool as TransportTool);
+                new WaitForFixedUpdate();
+                ThreadHelper.dispatcher.Dispatch(() =>
+                {
+                    TLMController.Instance.LineCreationToolbox.SyncForm();
+                });
+
+            }
+        }
 
         public static string ProcessTextTool(string text, int mode, ushort lastEditLine, ushort tempLine, int hoverStopIndex, int hoverSegmentIndex, Vector3 hitPosition, ushort line, ToolBase.ToolErrors errors, TransportTool tt)
         {
@@ -242,4 +214,36 @@ namespace Klyte.TransportLinesManager.Overrides
 
         private static string GetDistanceColor(float averageLength) => averageLength < 100 ? "red" : averageLength < 250 ? "yellow" : averageLength > 2500 ? "yellow" : "green";
     }
+
+    [HarmonyPatch]
+    public static class AfterEveryActionOverride 
+    {
+        static IEnumerable<MethodBase> TargetMethods()
+        {
+            yield return AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TransportTool), "NewLine"));
+            yield return AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TransportTool), "AddStop"));
+            yield return AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TransportTool), "MoveStop"));
+        }
+
+        public static void Prefix()
+        {
+            TransportToolOverrides.AfterEveryAction();
+        }
+	}
+
+    [HarmonyPatch]
+    public static class AfterEveryActionZeroableOverride 
+    {
+        static IEnumerable<MethodBase> TargetMethods()
+        {
+            yield return AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TransportTool), "RemoveStop"));
+            yield return AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TransportTool), "CancelPrevStop"));
+            yield return AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TransportTool), "CancelMoveStop"));
+        }
+
+        public static void Prefix()
+        {
+            TransportToolOverrides.AfterEveryActionZeroable();
+        }
+	}
 }

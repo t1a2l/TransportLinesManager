@@ -1,18 +1,14 @@
-﻿using Klyte.TransportLinesManager.CommonsWindow;
-using Klyte.TransportLinesManager.UI;
-using HarmonyLib;
+﻿using HarmonyLib;
+using Klyte.TransportLinesManager.CommonsWindow;
 using Klyte.TransportLinesManager.Data.Base;
 using Klyte.TransportLinesManager.Data.TsdImplementations;
 
 namespace Klyte.TransportLinesManager.Overrides
 {
-    [HarmonyPatch(typeof(PublicTransportInfoViewPanel))]
-    internal static class PublicTransportInfoViewPanelOverrides
-    {
-
-        public static TLMLineCreationToolbox Toolbox { get; private set; }
-
-        [HarmonyPatch(typeof(PublicTransportInfoViewPanel), "OpenDetailPanel")]
+    [HarmonyPatch(typeof(ToursInfoViewPanel))]
+	public static class ToursInfoViewPanelOverrides 
+	{
+		[HarmonyPatch(typeof(ToursInfoViewPanel), "OpenDetailPanel")]
         [HarmonyPrefix]
         public static bool OpenDetailPanel(int idx)
         {
@@ -57,19 +53,5 @@ namespace Klyte.TransportLinesManager.Overrides
             TLMPanel.Instance?.OpenAt(def);
             return false;
         }
-
-        [HarmonyPatch(typeof(PublicTransportInfoViewPanel), "OpenDetailPanelDefaultTab")]
-        [HarmonyPrefix]
-        public static bool OpenDetailPanelDefaultTab()
-        {
-            OpenDetailPanel(0);
-            return false;
-        }
-
-        [HarmonyPatch(typeof(PublicTransportInfoViewPanel), "Start")]
-        [HarmonyPrefix]
-        public static void AfterAwake(PublicTransportInfoViewPanel __instance) => Toolbox = __instance.gameObject.AddComponent<TLMLineCreationToolbox>();
-
-    }
-
+	}
 }

@@ -1,30 +1,38 @@
 ﻿using ColossalFramework.Math;
-using Klyte.Commons.Extensions;
-using Klyte.Commons.Utils;
-using System;
-using System.Reflection;
+using HarmonyLib;
 using UnityEngine;
+using System;
 
 namespace Klyte.TransportLinesManager.Overrides
 {
-    public class NetManagerOverrides : MonoBehaviour, IRedirectable
+    [HarmonyPatch(typeof(NetManager))]
+    public static class NetManagerOverrides
     {
-        public Redirector RedirectorInstance { get; set; }
 
-
-        #region Events
         public static event Action<ushort> EventNodeChanged;
         public static event Action<ushort> EventSegmentChanged;
         public static event Action<ushort> EventSegmentReleased;
         public static event Action<ushort> EventSegmentNameChanged;
-
-#pragma warning disable IDE0051 // Remover membros privados não utilizados
-        private static void OnNodeChanged(ref ushort node)
+  
+        [HarmonyPatch(typeof(NetManager), "CreateNode")]
+        [HarmonyPostfix]
+        public static void CreateNode(ref ushort node)
         {
             ushort node_ = node;
             SimulationManager.instance.AddAction(() => EventNodeChanged?.Invoke(node_)).Execute();
         }
-        private static void OnSegmentCreated(ref ushort segment, ref ushort startNode, ref ushort endNode)
+
+        [HarmonyPatch(typeof(NetManager), "ReleaseNode")]
+        [HarmonyPostfix]
+        public static void ReleaseNode(ref ushort node)
+        {
+            ushort node_ = node;
+            SimulationManager.instance.AddAction(() => EventNodeChanged?.Invoke(node_)).Execute();
+        }
+
+        [HarmonyPatch(typeof(NetManager), "CreateSegment", new Type[] { typeof(ushort), typeof(Randomizer), typeof(NetInfo), typeof(TreeInfo), typeof(ushort), typeof(ushort), typeof(Vector3), typeof(Vector3), typeof(uint), typeof(uint), typeof(bool) }, new ArgumentType[] { ArgumentType.Ref, ArgumentType.Ref, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal })]
+        [HarmonyPostfix]
+        public static void CreateSegment(ref ushort segment, ref ushort startNode, ref ushort endNode)
         {
             ushort startNode_ = startNode;
             ushort segment_ = segment;
@@ -37,7 +45,10 @@ namespace Klyte.TransportLinesManager.Overrides
                 EventSegmentChanged?.Invoke(segment_);
             }).Execute();
         }
-        private static void OnSegmentReleased(ref ushort segment)
+
+        [HarmonyPatch(typeof(NetManager), "ReleaseSegment")]
+        [HarmonyPrefix]
+        public static void ReleaseSegment(ref ushort segment)
         {
             ushort segment_ = segment;
             SimulationManager.instance.AddAction(() =>
@@ -48,36 +59,14 @@ namespace Klyte.TransportLinesManager.Overrides
                 EventSegmentReleased?.Invoke(segment_);
             }).Execute();
         }
-        private static void OnSegmentNameChanged(ref ushort segmentID)
+
+        [HarmonyPatch(typeof(NetManager), "SetSegmentNameImpl")]
+        [HarmonyPostfix]
+        public static void SetSegmentNameImpl(ref ushort segmentID)
         {
             ushort segment_ = segmentID;
             SimulationManager.instance.AddAction(() => EventSegmentNameChanged?.Invoke(segment_)).Execute();
         }
-        #endregion
-#pragma warning restore IDE0051 // Remover membros privados não utilizados
-
-        #region Hooking
-
-        public void Awake()
-        {
-            LogUtils.DoLog("Loading Net Manager Overrides");
-            RedirectorInstance = KlyteMonoUtils.CreateElement<Redirector>(transform);
-            #region Net Manager Hooks
-            MethodInfo OnNodeChanged = GetType().GetMethod("OnNodeChanged", RedirectorUtils.allFlags);
-            MethodInfo OnSegmentCreated = GetType().GetMethod("OnSegmentCreated", RedirectorUtils.allFlags);
-            MethodInfo OnSegmentReleased = GetType().GetMethod("OnSegmentReleased", RedirectorUtils.allFlags);
-            MethodInfo OnSegmentNameChanged = GetType().GetMethod("OnSegmentNameChanged", RedirectorUtils.allFlags);
-
-            RedirectorInstance.AddRedirect(typeof(NetManager).GetMethod("CreateNode", RedirectorUtils.allFlags), null, OnNodeChanged);
-            RedirectorInstance.AddRedirect(typeof(NetManager).GetMethod("ReleaseNode", RedirectorUtils.allFlags), null, OnNodeChanged);
-            RedirectorInstance.AddRedirect(typeof(NetManager).GetMethod("CreateSegment", RedirectorUtils.allFlags, null, new[] { typeof(ushort).MakeByRefType(), typeof(Randomizer).MakeByRefType(), typeof(NetInfo), typeof(TreeInfo), typeof(ushort), typeof(ushort), typeof(Vector3), typeof(Vector3), typeof(uint), typeof(uint), typeof(bool) }, null), null, OnSegmentCreated);
-            RedirectorInstance.AddRedirect(typeof(NetManager).GetMethod("ReleaseSegment", RedirectorUtils.allFlags), OnSegmentReleased);
-            RedirectorInstance.AddRedirect(typeof(NetManager).GetMethod("SetSegmentNameImpl", RedirectorUtils.allFlags), null, OnSegmentNameChanged);
-            #endregion
-
-        }
-        #endregion
-
 
     }
 }
