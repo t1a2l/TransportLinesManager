@@ -1,11 +1,13 @@
 ﻿using ColossalFramework.Globalization;
-using Klyte.Commons.Interfaces;
-using Klyte.Commons.UI.Sprites;
+using Klyte.Commons.Interfaces.Warehouse;
+using Klyte.Commons.UI.SpriteNames;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Base.Enums;
+using Klyte.TransportLinesManager.Data.DataContainers;
+using Klyte.TransportLinesManager.Data.TsdImplementations;
 using Klyte.TransportLinesManager.ModShared;
 using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.Xml;
 using System;
 using System.Linq;
 using System.Xml.Serialization;
@@ -487,71 +489,71 @@ namespace Klyte.TransportLinesManager
 
         public static ConfigIndex getConfigTransportSystemForDefinition(TransportSystemDefinition tsd)
         {
-            if (tsd == TransportSystemDefinition.BUS)
+            if (tsd == TransportSystemDefinitionType.BUS)
             {
                 return BUS_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.TRAIN)
+            else if (tsd == TransportSystemDefinitionType.TRAIN)
             {
                 return TRAIN_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.TRAM)
+            else if (tsd == TransportSystemDefinitionType.TRAM)
             {
                 return TRAM_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.SHIP)
+            else if (tsd == TransportSystemDefinitionType.SHIP)
             {
                 return SHIP_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.PLANE)
+            else if (tsd == TransportSystemDefinitionType.PLANE)
             {
                 return PLANE_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.FERRY)
+            else if (tsd == TransportSystemDefinitionType.FERRY)
             {
                 return FERRY_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.BLIMP)
+            else if (tsd == TransportSystemDefinitionType.BLIMP)
             {
                 return BLIMP_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.MONORAIL)
+            else if (tsd == TransportSystemDefinitionType.MONORAIL)
             {
                 return MONORAIL_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.METRO)
+            else if (tsd == TransportSystemDefinitionType.METRO)
             {
                 return METRO_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.EVAC_BUS)
+            else if (tsd == TransportSystemDefinitionType.EVAC_BUS)
             {
                 return EVAC_BUS_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.TOUR_BUS)
+            else if (tsd == TransportSystemDefinitionType.TOUR_BUS)
             {
                 return TOUR_BUS_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.TOUR_PED)
+            else if (tsd == TransportSystemDefinitionType.TOUR_PED)
             {
                 return TOUR_PED_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.CABLE_CAR)
+            else if (tsd == TransportSystemDefinitionType.CABLE_CAR)
             {
                 return CABLE_CAR_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.TAXI)
+            else if (tsd == TransportSystemDefinitionType.TAXI)
             {
                 return TAXI_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.BALLOON)
+            else if (tsd == TransportSystemDefinitionType.BALLOON)
             {
                 return BALLOON_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.HELICOPTER)
+            else if (tsd == TransportSystemDefinitionType.HELICOPTER)
             {
                 return HELICOPTER_CONFIG;
             }
-            else if (tsd == TransportSystemDefinition.TROLLEY)
+            else if (tsd == TransportSystemDefinitionType.TROLLEY)
             {
                 return TROLLEY_CONFIG;
             }
@@ -566,31 +568,31 @@ namespace Klyte.TransportLinesManager
             switch (systemIdx)
             {
                 case BUS_CONFIG:
-                    return TransportSystemDefinition.BUS;
+                    return TransportSystemDefinitionType.BUS;
                 case TRAIN_CONFIG:
-                    return TransportSystemDefinition.TRAIN;
+                    return TransportSystemDefinitionType.TRAIN;
                 case TRAM_CONFIG:
-                    return TransportSystemDefinition.TRAM;
+                    return TransportSystemDefinitionType.TRAM;
                 case SHIP_CONFIG:
-                    return TransportSystemDefinition.SHIP;
+                    return TransportSystemDefinitionType.SHIP;
                 case PLANE_CONFIG:
-                    return TransportSystemDefinition.PLANE;
+                    return TransportSystemDefinitionType.PLANE;
                 case METRO_CONFIG:
-                    return TransportSystemDefinition.METRO;
+                    return TransportSystemDefinitionType.METRO;
                 case MONORAIL_CONFIG:
-                    return TransportSystemDefinition.MONORAIL;
+                    return TransportSystemDefinitionType.MONORAIL;
                 case BLIMP_CONFIG:
-                    return TransportSystemDefinition.BLIMP;
+                    return TransportSystemDefinitionType.BLIMP;
                 case FERRY_CONFIG:
-                    return TransportSystemDefinition.FERRY;
+                    return TransportSystemDefinitionType.FERRY;
                 case TOUR_BUS_CONFIG:
-                    return TransportSystemDefinition.TOUR_BUS;
+                    return TransportSystemDefinitionType.TOUR_BUS;
                 case TOUR_PED_CONFIG:
-                    return TransportSystemDefinition.TOUR_PED;
+                    return TransportSystemDefinitionType.TOUR_PED;
                 case TROLLEY_CONFIG:
-                    return TransportSystemDefinition.TROLLEY;
+                    return TransportSystemDefinitionType.TROLLEY;
                 case HELICOPTER_CONFIG:
-                    return TransportSystemDefinition.HELICOPTER;
+                    return TransportSystemDefinitionType.HELICOPTER;
                 default:
                     return default;
             }
