@@ -1,5 +1,5 @@
 ﻿using Klyte.Commons.UI.SpriteNames;
-using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Tsd;
 using Klyte.TransportLinesManager.Data.Base.Interfaces;
 using Klyte.TransportLinesManager.Utils;
 using System.Xml.Serialization;

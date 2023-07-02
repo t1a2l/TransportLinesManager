@@ -4,8 +4,7 @@ using ColossalFramework;
 using ColossalFramework.Math;
 using HarmonyLib;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Base;
-using Klyte.TransportLinesManager.Data.TsdImplementations;
+using Klyte.TransportLinesManager.Data.Tsd;
 using Klyte.TransportLinesManager.Utils;
 using UnityEngine;
 
@@ -176,7 +175,7 @@ namespace Klyte.TransportLinesManager.Overrides
 		private static void SetRegionalLine(ushort vehicleId, ushort stopId)
         {
             ref Vehicle veh = ref VehicleManager.instance.m_vehicles.m_buffer[vehicleId];
-            if (TransportSystemDefinition.From(veh.Info) == TransportSystemDefinitionType.TRAIN)
+            if (TransportSystemDefinition.From(veh.Info) == TransportSystemDefinition.TRAIN)
             {
                 if (TLMStationUtils.GetStationBuilding(stopId, 0, false) != veh.m_sourceBuilding)
                 {

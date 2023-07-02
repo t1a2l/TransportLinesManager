@@ -1,5 +1,5 @@
 ﻿using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Tsd;
 using System.Collections.Generic;
 
 namespace Klyte.TransportLinesManager.Utils

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Reflection.Emit;
 using System.Reflection;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Tsd;
 using Klyte.TransportLinesManager.Data.DataContainers;
 using Klyte.Commons.Extensions;
 

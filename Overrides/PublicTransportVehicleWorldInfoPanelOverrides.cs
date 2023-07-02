@@ -1,7 +1,7 @@
 ﻿using ColossalFramework;
 using Klyte.TransportLinesManager.CommonsWindow;
 using HarmonyLib;
-using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Tsd;
 
 namespace Klyte.TransportLinesManager.Overrides
 {

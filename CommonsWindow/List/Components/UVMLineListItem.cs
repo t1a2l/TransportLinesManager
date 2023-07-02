@@ -6,7 +6,7 @@ using Klyte.Commons.Extensions.UI;
 using Klyte.Commons.UI;
 using Klyte.Commons.Utils;
 using Klyte.Commons.Utils.StructExtensions;
-using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Tsd;
 using Klyte.TransportLinesManager.Data.Managers;
 using Klyte.TransportLinesManager.Utils;
 using UnityEngine;

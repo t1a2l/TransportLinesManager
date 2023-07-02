@@ -1,7 +1,7 @@
 ﻿using ColossalFramework;
 using Klyte.Commons.Utils.UtilitiesClasses;
 using Klyte.TransportLinesManager.Cache.BuildingData;
-using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Tsd;
 using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
 using Klyte.TransportLinesManager.Data.DataContainers;
 using Klyte.TransportLinesManager.Utils;

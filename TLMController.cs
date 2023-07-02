@@ -5,7 +5,7 @@ using Klyte.Commons.Interfaces;
 using Klyte.Commons.Utils;
 using Klyte.Commons.Utils.StructExtensions;
 using Klyte.TransportLinesManager.Cache.BuildingData;
-using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Tsd;
 using Klyte.TransportLinesManager.Data.DataContainers;
 using Klyte.TransportLinesManager.ModShared;
 using Klyte.TransportLinesManager.Overrides;

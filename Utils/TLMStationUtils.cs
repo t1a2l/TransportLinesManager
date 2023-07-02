@@ -1,8 +1,7 @@
 ﻿using ColossalFramework;
 using Klyte.Commons.Utils;
 using Klyte.TransportLinesManager.Data.Base.Enums;
-using Klyte.TransportLinesManager.Data.Base;
-using Klyte.TransportLinesManager.Data.TsdImplementations;
+using Klyte.TransportLinesManager.Data.Tsd;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -196,20 +195,20 @@ namespace Klyte.TransportLinesManager.Utils
 
         //ORDEM DE BUSCA DE CONFIG
         private static object[] m_searchOrderStationNamingRule = new object[] {
-            TransportSystemDefinitionType.PLANE,
-            TransportSystemDefinitionType.SHIP,
-            TransportSystemDefinitionType.BLIMP,
-            TransportSystemDefinitionType.FERRY,
-            TransportSystemDefinitionType.CABLE_CAR,
-            TransportSystemDefinitionType.TRAIN,
-            TransportSystemDefinitionType.METRO,
-            TransportSystemDefinitionType.MONORAIL,
-            TransportSystemDefinitionType.TRAM,
-            TransportSystemDefinitionType.BUS,
-            TransportSystemDefinitionType.TOUR_PED,
-            TransportSystemDefinitionType.TOUR_BUS,
-            TransportSystemDefinitionType.BALLOON,
-            TransportSystemDefinitionType.TAXI,
+            TransportSystemDefinition.PLANE,
+            TransportSystemDefinition.SHIP,
+            TransportSystemDefinition.BLIMP,
+            TransportSystemDefinition.FERRY,
+            TransportSystemDefinition.CABLE_CAR,
+            TransportSystemDefinition.TRAIN,
+            TransportSystemDefinition.METRO,
+            TransportSystemDefinition.MONORAIL,
+            TransportSystemDefinition.TRAM,
+            TransportSystemDefinition.BUS,
+            TransportSystemDefinition.TOUR_PED,
+            TransportSystemDefinition.TOUR_BUS,
+            TransportSystemDefinition.BALLOON,
+            TransportSystemDefinition.TAXI,
             ItemClass.Service.PublicTransport,
             ItemClass.Service.Monument,
             ItemClass.Service.Beautification,

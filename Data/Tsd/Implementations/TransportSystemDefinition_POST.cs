@@ -1,8 +1,6 @@
-﻿using Klyte.TransportLinesManager.Data.Base;
-
-namespace Klyte.TransportLinesManager.Data.TsdImplementations
+﻿namespace Klyte.TransportLinesManager.Data.Tsd
 {
-    public partial class TransportSystemDefinitionType
+    public partial class TransportSystemDefinition
     {
         public static readonly TransportSystemDefinition POST = new TransportSystemDefinition(
                     ItemClass.SubService.PublicTransportPost,

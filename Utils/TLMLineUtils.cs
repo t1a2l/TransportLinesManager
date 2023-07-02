@@ -9,7 +9,7 @@ using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers;
 using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
 using Klyte.TransportLinesManager.Data.DataContainers;
 using Klyte.TransportLinesManager.Data.Extensions;
-using Klyte.TransportLinesManager.Data.TsdImplementations;
+using Klyte.TransportLinesManager.Data.Tsd;
 using Klyte.TransportLinesManager.Interfaces;
 using Klyte.TransportLinesManager.WorldInfoPanels;
 using System;
@@ -314,7 +314,7 @@ namespace Klyte.TransportLinesManager.Utils
         public static void GetNamingRulesFromTSD(out NamingMode prefix, out Separator s, out NamingMode suffix, out NamingMode nonPrefix, out bool zeros, out bool invertPrefixSuffix, TransportSystemDefinition tsd)
 
         {
-            if (tsd == TransportSystemDefinitionType.EVAC_BUS)
+            if (tsd == TransportSystemDefinition.EVAC_BUS)
             {
                 suffix = NamingMode.Number;
                 s = Separator.Hyphen;
@@ -474,20 +474,20 @@ namespace Klyte.TransportLinesManager.Utils
                 return null;
             }
             string transportTypeLetter =
-              tsd == TransportSystemDefinitionType.PLANE ? "A"
-            : tsd == TransportSystemDefinitionType.SHIP ? "B"
-            : tsd == TransportSystemDefinitionType.BLIMP ? "C"
-            : tsd == TransportSystemDefinitionType.HELICOPTER ? "D"
-            : tsd == TransportSystemDefinitionType.TRAIN ? "E"
-            : tsd == TransportSystemDefinitionType.FERRY ? "F"
-            : tsd == TransportSystemDefinitionType.MONORAIL ? "G"
-            : tsd == TransportSystemDefinitionType.METRO ? "H"
-            : tsd == TransportSystemDefinitionType.CABLE_CAR ? "I"
-            : tsd == TransportSystemDefinitionType.TROLLEY ? "J"
-            : tsd == TransportSystemDefinitionType.TRAM ? "K"
-            : tsd == TransportSystemDefinitionType.BUS ? "L"
-            : tsd == TransportSystemDefinitionType.TOUR_BUS ? "M"
-            : tsd == TransportSystemDefinitionType.TOUR_PED ? "N"
+              tsd == TransportSystemDefinition.PLANE ? "A"
+            : tsd == TransportSystemDefinition.SHIP ? "B"
+            : tsd == TransportSystemDefinition.BLIMP ? "C"
+            : tsd == TransportSystemDefinition.HELICOPTER ? "D"
+            : tsd == TransportSystemDefinition.TRAIN ? "E"
+            : tsd == TransportSystemDefinition.FERRY ? "F"
+            : tsd == TransportSystemDefinition.MONORAIL ? "G"
+            : tsd == TransportSystemDefinition.METRO ? "H"
+            : tsd == TransportSystemDefinition.CABLE_CAR ? "I"
+            : tsd == TransportSystemDefinition.TROLLEY ? "J"
+            : tsd == TransportSystemDefinition.TRAM ? "K"
+            : tsd == TransportSystemDefinition.BUS ? "L"
+            : tsd == TransportSystemDefinition.TOUR_BUS ? "M"
+            : tsd == TransportSystemDefinition.TOUR_PED ? "N"
             : "";
             return transportTypeLetter + GetLineStringId(s, regional);
         }

@@ -3,9 +3,8 @@ using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Klyte.Commons.UI.SpriteNames;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Tsd;
 using Klyte.TransportLinesManager.Data.Extensions;
-using Klyte.TransportLinesManager.Data.TsdImplementations;
 using Klyte.TransportLinesManager.Interfaces;
 using Klyte.TransportLinesManager.Palettes;
 using Klyte.Commons.Utils.UtilitiesClasses;
@@ -22,7 +21,7 @@ namespace Klyte.TransportLinesManager.Utils
 
         #region Prefix Operations
 
-        public static bool HasPrefix(TransportSystemDefinition tsd) => tsd != default && tsd != TransportSystemDefinitionType.EVAC_BUS && tsd.GetConfig().Prefix != NamingMode.None;
+        public static bool HasPrefix(TransportSystemDefinition tsd) => tsd != default && tsd != TransportSystemDefinition.EVAC_BUS && tsd.GetConfig().Prefix != NamingMode.None;
 
         public static bool HasPrefix(ref TransportLine t) => HasPrefix(TransportSystemDefinition.GetDefinitionForLine(ref t));
 

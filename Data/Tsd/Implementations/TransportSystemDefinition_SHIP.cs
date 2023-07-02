@@ -1,10 +1,9 @@
 ﻿using Klyte.Commons.UI.SpriteNames;
-using Klyte.TransportLinesManager.Data.Base;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Data.TsdImplementations
+namespace Klyte.TransportLinesManager.Data.Tsd
 {
-    public partial class TransportSystemDefinitionType
+    public partial class TransportSystemDefinition
     {
         public static readonly TransportSystemDefinition SHIP = new TransportSystemDefinition(
                     ItemClass.SubService.PublicTransportShip,

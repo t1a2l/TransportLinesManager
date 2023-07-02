@@ -1,6 +1,6 @@
 ﻿using ColossalFramework;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Tsd;
 using Klyte.TransportLinesManager.Data.DataContainers;
 
 namespace Klyte.TransportLinesManager.Utils

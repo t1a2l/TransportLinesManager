@@ -4,7 +4,7 @@ using ICities;
 using Klyte.Commons.Extensions.UI;
 using Klyte.Commons.UI.SpriteNames;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Tsd;
 using Klyte.TransportLinesManager.Data.DataContainers;
 using Klyte.TransportLinesManager.Data.Extensions;
 using Klyte.TransportLinesManager.Interfaces;

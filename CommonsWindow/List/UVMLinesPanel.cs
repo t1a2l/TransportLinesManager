@@ -6,9 +6,8 @@ using Klyte.Commons.UI.SpriteNames;
 using Klyte.Commons.Utils;
 using Klyte.Commons.Utils.UtilitiesClasses;
 using Klyte.TransportLinesManager.CommonsWindow.List.Components;
-using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Tsd;
 using Klyte.TransportLinesManager.Data.Managers;
-using Klyte.TransportLinesManager.Data.TsdImplementations;
 using Klyte.TransportLinesManager.Utils;
 using System;
 using System.Collections.Generic;
@@ -41,7 +40,7 @@ namespace Klyte.TransportLinesManager.CommonsWindow.List
         protected UITemplateList<UIPanel> lineItems;
         private UIScrollablePanel listPanel;
         protected UILabel m_countLines;
-        private TransportSystemDefinition m_tsd = TransportSystemDefinitionType.BUS;
+        private TransportSystemDefinition m_tsd = TransportSystemDefinition.BUS;
 
 
         private bool m_isUpdated;

@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using Klyte.TransportLinesManager.CommonsWindow;
-using Klyte.TransportLinesManager.Data.Base;
-using Klyte.TransportLinesManager.Data.TsdImplementations;
+using Klyte.TransportLinesManager.Data.Tsd;
 
 namespace Klyte.TransportLinesManager.Overrides
 {
@@ -16,37 +15,37 @@ namespace Klyte.TransportLinesManager.Overrides
             switch (idx)
             {
                 case 0:
-                    def = TransportSystemDefinitionType.BUS;
+                    def = TransportSystemDefinition.BUS;
                     break;
                 case 1:
-                    def = TransportSystemDefinitionType.TROLLEY;
+                    def = TransportSystemDefinition.TROLLEY;
                     break;
                 case 2:
-                    def = TransportSystemDefinitionType.TRAM;
+                    def = TransportSystemDefinition.TRAM;
                     break;
                 case 3:
-                    def = TransportSystemDefinitionType.METRO;
+                    def = TransportSystemDefinition.METRO;
                     break;
                 case 4:
-                    def = TransportSystemDefinitionType.TRAIN;
+                    def = TransportSystemDefinition.TRAIN;
                     break;
                 case 5:
-                    def = TransportSystemDefinitionType.FERRY;
+                    def = TransportSystemDefinition.FERRY;
                     break;
                 case 6:
-                    def = TransportSystemDefinitionType.BLIMP;
+                    def = TransportSystemDefinition.BLIMP;
                     break;
                 case 7:
-                    def = TransportSystemDefinitionType.MONORAIL;
+                    def = TransportSystemDefinition.MONORAIL;
                     break;
                 case 9:
-                    def = TransportSystemDefinitionType.TOUR_PED;
+                    def = TransportSystemDefinition.TOUR_PED;
                     break;
                 case 10:
-                    def = TransportSystemDefinitionType.TOUR_BUS;
+                    def = TransportSystemDefinition.TOUR_BUS;
                     break;
                 default:
-                    def = TransportSystemDefinitionType.BUS;
+                    def = TransportSystemDefinition.BUS;
                     break;
             }
 

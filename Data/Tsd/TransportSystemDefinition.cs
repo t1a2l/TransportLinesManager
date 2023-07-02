@@ -12,9 +12,8 @@ using System.Linq;
 using UnityEngine;
 using static TransferManager;
 using Klyte.TransportLinesManager.Data.DataContainers;
-using Klyte.TransportLinesManager.Data.TsdImplementations;
 
-namespace Klyte.TransportLinesManager.Data.Base
+namespace Klyte.TransportLinesManager.Data.Tsd
 {
     public partial class TransportSystemDefinition : IIdentifiable
     {
@@ -22,25 +21,25 @@ namespace Klyte.TransportLinesManager.Data.Base
 
         static TransportSystemDefinition() => registeredTsd = new NonSequentialList<TransportSystemDefinition>()
         {
-            [0] = TransportSystemDefinitionType.BUS,
-            [0] = TransportSystemDefinitionType.BLIMP,
-            [0] = TransportSystemDefinitionType.BALLOON,
-            [0] = TransportSystemDefinitionType.CABLE_CAR,
-            [0] = TransportSystemDefinitionType.EVAC_BUS,
-            [0] = TransportSystemDefinitionType.FERRY,
-            [0] = TransportSystemDefinitionType.HELICOPTER,
-            [0] = TransportSystemDefinitionType.METRO,
-            [0] = TransportSystemDefinitionType.MONORAIL,
-            [0] = TransportSystemDefinitionType.PLANE,
-            [0] = TransportSystemDefinitionType.POST,
-            [0] = TransportSystemDefinitionType.SHIP,
-            [0] = TransportSystemDefinitionType.TAXI,
-            [0] = TransportSystemDefinitionType.TOUR_BUS,
-            [0] = TransportSystemDefinitionType.TOUR_PED,
-            [0] = TransportSystemDefinitionType.TRAIN,
-            [0] = TransportSystemDefinitionType.TRAM,
-            [0] = TransportSystemDefinitionType.TROLLEY,
-            [0] = TransportSystemDefinitionType.FISHING,
+            [0] = BUS,
+            [0] = BLIMP,
+            [0] = BALLOON,
+            [0] = CABLE_CAR,
+            [0] = EVAC_BUS,
+            [0] = FERRY,
+            [0] = HELICOPTER,
+            [0] = METRO,
+            [0] = MONORAIL,
+            [0] = PLANE,
+            [0] = POST,
+            [0] = SHIP,
+            [0] = TAXI,
+            [0] = TOUR_BUS,
+            [0] = TOUR_PED,
+            [0] = TRAIN,
+            [0] = TRAM,
+            [0] = TROLLEY,
+            [0] = FISHING,
         };
 
         private static readonly Dictionary<TransportSystemDefinition, TransportInfoContainer> m_infoList = new Dictionary<TransportSystemDefinition, TransportInfoContainer>();
@@ -200,7 +199,7 @@ namespace Klyte.TransportLinesManager.Data.Base
 
         public ITLMTransportTypeExtension GetTransportExtension() => TLMTransportTypeDataContainer.Instance?.SafeGet(Index_Internal);
         public bool IsTour() => SubService == ItemClass.SubService.PublicTransportTours;
-        public bool IsShelterAiDepot() => this == TransportSystemDefinitionType.EVAC_BUS;
+        public bool IsShelterAiDepot() => this == EVAC_BUS;
         public bool HasVehicles() => VehicleType != VehicleInfo.VehicleType.None;
         public bool IsPrefixable()
         {
@@ -408,10 +407,10 @@ namespace Klyte.TransportLinesManager.Data.Base
         }
 
         public bool IsIntercityBusConnection(BuildingInfo connectionInfo)
-            => connectionInfo.m_class.m_service == ItemClass.Service.Road && this == TransportSystemDefinitionType.BUS && connectionInfo.m_class.m_subService == ItemClass.SubService.None;
+            => connectionInfo.m_class.m_service == ItemClass.Service.Road && this == BUS && connectionInfo.m_class.m_subService == ItemClass.SubService.None;
         
         public bool IsIntercityBusConnectionTrack(NetInfo trackInfo)
-            => trackInfo.m_class.m_service == ItemClass.Service.Road && this == TransportSystemDefinitionType.BUS && trackInfo.m_class.m_subService == ItemClass.SubService.None;
+            => trackInfo.m_class.m_service == ItemClass.Service.Road && this == BUS && trackInfo.m_class.m_subService == ItemClass.SubService.None;
         
         public bool IsValidOutsideConnection(ushort outsideConnectionBuildingId)
             => BuildingManager.instance.m_buildings.m_buffer[outsideConnectionBuildingId].Info is BuildingInfo outsideConn
@@ -492,22 +491,22 @@ namespace Klyte.TransportLinesManager.Data.Base
         public TLMTransportTypeConfigurationsXML GetConfig() => TLMBaseConfigXML.CurrentContextConfig.GetTransportData(this);
 
         public string GetTransportName() =>
-              this == TransportSystemDefinitionType.TRAIN ? Locale.Get("VEHICLE_TITLE", "Train Engine")
-            : this == TransportSystemDefinitionType.TRAM ? Locale.Get("VEHICLE_TITLE", "Tram")
-            : this == TransportSystemDefinitionType.METRO ? Locale.Get("VEHICLE_TITLE", "Metro")
-            : this == TransportSystemDefinitionType.BUS ? Locale.Get("VEHICLE_TITLE", "Bus")
-            : this == TransportSystemDefinitionType.PLANE ? Locale.Get("VEHICLE_TITLE", "Aircraft Passenger")
-            : this == TransportSystemDefinitionType.SHIP ? Locale.Get("VEHICLE_TITLE", "Ship Passenger")
-            : this == TransportSystemDefinitionType.BLIMP ? Locale.Get("VEHICLE_TITLE", "Blimp")
-            : this == TransportSystemDefinitionType.FERRY ? Locale.Get("VEHICLE_TITLE", "Ferry")
-            : this == TransportSystemDefinitionType.MONORAIL ? Locale.Get("VEHICLE_TITLE", "Monorail Front")
-            : this == TransportSystemDefinitionType.EVAC_BUS ? Locale.Get("VEHICLE_TITLE", "Evacuation Bus")
-            : this == TransportSystemDefinitionType.TOUR_BUS ? Locale.Get("TOOLTIP_TOURISTBUSLINES")
-            : this == TransportSystemDefinitionType.TOUR_PED ? Locale.Get("TOOLTIP_WALKINGTOURS")
-            : this == TransportSystemDefinitionType.CABLE_CAR ? Locale.Get("VEHICLE_TITLE", "Cable Car")
-            : this == TransportSystemDefinitionType.TAXI ? Locale.Get("VEHICLE_TITLE", "Taxi")
-            : this == TransportSystemDefinitionType.HELICOPTER ? Locale.Get("VEHICLE_TITLE", "Passenger Helicopter")
-            : this == TransportSystemDefinitionType.TROLLEY ? Locale.Get("VEHICLE_TITLE", "Trolleybus 01")
+              this == TRAIN ? Locale.Get("VEHICLE_TITLE", "Train Engine")
+            : this == TRAM ? Locale.Get("VEHICLE_TITLE", "Tram")
+            : this == METRO ? Locale.Get("VEHICLE_TITLE", "Metro")
+            : this == BUS ? Locale.Get("VEHICLE_TITLE", "Bus")
+            : this == PLANE ? Locale.Get("VEHICLE_TITLE", "Aircraft Passenger")
+            : this == SHIP ? Locale.Get("VEHICLE_TITLE", "Ship Passenger")
+            : this == BLIMP ? Locale.Get("VEHICLE_TITLE", "Blimp")
+            : this == FERRY ? Locale.Get("VEHICLE_TITLE", "Ferry")
+            : this == MONORAIL ? Locale.Get("VEHICLE_TITLE", "Monorail Front")
+            : this == EVAC_BUS ? Locale.Get("VEHICLE_TITLE", "Evacuation Bus")
+            : this == TOUR_BUS ? Locale.Get("TOOLTIP_TOURISTBUSLINES")
+            : this == TOUR_PED ? Locale.Get("TOOLTIP_WALKINGTOURS")
+            : this == CABLE_CAR ? Locale.Get("VEHICLE_TITLE", "Cable Car")
+            : this == TAXI ? Locale.Get("VEHICLE_TITLE", "Taxi")
+            : this == HELICOPTER ? Locale.Get("VEHICLE_TITLE", "Passenger Helicopter")
+            : this == TROLLEY ? Locale.Get("VEHICLE_TITLE", "Trolleybus 01")
             : "???";
 
         public bool CanHaveTerminals() => TLMController.Instance.ConnectorWTS.WtsAvailable ||
