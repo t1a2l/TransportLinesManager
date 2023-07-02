@@ -1,8 +1,7 @@
 ﻿using Klyte.Commons.Interfaces;
-using Klyte.TransportLinesManager.Extensions;
 using System.Xml.Serialization;
 
-namespace Klyte.TransportLinesManager.Xml
+namespace Klyte.TransportLinesManager.Data.Base
 {
     public abstract class TsdIdentifiable : IIdentifiable
     {

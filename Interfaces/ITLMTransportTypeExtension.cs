@@ -1,5 +1,5 @@
-﻿using Klyte.Commons.UI.Sprites;
-using Klyte.TransportLinesManager.Xml;
+﻿using Klyte.Commons.UI.SpriteNames;
+using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers;
 
 namespace Klyte.TransportLinesManager.Interfaces
 {

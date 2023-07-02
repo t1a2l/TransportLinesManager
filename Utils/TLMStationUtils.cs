@@ -1,13 +1,15 @@
 ﻿using ColossalFramework;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
-using Klyte.TransportLinesManager.Xml;
+using Klyte.TransportLinesManager.Data.Base.Enums;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.TsdImplementations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static ItemClass;
-
+using Klyte.TransportLinesManager.Data.Extensions;
+using Klyte.TransportLinesManager.Data.Base.Interfaces;
 
 namespace Klyte.TransportLinesManager.Utils
 {
@@ -36,12 +38,12 @@ namespace Klyte.TransportLinesManager.Utils
             }
         }
 
-
         public static IEnumerator<object> SetNodeName(ushort nodeId, string name, Action function)
         {
             yield return Singleton<SimulationManager>.instance.AddAction<bool>(SetNodeName(nodeId, name));
             function();
         }
+
         public static string GetStopName(ushort stopId)
         {
             InstanceID id = new InstanceID
@@ -194,20 +196,20 @@ namespace Klyte.TransportLinesManager.Utils
 
         //ORDEM DE BUSCA DE CONFIG
         private static object[] m_searchOrderStationNamingRule = new object[] {
-            TransportSystemDefinition.PLANE,
-            TransportSystemDefinition.SHIP,
-            TransportSystemDefinition.BLIMP,
-            TransportSystemDefinition.FERRY,
-            TransportSystemDefinition.CABLE_CAR,
-            TransportSystemDefinition.TRAIN,
-            TransportSystemDefinition.METRO,
-            TransportSystemDefinition.MONORAIL,
-            TransportSystemDefinition.TRAM,
-            TransportSystemDefinition.BUS,
-            TransportSystemDefinition.TOUR_PED,
-            TransportSystemDefinition.TOUR_BUS,
-            TransportSystemDefinition.BALLOON,
-            TransportSystemDefinition.TAXI,
+            TransportSystemDefinitionType.PLANE,
+            TransportSystemDefinitionType.SHIP,
+            TransportSystemDefinitionType.BLIMP,
+            TransportSystemDefinitionType.FERRY,
+            TransportSystemDefinitionType.CABLE_CAR,
+            TransportSystemDefinitionType.TRAIN,
+            TransportSystemDefinitionType.METRO,
+            TransportSystemDefinitionType.MONORAIL,
+            TransportSystemDefinitionType.TRAM,
+            TransportSystemDefinitionType.BUS,
+            TransportSystemDefinitionType.TOUR_PED,
+            TransportSystemDefinitionType.TOUR_BUS,
+            TransportSystemDefinitionType.BALLOON,
+            TransportSystemDefinitionType.TAXI,
             ItemClass.Service.PublicTransport,
             ItemClass.Service.Monument,
             ItemClass.Service.Beautification,
@@ -234,13 +236,14 @@ namespace Klyte.TransportLinesManager.Utils
             TLMSpecialNamingClass.Address,
         };
 
-
         public static string GetStationName(ushort stopId, ushort lineId, ItemClass.SubService ss, bool fromBuilding) => GetStationName(stopId, lineId, ss, out _, out _, out _, out _, out _, fromBuilding, excludeCargo: true);
+        
         public static string GetFullStationName(ushort stopId, ushort lineId, ItemClass.SubService ss, bool fromBuilding)
         {
             string result = GetStationName(stopId, lineId, ss, out _, out _, out string prefix, out _, out _, fromBuilding, true, false, false);
             return string.IsNullOrEmpty(prefix) ? result : prefix + " " + result;
         }
+        
         public static Vector3 GetStationBuildingPosition(uint stopId, ItemClass.SubService ss)
         {
             ushort buildingId = GetStationBuilding(stopId, ss);

@@ -1,10 +1,9 @@
-﻿using Klyte.Commons.UI.Sprites;
-using Klyte.TransportLinesManager.Interfaces;
-using UnityEngine;
+﻿using UnityEngine;
+using Klyte.TransportLinesManager.Data.Base;
 
-namespace Klyte.TransportLinesManager.Extensions
+namespace Klyte.TransportLinesManager.Data.TsdImplementations
 {
-    public partial class TransportSystemDefinition
+    public partial class TransportSystemDefinitionType
     {
         public static readonly TransportSystemDefinition FISHING = new TransportSystemDefinition(
                     ItemClass.SubService.None,

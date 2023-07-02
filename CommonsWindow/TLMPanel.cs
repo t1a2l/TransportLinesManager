@@ -1,7 +1,8 @@
 ﻿using ColossalFramework.UI;
 using Klyte.Commons.Interfaces;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
+using Klyte.TransportLinesManager.CommonsWindow.List;
+using Klyte.TransportLinesManager.Data.Base;
 using Klyte.TransportLinesManager.Utils;
 using System.Linq;
 using UnityEngine;

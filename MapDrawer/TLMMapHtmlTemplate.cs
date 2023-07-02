@@ -1,9 +1,8 @@
-﻿using Klyte.Commons.i18n;
+﻿using Klyte.Commons.UI.i18n;
 using Klyte.Commons.Utils;
 using System;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 /**
    OBS: Mudar a forma de pintar as linhas, criar caminhos comuns entre estações iguais (ajuda no tram)
    ver como fazer linhas de sentido único no tram

@@ -1,7 +1,7 @@
 ﻿using ColossalFramework;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
-using Klyte.TransportLinesManager.Xml;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.DataContainers;
 
 namespace Klyte.TransportLinesManager.Utils
 {

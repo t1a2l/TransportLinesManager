@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager
+namespace Klyte.TransportLinesManager.Palettes
 {
     public class TLMAutoColorPaletteContainer
     {

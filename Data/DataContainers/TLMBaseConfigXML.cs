@@ -1,7 +1,10 @@
 ﻿using ICities;
-using Klyte.Commons.Interfaces;
+using Klyte.Commons.Interfaces.Warehouse;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
+using Klyte.Commons.Utils.UtilitiesClasses;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers;
+using Klyte.TransportLinesManager.Data.Base.Enums;
 using Klyte.TransportLinesManager.OptionsMenu;
 using System;
 using System.Collections;
@@ -9,7 +12,7 @@ using System.IO;
 using System.Xml.Serialization;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Xml
+namespace Klyte.TransportLinesManager.Data.DataContainers
 {
     [XmlRoot("TLMBaseConfig")]
     public class TLMBaseConfigXML : DataExtensionBase<TLMBaseConfigXML>

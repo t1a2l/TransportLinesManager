@@ -1,7 +1,7 @@
 ﻿using Klyte.Commons.Interfaces;
 using System.Xml.Serialization;
 
-namespace Klyte.TransportLinesManager.Extensions
+namespace Klyte.TransportLinesManager.Data.Base.ConfigurationContainers
 {
     public class TLMStopsConfiguration : IIdentifiable
     {

@@ -1,9 +1,10 @@
-﻿using Klyte.Commons.UI.Sprites;
+﻿using Klyte.Commons.UI.SpriteNames;
+using Klyte.TransportLinesManager.Data.Base;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Extensions
+namespace Klyte.TransportLinesManager.Data.TsdImplementations
 {
-    public partial class TransportSystemDefinition
+    public partial class TransportSystemDefinitionType
     {
         public static readonly TransportSystemDefinition MONORAIL = new TransportSystemDefinition(
                     ItemClass.SubService.PublicTransportMonorail,

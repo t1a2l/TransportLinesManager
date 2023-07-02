@@ -1,5 +1,5 @@
 ﻿using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
+using Klyte.TransportLinesManager.Data.Base;
 using System.Collections.Generic;
 
 namespace Klyte.TransportLinesManager.Utils
@@ -10,12 +10,11 @@ namespace Klyte.TransportLinesManager.Utils
         internal static List<string> LoadBasicAssets(TransportSystemDefinition definition)
         {
             var basicAssetsList = new List<string>();
-
             LogUtils.DoLog("LoadBasicAssets: pre prefab read");
-            foreach (var prefabEntry in VehiclesIndexes.instance.PrefabsLoaded)
+            for (uint i = 0; i < PrefabCollection<VehicleInfo>.PrefabCount(); i++)
             {
-                VehicleInfo prefab = prefabEntry.Value;
-                if (!(prefab is null) && definition.IsFromSystem(prefab) && !VehicleUtils.IsTrailer(prefab))
+                VehicleInfo prefab = PrefabCollection<VehicleInfo>.GetPrefab(i);
+                if (prefab != null && definition.IsFromSystem(prefab))
                 {
                     basicAssetsList.Add(prefab.name);
                 }
@@ -30,10 +29,10 @@ namespace Klyte.TransportLinesManager.Utils
                 return basicAssetsList;
             }
             LogUtils.DoLog("LoadBasicAssetsIntercity: pre prefab read");
-            foreach (var prefabEntry in VehiclesIndexes.instance.PrefabsLoaded)
+            for (uint i = 0; i < PrefabCollection<VehicleInfo>.PrefabCount(); i++)
             {
-                VehicleInfo prefab = prefabEntry.Value;
-                if (!(prefab is null) && definition.IsFromSystemIntercity(prefab) && !VehicleUtils.IsTrailer(prefab))
+                VehicleInfo prefab = PrefabCollection<VehicleInfo>.GetPrefab(i);
+                if (prefab != null && definition.IsFromSystemIntercity(prefab))
                 {
                     basicAssetsList.Add(prefab.name);
                 }

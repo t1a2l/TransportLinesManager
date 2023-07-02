@@ -1,17 +1,21 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions;
+using Klyte.Commons.Extensions.UI;
 using Klyte.Commons.UI.SpriteNames;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
+using Klyte.Commons.Utils.UtilitiesClasses;
+using Klyte.TransportLinesManager.CommonsWindow.List.Components;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Managers;
+using Klyte.TransportLinesManager.Data.TsdImplementations;
 using Klyte.TransportLinesManager.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.CommonsWindow
+namespace Klyte.TransportLinesManager.CommonsWindow.List
 {
 
     internal class UVMLinesPanel : UICustomControl
@@ -37,7 +41,7 @@ namespace Klyte.TransportLinesManager.CommonsWindow
         protected UITemplateList<UIPanel> lineItems;
         private UIScrollablePanel listPanel;
         protected UILabel m_countLines;
-        private TransportSystemDefinition m_tsd = TransportSystemDefinition.BUS;
+        private TransportSystemDefinition m_tsd = TransportSystemDefinitionType.BUS;
 
 
         private bool m_isUpdated;

@@ -1,12 +1,12 @@
 ﻿using Klyte.Commons.Interfaces;
-using Klyte.Commons.UI.Sprites;
-using Klyte.Commons.Utils;
+using Klyte.Commons.UI.SpriteNames;
+using Klyte.Commons.Utils.StructExtensions;
 using Klyte.TransportLinesManager.ModShared;
 using System;
 using System.Xml.Serialization;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Extensions
+namespace Klyte.TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections
 {
     public class OutsideConnectionLineInfo : IIdentifiable
     {

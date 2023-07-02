@@ -1,14 +1,17 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.UI.Sprites;
+using Klyte.Commons.UI.SpriteNames;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Extensions;
+using Klyte.TransportLinesManager.Data.TsdImplementations;
 using Klyte.TransportLinesManager.Interfaces;
+using Klyte.TransportLinesManager.Palettes;
+using Klyte.Commons.Utils.UtilitiesClasses;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static Klyte.Commons.Utils.NumberArrays;
 
 
 namespace Klyte.TransportLinesManager.Utils
@@ -19,7 +22,7 @@ namespace Klyte.TransportLinesManager.Utils
 
         #region Prefix Operations
 
-        public static bool HasPrefix(TransportSystemDefinition tsd) => tsd != default && tsd != TransportSystemDefinition.EVAC_BUS && tsd.GetConfig().Prefix != NamingMode.None;
+        public static bool HasPrefix(TransportSystemDefinition tsd) => tsd != default && tsd != TransportSystemDefinitionType.EVAC_BUS && tsd.GetConfig().Prefix != NamingMode.None;
 
         public static bool HasPrefix(ref TransportLine t) => HasPrefix(TransportSystemDefinition.GetDefinitionForLine(ref t));
 
@@ -125,27 +128,27 @@ namespace Klyte.TransportLinesManager.Utils
             {
                 case NamingMode.GreekUpper:
                 case NamingMode.GreekUpperNumber:
-                    AddToArrayWithName(gregoMaiusculo, saida, tsd, useNameRefSystem);
+                    AddToArrayWithName(NumberArrays.gregoMaiusculo, saida, tsd, useNameRefSystem);
                     break;
                 case NamingMode.GreekLower:
                 case NamingMode.GreekLowerNumber:
-                    AddToArrayWithName(gregoMinusculo, saida, tsd, useNameRefSystem);
+                    AddToArrayWithName(NumberArrays.gregoMinusculo, saida, tsd, useNameRefSystem);
                     break;
                 case NamingMode.CyrillicUpper:
                 case NamingMode.CyrillicUpperUpper:
-                    AddToArrayWithName(cirilicoMaiusculo, saida, tsd, useNameRefSystem);
+                    AddToArrayWithName(NumberArrays.cirilicoMaiusculo, saida, tsd, useNameRefSystem);
                     break;
                 case NamingMode.CyrillicLower:
                 case NamingMode.CyrillicLowerNumber:
-                    AddToArrayWithName(cirilicoMinusculo, saida, tsd, useNameRefSystem);
+                    AddToArrayWithName(NumberArrays.cirilicoMinusculo, saida, tsd, useNameRefSystem);
                     break;
                 case NamingMode.LatinUpper:
                 case NamingMode.LatinUpperNumber:
-                    AddToArrayWithName(latinoMaiusculo, saida, tsd, useNameRefSystem);
+                    AddToArrayWithName(NumberArrays.latinoMaiusculo, saida, tsd, useNameRefSystem);
                     break;
                 case NamingMode.LatinLower:
                 case NamingMode.LatinLowerNumber:
-                    AddToArrayWithName(latinoMinusculo, saida, tsd, useNameRefSystem);
+                    AddToArrayWithName(NumberArrays.latinoMinusculo, saida, tsd, useNameRefSystem);
                     break;
                 case NamingMode.Number:
                     string[] temp = new string[64];
@@ -166,7 +169,7 @@ namespace Klyte.TransportLinesManager.Utils
             }
             if (TLMLineUtils.m_numberedNamingTypes.Contains(prefixNamingMode))
             {
-                AddToArrayWithName(numeros, saida, tsd, useNameRefSystem);
+                AddToArrayWithName(NumberArrays.numeros, saida, tsd, useNameRefSystem);
             }
             if (!noneOption && !showUnprefixed)
             {
@@ -186,27 +189,27 @@ namespace Klyte.TransportLinesManager.Utils
             {
                 case NamingMode.GreekUpper:
                 case NamingMode.GreekUpperNumber:
-                    saida.AddRange(gregoMaiusculo);
+                    saida.AddRange(NumberArrays.gregoMaiusculo);
                     break;
                 case NamingMode.GreekLower:
                 case NamingMode.GreekLowerNumber:
-                    saida.AddRange(gregoMinusculo);
+                    saida.AddRange(NumberArrays.gregoMinusculo);
                     break;
                 case NamingMode.CyrillicUpper:
                 case NamingMode.CyrillicUpperUpper:
-                    saida.AddRange(cirilicoMaiusculo);
+                    saida.AddRange(NumberArrays.cirilicoMaiusculo);
                     break;
                 case NamingMode.CyrillicLower:
                 case NamingMode.CyrillicLowerNumber:
-                    saida.AddRange(cirilicoMinusculo);
+                    saida.AddRange(NumberArrays.cirilicoMinusculo);
                     break;
                 case NamingMode.LatinUpper:
                 case NamingMode.LatinUpperNumber:
-                    saida.AddRange(latinoMaiusculo);
+                    saida.AddRange(NumberArrays.latinoMaiusculo);
                     break;
                 case NamingMode.LatinLower:
                 case NamingMode.LatinLowerNumber:
-                    saida.AddRange(latinoMinusculo);
+                    saida.AddRange(NumberArrays.latinoMinusculo);
                     break;
                 case NamingMode.Number:
                     string[] temp = new string[64];
@@ -227,7 +230,7 @@ namespace Klyte.TransportLinesManager.Utils
             }
             if (TLMLineUtils.m_numberedNamingTypes.Contains(prefixNamingMode))
             {
-                saida.AddRange(numeros);
+                saida.AddRange(NumberArrays.numeros);
             }
             return saida.ToArray();
         }
@@ -277,27 +280,27 @@ namespace Klyte.TransportLinesManager.Utils
             {
                 case NamingMode.GreekUpper:
                 case NamingMode.GreekUpperNumber:
-                    saida.AddRange(gregoMaiusculo.Select(x => x.ToString()));
+                    saida.AddRange(NumberArrays.gregoMaiusculo.Select(x => x.ToString()));
                     break;
                 case NamingMode.GreekLower:
                 case NamingMode.GreekLowerNumber:
-                    saida.AddRange(gregoMinusculo.Select(x => x.ToString()));
+                    saida.AddRange(NumberArrays.gregoMinusculo.Select(x => x.ToString()));
                     break;
                 case NamingMode.CyrillicUpper:
                 case NamingMode.CyrillicUpperUpper:
-                    saida.AddRange(cirilicoMaiusculo.Select(x => x.ToString()));
+                    saida.AddRange(NumberArrays.cirilicoMaiusculo.Select(x => x.ToString()));
                     break;
                 case NamingMode.CyrillicLower:
                 case NamingMode.CyrillicLowerNumber:
-                    saida.AddRange(cirilicoMinusculo.Select(x => x.ToString()));
+                    saida.AddRange(NumberArrays.cirilicoMinusculo.Select(x => x.ToString()));
                     break;
                 case NamingMode.LatinUpper:
                 case NamingMode.LatinUpperNumber:
-                    saida.AddRange(latinoMaiusculo.Select(x => x.ToString()));
+                    saida.AddRange(NumberArrays.latinoMaiusculo.Select(x => x.ToString()));
                     break;
                 case NamingMode.LatinLower:
                 case NamingMode.LatinLowerNumber:
-                    saida.AddRange(latinoMinusculo.Select(x => x.ToString()));
+                    saida.AddRange(NumberArrays.latinoMinusculo.Select(x => x.ToString()));
                     break;
                 case NamingMode.Number:
                     for (int i = 1; i <= 64; i++)
@@ -314,7 +317,7 @@ namespace Klyte.TransportLinesManager.Utils
             }
             if (TLMLineUtils.m_numberedNamingTypes.Contains(m))
             {
-                saida.AddRange(numeros.Select(x => x.ToString()));
+                saida.AddRange(NumberArrays.numeros.Select(x => x.ToString()));
             }
             return saida;
         }

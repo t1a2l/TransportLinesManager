@@ -1,12 +1,12 @@
-﻿using Klyte.TransportLinesManager.Interfaces;
+﻿using Klyte.TransportLinesManager.Data.Base;
 
-namespace Klyte.TransportLinesManager.Extensions
+namespace Klyte.TransportLinesManager.Data.TsdImplementations
 {
-    public partial class TransportSystemDefinition
+    public partial class TransportSystemDefinitionType
     {
         public static readonly TransportSystemDefinition BALLOON = new TransportSystemDefinition(
             ItemClass.SubService.PublicTransportTours,
-            VehicleInfo.VehicleType.None,
+            VehicleInfo.VehicleType.Balloon,
             TransportInfo.TransportType.HotAirBalloon,
             ItemClass.Level.Level4,
             new TransferManager.TransferReason[]

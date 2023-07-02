@@ -1,7 +1,10 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Klyte.Commons.Extensions;
-using Klyte.TransportLinesManager.Xml;
+using Klyte.Commons.Extensions.UI;
+using Klyte.TransportLinesManager.Data.Base.Enums;
+using Klyte.TransportLinesManager.Data.DataContainers;
+using Klyte.TransportLinesManager.Data.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +34,7 @@ namespace Klyte.TransportLinesManager.OptionsMenu.Tabs
             foreach (var serviceIt in Enum.GetValues(typeof(TLMSpecialNamingClass)).OfType<TLMSpecialNamingClass>().Where(x => x != TLMSpecialNamingClass.None))
             {
                 var service = serviceIt;
-                AddCheckbox(service.GetLocalizedName(), out UICheckBox check, group15, (x) => SetUseAutoName(service, x));
+                AddCheckbox(TLMSpecialNamingClassExtensions.GetLocalizedName(service), out UICheckBox check, group15, (x) => SetUseAutoName(service, x));
                 AddTextField(Locale.Get("K45_TLM_PREFIX_BUILDING_NAMES"), out UITextField textField, group15, (x) => SetPrefix(service, x));
                 m_checks[service] = check;
                 m_textFields[service] = textField;

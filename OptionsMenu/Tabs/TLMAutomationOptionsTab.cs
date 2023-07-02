@@ -1,7 +1,7 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions;
-using Klyte.TransportLinesManager.Xml;
+using Klyte.Commons.Extensions.UI;
+using Klyte.TransportLinesManager.Data.DataContainers;
 using static Klyte.Commons.UI.DefaultEditorUILib;
 
 namespace Klyte.TransportLinesManager.OptionsMenu.Tabs

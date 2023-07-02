@@ -1,5 +1,5 @@
 ﻿using ColossalFramework.Globalization;
-using Klyte.Commons.UI.Sprites;
+using Klyte.Commons.UI.SpriteNames;
 using System;
 using System.Linq;
 

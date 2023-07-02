@@ -1,12 +1,13 @@
 ﻿using Klyte.Commons.Interfaces;
 using Klyte.Commons.Utils;
+using Klyte.Commons.Utils.UtilitiesClasses;
 using Klyte.TransportLinesManager.Utils;
 using System;
 using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Extensions
+namespace Klyte.TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections
 {
     public class PlatformConfig : IIdentifiable
     {

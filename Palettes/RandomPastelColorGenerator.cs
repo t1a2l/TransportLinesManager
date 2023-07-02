@@ -1,7 +1,7 @@
 ﻿using Klyte.Commons.Utils;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager
+namespace Klyte.TransportLinesManager.Palettes
 {
     public class RandomPastelColorGenerator
     {

@@ -1,12 +1,13 @@
 ﻿using ColossalFramework.Globalization;
 using ICities;
 using Klyte.Commons;
-using Klyte.Commons.UI.Sprites;
+using Klyte.Commons.UI.SpriteNames;
 using Klyte.Commons.Utils;
+using Klyte.Commons.Utils.UtilitiesClasses;
+using Klyte.TransportLinesManager.Data.Extensions;
 using Klyte.TransportLinesManager.Interfaces;
 using Klyte.TransportLinesManager.ModShared;
 using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.Xml;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,7 +15,7 @@ using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Extensions
+namespace Klyte.TransportLinesManager.Data.Base.ConfigurationContainers
 {
     [XmlRoot("TransportTypeExtension")]
     public class TLMTransportTypeConfigurations : TsdIdentifiable, ITLMTransportTypeExtension
@@ -238,17 +239,15 @@ namespace Klyte.TransportLinesManager.Extensions
         {
             if (lineId > 0)
             {
-                if (m_basicAssetsList == null)
+                if (m_basicAssetsList == null || (m_basicAssetsList != null && m_basicAssetsList.Count == 0))
                 {
                     LoadBasicAssets();
                 }
-
                 return ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineId).Intersect(m_basicAssetsList).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x));
             }
             else
             {
-
-                if (m_basicAssetsListIntercity == null)
+                if (m_basicAssetsListIntercity == null || (m_basicAssetsListIntercity != null && m_basicAssetsListIntercity.Count == 0))
                 {
                     LoadBasicAssetsInterCity();
                 }
@@ -259,17 +258,15 @@ namespace Klyte.TransportLinesManager.Extensions
         {
             if (lineId > 0)
             {
-                if (m_basicAssetsList == null)
+                if (m_basicAssetsList == null || (m_basicAssetsList != null && m_basicAssetsList.Count == 0))
                 {
                     LoadBasicAssets();
                 }
-
                 return m_basicAssetsList.ToDictionary(x => x, x => Locale.GetUnchecked("VEHICLE_TITLE", x));
             }
             else
             {
-
-                if (m_basicAssetsListIntercity == null)
+                if (m_basicAssetsListIntercity == null || (m_basicAssetsListIntercity != null && m_basicAssetsListIntercity.Count == 0))
                 {
                     LoadBasicAssetsInterCity();
                 }

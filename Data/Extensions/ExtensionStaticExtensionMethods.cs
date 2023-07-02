@@ -1,13 +1,13 @@
-﻿using Klyte.Commons.Utils;
+﻿using Klyte.Commons.Utils.UtilitiesClasses;
+using Klyte.TransportLinesManager.Data.Base;
 using Klyte.TransportLinesManager.Interfaces;
 using Klyte.TransportLinesManager.ModShared;
 using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.Xml;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Extensions
+namespace Klyte.TransportLinesManager.Data.Extensions
 {
     public static class ExtensionStaticExtensionMethods
     {

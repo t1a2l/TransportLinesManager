@@ -1,15 +1,18 @@
 ﻿using ColossalFramework.Globalization;
-using Klyte.Commons.Interfaces;
+using Klyte.Commons.Interfaces.Warehouse;
 using Klyte.Commons.Utils;
+using Klyte.Commons.Utils.UtilitiesClasses;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers;
+using Klyte.TransportLinesManager.Data.Extensions;
 using Klyte.TransportLinesManager.Interfaces;
 using Klyte.TransportLinesManager.ModShared;
 using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.Xml;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace Klyte.TransportLinesManager.Extensions
+namespace Klyte.TransportLinesManager.Data.DataContainers
 {
     public class TLMTransportLineExtension : DataExtensionBase<TLMTransportLineExtension>, ISafeGettable<TLMTransportLineConfiguration>, IBasicExtension
     {
@@ -47,7 +50,6 @@ namespace Klyte.TransportLinesManager.Extensions
         #region Asset List
         public List<string> GetBasicAssetListForLine(ushort lineId)
         {
-
             var tsd = TransportSystemDefinition.FromLineId(lineId, false);
             if (!m_basicAssetsList.ContainsKey(tsd))
             {

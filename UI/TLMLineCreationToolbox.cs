@@ -1,10 +1,12 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
 using Klyte.Commons.Extensions;
+using Klyte.Commons.Extensions.UI;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.DataContainers;
 using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.Xml;
+using Klyte.TransportLinesManager.WorldInfoPanels.NearLines;
 using System.Collections;
 using System.Reflection;
 using UnityEngine;
@@ -29,7 +31,7 @@ namespace Klyte.TransportLinesManager.UI
         }
         #endregion
 
-        private static FieldInfo tt_nextLineNum = typeof(TransportManager).GetField("m_lineNumber", RedirectorUtils.allFlags);
+        private static FieldInfo tt_nextLineNum = typeof(TransportManager).GetField("m_lineNumber", Patcher.allFlags);
         private static readonly SavedBool m_showLineCreationToolBox = new SavedBool("K45_TLM_showLineToolbox", Settings.gameSettingsFile, true);
 
         public TransportInfo.TransportType CurrentType => TransportTool.m_prefab?.m_transportType ?? TransportInfo.TransportType.Bus;

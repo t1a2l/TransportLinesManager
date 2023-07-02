@@ -1,5 +1,6 @@
 ﻿using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.TsdImplementations;
 
 
 namespace Klyte.TransportLinesManager.Utils
@@ -73,19 +74,19 @@ namespace Klyte.TransportLinesManager.Utils
             }
         }
 
-        public static NamingType From(TransportSystemDefinition tsd) => tsd == TransportSystemDefinition.PLANE ? NamingType.PLANE
-                    : tsd == TransportSystemDefinition.SHIP ? NamingType.SHIP
-                    : tsd == TransportSystemDefinition.BLIMP ? NamingType.BLIMP
-                    : tsd == TransportSystemDefinition.HELICOPTER ? NamingType.HELICOPTER
-                    : tsd == TransportSystemDefinition.TRAIN ? NamingType.TRAIN
-                    : tsd == TransportSystemDefinition.FERRY ? NamingType.FERRY
-                    : tsd == TransportSystemDefinition.MONORAIL ? NamingType.MONORAIL
-                    : tsd == TransportSystemDefinition.METRO ? NamingType.METRO
-                    : tsd == TransportSystemDefinition.CABLE_CAR ? NamingType.CABLE_CAR
-                    : tsd == TransportSystemDefinition.TROLLEY ? NamingType.TROLLEY
-                    : tsd == TransportSystemDefinition.TRAM ? NamingType.TRAM
-                    : tsd == TransportSystemDefinition.BUS ? NamingType.BUS
-                    : tsd == TransportSystemDefinition.TOUR_BUS ? NamingType.TOUR_BUS
+        public static NamingType From(TransportSystemDefinition tsd) => tsd == TransportSystemDefinitionType.PLANE ? NamingType.PLANE
+                    : tsd == TransportSystemDefinitionType.SHIP ? NamingType.SHIP
+                    : tsd == TransportSystemDefinitionType.BLIMP ? NamingType.BLIMP
+                    : tsd == TransportSystemDefinitionType.HELICOPTER ? NamingType.HELICOPTER
+                    : tsd == TransportSystemDefinitionType.TRAIN ? NamingType.TRAIN
+                    : tsd == TransportSystemDefinitionType.FERRY ? NamingType.FERRY
+                    : tsd == TransportSystemDefinitionType.MONORAIL ? NamingType.MONORAIL
+                    : tsd == TransportSystemDefinitionType.METRO ? NamingType.METRO
+                    : tsd == TransportSystemDefinitionType.CABLE_CAR ? NamingType.CABLE_CAR
+                    : tsd == TransportSystemDefinitionType.TROLLEY ? NamingType.TROLLEY
+                    : tsd == TransportSystemDefinitionType.TRAM ? NamingType.TRAM
+                    : tsd == TransportSystemDefinitionType.BUS ? NamingType.BUS
+                    : tsd == TransportSystemDefinitionType.TOUR_BUS ? NamingType.TOUR_BUS
                     : NamingType.NONE;
 
         public static NamingType From(ItemClass.Service service, ItemClass.SubService subService)

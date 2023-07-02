@@ -1,12 +1,13 @@
 ﻿using ColossalFramework;
-using Klyte.Commons.UI.Sprites;
-using Klyte.Commons.Utils;
+using Klyte.Commons.UI.SpriteNames;
+using Klyte.Commons.Utils.StructExtensions;
+using Klyte.Commons.Utils.UtilitiesClasses;
 using Klyte.TransportLinesManager.Interfaces;
 using System;
 using System.Xml.Serialization;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Xml
+namespace Klyte.TransportLinesManager.Data.Base.ConfigurationContainers
 {
     public class TLMPrefixConfiguration : IAssetSelectorStorage, INameableStorage, IColorSelectableStorage, IBasicExtensionStorage
     {

@@ -1,7 +1,10 @@
 ﻿using ColossalFramework.Globalization;
+using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers;
+using Klyte.TransportLinesManager.Data.Base.Enums;
+using Klyte.TransportLinesManager.Data.DataContainers;
 using Klyte.TransportLinesManager.Utils;
 
-namespace Klyte.TransportLinesManager.Xml
+namespace Klyte.TransportLinesManager.Data.Extensions
 {
     public static class TLMSpecialNamingClassExtensions
     {

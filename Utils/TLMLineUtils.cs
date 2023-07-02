@@ -2,11 +2,16 @@
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Cache;
-using Klyte.TransportLinesManager.Extensions;
+using Klyte.Commons.Utils.UtilitiesClasses;
+using Klyte.TransportLinesManager.Cache.BuildingData;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers;
+using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
+using Klyte.TransportLinesManager.Data.DataContainers;
+using Klyte.TransportLinesManager.Data.Extensions;
+using Klyte.TransportLinesManager.Data.TsdImplementations;
 using Klyte.TransportLinesManager.Interfaces;
-using Klyte.TransportLinesManager.UI;
-using Klyte.TransportLinesManager.Xml;
+using Klyte.TransportLinesManager.WorldInfoPanels;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -309,7 +314,7 @@ namespace Klyte.TransportLinesManager.Utils
         public static void GetNamingRulesFromTSD(out NamingMode prefix, out Separator s, out NamingMode suffix, out NamingMode nonPrefix, out bool zeros, out bool invertPrefixSuffix, TransportSystemDefinition tsd)
 
         {
-            if (tsd == TransportSystemDefinition.EVAC_BUS)
+            if (tsd == TransportSystemDefinitionType.EVAC_BUS)
             {
                 suffix = NamingMode.Number;
                 s = Separator.Hyphen;
@@ -331,7 +336,7 @@ namespace Klyte.TransportLinesManager.Utils
         }
 
         public static string GetIconForLine(ushort lineIdx, bool regional, bool noBorder = true) => regional
-                ? KlyteResourceLoader.GetDefaultSpriteNameFor(TLMController.Instance.BuildingLines[lineIdx]?.LineDataObject?.LineBgSprite ?? TransportSystemDefinition.GetDefinitionForLine(lineIdx, regional)?.DefaultIcon ?? Commons.UI.Sprites.LineIconSpriteNames.NULL, noBorder)
+                ? KlyteResourceLoader.GetDefaultSpriteNameFor(TLMController.Instance.BuildingLines[lineIdx]?.LineDataObject?.LineBgSprite ?? TransportSystemDefinition.GetDefinitionForLine(lineIdx, regional)?.DefaultIcon ?? Commons.UI.SpriteNames.LineIconSpriteNames.NULL, noBorder)
                 : KlyteResourceLoader.GetDefaultSpriteNameFor(TLMPrefixesUtils.GetLineIcon(TransportManager.instance.m_lines.m_buffer[lineIdx].m_lineNumber, TransportSystemDefinition.GetDefinitionForLine(lineIdx, regional)), noBorder);
 
         public static Color GetLineColor(ushort lineIdx, bool regional) => regional
@@ -469,20 +474,20 @@ namespace Klyte.TransportLinesManager.Utils
                 return null;
             }
             string transportTypeLetter =
-              tsd == TransportSystemDefinition.PLANE ? "A"
-            : tsd == TransportSystemDefinition.SHIP ? "B"
-            : tsd == TransportSystemDefinition.BLIMP ? "C"
-            : tsd == TransportSystemDefinition.HELICOPTER ? "D"
-            : tsd == TransportSystemDefinition.TRAIN ? "E"
-            : tsd == TransportSystemDefinition.FERRY ? "F"
-            : tsd == TransportSystemDefinition.MONORAIL ? "G"
-            : tsd == TransportSystemDefinition.METRO ? "H"
-            : tsd == TransportSystemDefinition.CABLE_CAR ? "I"
-            : tsd == TransportSystemDefinition.TROLLEY ? "J"
-            : tsd == TransportSystemDefinition.TRAM ? "K"
-            : tsd == TransportSystemDefinition.BUS ? "L"
-            : tsd == TransportSystemDefinition.TOUR_BUS ? "M"
-            : tsd == TransportSystemDefinition.TOUR_PED ? "N"
+              tsd == TransportSystemDefinitionType.PLANE ? "A"
+            : tsd == TransportSystemDefinitionType.SHIP ? "B"
+            : tsd == TransportSystemDefinitionType.BLIMP ? "C"
+            : tsd == TransportSystemDefinitionType.HELICOPTER ? "D"
+            : tsd == TransportSystemDefinitionType.TRAIN ? "E"
+            : tsd == TransportSystemDefinitionType.FERRY ? "F"
+            : tsd == TransportSystemDefinitionType.MONORAIL ? "G"
+            : tsd == TransportSystemDefinitionType.METRO ? "H"
+            : tsd == TransportSystemDefinitionType.CABLE_CAR ? "I"
+            : tsd == TransportSystemDefinitionType.TROLLEY ? "J"
+            : tsd == TransportSystemDefinitionType.TRAM ? "K"
+            : tsd == TransportSystemDefinitionType.BUS ? "L"
+            : tsd == TransportSystemDefinitionType.TOUR_BUS ? "M"
+            : tsd == TransportSystemDefinitionType.TOUR_PED ? "N"
             : "";
             return transportTypeLetter + GetLineStringId(s, regional);
         }

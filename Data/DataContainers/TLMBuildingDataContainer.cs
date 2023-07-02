@@ -1,7 +1,8 @@
-﻿using Klyte.Commons.Interfaces;
+﻿using Klyte.Commons.Interfaces.Warehouse;
+using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers;
 using System.Xml.Serialization;
 
-namespace Klyte.TransportLinesManager.Extensions
+namespace Klyte.TransportLinesManager.Data.DataContainers
 {
     [XmlRoot("BuildingDataContainer")]
     public class TLMBuildingDataContainer : ExtensionInterfaceIndexableImpl<TLMBuildingsConfiguration, TLMBuildingDataContainer>

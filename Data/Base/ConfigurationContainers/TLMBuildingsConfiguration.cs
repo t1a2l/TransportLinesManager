@@ -1,10 +1,11 @@
 ﻿using Klyte.Commons.Interfaces;
-using Klyte.Commons.Utils;
+using Klyte.Commons.Utils.UtilitiesClasses;
+using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
 using Klyte.TransportLinesManager.Overrides;
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace Klyte.TransportLinesManager.Extensions
+namespace Klyte.TransportLinesManager.Data.Base.ConfigurationContainers
 {
     public class TLMBuildingsConfiguration : IIdentifiable
     {

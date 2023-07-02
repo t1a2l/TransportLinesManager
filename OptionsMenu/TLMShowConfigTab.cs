@@ -1,12 +1,14 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions;
+using Klyte.Commons.Extensions.UI;
 using Klyte.Commons.UI;
 using Klyte.Commons.UI.SpriteNames;
-using Klyte.Commons.UI.Sprites;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
+using Klyte.Commons.Utils.UtilitiesClasses;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.TsdImplementations;
 using Klyte.TransportLinesManager.OptionsMenu.Tabs;
+using Klyte.TransportLinesManager.Palettes;
 using Klyte.TransportLinesManager.UI;
 using Klyte.TransportLinesManager.Utils;
 using System;
@@ -174,17 +176,17 @@ namespace Klyte.TransportLinesManager.OptionsMenu
         }
     }
 
-    internal sealed class TLMShowConfigTabNorBus : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinition.BUS; }
-    internal sealed class TLMShowConfigTabNorTrm : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinition.TRAM; }
-    internal sealed class TLMShowConfigTabNorMnr : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinition.MONORAIL; }
-    internal sealed class TLMShowConfigTabNorMet : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinition.METRO; }
-    internal sealed class TLMShowConfigTabNorTrn : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinition.TRAIN; }
-    internal sealed class TLMShowConfigTabNorFer : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinition.FERRY; }
-    internal sealed class TLMShowConfigTabNorBlp : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinition.BLIMP; }
-    internal sealed class TLMShowConfigTabNorShp : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinition.SHIP; }
-    internal sealed class TLMShowConfigTabNorPln : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinition.PLANE; }
-    internal sealed class TLMShowConfigTabTouBus : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinition.TOUR_BUS; }
-    internal sealed class TLMShowConfigTabTouPed : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinition.TOUR_PED; }
-    internal sealed class TLMShowConfigTabNorTrl : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinition.TROLLEY; }
-    internal sealed class TLMShowConfigTabNorHel : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinition.HELICOPTER; }
+    internal sealed class TLMShowConfigTabNorBus : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinitionType.BUS; }
+    internal sealed class TLMShowConfigTabNorTrm : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinitionType.TRAM; }
+    internal sealed class TLMShowConfigTabNorMnr : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinitionType.MONORAIL; }
+    internal sealed class TLMShowConfigTabNorMet : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinitionType.METRO; }
+    internal sealed class TLMShowConfigTabNorTrn : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinitionType.TRAIN; }
+    internal sealed class TLMShowConfigTabNorFer : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinitionType.FERRY; }
+    internal sealed class TLMShowConfigTabNorBlp : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinitionType.BLIMP; }
+    internal sealed class TLMShowConfigTabNorShp : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinitionType.SHIP; }
+    internal sealed class TLMShowConfigTabNorPln : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinitionType.PLANE; }
+    internal sealed class TLMShowConfigTabTouBus : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinitionType.TOUR_BUS; }
+    internal sealed class TLMShowConfigTabTouPed : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinitionType.TOUR_PED; }
+    internal sealed class TLMShowConfigTabNorTrl : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinitionType.TROLLEY; }
+    internal sealed class TLMShowConfigTabNorHel : TLMShowConfigTab { internal override TransportSystemDefinition TSD { get; } = TransportSystemDefinitionType.HELICOPTER; }
 }

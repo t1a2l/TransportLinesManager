@@ -1,11 +1,11 @@
-﻿using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
+﻿using Klyte.Commons.Utils.UtilitiesClasses;
+using Klyte.TransportLinesManager.Data.Base;
 using Klyte.TransportLinesManager.Overrides;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Cache
+namespace Klyte.TransportLinesManager.Cache.BuildingData
 {
     public class BuildingTransportLinesCache : MonoBehaviour
     {

@@ -1,9 +1,10 @@
-﻿using Klyte.Commons.UI.Sprites;
-using Klyte.TransportLinesManager.Extensions;
+﻿using Klyte.Commons.UI.SpriteNames;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Base.Interfaces;
 using Klyte.TransportLinesManager.Utils;
 using System.Xml.Serialization;
 
-namespace Klyte.TransportLinesManager.Xml
+namespace Klyte.TransportLinesManager.Data.DataContainers
 {
     [XmlRoot("TransportType")]
     public class TLMTransportTypeConfigurationsXML : TsdIdentifiable, ITLMAutoNameConfigurable

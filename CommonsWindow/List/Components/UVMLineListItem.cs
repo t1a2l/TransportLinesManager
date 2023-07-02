@@ -2,13 +2,16 @@
 using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions;
+using Klyte.Commons.Extensions.UI;
+using Klyte.Commons.UI;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
+using Klyte.Commons.Utils.StructExtensions;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Managers;
 using Klyte.TransportLinesManager.Utils;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.CommonsWindow
+namespace Klyte.TransportLinesManager.CommonsWindow.List.Components
 {
     internal class UVMLineListItem : UICustomControl
     {

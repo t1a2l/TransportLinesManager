@@ -1,6 +1,7 @@
 ﻿using ColossalFramework;
 using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Extensions;
+using Klyte.TransportLinesManager.Data.Base;
+using Klyte.TransportLinesManager.Data.Extensions;
 using Klyte.TransportLinesManager.Interfaces;
 using System;
 using System.Collections;
@@ -23,6 +24,7 @@ namespace Klyte.TransportLinesManager.Utils
             }
             return num;
         }
+
         public static IEnumerator UpdateCapacityUnitsFromTSD()
         {
             int count = 0;
@@ -144,6 +146,7 @@ namespace Klyte.TransportLinesManager.Utils
                 }
             }
         }
+
         public static void DoSoftDespawn(ushort vehicleID, ref Vehicle vehicleData)
         {
             var targetBuilding = vehicleData.m_targetBuilding;

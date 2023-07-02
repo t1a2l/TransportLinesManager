@@ -1,6 +1,8 @@
-﻿namespace Klyte.TransportLinesManager.Extensions
+﻿using Klyte.TransportLinesManager.Data.Base;
+
+namespace Klyte.TransportLinesManager.Data.TsdImplementations
 {
-    public partial class TransportSystemDefinition
+    public partial class TransportSystemDefinitionType
     {
         public static readonly TransportSystemDefinition POST = new TransportSystemDefinition(
                     ItemClass.SubService.PublicTransportPost,

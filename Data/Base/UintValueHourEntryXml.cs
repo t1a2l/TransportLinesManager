@@ -2,7 +2,7 @@
 using System;
 using System.Xml.Serialization;
 
-namespace Klyte.TransportLinesManager.Xml
+namespace Klyte.TransportLinesManager.Data.Base
 {
 
     public class UintValueHourEntryXml<T> : ITimeable<T> where T : UintValueHourEntryXml<T>
