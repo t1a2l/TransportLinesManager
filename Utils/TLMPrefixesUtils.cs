@@ -1,19 +1,19 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.UI.SpriteNames;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.Extensions;
-using Klyte.TransportLinesManager.Interfaces;
-using Klyte.TransportLinesManager.Palettes;
-using Klyte.Commons.Utils.UtilitiesClasses;
+using Commons.UI.SpriteNames;
+using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Interfaces;
+using TransportLinesManager.Palettes;
+using Commons.Utils.UtilitiesClasses;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 
-namespace Klyte.TransportLinesManager.Utils
+namespace TransportLinesManager.Utils
 {
     public static class TLMPrefixesUtils
     {

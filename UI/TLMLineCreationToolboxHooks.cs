@@ -1,9 +1,9 @@
 ﻿using HarmonyLib;
 using ColossalFramework.UI;
 using UnityEngine;
-using static Klyte.Commons.Extensions.Patcher;
+using static Commons.Extensions.Patcher;
 
-namespace Klyte.TransportLinesManager.UI
+namespace TransportLinesManager.UI
 {
     internal class TLMLineCreationToolboxHooks : MonoBehaviour, IPatcher
     {

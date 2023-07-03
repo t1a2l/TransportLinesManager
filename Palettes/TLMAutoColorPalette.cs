@@ -1,11 +1,11 @@
-﻿using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.StructExtensions;
+﻿using Commons.Utils;
+using Commons.Utils.StructExtensions;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Palettes
+namespace TransportLinesManager.Palettes
 {
     public class TLMAutoColorPalette
     {

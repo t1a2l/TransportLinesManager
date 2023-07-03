@@ -1,16 +1,16 @@
 using ColossalFramework;
 using ColossalFramework.UI;
-using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Data.Base;
-using Klyte.TransportLinesManager.Data.Extensions;
-using Klyte.TransportLinesManager.Overrides;
-using Klyte.TransportLinesManager.UI;
-using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.WorldInfoPanels.Tabs;
+using Commons.Utils;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Data.Base;
+using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Overrides;
+using TransportLinesManager.UI;
+using TransportLinesManager.Utils;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Components
+namespace TransportLinesManager.WorldInfoPanels.Components
 {
     public class UVMBudgetTimeChart : TLMBaseTimeChart<UVMBudgetConfigTab, UVMBudgetTimeChart, UVMBudgetEditorLine, BudgetEntryXml>
     {

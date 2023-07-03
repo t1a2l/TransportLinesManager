@@ -1,14 +1,14 @@
 using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Utils;
+using Commons.Utils;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Palettes
+namespace TransportLinesManager.Palettes
 {
     public class TLMAutoColorPaletteContainer
     {

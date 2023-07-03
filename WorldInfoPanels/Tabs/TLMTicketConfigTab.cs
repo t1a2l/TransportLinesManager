@@ -1,12 +1,12 @@
-﻿using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Data.Base;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.WorldInfoPanels.Components;
+﻿using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Data.Base;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Utils;
+using TransportLinesManager.WorldInfoPanels.Components;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Tabs
+namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
 
     public class TLMTicketConfigTab : TLMBaseTimedConfigTab<TLMTicketConfigTab, TLMTicketPriceTimeChart, TLMTicketPriceEditorLine, TicketPriceEntryXml>

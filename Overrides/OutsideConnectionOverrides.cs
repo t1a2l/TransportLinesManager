@@ -1,11 +1,11 @@
-﻿using Klyte.Commons.Utils;
+﻿using Commons.Utils;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
-using Klyte.Commons.Extensions;
+using Commons.Extensions;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     [HarmonyPatch(typeof(OutsideConnectionAI))]
     public static class OutsideConnectionOverrides

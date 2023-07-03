@@ -1,9 +1,9 @@
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.TransportLinesManager.Data.Managers;
-using static Klyte.TransportLinesManager.Data.Managers.TLMTransportLineStatusesManager;
+using TransportLinesManager.Data.Managers;
+using static TransportLinesManager.Data.Managers.TLMTransportLineStatusesManager;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Components
+namespace TransportLinesManager.WorldInfoPanels.Components
 {
     internal class TLMPassengerAgeReportLine : BaseReportLine<AgePassengerReport>
     {

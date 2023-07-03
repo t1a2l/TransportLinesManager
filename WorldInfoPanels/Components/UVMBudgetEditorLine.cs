@@ -1,9 +1,9 @@
-using Klyte.TransportLinesManager.Data.Base;
-using Klyte.TransportLinesManager.UI;
-using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.WorldInfoPanels.Tabs;
+using TransportLinesManager.Data.Base;
+using TransportLinesManager.UI;
+using TransportLinesManager.Utils;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Components
+namespace TransportLinesManager.WorldInfoPanels.Components
 {
     public class UVMBudgetEditorLine : TLMBaseSliderEditorLine<UVMBudgetEditorLine, BudgetEntryXml>
     {

@@ -1,16 +1,16 @@
 ﻿using ColossalFramework;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Cache.BuildingData;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
-using Klyte.TransportLinesManager.Data.DataContainers;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Cache.BuildingData;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
+using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.ModShared
+namespace TransportLinesManager.ModShared
 {
     public class TLMFacade : MonoBehaviour
     {

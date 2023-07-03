@@ -1,8 +1,8 @@
-﻿using Klyte.Commons.Interfaces;
+﻿using Commons.Interfaces;
 using System;
 using System.Xml.Serialization;
 
-namespace Klyte.TransportLinesManager.Data.Base
+namespace TransportLinesManager.Data.Base
 {
 
     public class UintValueHourEntryXml<T> : ITimeable<T> where T : UintValueHourEntryXml<T>

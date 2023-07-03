@@ -1,20 +1,20 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions.UI;
-using Klyte.Commons.UI;
-using Klyte.Commons.UI.SpriteNames;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.DataContainers;
-using Klyte.TransportLinesManager.ModShared;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Extensions.UI;
+using Commons.UI;
+using Commons.UI.SpriteNames;
+using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.ModShared;
+using TransportLinesManager.Utils;
 using System;
 using System.Collections;
 using UnityEngine;
-using static Klyte.TransportLinesManager.WorldInfoPanels.UVMPublicTransportWorldInfoPanel.UVMPublicTransportWorldInfoPanelObject;
+using static TransportLinesManager.WorldInfoPanels.UVMPublicTransportWorldInfoPanel.UVMPublicTransportWorldInfoPanelObject;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Tabs
+namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
 
     public class UVMMainWIPTab : UICustomControl, IUVMPTWIPChild

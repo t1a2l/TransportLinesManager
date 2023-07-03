@@ -1,11 +1,11 @@
 ﻿using ColossalFramework;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Utils;
+using TransportLinesManager.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.MapDrawer
+namespace TransportLinesManager.MapDrawer
 {
     public struct TLMMapTransportLine
     {

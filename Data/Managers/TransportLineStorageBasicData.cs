@@ -1,10 +1,10 @@
 ﻿using ICities;
-using Klyte.Commons.Interfaces.Warehouse;
-using Klyte.Commons.Utils;
+using Commons.Interfaces.Warehouse;
+using Commons.Utils;
 using System;
 using System.IO;
 
-namespace Klyte.TransportLinesManager.Data.Managers
+namespace TransportLinesManager.Data.Managers
 {
     public partial class TLMTransportLineStatusesManager
     {

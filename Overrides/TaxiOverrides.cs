@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     [HarmonyPatch]
     public static class TaxiOverrides

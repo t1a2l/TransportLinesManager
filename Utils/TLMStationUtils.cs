@@ -1,16 +1,16 @@
 ﻿using ColossalFramework;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Base.Enums;
-using Klyte.TransportLinesManager.Data.Tsd;
+using Commons.Utils;
+using TransportLinesManager.Data.Base.Enums;
+using TransportLinesManager.Data.Tsd;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static ItemClass;
-using Klyte.TransportLinesManager.Data.Extensions;
-using Klyte.TransportLinesManager.Data.Base.Interfaces;
+using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Data.Base.Interfaces;
 
-namespace Klyte.TransportLinesManager.Utils
+namespace TransportLinesManager.Utils
 {
     internal static class TLMStationUtils
     {

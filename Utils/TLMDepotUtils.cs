@@ -1,7 +1,7 @@
-using Klyte.TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Tsd;
 using System.Collections.Generic;
 
-namespace Klyte.TransportLinesManager.Utils
+namespace TransportLinesManager.Utils
 {
     internal class TLMDepotUtils
     {

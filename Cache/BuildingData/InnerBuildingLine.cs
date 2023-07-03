@@ -1,12 +1,12 @@
 ﻿using ColossalFramework.Math;
-using Klyte.Commons.Interfaces;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
-using Klyte.TransportLinesManager.Data.DataContainers;
+using Commons.Interfaces;
+using Commons.Utils;
+using TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
+using TransportLinesManager.Data.DataContainers;
 using System;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Cache.BuildingData
+namespace TransportLinesManager.Cache.BuildingData
 {
     public class InnerBuildingLine : IIdentifiable
     {

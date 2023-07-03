@@ -1,18 +1,18 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.UI;
-using Klyte.Commons.UI.SpriteNames;
-using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Data.Base;
-using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.WorldInfoPanels.Components;
-using Klyte.TransportLinesManager.WorldInfoPanels.Tabs;
+using Commons.UI;
+using Commons.UI.SpriteNames;
+using Commons.Utils;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Data.Base;
+using TransportLinesManager.Utils;
+using TransportLinesManager.WorldInfoPanels.Components;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.UI
+namespace TransportLinesManager.UI
 {
     public abstract class TLMBaseTimeChart<T, C, L, V> : MonoBehaviour
         where T : TLMBaseTimedConfigTab<T, C, L, V>

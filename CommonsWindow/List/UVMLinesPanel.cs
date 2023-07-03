@@ -1,20 +1,20 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions.UI;
-using Klyte.Commons.UI.SpriteNames;
-using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.CommonsWindow.List.Components;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.Managers;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Extensions.UI;
+using Commons.UI.SpriteNames;
+using Commons.Utils;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.CommonsWindow.List.Components;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Managers;
+using TransportLinesManager.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.CommonsWindow.List
+namespace TransportLinesManager.CommonsWindow.List
 {
 
     internal class UVMLinesPanel : UICustomControl

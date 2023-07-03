@@ -1,9 +1,9 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions;
-using Klyte.Commons.Extensions.UI;
+using Commons.Extensions;
+using Commons.Extensions.UI;
 
-namespace Klyte.TransportLinesManager.OptionsMenu.Tabs
+namespace TransportLinesManager.OptionsMenu.Tabs
 {
     internal class TLMNearLinesConfigTab : UICustomControl, ITLMConfigOptionsTab
     {

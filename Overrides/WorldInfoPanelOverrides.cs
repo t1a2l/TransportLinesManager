@@ -1,8 +1,8 @@
 ﻿using HarmonyLib;
-using Klyte.TransportLinesManager.UI;
-using Klyte.TransportLinesManager.WorldInfoPanels;
+using TransportLinesManager.UI;
+using TransportLinesManager.WorldInfoPanels;
 
-namespace Klyte.TransportLinesManager.Overrides 
+namespace TransportLinesManager.Overrides 
 {
     [HarmonyPatch(typeof(WorldInfoPanel))]
 	public static class WorldInfoPanelOverrides 

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Data.Tsd
+namespace TransportLinesManager.Data.Tsd
 {
     public partial class TransportSystemDefinition
     {

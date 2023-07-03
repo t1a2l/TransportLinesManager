@@ -1,13 +1,13 @@
 ﻿using ColossalFramework.UI;
-using Klyte.Commons.Extensions.UI;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.WorldInfoPanels.Components;
+using Commons.Extensions.UI;
+using Commons.Utils;
+using TransportLinesManager.WorldInfoPanels.Components;
 using System.Collections.Generic;
 using UnityEngine;
-using static Klyte.TransportLinesManager.Data.Managers.TLMTransportLineStatusesManager;
-using static Klyte.TransportLinesManager.WorldInfoPanels.Tabs.TLMReportsTab;
+using static TransportLinesManager.Data.Managers.TLMTransportLineStatusesManager;
+using static TransportLinesManager.WorldInfoPanels.Tabs.TLMReportsTab;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.ReportTabs
+namespace TransportLinesManager.WorldInfoPanels.ReportTabs
 {
 
     internal abstract class BasicReportTab<L, D> : UICustomControl, ITLMReportChild where D : BasicReportData, new() where L : BaseReportLine<D>

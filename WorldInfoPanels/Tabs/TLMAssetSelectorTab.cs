@@ -1,20 +1,20 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.UI;
-using Klyte.Commons.UI.SpriteNames;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers;
-using Klyte.TransportLinesManager.Data.Extensions;
-using Klyte.TransportLinesManager.Interfaces;
-using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.WorldInfoPanels.Components;
+using Commons.UI;
+using Commons.UI.SpriteNames;
+using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Base.ConfigurationContainers;
+using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Interfaces;
+using TransportLinesManager.Utils;
+using TransportLinesManager.WorldInfoPanels.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Tabs
+namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
     internal class TLMAssetSelectorTab : UICustomControl, IUVMPTWIPChild
     {

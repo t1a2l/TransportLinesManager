@@ -1,10 +1,10 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.Threading;
 using HarmonyLib;
-using Klyte.Commons.Extensions;
-using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.StructExtensions;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Extensions;
+using Commons.Utils;
+using Commons.Utils.StructExtensions;
+using TransportLinesManager.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     [HarmonyPatch(typeof(TransportTool))]
     public static class TransportToolOverrides

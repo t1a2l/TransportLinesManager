@@ -1,8 +1,8 @@
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions;
+using Commons.Extensions;
 using System.Collections.Generic;
 
-namespace Klyte.TransportLinesManager.Utils
+namespace TransportLinesManager.Utils
 {
     internal class TLMUiTemplateUtils
     {

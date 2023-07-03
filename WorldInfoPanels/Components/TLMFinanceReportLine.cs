@@ -1,11 +1,11 @@
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.UI.SpriteNames;
-using Klyte.Commons.Utils;
+using Commons.UI.SpriteNames;
+using Commons.Utils;
 using UnityEngine;
-using static Klyte.TransportLinesManager.Data.Managers.TLMTransportLineStatusesManager;
+using static TransportLinesManager.Data.Managers.TLMTransportLineStatusesManager;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Components
+namespace TransportLinesManager.WorldInfoPanels.Components
 {
     internal class TLMFinanceReportLine : BaseReportLine<IncomeExpenseReport>
     {

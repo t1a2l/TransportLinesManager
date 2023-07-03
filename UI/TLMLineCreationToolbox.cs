@@ -1,17 +1,17 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions;
-using Klyte.Commons.Extensions.UI;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.DataContainers;
-using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.WorldInfoPanels.NearLines;
+using Commons.Extensions;
+using Commons.Extensions.UI;
+using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Utils;
+using TransportLinesManager.WorldInfoPanels.NearLines;
 using System.Collections;
 using System.Reflection;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.UI
+namespace TransportLinesManager.UI
 {
 
     internal class TLMLineCreationToolbox : UICustomControl

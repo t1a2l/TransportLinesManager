@@ -1,19 +1,19 @@
 ﻿using ColossalFramework.Globalization;
-using Klyte.Commons.Interfaces.Warehouse;
-using Klyte.Commons.UI.SpriteNames;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.Base.Enums;
-using Klyte.TransportLinesManager.Data.DataContainers;
-using Klyte.TransportLinesManager.ModShared;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Interfaces.Warehouse;
+using Commons.UI.SpriteNames;
+using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Base.Enums;
+using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.ModShared;
+using TransportLinesManager.Utils;
 using System;
 using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
-using static Klyte.TransportLinesManager.TLMConfigWarehouse.ConfigIndex;
+using static TransportLinesManager.TLMConfigWarehouse.ConfigIndex;
 
-namespace Klyte.TransportLinesManager
+namespace TransportLinesManager
 {
     public class TLMConfigWarehouse : ConfigWarehouseBase<TLMConfigWarehouse.ConfigIndex, TLMConfigWarehouse>
     {

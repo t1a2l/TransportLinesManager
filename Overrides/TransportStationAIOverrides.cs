@@ -3,12 +3,12 @@ using System.Linq;
 using ColossalFramework;
 using ColossalFramework.Math;
 using HarmonyLib;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Utils;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
 	[HarmonyPatch(typeof(TransportStationAI))]
     public static class TransportStationAIOverrides

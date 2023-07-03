@@ -1,7 +1,7 @@
-﻿using Klyte.Commons.Utils;
+﻿using Commons.Utils;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.ModShared
+namespace TransportLinesManager.ModShared
 {
     internal class BridgeADRFallback : IBridgeADR
     {

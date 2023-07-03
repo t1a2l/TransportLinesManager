@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Klyte.TransportLinesManager.ModShared
+namespace TransportLinesManager.ModShared
 {
     internal abstract class IBridgeWTS : MonoBehaviour
     {

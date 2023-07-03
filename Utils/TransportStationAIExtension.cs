@@ -1,9 +1,9 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Math;
-using Klyte.TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Tsd;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Utils
+namespace TransportLinesManager.Utils
 {
     public static class TransportStationAIExtension
     {

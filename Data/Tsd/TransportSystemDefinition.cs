@@ -1,19 +1,19 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
-using Klyte.Commons;
-using Klyte.Commons.Interfaces;
-using Klyte.Commons.UI.SpriteNames;
-using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Interfaces;
+using Commons;
+using Commons.Interfaces;
+using Commons.UI.SpriteNames;
+using Commons.Utils;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static TransferManager;
-using Klyte.TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Data.DataContainers;
 
-namespace Klyte.TransportLinesManager.Data.Tsd
+namespace TransportLinesManager.Data.Tsd
 {
     public partial class TransportSystemDefinition : IIdentifiable
     {

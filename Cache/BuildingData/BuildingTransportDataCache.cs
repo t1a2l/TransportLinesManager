@@ -1,15 +1,15 @@
-﻿using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers;
-using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
-using Klyte.TransportLinesManager.Data.DataContainers;
-using Klyte.TransportLinesManager.Utils;
+﻿using Commons.Utils;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Base.ConfigurationContainers;
+using TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
+using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Cache.BuildingData
+namespace TransportLinesManager.Cache.BuildingData
 {
     public class BuildingTransportDataCache
     {

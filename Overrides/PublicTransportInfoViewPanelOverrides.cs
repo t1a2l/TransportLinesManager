@@ -1,9 +1,9 @@
-﻿using Klyte.TransportLinesManager.CommonsWindow;
-using Klyte.TransportLinesManager.UI;
+﻿using TransportLinesManager.CommonsWindow;
+using TransportLinesManager.UI;
 using HarmonyLib;
-using Klyte.TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Tsd;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     [HarmonyPatch(typeof(PublicTransportInfoViewPanel))]
     internal static class PublicTransportInfoViewPanelOverrides

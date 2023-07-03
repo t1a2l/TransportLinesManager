@@ -1,9 +1,9 @@
 ﻿using ColossalFramework.UI;
-using Klyte.Commons.Utils;
+using Commons.Utils;
 using System;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.OptionsMenu.Tabs
+namespace TransportLinesManager.OptionsMenu.Tabs
 {
     internal class TLMShowConfigTabContainer : UICustomControl, ITLMConfigOptionsTab
     {

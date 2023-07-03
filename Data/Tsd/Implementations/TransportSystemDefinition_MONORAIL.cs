@@ -1,7 +1,7 @@
-﻿using Klyte.Commons.UI.SpriteNames;
+﻿using Commons.UI.SpriteNames;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Data.Tsd
+namespace TransportLinesManager.Data.Tsd
 {
     public partial class TransportSystemDefinition
     {

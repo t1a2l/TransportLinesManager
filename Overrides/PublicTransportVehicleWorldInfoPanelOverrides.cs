@@ -1,9 +1,9 @@
 ﻿using ColossalFramework;
-using Klyte.TransportLinesManager.CommonsWindow;
+using TransportLinesManager.CommonsWindow;
 using HarmonyLib;
-using Klyte.TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Tsd;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     [HarmonyPatch(typeof(PublicTransportVehicleWorldInfoPanel))]
     public class PublicTransportVehicleWorldInfoPanelOverrides

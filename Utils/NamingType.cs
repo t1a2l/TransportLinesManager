@@ -1,4 +1,4 @@
-﻿namespace Klyte.TransportLinesManager.Utils
+﻿namespace TransportLinesManager.Utils
 {
     public enum NamingType
     {

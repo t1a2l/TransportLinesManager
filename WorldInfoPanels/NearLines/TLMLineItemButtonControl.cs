@@ -1,12 +1,12 @@
 ﻿using ColossalFramework.UI;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.DataContainers;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Utils;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.NearLines
+namespace TransportLinesManager.WorldInfoPanels.NearLines
 {
     public class TLMLineItemButtonControl : UICustomControl
     {

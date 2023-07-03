@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
 	[HarmonyPatch(typeof(PublicTransportLineInfo))]
 	public static class PublicTransportLineInfoOverrides 

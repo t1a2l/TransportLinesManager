@@ -1,8 +1,8 @@
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using static Klyte.TransportLinesManager.Data.Managers.TLMTransportLineStatusesManager;
+using static TransportLinesManager.Data.Managers.TLMTransportLineStatusesManager;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Components
+namespace TransportLinesManager.WorldInfoPanels.Components
 {
     internal class TLMPassengerWealthReportLine : BaseReportLine<WealthPassengerReport>
     {

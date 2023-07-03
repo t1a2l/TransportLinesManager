@@ -1,21 +1,21 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions.UI;
-using Klyte.Commons.UI;
-using Klyte.Commons.UI.SpriteNames;
-using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.OptionsMenu.Tabs;
-using Klyte.TransportLinesManager.Palettes;
-using Klyte.TransportLinesManager.UI;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Extensions.UI;
+using Commons.UI;
+using Commons.UI.SpriteNames;
+using Commons.Utils;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.OptionsMenu.Tabs;
+using TransportLinesManager.Palettes;
+using TransportLinesManager.UI;
+using TransportLinesManager.Utils;
 using System;
 using System.Linq;
 using UnityEngine;
-using static Klyte.Commons.UI.DefaultEditorUILib;
+using static Commons.UI.DefaultEditorUILib;
 
-namespace Klyte.TransportLinesManager.OptionsMenu
+namespace TransportLinesManager.OptionsMenu
 {
     internal abstract class TLMShowConfigTab : UICustomControl, ITLMConfigOptionsTab
     {

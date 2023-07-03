@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
-using Klyte.TransportLinesManager.Data.Managers;
+using TransportLinesManager.Data.Managers;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     [HarmonyPatch(typeof(StatisticsManager))]
     public static class StatisticsManagerOverrides

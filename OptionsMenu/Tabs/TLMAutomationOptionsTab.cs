@@ -1,10 +1,10 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions.UI;
-using Klyte.TransportLinesManager.Data.DataContainers;
-using static Klyte.Commons.UI.DefaultEditorUILib;
+using Commons.Extensions.UI;
+using TransportLinesManager.Data.DataContainers;
+using static Commons.UI.DefaultEditorUILib;
 
-namespace Klyte.TransportLinesManager.OptionsMenu.Tabs
+namespace TransportLinesManager.OptionsMenu.Tabs
 {
     internal class TLMAutomationOptionsTab : UICustomControl, ITLMConfigOptionsTab
     {

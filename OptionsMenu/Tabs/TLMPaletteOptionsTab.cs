@@ -1,19 +1,19 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions;
-using Klyte.Commons.Extensions.UI;
-using Klyte.Commons.UI;
-using Klyte.Commons.UI.SpriteNames;
-using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.StructExtensions;
-using Klyte.TransportLinesManager.Palettes;
+using Commons.Extensions;
+using Commons.Extensions.UI;
+using Commons.UI;
+using Commons.UI.SpriteNames;
+using Commons.Utils;
+using Commons.Utils.StructExtensions;
+using TransportLinesManager.Palettes;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.OptionsMenu.Tabs
+namespace TransportLinesManager.OptionsMenu.Tabs
 {
     internal class TLMPaletteOptionsTab : UICustomControl, ITLMConfigOptionsTab
     {

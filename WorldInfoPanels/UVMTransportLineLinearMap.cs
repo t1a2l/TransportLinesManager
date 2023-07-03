@@ -1,21 +1,21 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions.UI;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.CommonsWindow;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.Managers;
-using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.WorldInfoPanels.Components;
-using Klyte.TransportLinesManager.WorldInfoPanels.NearLines;
-using Klyte.TransportLinesManager.WorldInfoPanels.Tabs;
+using Commons.Extensions.UI;
+using Commons.Utils;
+using TransportLinesManager.CommonsWindow;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Managers;
+using TransportLinesManager.Utils;
+using TransportLinesManager.WorldInfoPanels.Components;
+using TransportLinesManager.WorldInfoPanels.NearLines;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 using System;
 using System.Linq;
 using UnityEngine;
-using static Klyte.TransportLinesManager.WorldInfoPanels.UVMPublicTransportWorldInfoPanel.UVMPublicTransportWorldInfoPanelObject;
+using static TransportLinesManager.WorldInfoPanels.UVMPublicTransportWorldInfoPanel.UVMPublicTransportWorldInfoPanelObject;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels
+namespace TransportLinesManager.WorldInfoPanels
 {
 
     public class UVMTransportLineLinearMap : UICustomControl, IUVMPTWIPChild

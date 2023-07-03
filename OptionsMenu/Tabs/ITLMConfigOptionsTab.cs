@@ -1,4 +1,4 @@
-﻿namespace Klyte.TransportLinesManager.OptionsMenu.Tabs
+﻿namespace TransportLinesManager.OptionsMenu.Tabs
 {
     public interface ITLMConfigOptionsTab
     {

@@ -1,14 +1,14 @@
 ﻿using ColossalFramework.Globalization;
 using ICities;
-using Klyte.Commons;
-using Klyte.Commons.UI.SpriteNames;
-using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Data.Extensions;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Interfaces;
-using Klyte.TransportLinesManager.ModShared;
-using Klyte.TransportLinesManager.Utils;
+using Commons;
+using Commons.UI.SpriteNames;
+using Commons.Utils;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Interfaces;
+using TransportLinesManager.ModShared;
+using TransportLinesManager.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,7 +16,7 @@ using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Data.Base.ConfigurationContainers
+namespace TransportLinesManager.Data.Base.ConfigurationContainers
 {
     [XmlRoot("TransportTypeExtension")]
     public class TLMTransportTypeConfigurations : TsdIdentifiable, ITLMTransportTypeExtension

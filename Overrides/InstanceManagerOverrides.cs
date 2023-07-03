@@ -2,7 +2,7 @@
 using UnityEngine;
 using HarmonyLib;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     [HarmonyPatch]
     public class InstanceManagerOverrides

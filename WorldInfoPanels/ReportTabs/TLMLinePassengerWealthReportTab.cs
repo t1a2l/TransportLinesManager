@@ -1,9 +1,9 @@
-﻿using Klyte.TransportLinesManager.Data.Managers;
-using Klyte.TransportLinesManager.WorldInfoPanels.Components;
+﻿using TransportLinesManager.Data.Managers;
+using TransportLinesManager.WorldInfoPanels.Components;
 using System.Collections.Generic;
-using static Klyte.TransportLinesManager.Data.Managers.TLMTransportLineStatusesManager;
+using static TransportLinesManager.Data.Managers.TLMTransportLineStatusesManager;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.ReportTabs
+namespace TransportLinesManager.WorldInfoPanels.ReportTabs
 {
 
     internal class TLMLinePassengerWealthReportTab : BasicReportTab<TLMPassengerWealthReportLine, WealthPassengerReport>

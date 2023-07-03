@@ -1,19 +1,19 @@
 using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions.UI;
-using Klyte.Commons.Interfaces;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.CommonsWindow;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.DataContainers;
-using Klyte.TransportLinesManager.MapDrawer;
-using Klyte.TransportLinesManager.OptionsMenu;
+using Commons.Extensions.UI;
+using Commons.Interfaces;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.CommonsWindow;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.MapDrawer;
+using TransportLinesManager.OptionsMenu;
 using System.Collections.Generic;
 using System.Reflection;
 
 [assembly: AssemblyVersion("14.3.0.*")]
-namespace Klyte.TransportLinesManager
+namespace TransportLinesManager
 {
     public class TransportLinesManagerMod : BasicIUserMod<TransportLinesManagerMod, TLMController, TLMPanel>
     {

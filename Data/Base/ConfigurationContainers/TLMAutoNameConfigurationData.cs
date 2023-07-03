@@ -1,10 +1,10 @@
-﻿using Klyte.Commons.Interfaces;
-using Klyte.TransportLinesManager.Data.Base.Interfaces;
+﻿using Commons.Interfaces;
+using TransportLinesManager.Data.Base.Interfaces;
 using System;
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace Klyte.TransportLinesManager.Data.Base.ConfigurationContainers
+namespace TransportLinesManager.Data.Base.ConfigurationContainers
 {
     [XmlRoot("AutoNameConfig")]
     public class TLMAutoNameConfigurationData<E> : IIdentifiable, ITLMAutoNameConfigurable where E : struct, Enum

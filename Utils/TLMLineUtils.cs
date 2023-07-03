@@ -1,25 +1,25 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Cache.BuildingData;
-using Klyte.TransportLinesManager.Data.Base;
-using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers;
-using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
-using Klyte.TransportLinesManager.Data.DataContainers;
-using Klyte.TransportLinesManager.Data.Extensions;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Interfaces;
-using Klyte.TransportLinesManager.WorldInfoPanels;
+using Commons.Utils;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Cache.BuildingData;
+using TransportLinesManager.Data.Base;
+using TransportLinesManager.Data.Base.ConfigurationContainers;
+using TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
+using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Interfaces;
+using TransportLinesManager.WorldInfoPanels;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static Klyte.TransportLinesManager.ModShared.TLMFacade;
+using static TransportLinesManager.ModShared.TLMFacade;
 
-namespace Klyte.TransportLinesManager.Utils
+namespace TransportLinesManager.Utils
 {
     internal class TLMLineUtils
     {

@@ -1,15 +1,15 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Math;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Utils;
+using TransportLinesManager.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using HarmonyLib;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Extensions;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     [HarmonyPatch(typeof(DepotAI))]
     public static class TLMDepotAIOverrides

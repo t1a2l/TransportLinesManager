@@ -2,20 +2,20 @@
 using ColossalFramework.Globalization;
 using ColossalFramework.Plugins;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions;
-using Klyte.Commons.Extensions.UI;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.DataContainers;
-using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.WorldInfoPanels.Tabs;
+using Commons.Extensions;
+using Commons.Extensions.UI;
+using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Utils;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Klyte.Commons.Extensions.Patcher;
+using static Commons.Extensions.Patcher;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels
+namespace TransportLinesManager.WorldInfoPanels
 {
     public class UVMPublicTransportWorldInfoPanel : Patcher, IPatcher
     {

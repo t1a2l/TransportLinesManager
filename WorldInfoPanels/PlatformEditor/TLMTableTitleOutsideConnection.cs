@@ -1,10 +1,10 @@
 ﻿using ColossalFramework.UI;
-using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.StructExtensions;
-using Klyte.Commons.Utils.UtilitiesClasses;
+using Commons.Utils;
+using Commons.Utils.StructExtensions;
+using Commons.Utils.UtilitiesClasses;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.PlatformEditor
+namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
 {
     public class TLMTableTitleOutsideConnection : UICustomControl
     {

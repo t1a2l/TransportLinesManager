@@ -1,15 +1,15 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions.UI;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.OptionsMenu.Tabs;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Extensions.UI;
+using Commons.Utils;
+using TransportLinesManager.OptionsMenu.Tabs;
+using TransportLinesManager.Utils;
 using System;
 using UnityEngine;
-using static Klyte.TransportLinesManager.OptionsMenu.TLMConfigOptions;
+using static TransportLinesManager.OptionsMenu.TLMConfigOptions;
 
-namespace Klyte.TransportLinesManager.OptionsMenu
+namespace TransportLinesManager.OptionsMenu
 {
     internal class TLMConfigOptions : Singleton<TLMConfigOptions>
     {

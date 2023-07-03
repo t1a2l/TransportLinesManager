@@ -1,14 +1,14 @@
 ﻿using ColossalFramework.UI;
-using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Data.Base;
-using Klyte.TransportLinesManager.Data.DataContainers;
-using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.WorldInfoPanels.Components;
+using Commons.Utils;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Data.Base;
+using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Utils;
+using TransportLinesManager.WorldInfoPanels.Components;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Tabs
+namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
 
     public class UVMBudgetConfigTab : TLMBaseTimedConfigTab<UVMBudgetConfigTab, UVMBudgetTimeChart, UVMBudgetEditorLine, BudgetEntryXml>

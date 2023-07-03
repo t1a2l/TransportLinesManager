@@ -1,16 +1,16 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions;
-using Klyte.Commons.Extensions.UI;
-using Klyte.TransportLinesManager.Data.Base.Enums;
-using Klyte.TransportLinesManager.Data.DataContainers;
-using Klyte.TransportLinesManager.Data.Extensions;
+using Commons.Extensions;
+using Commons.Extensions.UI;
+using TransportLinesManager.Data.Base.Enums;
+using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Data.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static Klyte.Commons.UI.DefaultEditorUILib;
+using static Commons.UI.DefaultEditorUILib;
 
-namespace Klyte.TransportLinesManager.OptionsMenu.Tabs
+namespace TransportLinesManager.OptionsMenu.Tabs
 {
     internal class TLMAutoNamePublicAreasTab : UICustomControl, ITLMConfigOptionsTab
     {

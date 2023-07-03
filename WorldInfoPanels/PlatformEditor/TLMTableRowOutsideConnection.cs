@@ -1,9 +1,9 @@
 ﻿using ColossalFramework.UI;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Tsd;
+using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.PlatformEditor
+namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
 {
     public class TLMTableRowOutsideConnection : UICustomControl
     {

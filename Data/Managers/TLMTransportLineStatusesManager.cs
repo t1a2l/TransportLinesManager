@@ -1,11 +1,11 @@
 ﻿using ColossalFramework;
-using Klyte.Commons.Utils;
+using Commons.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Data.Managers
+namespace TransportLinesManager.Data.Managers
 {
     public partial class TLMTransportLineStatusesManager : SingletonLite<TLMTransportLineStatusesManager>
     {

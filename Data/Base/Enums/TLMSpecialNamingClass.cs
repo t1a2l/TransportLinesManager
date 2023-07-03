@@ -1,4 +1,4 @@
-﻿namespace Klyte.TransportLinesManager.Data.Base.Enums
+﻿namespace TransportLinesManager.Data.Base.Enums
 {
     public enum TLMSpecialNamingClass
     {

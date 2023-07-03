@@ -1,9 +1,9 @@
-﻿using Klyte.Commons.Utils.StructExtensions;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Interfaces;
+﻿using Commons.Utils.StructExtensions;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Interfaces;
 using System.Xml.Serialization;
 
-namespace Klyte.TransportLinesManager.Data.Base.ConfigurationContainers
+namespace TransportLinesManager.Data.Base.ConfigurationContainers
 {
     public class TLMTransportLineConfiguration : IBasicExtensionStorage
     {

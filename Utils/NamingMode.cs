@@ -1,6 +1,6 @@
 ﻿using ColossalFramework.Globalization;
 
-namespace Klyte.TransportLinesManager.Utils
+namespace TransportLinesManager.Utils
 {
     public enum NamingMode
     {

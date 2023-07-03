@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Tabs
+namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
     public interface IUVMPTWIPChild
     {

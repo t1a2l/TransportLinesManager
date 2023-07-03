@@ -1,4 +1,4 @@
-﻿namespace Klyte.TransportLinesManager.Data.Base.Interfaces
+﻿namespace TransportLinesManager.Data.Base.Interfaces
 {
     public interface ITLMAutoNameConfigurable
     {

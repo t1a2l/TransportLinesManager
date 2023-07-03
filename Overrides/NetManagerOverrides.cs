@@ -3,7 +3,7 @@ using HarmonyLib;
 using UnityEngine;
 using System;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     [HarmonyPatch(typeof(NetManager))]
     public static class NetManagerOverrides

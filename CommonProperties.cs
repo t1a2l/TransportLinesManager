@@ -1,7 +1,7 @@
-using Klyte.TransportLinesManager;
+using TransportLinesManager;
 using UnityEngine;
 
-namespace Klyte.Commons
+namespace Commons
 {
     public static class CommonProperties
     {

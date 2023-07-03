@@ -1,12 +1,12 @@
 ﻿using ColossalFramework.UI;
-using Klyte.Commons.Extensions.UI;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.WorldInfoPanels.ReportTabs;
+using Commons.Extensions.UI;
+using Commons.Utils;
+using TransportLinesManager.WorldInfoPanels.ReportTabs;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Tabs
+namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
     internal class TLMReportsTab : UICustomControl, IUVMPTWIPChild
     {

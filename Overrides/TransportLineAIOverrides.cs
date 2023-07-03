@@ -1,13 +1,13 @@
 ﻿using HarmonyLib;
-using Klyte.Commons.Extensions;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Extensions;
+using Commons.Utils;
+using TransportLinesManager.Utils;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     [HarmonyPatch(typeof(TransportLineAI))]
 	public static class TransportLineAIOverrides 

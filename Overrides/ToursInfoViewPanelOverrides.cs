@@ -1,8 +1,8 @@
 ﻿using HarmonyLib;
-using Klyte.TransportLinesManager.CommonsWindow;
-using Klyte.TransportLinesManager.Data.Tsd;
+using TransportLinesManager.CommonsWindow;
+using TransportLinesManager.Data.Tsd;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     [HarmonyPatch(typeof(ToursInfoViewPanel))]
 	public static class ToursInfoViewPanelOverrides 

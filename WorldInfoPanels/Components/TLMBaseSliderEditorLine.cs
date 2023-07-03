@@ -1,13 +1,13 @@
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions.UI;
-using Klyte.Commons.UI.SpriteNames;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Base;
+using Commons.Extensions.UI;
+using Commons.UI.SpriteNames;
+using Commons.Utils;
+using TransportLinesManager.Data.Base;
 using System;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Components
+namespace TransportLinesManager.WorldInfoPanels.Components
 {
     public abstract class TLMBaseSliderEditorLine<L, V> : UICustomControl
         where L : TLMBaseSliderEditorLine<L, V>

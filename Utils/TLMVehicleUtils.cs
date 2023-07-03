@@ -1,14 +1,14 @@
 ﻿using ColossalFramework;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.Extensions;
-using Klyte.TransportLinesManager.Interfaces;
+using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Utils
+namespace TransportLinesManager.Utils
 {
     public class TLMVehicleUtils
     {

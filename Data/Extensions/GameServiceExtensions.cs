@@ -1,9 +1,9 @@
-﻿using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers;
-using Klyte.TransportLinesManager.Data.Base.Enums;
-using Klyte.TransportLinesManager.Data.DataContainers;
+﻿using TransportLinesManager.Data.Base.ConfigurationContainers;
+using TransportLinesManager.Data.Base.Enums;
+using TransportLinesManager.Data.DataContainers;
 using static ItemClass;
 
-namespace Klyte.TransportLinesManager.Data.Extensions
+namespace TransportLinesManager.Data.Extensions
 {
     internal static class GameServiceExtensions
     {

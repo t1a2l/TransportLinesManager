@@ -1,19 +1,19 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions.UI;
-using Klyte.Commons.UI.SpriteNames;
-using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Data.Base;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.UI;
-using Klyte.TransportLinesManager.WorldInfoPanels.Components;
+using Commons.Extensions.UI;
+using Commons.UI.SpriteNames;
+using Commons.Utils;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Data.Base;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.UI;
+using TransportLinesManager.WorldInfoPanels.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Tabs
+namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
     public abstract class TLMBaseTimedConfigTab<T, C, L, V> : UICustomControl, IUVMPTWIPChild where T : TLMBaseTimedConfigTab<T, C, L, V> where V : UintValueHourEntryXml<V> where L : TLMBaseSliderEditorLine<L, V> where C : TLMBaseTimeChart<T, C, L, V>
     {

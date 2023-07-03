@@ -1,9 +1,9 @@
 ﻿using HarmonyLib;
-using Klyte.Commons.Utils;
+using Commons.Utils;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     [HarmonyPatch]
     public static class PassengerPlatformsSizesOverrides

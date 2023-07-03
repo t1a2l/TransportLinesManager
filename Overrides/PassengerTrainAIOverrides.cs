@@ -1,10 +1,10 @@
 ﻿using System;
 using UnityEngine;
 using HarmonyLib;
-using Klyte.TransportLinesManager.Cache.BuildingData;
-using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
+using TransportLinesManager.Cache.BuildingData;
+using TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     [HarmonyPatch(typeof(PassengerTrainAI))]
     public class PassengerTrainAIOverrides

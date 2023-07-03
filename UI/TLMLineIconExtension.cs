@@ -1,9 +1,9 @@
 ﻿using ColossalFramework.Globalization;
-using Klyte.Commons.UI.SpriteNames;
+using Commons.UI.SpriteNames;
 using System;
 using System.Linq;
 
-namespace Klyte.TransportLinesManager.UI
+namespace TransportLinesManager.UI
 {
     internal static class TLMLineIconExtension
     {

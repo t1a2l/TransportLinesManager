@@ -1,7 +1,7 @@
-﻿using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Tsd;
+﻿using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
 
-namespace Klyte.TransportLinesManager.Utils
+namespace TransportLinesManager.Utils
 {
     internal static class NamingTypeExtensions
     {

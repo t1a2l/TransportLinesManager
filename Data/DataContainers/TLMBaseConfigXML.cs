@@ -1,18 +1,18 @@
 ﻿using ICities;
-using Klyte.Commons.Interfaces.Warehouse;
-using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers;
-using Klyte.TransportLinesManager.Data.Base.Enums;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.OptionsMenu;
+using Commons.Interfaces.Warehouse;
+using Commons.Utils;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Data.Base.ConfigurationContainers;
+using TransportLinesManager.Data.Base.Enums;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.OptionsMenu;
 using System;
 using System.Collections;
 using System.IO;
 using System.Xml.Serialization;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Data.DataContainers
+namespace TransportLinesManager.Data.DataContainers
 {
     [XmlRoot("TLMBaseConfig")]
     public class TLMBaseConfigXML : DataExtensionBase<TLMBaseConfigXML>

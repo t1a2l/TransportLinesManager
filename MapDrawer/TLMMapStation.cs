@@ -6,7 +6,7 @@ using UnityEngine;
    OBS: Mudar a forma de pintar as linhas, criar caminhos comuns entre estações iguais (ajuda no tram)
    ver como fazer linhas de sentido único no tram
 */
-namespace Klyte.TransportLinesManager.MapDrawer
+namespace TransportLinesManager.MapDrawer
 {
     public class TLMMapStation
     {

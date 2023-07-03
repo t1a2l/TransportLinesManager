@@ -1,9 +1,9 @@
-﻿using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Data.Base;
+﻿using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Data.Base;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.Interfaces
+namespace TransportLinesManager.Interfaces
 {
     public interface ILineNumberToIndexable
     {

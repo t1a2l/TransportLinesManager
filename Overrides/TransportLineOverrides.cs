@@ -1,12 +1,12 @@
 ﻿using ColossalFramework;
 using HarmonyLib;
-using Klyte.Commons.Extensions;
-using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.DataContainers;
-using Klyte.TransportLinesManager.Data.Managers;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Extensions;
+using Commons.Utils;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Data.Managers;
+using TransportLinesManager.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using static EconomyManager;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     internal enum TLMTransportLineFlags
     {

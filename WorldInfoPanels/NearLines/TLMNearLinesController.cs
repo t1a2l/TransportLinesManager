@@ -1,14 +1,14 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
-using Klyte.Commons.Utils;
-using Klyte.Commons.Utils.UtilitiesClasses;
-using Klyte.TransportLinesManager.Cache.BuildingData;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Utils;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Cache.BuildingData;
+using TransportLinesManager.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.NearLines
+namespace TransportLinesManager.WorldInfoPanels.NearLines
 {
     public class TLMNearLinesController : UICustomControl
     {

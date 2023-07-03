@@ -1,12 +1,12 @@
 ﻿using HarmonyLib;
-using Klyte.Commons.Extensions;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.CommonsWindow;
-using Klyte.TransportLinesManager.WorldInfoPanels;
+using Commons.Extensions;
+using Commons.Utils;
+using TransportLinesManager.CommonsWindow;
+using TransportLinesManager.WorldInfoPanels;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
 	[HarmonyPatch(typeof(PublicTransportWorldInfoPanel))]
 	public static class PublicTransportWorldInfoPanelOverrides

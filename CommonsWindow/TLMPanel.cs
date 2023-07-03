@@ -1,13 +1,13 @@
 ﻿using ColossalFramework.UI;
-using Klyte.Commons.Interfaces;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.CommonsWindow.List;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Interfaces;
+using Commons.Utils;
+using TransportLinesManager.CommonsWindow.List;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Utils;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.CommonsWindow
+namespace TransportLinesManager.CommonsWindow
 {
 
     public class TLMPanel : BasicKPanel<TransportLinesManagerMod, TLMController, TLMPanel>

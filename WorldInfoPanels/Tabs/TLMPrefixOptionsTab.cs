@@ -1,22 +1,22 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using ICities;
-using Klyte.Commons.Extensions.UI;
-using Klyte.Commons.UI.SpriteNames;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.DataContainers;
-using Klyte.TransportLinesManager.Data.Extensions;
-using Klyte.TransportLinesManager.Interfaces;
-using Klyte.TransportLinesManager.OptionsMenu.Tabs;
-using Klyte.TransportLinesManager.Palettes;
-using Klyte.TransportLinesManager.UI;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Extensions.UI;
+using Commons.UI.SpriteNames;
+using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Interfaces;
+using TransportLinesManager.OptionsMenu.Tabs;
+using TransportLinesManager.Palettes;
+using TransportLinesManager.UI;
+using TransportLinesManager.Utils;
 using System;
 using System.Linq;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Tabs
+namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
     internal class TLMPrefixOptionsTab : UICustomControl, IUVMPTWIPChild
     {

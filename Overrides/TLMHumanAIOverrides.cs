@@ -4,14 +4,14 @@ using System.Reflection;
 using System.Reflection.Emit;
 using ColossalFramework;
 using HarmonyLib;
-using Klyte.Commons.Extensions;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.Managers;
-using Klyte.TransportLinesManager.Utils;
+using Commons.Extensions;
+using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Managers;
+using TransportLinesManager.Utils;
 using static EconomyManager;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     [HarmonyPatch(typeof(HumanAI))]
 	public static class TLMHumanAIOverrides 

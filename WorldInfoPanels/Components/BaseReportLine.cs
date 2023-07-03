@@ -1,10 +1,10 @@
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Managers;
+using Commons.Utils;
+using TransportLinesManager.Data.Managers;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Components
+namespace TransportLinesManager.WorldInfoPanels.Components
 {
     internal abstract class BaseReportLine<T> : MonoBehaviour where T : TLMTransportLineStatusesManager.BasicReportData
     {

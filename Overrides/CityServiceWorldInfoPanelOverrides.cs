@@ -1,15 +1,15 @@
 ﻿using ColossalFramework;
-using Klyte.TransportLinesManager.CommonsWindow;
+using TransportLinesManager.CommonsWindow;
 using HarmonyLib;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using System.Reflection;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.DataContainers;
-using Klyte.Commons.Extensions;
+using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.DataContainers;
+using Commons.Extensions;
 
-namespace Klyte.TransportLinesManager.Overrides
+namespace TransportLinesManager.Overrides
 {
     [HarmonyPatch(typeof(CityServiceWorldInfoPanel))]
     public static class CityServiceWorldInfoPanelOverrides

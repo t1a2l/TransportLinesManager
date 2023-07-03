@@ -1,18 +1,18 @@
 using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Commons.Extensions.UI;
-using Klyte.Commons.Utils;
-using Klyte.TransportLinesManager.Data.Tsd;
-using Klyte.TransportLinesManager.Data.Extensions;
-using Klyte.TransportLinesManager.Interfaces;
-using Klyte.TransportLinesManager.UI;
-using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.WorldInfoPanels.Tabs;
+using Commons.Extensions.UI;
+using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Interfaces;
+using TransportLinesManager.UI;
+using TransportLinesManager.Utils;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 using System;
 using UnityEngine;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Components
+namespace TransportLinesManager.WorldInfoPanels.Components
 {
     public class TLMAssetItemLine : UICustomControl
     {

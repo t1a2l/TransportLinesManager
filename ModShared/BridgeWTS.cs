@@ -1,4 +1,4 @@
-﻿namespace Klyte.TransportLinesManager.ModShared
+﻿namespace TransportLinesManager.ModShared
 {
     internal class BridgeWTS : IBridgeWTS
     {

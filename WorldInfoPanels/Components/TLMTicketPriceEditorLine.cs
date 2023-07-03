@@ -1,8 +1,8 @@
 using ColossalFramework.Globalization;
-using Klyte.TransportLinesManager.Data.Base;
-using Klyte.TransportLinesManager.UI;
+using TransportLinesManager.Data.Base;
+using TransportLinesManager.UI;
 
-namespace Klyte.TransportLinesManager.WorldInfoPanels.Components
+namespace TransportLinesManager.WorldInfoPanels.Components
 {
     public class TLMTicketPriceEditorLine : TLMBaseSliderEditorLine<TLMTicketPriceEditorLine, TicketPriceEntryXml>
     {

@@ -1,7 +1,7 @@
-﻿using Klyte.Commons.UI.SpriteNames;
-using Klyte.TransportLinesManager.Data.Base.ConfigurationContainers;
+﻿using Commons.UI.SpriteNames;
+using TransportLinesManager.Data.Base.ConfigurationContainers;
 
-namespace Klyte.TransportLinesManager.Interfaces
+namespace TransportLinesManager.Interfaces
 {
     public interface ITLMTransportTypeExtension :
         IBasicExtension,
