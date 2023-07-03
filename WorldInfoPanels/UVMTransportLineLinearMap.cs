@@ -85,12 +85,12 @@ namespace TransportLinesManager.WorldInfoPanels
             BindComponents(ptwip);
             AdjustLineStopsPanel(ptwip);
 
-            KlyteMonoUtils.CreateUIElement(out m_panelModeSelector, m_bg.parent.transform);
+            MonoUtils.CreateUIElement(out m_panelModeSelector, m_bg.parent.transform);
             m_panelModeSelector.autoFitChildrenHorizontally = true;
             m_panelModeSelector.autoFitChildrenVertically = true;
             m_panelModeSelector.autoLayout = true;
             m_panelModeSelector.autoLayoutDirection = LayoutDirection.Horizontal;
-            m_mapModeDropDown = UIHelperExtension.CloneBasicDropDownNoLabel(Enum.GetValues(typeof(MapMode)).Cast<MapMode>().Where(x => x >= 0).Select(x => Locale.Get("K45_TLM_LINEAR_MAP_VIEW_MODE", x.ToString())).ToArray(), (int idx) =>
+            m_mapModeDropDown = UIHelperExtension.CloneBasicDropDownNoLabel(Enum.GetValues(typeof(MapMode)).Cast<MapMode>().Where(x => x >= 0).Select(x => Locale.Get("TLM_LINEAR_MAP_VIEW_MODE", x.ToString())).ToArray(), (int idx) =>
                {
                    m_currentMode = (MapMode)idx;
                    RefreshVehicleButtons(GetLineID(out bool fromBuilding), fromBuilding);
@@ -100,12 +100,12 @@ namespace TransportLinesManager.WorldInfoPanels
             m_mapModeDropDown.size = new Vector2(200, 25);
             m_mapModeDropDown.itemHeight = 16;
 
-            m_unscaledCheck = UIHelperExtension.AddCheckboxLocale(m_panelModeSelector, "K45_TLM_LINEAR_MAP_SHOW_UNSCALED", m_unscaledMode, (val) =>
+            m_unscaledCheck = UIHelperExtension.AddCheckboxLocale(m_panelModeSelector, "TLM_LINEAR_MAP_SHOW_UNSCALED", m_unscaledMode, (val) =>
             {
                 m_unscaledMode = val;
                 MarkDirty();
             });
-            KlyteMonoUtils.LimitWidthAndBox(m_unscaledCheck.label, 165);
+            MonoUtils.LimitWidthAndBox(m_unscaledCheck.label, 165);
 
         }
 
@@ -136,7 +136,7 @@ namespace TransportLinesManager.WorldInfoPanels
             m_connectionLabel = Instantiate(m_vehiclesLabel);
             m_connectionLabel.transform.SetParent(m_vehiclesLabel.transform.parent);
             m_connectionLabel.absolutePosition = m_vehiclesLabel.absolutePosition;
-            m_connectionLabel.localeID = "K45_TLM_CONNECTIONS";
+            m_connectionLabel.localeID = "TLM_CONNECTIONS";
 
             TLMLineItemButtonControl.EnsureTemplate();
             var lineStringButton = m_vehiclesLabel.parent.AttachUIComponent(UITemplateManager.GetAsGameObject(TLMLineItemButtonControl.LINE_ITEM_TEMPLATE)) as UIButton;

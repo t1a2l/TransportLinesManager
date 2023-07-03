@@ -8,7 +8,7 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
     public class TLMTableRowOutsideConnection : UICustomControl
     {
 
-        public const string ITEM_TEMPLATE = "K45_TLM_TLMTableRowOutsideConnection";
+        public const string ITEM_TEMPLATE = "TLM_TLMTableRowOutsideConnection";
 
         public static void EnsureTemplate()
         {
@@ -24,14 +24,14 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
             rowContainer.wrapLayout = false;
             rowContainer.autoLayoutDirection = LayoutDirection.Horizontal;
 
-            KlyteMonoUtils.CreateUIElement(out UISprite platformClr, rowContainer.transform);
+            MonoUtils.CreateUIElement(out UISprite platformClr, rowContainer.transform);
             platformClr.autoSize = false;
             platformClr.width = 36;
             platformClr.spriteName = "EmptySprite";
             platformClr.height = 18;
             platformClr.name = "PlatformClr";
 
-            KlyteMonoUtils.CreateUIElement(out UILabel platformNum, platformClr.transform);
+            MonoUtils.CreateUIElement(out UILabel platformNum, platformClr.transform);
             platformNum.autoSize = false;
             platformNum.width = 36;
             platformNum.height = 18;
@@ -40,7 +40,7 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
             platformNum.textAlignment = UIHorizontalAlignment.Center;
             platformNum.padding.top = 3;
 
-            KlyteMonoUtils.CreateUIElement(out UIPanel outsideConnectionColumns, rowContainer.transform);
+            MonoUtils.CreateUIElement(out UIPanel outsideConnectionColumns, rowContainer.transform);
             outsideConnectionColumns.autoLayout = true;
             outsideConnectionColumns.autoLayoutDirection = LayoutDirection.Horizontal;
             outsideConnectionColumns.autoFitChildrenHorizontally = true;
@@ -63,7 +63,7 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
         {
             m_platClr = Find<UISprite>("PlatformClr");
             m_platNum = m_platClr.Find<UILabel>("PlatformNum");
-            KlyteMonoUtils.LimitWidthAndBox(m_platNum, 36, true);
+            MonoUtils.LimitWidthAndBox(m_platNum, 36, true);
             m_platNum.Disable();
 
             TLMTableRowDataOutsideConnection.EnsureTemplate();

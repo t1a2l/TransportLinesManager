@@ -211,7 +211,7 @@ namespace TransportLinesManager.Palettes
                 {
                     Init();
                 }
-                return new string[] { "<" + Locale.Get("K45_TLM_RANDOM") + ">" }.Union(m_palettes.Keys).OrderBy(x => x).ToArray();
+                return new string[] { "<" + Locale.Get("TLM_RANDOM") + ">" }.Union(m_palettes.Keys).OrderBy(x => x).ToArray();
             }
         }
 

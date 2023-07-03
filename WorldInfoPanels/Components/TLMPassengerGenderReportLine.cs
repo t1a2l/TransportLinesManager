@@ -19,8 +19,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         protected override void AsTitleInternal()
         {
-            m_male.text = Locale.Get("K45_TLM_GENDER_REPORT_COLUMN_MALE");
-            m_female.text = Locale.Get("K45_TLM_GENDER_REPORT_COLUMN_FEMALE");
+            m_male.text = Locale.Get("TLM_GENDER_REPORT_COLUMN_MALE");
+            m_female.text = Locale.Get("TLM_GENDER_REPORT_COLUMN_FEMALE");
             m_total.text = Locale.Get("INFO_PUBLICTRANSPORT_TOTAL");
 
             m_male.textAlignment = UIHorizontalAlignment.Center;
@@ -30,8 +30,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         protected override void AddColumns(ref float xAdvance)
         {
-            xAdvance += InitField(out m_male, "M", "K45_TLM_GENDER_REPORT_COLUMN_MALE", xAdvance, TOTAL_DATA_COLUMNS_SPACE / 3);
-            xAdvance += InitField(out m_female, "F", "K45_TLM_GENDER_REPORT_COLUMN_FEMALE", xAdvance, TOTAL_DATA_COLUMNS_SPACE / 3);
+            xAdvance += InitField(out m_male, "M", "TLM_GENDER_REPORT_COLUMN_MALE", xAdvance, TOTAL_DATA_COLUMNS_SPACE / 3);
+            xAdvance += InitField(out m_female, "F", "TLM_GENDER_REPORT_COLUMN_FEMALE", xAdvance, TOTAL_DATA_COLUMNS_SPACE / 3);
             xAdvance += InitField(out m_total, "Tt", "INFO_PUBLICTRANSPORT_TOTAL", xAdvance, TOTAL_DATA_COLUMNS_SPACE / 3);
         }
     }

@@ -13,7 +13,7 @@ namespace TransportLinesManager.Data.Tsd
             new TransferManager.TransferReason[] { TransferManager.TransferReason.Taxi },
             new Color32(60, 184, 120, 255),
             1,
-            LineIconSpriteNames.K45_TriangleIcon,
+            LineIconSpriteNames.TriangleIcon,
             false);
     }
 

@@ -22,12 +22,12 @@ namespace TransportLinesManager.CommonsWindow
         protected override void AwakeActions()
         {
 
-            KlyteMonoUtils.CreateUIElement(out m_stripMain, MainPanel.transform, "TLMTabstrip", new Vector4(5, 45, MainPanel.width - 10, 40));
+            MonoUtils.CreateUIElement(out m_stripMain, MainPanel.transform, "TLMTabstrip", new Vector4(5, 45, MainPanel.width - 10, 40));
             CreateTsdTabstrip();
             m_stripMain.eventVisibilityChanged += OnOpenClosePanel;
             m_stripMain.selectedIndex = 0;
 
-            KlyteMonoUtils.CreateUIElement(out UIPanel bodyContent, MainPanel.transform, "Content", new Vector4(0, 85, MainPanel.width, MainPanel.height - 85));
+            MonoUtils.CreateUIElement(out UIPanel bodyContent, MainPanel.transform, "Content", new Vector4(0, 85, MainPanel.width, MainPanel.height - 85));
             m_linesPanel = bodyContent.gameObject.AddComponent<UVMLinesPanel>();
             m_stripMain.eventSelectedIndexChanged += (x, y) =>
             {
@@ -59,7 +59,7 @@ namespace TransportLinesManager.CommonsWindow
                 string name = tsd.GetTransportName();
                 UIButton tabButton = m_stripMain.AddTab();
                 UpdateTabSubStripTemplate(tabButton);
-                string bgIcon = KlyteResourceLoader.GetDefaultSpriteNameFor(TLMPrefixesUtils.GetLineIcon(0, tsd), true);
+                string bgIcon = ResourceLoader.GetDefaultSpriteNameFor(TLMPrefixesUtils.GetLineIcon(0, tsd), true);
                 string fgIcon = tsd.GetTransportTypeIcon();
                 tabButton.tooltip = name;
                 tabButton.name = tsd.ToString();
@@ -73,7 +73,7 @@ namespace TransportLinesManager.CommonsWindow
                 tabButton.disabledColor = Color.gray;
                 if (!string.IsNullOrEmpty(fgIcon))
                 {
-                    KlyteMonoUtils.CreateUIElement(out UIButton secSprite, tabButton.transform, "OverSprite", new Vector4(5, 5, 30, 30));
+                    MonoUtils.CreateUIElement(out UIButton secSprite, tabButton.transform, "OverSprite", new Vector4(5, 5, 30, 30));
                     secSprite.normalFgSprite = fgIcon;
                     secSprite.foregroundSpriteMode = UIForegroundSpriteMode.Scale;
                     secSprite.isInteractive = false;
@@ -85,7 +85,7 @@ namespace TransportLinesManager.CommonsWindow
 
         private static UIButton UpdateTabSubStripTemplate(UIButton tabTemplate)
         {
-            KlyteMonoUtils.InitButton(tabTemplate, false, "GenericTab");
+            MonoUtils.InitButton(tabTemplate, false, "GenericTab");
             tabTemplate.autoSize = false;
             tabTemplate.width = 40;
             tabTemplate.height = 40;

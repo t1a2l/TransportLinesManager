@@ -18,7 +18,7 @@ namespace TransportLinesManager
     public class TLMConfigWarehouse : ConfigWarehouseBase<TLMConfigWarehouse.ConfigIndex, TLMConfigWarehouse>
     {
 
-        protected override string ID { get; } = "K45_TLM_ConfigWarehouse";
+        protected override string ID { get; } = "TLM_ConfigWarehouse";
         [XmlIgnore]
         public static readonly ConfigIndex[] PALETTES_INDEXES = new ConfigIndex[] {
           SHIP_PALETTE_MAIN,
@@ -248,7 +248,7 @@ namespace TransportLinesManager
                 case OFFICE_SERVICE_CONFIG:
                     return "DISTRICT_OFFICE";
                 case ADDRESS_NAME_CONFIG:
-                    return "K45_TLM_ROAD_NAMING_STOP";
+                    return "TLM_ROAD_NAMING_STOP";
                 case PARKAREA_NAME_CONFIG:
                 case CAMPUS_AREA_NAME_CONFIG:
                 case INDUSTRIAL_AREA_NAME_CONFIG:
@@ -299,40 +299,40 @@ namespace TransportLinesManager
             switch (transportType & SYSTEM_PART)
             {
                 case TRAIN_CONFIG:
-                    return LineIconSpriteNames.K45_CircleIcon;
+                    return LineIconSpriteNames.CircleIcon;
                 case METRO_CONFIG:
-                    return LineIconSpriteNames.K45_SquareIcon;
+                    return LineIconSpriteNames.SquareIcon;
                 case BUS_CONFIG:
-                    return LineIconSpriteNames.K45_HexagonIcon;
+                    return LineIconSpriteNames.HexagonIcon;
                 case TRAM_CONFIG:
-                    return LineIconSpriteNames.K45_TrapezeIcon;
+                    return LineIconSpriteNames.TrapezeIcon;
                 case SHIP_CONFIG:
-                    return LineIconSpriteNames.K45_DiamondIcon;
+                    return LineIconSpriteNames.DiamondIcon;
                 case CABLE_CAR_CONFIG:
-                    return LineIconSpriteNames.K45_ConeIcon;
+                    return LineIconSpriteNames.ConeIcon;
                 case MONORAIL_CONFIG:
-                    return LineIconSpriteNames.K45_RoundedSquareIcon;
+                    return LineIconSpriteNames.RoundedSquareIcon;
                 case PLANE_CONFIG:
-                    return LineIconSpriteNames.K45_PentagonIcon;
+                    return LineIconSpriteNames.PentagonIcon;
                 case FERRY_CONFIG:
-                    return LineIconSpriteNames.K45_S08StarIcon;
+                    return LineIconSpriteNames.S08StarIcon;
                 case BLIMP_CONFIG:
-                    return LineIconSpriteNames.K45_ParachuteIcon;
+                    return LineIconSpriteNames.ParachuteIcon;
                 case EVAC_BUS_CONFIG:
-                    return LineIconSpriteNames.K45_CrossIcon;
+                    return LineIconSpriteNames.CrossIcon;
                 case TOUR_PED_CONFIG:
-                    return LineIconSpriteNames.K45_MountainIcon;
+                    return LineIconSpriteNames.MountainIcon;
                 case TOUR_BUS_CONFIG:
-                    return LineIconSpriteNames.K45_CameraIcon;
+                    return LineIconSpriteNames.CameraIcon;
                 case TAXI_CONFIG:
-                    return LineIconSpriteNames.K45_TriangleIcon;
+                    return LineIconSpriteNames.TriangleIcon;
                 case TROLLEY_CONFIG:
-                    return LineIconSpriteNames.K45_OvalIcon;
+                    return LineIconSpriteNames.OvalIcon;
                 case HELICOPTER_CONFIG:
-                    return LineIconSpriteNames.K45_S05StarIcon;
+                    return LineIconSpriteNames.S05StarIcon;
                 default:
                     LogUtils.DoErrorLog($"INVALID TT! {transportType}");
-                    return LineIconSpriteNames.K45_S09StarIcon;
+                    return LineIconSpriteNames.S09StarIcon;
             }
         }
         public static string getNameForTransportType(ConfigIndex i)

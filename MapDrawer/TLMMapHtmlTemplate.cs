@@ -13,10 +13,10 @@ namespace TransportLinesManager.MapDrawer
     {
         public string GetResult(TLMMapCityTransportObject cto, string cityName, DateTime currentTime) => $@"
              <!DOCTYPE html><html><head> <meta charset='UTF-8'> 
-             <style>{KlyteResourceLoader.LoadResourceString("MapDrawer.lineDrawBasicCss.css") }</style>
+             <style>{ResourceLoader.LoadResourceString("MapDrawer.lineDrawBasicCss.css") }</style>
              <script src=""https://code.jquery.com/jquery-3.6.0.min.js"" integrity=""sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="" crossorigin=""anonymous""></script>
              <script>var _infoLines = {cto.ToJson()};</script>
-             <script>{KlyteResourceLoader.LoadResourceString("MapDrawer.app.js") }</script>
+             <script>{ResourceLoader.LoadResourceString("MapDrawer.app.js") }</script>
              </head><body>
              <div id=""mapContainer"">
                     <div id=""mapGroup"">
@@ -36,7 +36,7 @@ namespace TransportLinesManager.MapDrawer
             </div>
             <div id=""linesPanel"">
                 <div id=""title"">{cityName}</div>
-                <div id=""date"">{currentTime.ToString(CultureInfo.GetCultures(CultureTypes.SpecificCultures).Where(c => c.TwoLetterISOLanguageName == KlyteLocaleManager.CurrentLanguageId).FirstOrDefault())}</div>
+                <div id=""date"">{currentTime.ToString(CultureInfo.GetCultures(CultureTypes.SpecificCultures).Where(c => c.TwoLetterISOLanguageName == TLMLocaleManager.CurrentLanguageId).FirstOrDefault())}</div>
                 <div id=""content"">
             </div></body></html>";     
     }

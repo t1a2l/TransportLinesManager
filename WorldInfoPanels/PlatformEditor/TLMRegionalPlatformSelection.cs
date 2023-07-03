@@ -24,7 +24,7 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
 
         internal static TLMRegionalPlatformSelection Init(UIComponent parent)
         {
-            KlyteMonoUtils.CreateUIElement(out UIPanel panel, parent.transform);
+            MonoUtils.CreateUIElement(out UIPanel panel, parent.transform);
             return panel.gameObject.AddComponent<TLMRegionalPlatformSelection>();
         }
 
@@ -46,13 +46,13 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
             m_containerParent.padding.top = 5;
             m_containerParent.padding.bottom = 5;
 
-            m_title = UIHelperExtension.AddCheckboxLocale(m_containerParent, "K45_TLM_REGIONALPLATFORM_USECONFIG", false);
+            m_title = UIHelperExtension.AddCheckboxLocale(m_containerParent, "TLM_REGIONALPLATFORM_USECONFIG", false);
             m_title.label.autoSize = true;
-            KlyteMonoUtils.LimitWidthAndBox(m_title.label, 320);
+            MonoUtils.LimitWidthAndBox(m_title.label, 320);
             m_title.height = 24;
             m_title.width = 350;
 
-            KlyteMonoUtils.CreateUIElement(out m_tableContainer, m_containerParent.transform);
+            MonoUtils.CreateUIElement(out m_tableContainer, m_containerParent.transform);
             m_tableContainer.width = m_containerParent.width;
             m_tableContainer.autoFitChildrenVertically = true;
             m_tableContainer.autoFitChildrenHorizontally = true;
@@ -64,7 +64,7 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
             m_tableContainer.name = "TableContainer";
 
 
-            KlyteMonoUtils.CreateUIElement(out m_titleRowContainer, m_tableContainer.transform);
+            MonoUtils.CreateUIElement(out m_titleRowContainer, m_tableContainer.transform);
             m_titleRowContainer.width = m_tableContainer.width;
             m_titleRowContainer.autoFitChildrenVertically = true;
             m_titleRowContainer.autoFitChildrenHorizontally = true;
@@ -76,13 +76,13 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
             m_titleRowContainer.wrapLayout = false;
             m_titleRowContainer.name = "TLMOutsideConnections";
 
-            KlyteMonoUtils.CreateUIElement(out UILabel outsideConnectionIcon, m_titleRowContainer.transform);
+            MonoUtils.CreateUIElement(out UILabel outsideConnectionIcon, m_titleRowContainer.transform);
             outsideConnectionIcon.autoSize = false;
             outsideConnectionIcon.width = 36;
             outsideConnectionIcon.backgroundSprite = "InfoIconOutsideConnections";
             outsideConnectionIcon.height = 36;
 
-            KlyteMonoUtils.CreateUIElement(out UIPanel outsideConnectionColumns, m_titleRowContainer.transform);
+            MonoUtils.CreateUIElement(out UIPanel outsideConnectionColumns, m_titleRowContainer.transform);
             outsideConnectionColumns.autoLayout = true;
             outsideConnectionColumns.autoLayoutDirection = LayoutDirection.Horizontal;
             outsideConnectionColumns.autoFitChildrenHorizontally = true;
@@ -91,7 +91,7 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
             m_titleOutsideConnectionsTemplateList = new UITemplateList<UILabel>(outsideConnectionColumns, TLMTableTitleOutsideConnection.ITEM_TEMPLATE);
 
 
-            KlyteMonoUtils.CreateUIElement(out m_platformListContainer, m_tableContainer.transform);
+            MonoUtils.CreateUIElement(out m_platformListContainer, m_tableContainer.transform);
             m_platformListContainer.width = m_tableContainer.width;
             m_platformListContainer.autoFitChildrenVertically = true;
             m_platformListContainer.autoFitChildrenHorizontally = true;

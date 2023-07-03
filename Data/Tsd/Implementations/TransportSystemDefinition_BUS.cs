@@ -13,7 +13,7 @@ namespace TransportLinesManager.Data.Tsd
             new TransferManager.TransferReason[] { TransferManager.TransferReason.Bus },
             new Color32(53, 121, 188, 255),
             30,
-            LineIconSpriteNames.K45_HexagonIcon,
+            LineIconSpriteNames.HexagonIcon,
             true,
             ItemClass.Level.Level3,
             ItemClass.Level.Level2

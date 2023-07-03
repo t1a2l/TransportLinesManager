@@ -29,7 +29,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
 
         internal static TLMNearLinesController InitPanelNearLinesOnWorldInfoPanel(UIComponent parent)
         {
-            KlyteMonoUtils.CreateUIElement(out UIPanel panel, parent.transform);
+            MonoUtils.CreateUIElement(out UIPanel panel, parent.transform);
             return panel.gameObject.AddComponent<TLMNearLinesController>();
         }
 
@@ -51,7 +51,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_containerParent.padding.bottom = 5;
 
 
-            KlyteMonoUtils.CreateUIElement(out m_localContainer, m_containerParent.transform);
+            MonoUtils.CreateUIElement(out m_localContainer, m_containerParent.transform);
             m_localContainer.width = m_containerParent.width;
             m_localContainer.autoFitChildrenVertically = true;
             m_localContainer.autoLayout = true;
@@ -61,15 +61,15 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_localContainer.autoLayoutStart = LayoutStart.TopLeft;
             m_localContainer.name = "TLMLinesNearRegional";
 
-            KlyteMonoUtils.CreateUIElement(out m_title, m_localContainer.transform);
+            MonoUtils.CreateUIElement(out m_title, m_localContainer.transform);
             m_title.autoSize = false;
             m_title.width = m_localContainer.width;
             m_title.textAlignment = UIHorizontalAlignment.Left;
-            m_title.localeID = "K45_TLM_NEAR_LINES";
+            m_title.localeID = "TLM_NEAR_LINES";
             m_title.useOutline = true;
             m_title.height = 18;
 
-            KlyteMonoUtils.CreateUIElement(out m_listContainer, m_localContainer.transform);
+            MonoUtils.CreateUIElement(out m_listContainer, m_localContainer.transform);
             m_listContainer.width = m_localContainer.width;
             m_listContainer.autoFitChildrenVertically = true;
             m_listContainer.autoLayout = true;
@@ -83,7 +83,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_localLinesTemplateList = new UITemplateList<UIButton>(m_listContainer, TLMLineItemButtonControl.LINE_ITEM_TEMPLATE);
 
 
-            KlyteMonoUtils.CreateUIElement(out m_regionalContainer, m_containerParent.transform);
+            MonoUtils.CreateUIElement(out m_regionalContainer, m_containerParent.transform);
             m_regionalContainer.width = m_containerParent.width;
             m_regionalContainer.autoFitChildrenVertically = true;
             m_regionalContainer.autoLayout = true;
@@ -93,16 +93,16 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_regionalContainer.autoLayoutStart = LayoutStart.TopLeft;
             m_regionalContainer.name = "TLMLinesNearRegional";
 
-            KlyteMonoUtils.CreateUIElement(out m_regTitle, m_regionalContainer.transform);
+            MonoUtils.CreateUIElement(out m_regTitle, m_regionalContainer.transform);
             m_regTitle.autoSize = false;
             m_regTitle.width = m_regionalContainer.width;
             m_regTitle.textAlignment = UIHorizontalAlignment.Left;
-            m_regTitle.localeID = "K45_TLM_NEAR_LINES_REGIONAL";
+            m_regTitle.localeID = "TLM_NEAR_LINES_REGIONAL";
             m_regTitle.useOutline = true;
             m_regTitle.height = 18;
 
 
-            KlyteMonoUtils.CreateUIElement(out m_regListContainer, m_regionalContainer.transform);
+            MonoUtils.CreateUIElement(out m_regListContainer, m_regionalContainer.transform);
             m_regListContainer.width = m_regionalContainer.width;
             m_regListContainer.autoFitChildrenVertically = true;
             m_regListContainer.autoLayout = true;

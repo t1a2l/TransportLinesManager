@@ -54,7 +54,7 @@ namespace TransportLinesManager.CommonsWindow.List
             CreateTitleRow(out titleLine, MainContainer);
 
 
-            KlyteMonoUtils.CreateScrollPanel(MainContainer, out listPanel, out UIScrollbar scrollbar, MainContainer.width - 30, MainContainer.height - 70, new Vector3(5, 40));
+            MonoUtils.CreateScrollPanel(MainContainer, out listPanel, out UIScrollbar scrollbar, MainContainer.width - 30, MainContainer.height - 70, new Vector3(5, 40));
             listPanel.autoLayout = true;
             listPanel.autoLayoutDirection = LayoutDirection.Vertical;
             listPanel.eventVisibilityChanged += OnToggleVisible;
@@ -96,16 +96,16 @@ namespace TransportLinesManager.CommonsWindow.List
             m_lastSortCriterionLines = LineSortCriterion.LINE_NUMBER;
 
             UIComponent parent = GetComponent<UIComponent>();
-            KlyteMonoUtils.CreateUIElement(out m_autoNameAll, parent.transform);
+            MonoUtils.CreateUIElement(out m_autoNameAll, parent.transform);
             m_autoNameAll.relativePosition = new Vector3(parent.width - 50f, -5);
             m_autoNameAll.textScale = 0.6f;
             m_autoNameAll.width = 40;
             m_autoNameAll.height = 40;
-            m_autoNameAll.tooltip = Locale.Get("K45_TLM_AUTO_NAME_ALL_TOOLTIP");
-            KlyteMonoUtils.InitButton(m_autoNameAll, true, "ButtonMenu");
+            m_autoNameAll.tooltip = Locale.Get("TLM_AUTO_NAME_ALL_TOOLTIP");
+            MonoUtils.InitButton(m_autoNameAll, true, "ButtonMenu");
             m_autoNameAll.name = "AutoNameAll";
             m_autoNameAll.isVisible = true;
-            m_autoNameAll.normalFgSprite = KlyteResourceLoader.GetDefaultSpriteNameFor(CommonsSpriteNames.K45_AutoNameIcon);
+            m_autoNameAll.normalFgSprite = ResourceLoader.GetDefaultSpriteNameFor(CommonsSpriteNames.AutoNameIcon);
             m_autoNameAll.eventClick += (component, eventParam) =>
             {
                 foreach (UVMLineListItem item in lineItems.items.Select(x => x.GetComponentInChildren<UVMLineListItem>()))
@@ -114,16 +114,16 @@ namespace TransportLinesManager.CommonsWindow.List
                 }
             };
 
-            KlyteMonoUtils.CreateUIElement(out m_autoColorAll, parent.transform);
+            MonoUtils.CreateUIElement(out m_autoColorAll, parent.transform);
             m_autoColorAll.relativePosition = new Vector3(parent.width - 90f, -5);
             m_autoColorAll.textScale = 0.6f;
             m_autoColorAll.width = 40;
             m_autoColorAll.height = 40;
-            m_autoColorAll.tooltip = Locale.Get("K45_TLM_AUTO_COLOR_ALL_TOOLTIP");
-            KlyteMonoUtils.InitButton(m_autoColorAll, true, "ButtonMenu");
+            m_autoColorAll.tooltip = Locale.Get("TLM_AUTO_COLOR_ALL_TOOLTIP");
+            MonoUtils.InitButton(m_autoColorAll, true, "ButtonMenu");
             m_autoColorAll.name = "AutoColorAll";
             m_autoColorAll.isVisible = true;
-            m_autoColorAll.normalFgSprite = KlyteResourceLoader.GetDefaultSpriteNameFor(CommonsSpriteNames.K45_AutoColorIcon);
+            m_autoColorAll.normalFgSprite = ResourceLoader.GetDefaultSpriteNameFor(CommonsSpriteNames.AutoColorIcon);
             m_autoColorAll.eventClick += (component, eventParam) =>
             {
                 foreach (UVMLineListItem item in lineItems.items.Select(x => x.GetComponentInChildren<UVMLineListItem>()))
@@ -139,58 +139,58 @@ namespace TransportLinesManager.CommonsWindow.List
         protected void CreateTitleRow(out UIPanel titleLine, UIComponent parent)
         {
             LogUtils.DoLog("Creating Title Row ");
-            KlyteMonoUtils.CreateUIElement(out titleLine, parent.transform, "TLMtitleline", new Vector4(5, 0, parent.width - 10, 40));
+            MonoUtils.CreateUIElement(out titleLine, parent.transform, "TLMtitleline", new Vector4(5, 0, parent.width - 10, 40));
             titleLine.padding = new RectOffset(0, 0, 50, 0);
             m_createdTitleLine = titleLine;
 
-            KlyteMonoUtils.CreateUIElement(out UILabel codColor, titleLine.transform, "codColor");
+            MonoUtils.CreateUIElement(out UILabel codColor, titleLine.transform, "codColor");
             codColor.minimumSize = new Vector2(60, 0);
             codColor.area = new Vector4(80, 10, codColor.minimumSize.x, 18);
-            KlyteMonoUtils.LimitWidthAndBox(codColor, (uint)codColor.width);
+            MonoUtils.LimitWidthAndBox(codColor, (uint)codColor.width);
             codColor.textAlignment = UIHorizontalAlignment.Center;
             codColor.prefix = Locale.Get("PUBLICTRANSPORT_LINECOLOR");
             codColor.text = "/";
-            codColor.suffix = Locale.Get("K45_TLM_CODE_SHORT");
+            codColor.suffix = Locale.Get("TLM_CODE_SHORT");
             codColor.eventClicked += CodColor_eventClicked;
 
-            KlyteMonoUtils.CreateUIElement(out UILabel lineName, titleLine.transform, "lineName");
+            MonoUtils.CreateUIElement(out UILabel lineName, titleLine.transform, "lineName");
             lineName.minimumSize = new Vector2(200, 0);
             lineName.area = new Vector4(140, 10, lineName.minimumSize.x, 18);
-            KlyteMonoUtils.LimitWidthAndBox(lineName, (uint)lineName.width);
+            MonoUtils.LimitWidthAndBox(lineName, (uint)lineName.width);
             lineName.textAlignment = UIHorizontalAlignment.Center;
             lineName.text = Locale.Get("PUBLICTRANSPORT_LINENAME");
             lineName.eventClicked += LineName_eventClicked;
 
-            KlyteMonoUtils.CreateUIElement(out UILabel stops, titleLine.transform, "stops");
+            MonoUtils.CreateUIElement(out UILabel stops, titleLine.transform, "stops");
             stops.minimumSize = new Vector2(80, 0);
             stops.area = new Vector4(340, 10, stops.minimumSize.x, 18);
-            KlyteMonoUtils.LimitWidthAndBox(stops, (uint)stops.width);
+            MonoUtils.LimitWidthAndBox(stops, (uint)stops.width);
             stops.textAlignment = UIHorizontalAlignment.Center;
             stops.text = Locale.Get("PUBLICTRANSPORT_LINESTOPS");
             stops.eventClicked += Stops_eventClicked;
 
-            KlyteMonoUtils.CreateUIElement(out UILabel vehicles, titleLine.transform, "vehicles");
+            MonoUtils.CreateUIElement(out UILabel vehicles, titleLine.transform, "vehicles");
             vehicles.minimumSize = new Vector2(110, 0);
             vehicles.area = new Vector4(430, 10, vehicles.minimumSize.x, 18);
-            KlyteMonoUtils.LimitWidthAndBox(vehicles, (uint)vehicles.width);
+            MonoUtils.LimitWidthAndBox(vehicles, (uint)vehicles.width);
             vehicles.textAlignment = UIHorizontalAlignment.Center;
             vehicles.text = Locale.Get("PUBLICTRANSPORT_VEHICLES");
             vehicles.eventClicked += Vehicles_eventClicked;
 
-            KlyteMonoUtils.CreateUIElement(out UILabel passengers, titleLine.transform, "passengers");
+            MonoUtils.CreateUIElement(out UILabel passengers, titleLine.transform, "passengers");
             passengers.minimumSize = new Vector2(80, 0);
             passengers.area = new Vector4(540, 10, passengers.minimumSize.x, 18);
-            KlyteMonoUtils.LimitWidthAndBox(passengers, (uint)passengers.width);
+            MonoUtils.LimitWidthAndBox(passengers, (uint)passengers.width);
             passengers.textAlignment = UIHorizontalAlignment.Center;
             passengers.text = Locale.Get("PUBLICTRANSPORT_PASSENGERS");
             passengers.eventClicked += Passengers_eventClicked;
 
-            KlyteMonoUtils.CreateUIElement(out UILabel profitLW, titleLine.transform, "profit");
+            MonoUtils.CreateUIElement(out UILabel profitLW, titleLine.transform, "profit");
             profitLW.minimumSize = new Vector2(150, 0);
             profitLW.area = new Vector4(625, 10, profitLW.minimumSize.x, 18);
-            KlyteMonoUtils.LimitWidthAndBox(profitLW, (uint)profitLW.width);
+            MonoUtils.LimitWidthAndBox(profitLW, (uint)profitLW.width);
             profitLW.textAlignment = UIHorizontalAlignment.Center;
-            profitLW.text = Locale.Get(TLMController.IsRealTimeEnabled ? "K45_TLM_BALANCE_LAST_HOUR_HALF" : "K45_TLM_BALANCE_LAST_WEEK");
+            profitLW.text = Locale.Get(TLMController.IsRealTimeEnabled ? "TLM_BALANCE_LAST_HOUR_HALF" : "TLM_BALANCE_LAST_WEEK");
             profitLW.eventClicked += Profit_eventClicked;
 
             AwakeShowLineButton();
@@ -278,7 +278,7 @@ namespace TransportLinesManager.CommonsWindow.List
             m_visibilityToggle.area = new Vector4(8, 5, 28, 28);
             List<ushort> lines = TargetTsdLines();
 
-            m_countLines.text = string.Format(Locale.Get("K45_TLM_TOTALIZERTEXT"), lines.Count - lines.Where(x => x == 0).Count(), TransportManager.instance.m_lineCount - 1);
+            m_countLines.text = string.Format(Locale.Get("TLM_TOTALIZERTEXT"), lines.Count - lines.Where(x => x == 0).Count(), TransportManager.instance.m_lineCount - 1);
             var newItems = lineItems.SetItemCount(lines.Count);
             if (lines.Count == 0)
             {

@@ -23,7 +23,7 @@ namespace TransportLinesManager.Utils
 
     public static class NamingModeExtensions
     {
-        public static string GetName(this NamingMode namingMode) => Locale.Get("K45_TLM_MODO_NOMENCLATURA", namingMode.ToString());
+        public static string GetName(this NamingMode namingMode) => Locale.Get("TLM_MODO_NOMENCLATURA", namingMode.ToString());
     }
 
 }

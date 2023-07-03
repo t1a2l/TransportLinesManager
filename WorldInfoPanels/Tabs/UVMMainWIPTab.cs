@@ -373,7 +373,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void CreatePrefixAndLineNumberEditor()
         {
-            m_linePrefixDropDown = UIHelperExtension.CloneBasicDropDownLocalized("K45_TLM_PREFIX_LINE_DETAILS_DD_LABEL", new string[1], (x) => StartCoroutine(SaveLineNumber()), 0, m_bg, out UILabel label, out UIPanel container);
+            m_linePrefixDropDown = UIHelperExtension.CloneBasicDropDownLocalized("TLM_PREFIX_LINE_DETAILS_DD_LABEL", new string[1], (x) => StartCoroutine(SaveLineNumber()), 0, m_bg, out UILabel label, out UIPanel container);
             container.autoFitChildrenHorizontally = false;
             container.autoLayoutDirection = LayoutDirection.Horizontal;
             container.autoLayout = false;
@@ -387,17 +387,17 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_linePrefixDropDown.size = new Vector3(140, 22);
             m_linePrefixDropDown.textScale = 1;
             m_linePrefixDropDown.listPosition = UIDropDown.PopupListPosition.Automatic;
-            KlyteMonoUtils.InitButtonFull(m_linePrefixDropDown, false, "OptionsDropboxListbox");
+            MonoUtils.InitButtonFull(m_linePrefixDropDown, false, "OptionsDropboxListbox");
             m_linePrefixDropDown.horizontalAlignment = UIHorizontalAlignment.Center;
 
-            KlyteMonoUtils.LimitWidthAndBox(label, 200);
+            MonoUtils.LimitWidthAndBox(label, 200);
             label.textScale = 1;
             label.padding.top = 4;
             label.position = Vector3.zero;
             label.verticalAlignment = UIVerticalAlignment.Middle;
             label.textAlignment = UIHorizontalAlignment.Left;
 
-            KlyteMonoUtils.CreateUIElement(out m_lineNumberLabel, container.transform);
+            MonoUtils.CreateUIElement(out m_lineNumberLabel, container.transform);
             m_lineNumberLabel.autoSize = false;
             m_lineNumberLabel.horizontalAlignment = UIHorizontalAlignment.Right;
             m_lineNumberLabel.text = "";
@@ -406,7 +406,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_lineNumberLabel.textScale = 1f;
             m_lineNumberLabel.padding = new RectOffset(4, 4, 4, 4);
             m_lineNumberLabel.color = new Color(0, 0, 0, 1);
-            KlyteMonoUtils.UiTextFieldDefaults(m_lineNumberLabel);
+            MonoUtils.UiTextFieldDefaults(m_lineNumberLabel);
             m_lineNumberLabel.numericalOnly = true;
             m_lineNumberLabel.maxLength = 4;
             m_lineNumberLabel.eventLostFocus += SaveLineNumber;
@@ -471,11 +471,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void CreateCustomLineCodeEditor()
         {
-            m_customLineCodeInput = UIHelperExtension.AddTextfield(m_bg, Locale.Get("K45_TLM_CUSTOMLINECODE"), "", out UILabel lbl, out UIPanel container);
+            m_customLineCodeInput = UIHelperExtension.AddTextfield(m_bg, Locale.Get("TLM_CUSTOMLINECODE"), "", out UILabel lbl, out UIPanel container);
             container.width = m_bg.width / 2;
             container.autoLayout = true;
             container.autoLayoutDirection = LayoutDirection.Vertical;
-            KlyteMonoUtils.LimitWidthAndBox(lbl, m_bg.width / 2, true);
+            MonoUtils.LimitWidthAndBox(lbl, m_bg.width / 2, true);
             lbl.textAlignment = UIHorizontalAlignment.Center;
 
             m_customLineCodeInput.autoSize = false;
@@ -501,7 +501,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         #region First stop
         private void CreateFirstStopSelector()
         {
-            m_firstStopSelect = UIHelperExtension.CloneBasicDropDownLocalized("K45_TLM_FIRST_STOP_DD_LABEL", new string[1], ChangeFirstStop, 0, m_bg, out UILabel label, out UIPanel container);
+            m_firstStopSelect = UIHelperExtension.CloneBasicDropDownLocalized("TLM_FIRST_STOP_DD_LABEL", new string[1], ChangeFirstStop, 0, m_bg, out UILabel label, out UIPanel container);
             ReflectionUtils.GetEventField(typeof(UIDropDown), "eventMouseWheel")?.SetValue(m_firstStopSelect, null);
 
             container.autoFitChildrenHorizontally = false;
@@ -510,7 +510,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_firstStopSelect.transform.localScale = Vector3.one * 0.75f;
             m_firstStopSelect.listPosition = UIDropDown.PopupListPosition.Automatic;
 
-            KlyteMonoUtils.LimitWidthAndBox(label, 120);
+            MonoUtils.LimitWidthAndBox(label, 120);
             label.textScale = 1;
             label.padding.top = 7;
             label.verticalAlignment = UIVerticalAlignment.Middle;
@@ -547,13 +547,13 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         #region Action buttons row
         private void CreateActionButtonsRow()
         {
-            KlyteMonoUtils.CreateUIElement(out UIButton buttonAutoName, transform);
+            MonoUtils.CreateUIElement(out UIButton buttonAutoName, transform);
             buttonAutoName.textScale = 0.6f;
             buttonAutoName.relativePosition = new Vector3(45, 325);
             buttonAutoName.width = 40;
             buttonAutoName.height = 40;
-            buttonAutoName.tooltip = Locale.Get("K45_TLM_USE_AUTO_NAME");
-            KlyteMonoUtils.InitButton(buttonAutoName, true, "ButtonMenu");
+            buttonAutoName.tooltip = Locale.Get("TLM_USE_AUTO_NAME");
+            MonoUtils.InitButton(buttonAutoName, true, "ButtonMenu");
             buttonAutoName.name = "AutoName";
             buttonAutoName.isVisible = true;
             buttonAutoName.eventClicked += (component, eventParam) =>
@@ -565,15 +565,15 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     UVMPublicTransportWorldInfoPanel.MarkDirty(GetType());
                 }
             };
-            buttonAutoName.normalFgSprite = KlyteResourceLoader.GetDefaultSpriteNameFor(CommonsSpriteNames.K45_AutoNameIcon);
+            buttonAutoName.normalFgSprite = ResourceLoader.GetDefaultSpriteNameFor(CommonsSpriteNames.AutoNameIcon);
 
-            KlyteMonoUtils.CreateUIElement(out UIButton buttonAutoColor, transform);
+            MonoUtils.CreateUIElement(out UIButton buttonAutoColor, transform);
             buttonAutoColor.relativePosition = new Vector3(0f, 325f);
             buttonAutoColor.textScale = 0.6f;
             buttonAutoColor.width = 40;
             buttonAutoColor.height = 40;
-            buttonAutoColor.tooltip = Locale.Get("K45_TLM_PICK_COLOR_FROM_PALETTE_TOOLTIP");
-            KlyteMonoUtils.InitButton(buttonAutoColor, true, "ButtonMenu");
+            buttonAutoColor.tooltip = Locale.Get("TLM_PICK_COLOR_FROM_PALETTE_TOOLTIP");
+            MonoUtils.InitButton(buttonAutoColor, true, "ButtonMenu");
             buttonAutoColor.name = "AutoColor";
             buttonAutoColor.isVisible = true;
             buttonAutoColor.eventClicked += (component, eventParam) =>
@@ -583,7 +583,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     TLMController.AutoColor(lineId);
                 }
             };
-            buttonAutoColor.normalFgSprite = KlyteResourceLoader.GetDefaultSpriteNameFor(CommonsSpriteNames.K45_AutoColorIcon);
+            buttonAutoColor.normalFgSprite = ResourceLoader.GetDefaultSpriteNameFor(CommonsSpriteNames.AutoColorIcon);
         }
         #endregion
 

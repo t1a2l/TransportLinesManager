@@ -219,7 +219,7 @@ namespace TransportLinesManager.Data.Managers
 
         public class TLMTransportLineStorageEconomyData_LineStop : TransportLineStorageBasicData
         {
-            public override string SaveId => "K45_TLM_TLMTransportLineStorageEconomyData";
+            public override string SaveId => "TLM_TLMTransportLineStorageEconomyData";
 
             protected override Enum[] LoadOrder { get; } = new Enum[]
                                                             {
@@ -230,7 +230,7 @@ namespace TransportLinesManager.Data.Managers
         }
         public class TLMTransportLineStorageEconomyData_Vehicle : TransportLineStorageBasicData
         {
-            public override string SaveId => "K45_TLM_TLMTransportLineStorageEconomyData_Vehicle";
+            public override string SaveId => "TLM_TLMTransportLineStorageEconomyData_Vehicle";
 
             protected override Enum[] LoadOrder { get; } = new Enum[]
                                                             {
@@ -242,7 +242,7 @@ namespace TransportLinesManager.Data.Managers
         }
         public class TLMTransportLineStoragePassengerData_Vehicles : TransportLineStorageBasicData
         {
-            public override string SaveId => "K45_TLM_TLMTransportLineStoragePassengerData";
+            public override string SaveId => "TLM_TLMTransportLineStoragePassengerData";
 
             protected override Enum[] LoadOrder { get; } = new Enum[]
                                                             {
@@ -255,7 +255,7 @@ namespace TransportLinesManager.Data.Managers
         }
         public class TLMTransportLineStoragePassengerData_LineStop : TransportLineStorageBasicData
         {
-            public override string SaveId => "K45_TLM_TLMTransportLineStoragePassengerData_LineStop";
+            public override string SaveId => "TLM_TLMTransportLineStoragePassengerData_LineStop";
 
             protected override Enum[] LoadOrder { get; } = new Enum[]
                                                             {
@@ -271,7 +271,7 @@ namespace TransportLinesManager.Data.Managers
         }
         public class TLMTransportLineStorageDetailedPassengerData_W1 : TransportLineStorageBasicData
         {
-            public override string SaveId => "K45_TLM_TLMTransportLineStorageDetailedPassengerData_W1";
+            public override string SaveId => "TLM_TLMTransportLineStorageDetailedPassengerData_W1";
 
             protected override Enum[] LoadOrder { get; } = new Enum[]
                                                             {
@@ -291,7 +291,7 @@ namespace TransportLinesManager.Data.Managers
         }
         public class TLMTransportLineStorageDetailedPassengerData_W2 : TransportLineStorageBasicData
         {
-            public override string SaveId => "K45_TLM_TLMTransportLineStorageDetailedPassengerData_W2";
+            public override string SaveId => "TLM_TLMTransportLineStorageDetailedPassengerData_W2";
 
             protected override Enum[] LoadOrder { get; } = new Enum[]
                                                             {
@@ -310,7 +310,7 @@ namespace TransportLinesManager.Data.Managers
         }
         public class TLMTransportLineStorageDetailedPassengerData_W3 : TransportLineStorageBasicData
         {
-            public override string SaveId => "K45_TLM_TLMTransportLineStorageDetailedPassengerData_W3";
+            public override string SaveId => "TLM_TLMTransportLineStorageDetailedPassengerData_W3";
 
             protected override Enum[] LoadOrder { get; } = new Enum[]
                                                             {

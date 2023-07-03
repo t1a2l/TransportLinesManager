@@ -33,7 +33,7 @@ namespace TransportLinesManager.Data.DataContainers
         IDepotSelectionStorage ISafeGettable<IDepotSelectionStorage>.SafeGet(uint index) => SafeGet(index);
         IBasicExtensionStorage ISafeGettable<IBasicExtensionStorage>.SafeGet(uint index) => SafeGet(index);
 
-        public override string SaveId => $"K45_TLM_TLMTransportLineExtension";
+        public override string SaveId => $"TLM_TLMTransportLineExtension";
 
         private readonly Dictionary<TransportSystemDefinition, List<string>> m_basicAssetsList = new Dictionary<TransportSystemDefinition, List<string>>();
 

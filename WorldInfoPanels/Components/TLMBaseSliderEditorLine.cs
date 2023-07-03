@@ -90,7 +90,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             };
             m_die = Find<UIButton>("Delete");
             m_die.eventClick += (component, eventParam) => OnDie?.Invoke(Entry);
-            KlyteMonoUtils.LimitWidthAndBox(m_value, 60, out UIPanel container, true);
+            MonoUtils.LimitWidthAndBox(m_value, 60, out UIPanel container, true);
 
             container.AttachUIComponent(m_valueField.gameObject);
 
@@ -147,8 +147,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_container.wrapLayout = false;
             m_container.name = "EntryLine";
 
-            KlyteMonoUtils.CreateUIElement(out UITextField m_timeInput, m_container.transform, "HourInput");
-            KlyteMonoUtils.UiTextFieldDefaults(m_timeInput);
+            MonoUtils.CreateUIElement(out UITextField m_timeInput, m_container.transform, "HourInput");
+            MonoUtils.UiTextFieldDefaults(m_timeInput);
             m_timeInput.normalBgSprite = "OptionsDropboxListbox";
             m_timeInput.width = 50;
             m_timeInput.height = 28;
@@ -158,7 +158,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_timeInput.text = "0";
             m_timeInput.submitOnFocusLost = true;
 
-            KlyteMonoUtils.CreateUIElement(out UILabel m_value, m_container.transform, "ValueLabel");
+            MonoUtils.CreateUIElement(out UILabel m_value, m_container.transform, "ValueLabel");
             m_value.autoSize = false;
             m_value.width = 60;
             m_value.height = 30;
@@ -168,7 +168,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_value.processMarkup = true;
 
 
-            KlyteMonoUtils.CreateUIElement(out UITextField m_valueField, m_container.transform, "ValueField", new Vector4(0, 0, 60, 26));
+            MonoUtils.CreateUIElement(out UITextField m_valueField, m_container.transform, "ValueField", new Vector4(0, 0, 60, 26));
             m_valueField.numericalOnly = true;
             m_valueField.allowNegative = false;
             m_valueField.allowFloats = false;
@@ -209,15 +209,15 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
             m_ValueSlider.name = "ValueSlider";
 
-            KlyteMonoUtils.CreateUIElement(out UIButton m_die, m_container.transform, "Delete");
+            MonoUtils.CreateUIElement(out UIButton m_die, m_container.transform, "Delete");
             m_die.textScale = 1f;
             m_die.width = 25;
             m_die.height = 25;
-            m_die.tooltip = Locale.Get("K45_TLM_DELETE_STOP_TICKET_PRICE_LIST");
-            KlyteMonoUtils.InitButton(m_die, true, "OptionBase");
+            m_die.tooltip = Locale.Get("TLM_DELETE_STOP_TICKET_PRICE_LIST");
+            MonoUtils.InitButton(m_die, true, "OptionBase");
             m_die.isVisible = true;
             m_die.foregroundSpriteMode = UIForegroundSpriteMode.Scale;
-            m_die.normalFgSprite = KlyteResourceLoader.GetDefaultSpriteNameFor(CommonsSpriteNames.K45_Delete);
+            m_die.normalFgSprite = ResourceLoader.GetDefaultSpriteNameFor(CommonsSpriteNames.Delete);
 
             go.AddComponent<L>();
 

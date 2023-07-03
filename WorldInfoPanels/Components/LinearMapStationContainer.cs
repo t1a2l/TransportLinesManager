@@ -19,7 +19,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 {
     public class LinearMapStationContainer : UICustomControl
     {
-        public const string TEMPLATE_NAME = "K45_TLM_LinearMapStopTemplate";
+        public const string TEMPLATE_NAME = "TLM_LinearMapStopTemplate";
         public static void EnsureTemplate()
         {
             if (UITemplateUtils.GetTemplateDict().ContainsKey(TEMPLATE_NAME))
@@ -36,8 +36,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             button.scaleFactor = 1f;
             button.spritePadding.top = 2;
             button.isTooltipLocalized = true;
-            KlyteMonoUtils.InitButtonFg(button, false, "DistrictOptionBrushMedium");
-            KlyteMonoUtils.InitButtonSameSprite(button, "");
+            MonoUtils.InitButtonFg(button, false, "DistrictOptionBrushMedium");
+            MonoUtils.InitButtonSameSprite(button, "");
 
             UILabel uilabel = button.Find<UILabel>("PassengerCount");
             panel.AttachUIComponent(uilabel.gameObject).transform.localScale = Vector3.one;
@@ -46,7 +46,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             uilabel.isVisible = true;
             uilabel.minimumSize = new Vector2(175, 50);
             uilabel.verticalAlignment = UIVerticalAlignment.Middle;
-            KlyteMonoUtils.LimitWidthAndBox(uilabel, 175, true);
+            MonoUtils.LimitWidthAndBox(uilabel, 175, true);
 
 
             UIPanel connectionPanel = panel.AddUIComponent<UIPanel>();
@@ -71,7 +71,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             distLabel.minimumSize = new Vector2(60, 0);
             distLabel.outlineColor = Color.black;
 
-            KlyteMonoUtils.CreateUIElement(out UITextField lineNameField, panel.transform, "StopNameField", new Vector4(38, -6, 175, 50));
+            MonoUtils.CreateUIElement(out UITextField lineNameField, panel.transform, "StopNameField", new Vector4(38, -6, 175, 50));
             lineNameField.maxLength = 256;
             lineNameField.isVisible = false;
             lineNameField.verticalAlignment = UIVerticalAlignment.Middle;
@@ -82,7 +82,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             lineNameField.padding.top = 18;
             lineNameField.padding.left = 5;
             lineNameField.padding.bottom = 14;
-            KlyteMonoUtils.InitButtonFull(lineNameField, false, "TextFieldPanel");
+            MonoUtils.InitButtonFull(lineNameField, false, "TextFieldPanel");
 
             UITemplateUtils.GetTemplateDict()[TEMPLATE_NAME] = go.AddComponent<LinearMapStationContainer>().component;
         }
@@ -176,8 +176,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             uibutton.tooltipLocaleID = m_fromBuilding || !TransportSystemDefinition.FromLineId(m_lineId, m_fromBuilding).CanHaveTerminals()
                 ? ""
                 : m_stopId == TransportManager.instance.m_lines.m_buffer[m_lineId].m_stops
-                    ? "K45_TLM_FIRSTSTOPALWAYSTERMINAL"
-                    : "K45_TLM_RIGHTCLICKSETTERMINAL";
+                    ? "TLM_FIRSTSTOPALWAYSTERMINAL"
+                    : "TLM_RIGHTCLICKSETTERMINAL";
         }
 
 
@@ -206,9 +206,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 case MapMode.WAITING:
                 case MapMode.WAITING_AND_CONNECTIONS:
                     TLMLineUtils.GetQuantityPassengerWaiting(m_stopId, out int residents, out int tourists, out int timeTillBored);
-                    uilabel.text = "\n" + string.Format(Locale.Get("K45_TLM_WAITING_PASSENGERS_RESIDENT_TOURSTS"), residents + tourists, residents, tourists) + "\n";
+                    uilabel.text = "\n" + string.Format(Locale.Get("TLM_WAITING_PASSENGERS_RESIDENT_TOURSTS"), residents + tourists, residents, tourists) + "\n";
                     uibutton.color = Color.Lerp(Color.red, Color.white, timeTillBored / 255f);
-                    uilabel.suffix = string.Format(Locale.Get("K45_TLM_TIME_TILL_BORED_TEMPLATE_STATION_MAP"), uibutton.color.ToRGB(), timeTillBored);
+                    uilabel.suffix = string.Format(Locale.Get("TLM_TIME_TILL_BORED_TEMPLATE_STATION_MAP"), uibutton.color.ToRGB(), timeTillBored);
                     break;
                 case MapMode.NONE:
                     uibutton.color = Color.white;
@@ -241,7 +241,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         private void UpdateTerminalStatus() => uibutton.normalBgSprite =
                               !m_fromBuilding && TransportSystemDefinition.FromLineId(m_lineId, m_fromBuilding).CanHaveTerminals() && (m_stopId == Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineId].m_stops || TLMStopDataContainer.Instance.SafeGet(m_stopId).IsTerminal)
-                                ? KlyteResourceLoader.GetDefaultSpriteNameFor(LineIconSpriteNames.K45_S05StarIcon, true)
+                                ? ResourceLoader.GetDefaultSpriteNameFor(LineIconSpriteNames.S05StarIcon, true)
                                 : "";
 
         private void PrintIncomeStop(long income)

@@ -22,7 +22,7 @@ namespace TransportLinesManager.Data.Tsd
                     },
             new Color32(202, 162, 31, 255),
             50,
-            LineIconSpriteNames.K45_CrossIcon,
+            LineIconSpriteNames.CrossIcon,
             false);
     }
 

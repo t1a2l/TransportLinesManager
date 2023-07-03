@@ -14,12 +14,12 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
     public class UVMBudgetConfigTab : TLMBaseTimedConfigTab<UVMBudgetConfigTab, UVMBudgetTimeChart, UVMBudgetEditorLine, BudgetEntryXml>
     {
         private UICheckBox m_showAbsoluteCheckbox;
-        public override string GetTitleLocale() => "K45_TLM_PER_HOUR_BUDGET_TITLE";
-        public override string GetValueColumnLocale() => "K45_TLM_BUDGET";
+        public override string GetTitleLocale() => "TLM_PER_HOUR_BUDGET_TITLE";
+        public override string GetValueColumnLocale() => "TLM_BUDGET";
         public override float GetMaxSliderValue() => 500;
         public override void ExtraAwake()
         {
-            m_showAbsoluteCheckbox = m_uiHelper.AddCheckboxLocale("K45_TLM_SHOW_ABSOLUTE_VALUE", false, (x) =>
+            m_showAbsoluteCheckbox = m_uiHelper.AddCheckboxLocale("TLM_SHOW_ABSOLUTE_VALUE", false, (x) =>
             {
                 if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
                 {
@@ -30,7 +30,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     }
                 }              
             });
-            KlyteMonoUtils.LimitWidthAndBox(m_showAbsoluteCheckbox.label, m_uiHelper.Self.width - 40f);
+            MonoUtils.LimitWidthAndBox(m_showAbsoluteCheckbox.label, m_uiHelper.Self.width - 40f);
         }
 
         public override void ExtraOnSetTarget(ushort lineID)

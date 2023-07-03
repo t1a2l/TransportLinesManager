@@ -17,7 +17,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
 {
     internal class TLMPaletteOptionsTab : UICustomControl, ITLMConfigOptionsTab
     {
-        private const string COLOR_SELECTOR_TEMPLATE = "K45_TLM_PaletteColorListSelectorTemplate";
+        private const string COLOR_SELECTOR_TEMPLATE = "TLM_PaletteColorListSelectorTemplate";
 
         private UIComponent parent;
         private UIDropDown m_paletteSelect;
@@ -44,17 +44,17 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             ((UIScrollablePanel)group6.Self).wrapLayout = true;
             ((UIScrollablePanel)group6.Self).width = 730;
 
-            group6.AddLabel(Locale.Get("K45_TLM_CUSTOM_PALETTE_CONFIG"));
+            group6.AddLabel(Locale.Get("TLM_CUSTOM_PALETTE_CONFIG"));
             group6.AddSpace(15);
 
             FileInfo fiPalette = FileUtils.EnsureFolderCreation(TLMController.PalettesFolder);
 
-            group6.AddLabel(Locale.Get("K45_TLM_PALETTE_FOLDER_LABEL") + ":");
+            group6.AddLabel(Locale.Get("TLM_PALETTE_FOLDER_LABEL") + ":");
             var namesFilesButton = ((UIButton)group6.AddButton("/", () => ColossalFramework.Utils.OpenInFileBrowser(fiPalette.FullName)));
             namesFilesButton.textColor = Color.yellow;
-            KlyteMonoUtils.LimitWidthAndBox(namesFilesButton, 710);
+            MonoUtils.LimitWidthAndBox(namesFilesButton, 710);
             namesFilesButton.text = fiPalette.FullName + Path.DirectorySeparatorChar;
-            ((UIButton)group6.AddButton(Locale.Get("K45_TLM_RELOAD_PALETTES"), delegate ()
+            ((UIButton)group6.AddButton(Locale.Get("TLM_RELOAD_PALETTES"), delegate ()
             {
                 TLMAutoColorPaletteContainer.Reload();
                 ReloadData();
@@ -62,7 +62,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             })).width = 710;
 
             UIPanel m_listColorContainer = null;
-            m_paletteSelect = group6.AddDropdown(Locale.Get("K45_TLM_PALETTE_VIEW"), TLMAutoColorPaletteContainer.PaletteListForEditing, 0, delegate (int sel)
+            m_paletteSelect = group6.AddDropdown(Locale.Get("TLM_PALETTE_VIEW"), TLMAutoColorPaletteContainer.PaletteListForEditing, 0, delegate (int sel)
             {
                 if (sel <= 0 || sel >= TLMAutoColorPaletteContainer.PaletteListForEditing.Length)
                 {
@@ -80,8 +80,8 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             m_paletteSelect.GetComponentInParent<UIPanel>().wrapLayout = true;
             m_paletteSelect.width = 710;
 
-            KlyteMonoUtils.CreateUIElement(out m_listColorContainer, group6.Self.transform, "listColors", new UnityEngine.Vector4(0, 0, group6.Self.width, group6.Self.height - 250));
-            KlyteMonoUtils.CreateScrollPanel(m_listColorContainer, out m_colorListScroll, out _, m_listColorContainer.width - 20, m_listColorContainer.height);
+            MonoUtils.CreateUIElement(out m_listColorContainer, group6.Self.transform, "listColors", new UnityEngine.Vector4(0, 0, group6.Self.width, group6.Self.height - 250));
+            MonoUtils.CreateScrollPanel(m_listColorContainer, out m_colorListScroll, out _, m_listColorContainer.width - 20, m_listColorContainer.height);
             m_colorListScroll.backgroundSprite = "OptionsScrollbarTrack";
             m_colorListScroll.autoLayout = true;
             m_colorListScroll.autoLayoutDirection = LayoutDirection.Horizontal;
@@ -93,15 +93,15 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             m_colorFieldTemplateListColors = new UITemplateList<UIPanel>(m_colorListScroll, COLOR_SELECTOR_TEMPLATE);
             if (canEdit)
             {
-                KlyteMonoUtils.InitCircledButton(m_colorListScroll, out m_addColor, CommonsSpriteNames.K45_Plus, (x, y) => AddColor(), "", 36);
-                DefaultEditorUILib.AddButtonInEditorRow(m_paletteSelect, CommonsSpriteNames.K45_Plus, () => AddPalette(), "K45_TLM_ADDPALETTE", true, (int)m_paletteSelect.height);
+                MonoUtils.InitCircledButton(m_colorListScroll, out m_addColor, CommonsSpriteNames.Plus, (x, y) => AddColor(), "", 36);
+                DefaultEditorUILib.AddButtonInEditorRow(m_paletteSelect, CommonsSpriteNames.Plus, () => AddPalette(), "TLM_ADDPALETTE", true, (int)m_paletteSelect.height);
             }
         }
 
-        private void AddPalette(string errorMsg = null, string oldVal = null) => K45DialogControl.ShowModalPromptText(new K45DialogControl.BindProperties
+        private void AddPalette(string errorMsg = null, string oldVal = null) => DialogControl.ShowModalPromptText(new DialogControl.BindProperties
         {
-            title = Locale.Get("K45_TLM_ADDPALETTE"),
-            message = (errorMsg + "\n").TrimToNull() + Locale.Get("K45_TLM_ADDPALETTE_PROMPTNAME"),
+            title = Locale.Get("TLM_ADDPALETTE"),
+            message = (errorMsg + "\n").TrimToNull() + Locale.Get("TLM_ADDPALETTE_PROMPTNAME"),
             defaultTextFieldContent = oldVal,
             showButton1 = true,
             textButton1 = Locale.Get("EXCEPTION_OK"),
@@ -113,11 +113,11 @@ namespace TransportLinesManager.OptionsMenu.Tabs
              {
                  if (val == TLMAutoColorPaletteContainer.PALETTE_RANDOM || !(TLMAutoColorPaletteContainer.GetPalette(val) is null))
                  {
-                     AddPalette(Locale.Get("K45_TLM_ADDPALETTE_ERROR_PALETTEALREADYEXISTS"), val);
+                     AddPalette(Locale.Get("TLM_ADDPALETTE_ERROR_PALETTEALREADYEXISTS"), val);
                  }
                  else if (val.IsNullOrWhiteSpace())
                  {
-                     AddPalette(Locale.Get("K45_TLM_ADDPALETTE_ERROR_INVALIDNAME"), val);
+                     AddPalette(Locale.Get("TLM_ADDPALETTE_ERROR_INVALIDNAME"), val);
                  }
                  TLMAutoColorPaletteContainer.AddPalette(val);
                  TLMAutoColorPaletteContainer.Save(val);
@@ -141,10 +141,10 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             panel.padding = new RectOffset(4, 4, 4, 4);
             panel.autoLayoutDirection = LayoutDirection.Horizontal;
 
-            canEdit = KlyteMonoUtils.EnsureColorFieldTemplate();
+            canEdit = MonoUtils.EnsureColorFieldTemplate();
 
-            KlyteMonoUtils.CreateUIElement(out UIColorField colorField, panel.transform);
-            KlyteMonoUtils.InitColorField(colorField, 36);
+            MonoUtils.CreateUIElement(out UIColorField colorField, panel.transform);
+            MonoUtils.InitColorField(colorField, 36);
             var triggerButton = UIHelperExtension.AddLabel(colorField, "0", 36, out _);
             triggerButton.autoSize = false;
             triggerButton.size = colorField.size;
@@ -186,7 +186,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
                 UIColorField colorField = colorPickers[i].GetComponentInChildren<UIColorField>();
                 if (canEdit && colorField.objectUserData == null)
                 {
-                    colorField.colorPicker = KlyteMonoUtils.GetDefaultPicker();
+                    colorField.colorPicker = MonoUtils.GetDefaultPicker();
                     colorField.eventSelectedColorReleased += (x, y) =>
                     {
                         if (GetPaletteName(out string paletteName))

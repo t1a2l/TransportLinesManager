@@ -29,6 +29,6 @@ namespace TransportLinesManager.Data.Extensions
             }
         }
 
-        public static string GetLocalizedName(this TLMSpecialNamingClass clazz) => Locale.Get("K45_TLM_SPECIALNAMINGCLASS", clazz.ToString());
+        public static string GetLocalizedName(this TLMSpecialNamingClass clazz) => Locale.Get("TLM_SPECIALNAMINGCLASS", clazz.ToString());
     }
 }

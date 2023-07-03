@@ -8,7 +8,7 @@ namespace TransportLinesManager.WorldInfoPanels.ReportTabs
 
     internal class TLMLineFinanceReportTab : BasicReportTab<TLMFinanceReportLine, IncomeExpenseReport>
     {
-        protected override string TitleLocaleID { get; } = "K45_TLM_FINANCIAL_REPORT";
+        protected override string TitleLocaleID { get; } = "TLM_FINANCIAL_REPORT";
         public override bool MayBeVisible() => UVMPublicTransportWorldInfoPanel.GetCurrentTSD().HasVehicles();
         protected override List<IncomeExpenseReport> GetReportData(ushort lineId) => TLMTransportLineStatusesManager.instance.GetLineFinanceReport(lineId);
         protected override void AddToTotalizer(ref IncomeExpenseReport totalizer, IncomeExpenseReport data)

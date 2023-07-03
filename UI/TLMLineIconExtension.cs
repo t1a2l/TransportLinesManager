@@ -7,7 +7,7 @@ namespace TransportLinesManager.UI
 {
     internal static class TLMLineIconExtension
     {
-        public static string GetNameForTLM(this LineIconSpriteNames icon) => Locale.Get("K45_TLM_LINE_ICON_ENUM", icon.ToString());
+        public static string GetNameForTLM(this LineIconSpriteNames icon) => Locale.Get("TLM_LINE_ICON_ENUM", icon.ToString());
         public static string[] GetDropDownOptions(string option0 = null)
         {
             string[] result = Enum.GetValues(typeof(LineIconSpriteNames)).OfType<LineIconSpriteNames>().OrderBy(x => x).Select(x => x.GetNameForTLM()).ToArray();

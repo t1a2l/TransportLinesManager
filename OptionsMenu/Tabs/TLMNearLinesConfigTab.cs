@@ -19,11 +19,11 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             ((UIScrollablePanel)group7.Self).wrapLayout = true;
             ((UIScrollablePanel)group7.Self).width = 730;
 
-            group7.AddLabel(Locale.Get("K45_TLM_NEAR_LINES_CONFIG"));
+            group7.AddLabel(Locale.Get("TLM_NEAR_LINES_CONFIG"));
             group7.AddSpace(15);
 
-            group7.AddCheckbox(Locale.Get("K45_TLM_NEAR_LINES_SHOW_IN_SERVICES_BUILDINGS"), TransportLinesManagerMod.ShowNearLinesPlop, toggleShowNearLinesInCityServicesWorldInfoPanel);
-            group7.AddCheckbox(Locale.Get("K45_TLM_NEAR_LINES_SHOW_IN_ZONED_BUILDINGS"), TransportLinesManagerMod.ShowNearLinesGrow, toggleShowNearLinesInZonedBuildingWorldInfoPanel);
+            group7.AddCheckbox(Locale.Get("TLM_NEAR_LINES_SHOW_IN_SERVICES_BUILDINGS"), TransportLinesManagerMod.ShowNearLinesPlop, toggleShowNearLinesInCityServicesWorldInfoPanel);
+            group7.AddCheckbox(Locale.Get("TLM_NEAR_LINES_SHOW_IN_ZONED_BUILDINGS"), TransportLinesManagerMod.ShowNearLinesGrow, toggleShowNearLinesInZonedBuildingWorldInfoPanel);
 
         }
         private void toggleShowNearLinesInCityServicesWorldInfoPanel(bool b) => TransportLinesManagerMod.ShowNearLinesPlop = b;

@@ -8,7 +8,7 @@ namespace TransportLinesManager.WorldInfoPanels.ReportTabs
 
     internal class TLMLinePassengerGenderReportTab : BasicReportTab<TLMPassengerGenderReportLine, GenderPassengerReport>
     {
-        protected override string TitleLocaleID { get; } = "K45_TLM_PASSENGERS_GENDER_LINE_REPORT";
+        protected override string TitleLocaleID { get; } = "TLM_PASSENGERS_GENDER_LINE_REPORT";
         public override bool MayBeVisible() => true;
         protected override List<GenderPassengerReport> GetReportData(ushort lineId) => TLMTransportLineStatusesManager.instance.GetLineGenderReport(lineId);
         protected override void AddToTotalizer(ref GenderPassengerReport totalizer, GenderPassengerReport data)

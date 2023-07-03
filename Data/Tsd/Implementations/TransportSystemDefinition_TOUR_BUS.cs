@@ -13,7 +13,7 @@ namespace TransportLinesManager.Data.Tsd
             new TransferManager.TransferReason[] { TransferManager.TransferReason.TouristBus },
             new Color32(110, 152, 251, 255),
             30,
-            LineIconSpriteNames.K45_CameraIcon,
+            LineIconSpriteNames.CameraIcon,
             true);
     }
 

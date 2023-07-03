@@ -11,7 +11,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
     public class TLMLineItemButtonControl : UICustomControl
     {
 
-        public const string LINE_ITEM_TEMPLATE = "K45_TLM_NearLinesItemTemplate";
+        public const string LINE_ITEM_TEMPLATE = "TLM_NearLinesItemTemplate";
 
         public static void EnsureTemplate()
         {
@@ -33,7 +33,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             button.hoveredColor = Color.white;
             button.hoveredTextColor = Color.red;
 
-            KlyteMonoUtils.CreateUIElement(out UILabel label, button.transform);
+            MonoUtils.CreateUIElement(out UILabel label, button.transform);
             label.autoSize = true;
             label.autoHeight = false;
             label.minimumSize = new Vector2(size, 0);
@@ -46,7 +46,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             label.outlineColor = Color.black;
             label.useOutline = true;
             label.anchor = UIAnchorStyle.CenterHorizontal | UIAnchorStyle.CenterVertical;
-            KlyteMonoUtils.CreateUIElement(out UILabel daytimeIndicator, button.transform);
+            MonoUtils.CreateUIElement(out UILabel daytimeIndicator, button.transform);
             daytimeIndicator.autoSize = false;
             daytimeIndicator.width = size;
             daytimeIndicator.height = size;
@@ -150,7 +150,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
                 button.color = color;
                 button.disabledColor = color;
                 button.focusedColor = color;
-                button.normalBgSprite = KlyteResourceLoader.GetDefaultSpriteNameFor(ldo?.LineBgSprite ?? TransportSystemDefinition.FromIntercity(lineObj.Info)?.DefaultIcon ?? Commons.UI.SpriteNames.LineIconSpriteNames.K45_S10StarIcon, true);
+                button.normalBgSprite = ResourceLoader.GetDefaultSpriteNameFor(ldo?.LineBgSprite ?? TransportSystemDefinition.FromIntercity(lineObj.Info)?.DefaultIcon ?? Commons.UI.SpriteNames.LineIconSpriteNames.S10StarIcon, true);
                 button.tooltip = TLMStationUtils.GetStationName(lineObj.DstStop, lineObj.SrcStop, lineObj.Info.m_class.m_subService, fromBuilding);
 
                 var text = TLMLineUtils.GetLineStringId(lineId, fromBuilding).Trim();

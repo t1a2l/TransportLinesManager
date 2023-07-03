@@ -13,7 +13,7 @@ namespace TransportLinesManager.Data.Tsd
             new TransferManager.TransferReason[] { TransferManager.TransferReason.PassengerTrain },
             new Color32(250, 104, 0, 255),
             240,
-            LineIconSpriteNames.K45_CircleIcon,
+            LineIconSpriteNames.CircleIcon,
             true,
             ItemClass.Level.Level1);
     }

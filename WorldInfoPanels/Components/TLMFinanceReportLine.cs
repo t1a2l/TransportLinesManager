@@ -18,9 +18,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         protected override void AsTitleInternal()
         {
-            m_income.localeID = "K45_TLM_FINANCE_REPORT_TITLE_INCOME";
-            m_expense.localeID = "K45_TLM_FINANCE_REPORT_TITLE_EXPENSE";
-            m_balance.localeID = "K45_TLM_FINANCE_REPORT_TITLE_BALANCE";
+            m_income.localeID = "TLM_FINANCE_REPORT_TITLE_INCOME";
+            m_expense.localeID = "TLM_FINANCE_REPORT_TITLE_EXPENSE";
+            m_balance.localeID = "TLM_FINANCE_REPORT_TITLE_BALANCE";
 
             m_income.textAlignment = UIHorizontalAlignment.Center;
             m_expense.textAlignment = UIHorizontalAlignment.Center;
@@ -36,10 +36,10 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         }
         protected override void AddColumns(ref float xAdvance)
         {
-            xAdvance += InitField(out m_income, "Income", "K45_TLM_FINANCE_REPORT_TITLE_INCOME", xAdvance, TOTAL_DATA_COLUMNS_SPACE / 3);
-            xAdvance += InitField(out m_expense, "Expense", "K45_TLM_FINANCE_REPORT_TITLE_EXPENSE", xAdvance, TOTAL_DATA_COLUMNS_SPACE / 3);
-            xAdvance += InitField(out m_balance, "Balance", "K45_TLM_FINANCE_REPORT_TITLE_BALANCE", xAdvance, TOTAL_DATA_COLUMNS_SPACE / 3);
-            m_balance.backgroundSprite = KlyteResourceLoader.GetDefaultSpriteNameFor(LineIconSpriteNames.K45_SquareIcon);
+            xAdvance += InitField(out m_income, "Income", "TLM_FINANCE_REPORT_TITLE_INCOME", xAdvance, TOTAL_DATA_COLUMNS_SPACE / 3);
+            xAdvance += InitField(out m_expense, "Expense", "TLM_FINANCE_REPORT_TITLE_EXPENSE", xAdvance, TOTAL_DATA_COLUMNS_SPACE / 3);
+            xAdvance += InitField(out m_balance, "Balance", "TLM_FINANCE_REPORT_TITLE_BALANCE", xAdvance, TOTAL_DATA_COLUMNS_SPACE / 3);
+            m_balance.backgroundSprite = ResourceLoader.GetDefaultSpriteNameFor(LineIconSpriteNames.SquareIcon);
         }
     }
 

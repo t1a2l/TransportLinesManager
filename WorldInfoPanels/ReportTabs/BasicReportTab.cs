@@ -35,21 +35,21 @@ namespace TransportLinesManager.WorldInfoPanels.ReportTabs
             titleLabel.minimumSize = new Vector2(m_bg.width, 0);
             titleLabel.localeID = TitleLocaleID;
 
-            KlyteMonoUtils.CreateUIElement(out UIPanel listTitle, m_bg.transform, "LT");
+            MonoUtils.CreateUIElement(out UIPanel listTitle, m_bg.transform, "LT");
             L titleList = listTitle.gameObject.AddComponent<L>();
             titleList.AsTitle();
 
-            KlyteMonoUtils.CreateUIElement(out UIPanel reportLinesContainer, m_bg.transform, "listContainer", new Vector4(0, 0, m_bg.width, m_bg.height - titleLabel.height - listTitle.height - 35));
+            MonoUtils.CreateUIElement(out UIPanel reportLinesContainer, m_bg.transform, "listContainer", new Vector4(0, 0, m_bg.width, m_bg.height - titleLabel.height - listTitle.height - 35));
             reportLinesContainer.autoLayout = true;
             reportLinesContainer.autoLayoutDirection = LayoutDirection.Horizontal;
-            KlyteMonoUtils.CreateScrollPanel(reportLinesContainer, out UIScrollablePanel reportLines, out _, reportLinesContainer.width - 10, reportLinesContainer.height, Vector3.zero);
+            MonoUtils.CreateScrollPanel(reportLinesContainer, out UIScrollablePanel reportLines, out _, reportLinesContainer.width - 10, reportLinesContainer.height, Vector3.zero);
 
             for (int i = 0; i < m_reportLines.Length; i++)
             {
-                KlyteMonoUtils.CreateUIElement(out UIPanel line, reportLines.transform, $"L{i}");
+                MonoUtils.CreateUIElement(out UIPanel line, reportLines.transform, $"L{i}");
                 m_reportLines[i] = line.gameObject.AddComponent<L>();
             }
-            KlyteMonoUtils.CreateUIElement(out UIPanel aggregateLine, m_bg.transform, $"L_AGG");
+            MonoUtils.CreateUIElement(out UIPanel aggregateLine, m_bg.transform, $"L_AGG");
             m_aggregateLine = aggregateLine.gameObject.AddComponent<L>();
         }
 

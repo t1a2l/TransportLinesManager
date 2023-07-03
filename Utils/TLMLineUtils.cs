@@ -110,7 +110,7 @@ namespace TransportLinesManager.Utils
                 {
                     return "";
                 }
-                return string.Format(Locale.Get("K45_TLM_OUTSIDECONNECTION_TARGETCITYTEMPLATE"), TLMStationUtils.GetStationName(lineObj.DstStop, lineId, lineObj.Info.m_class.m_subService, true));
+                return string.Format(Locale.Get("TLM_OUTSIDECONNECTION_TARGETCITYTEMPLATE"), TLMStationUtils.GetStationName(lineObj.DstStop, lineId, lineObj.Info.m_class.m_subService, true));
             }
         }
         internal static int GetStopLine(ushort stopId, out bool isBuilding)
@@ -336,8 +336,8 @@ namespace TransportLinesManager.Utils
         }
 
         public static string GetIconForLine(ushort lineIdx, bool regional, bool noBorder = true) => regional
-                ? KlyteResourceLoader.GetDefaultSpriteNameFor(TLMController.Instance.BuildingLines[lineIdx]?.LineDataObject?.LineBgSprite ?? TransportSystemDefinition.GetDefinitionForLine(lineIdx, regional)?.DefaultIcon ?? Commons.UI.SpriteNames.LineIconSpriteNames.NULL, noBorder)
-                : KlyteResourceLoader.GetDefaultSpriteNameFor(TLMPrefixesUtils.GetLineIcon(TransportManager.instance.m_lines.m_buffer[lineIdx].m_lineNumber, TransportSystemDefinition.GetDefinitionForLine(lineIdx, regional)), noBorder);
+                ? ResourceLoader.GetDefaultSpriteNameFor(TLMController.Instance.BuildingLines[lineIdx]?.LineDataObject?.LineBgSprite ?? TransportSystemDefinition.GetDefinitionForLine(lineIdx, regional)?.DefaultIcon ?? Commons.UI.SpriteNames.LineIconSpriteNames.NULL, noBorder)
+                : ResourceLoader.GetDefaultSpriteNameFor(TLMPrefixesUtils.GetLineIcon(TransportManager.instance.m_lines.m_buffer[lineIdx].m_lineNumber, TransportSystemDefinition.GetDefinitionForLine(lineIdx, regional)), noBorder);
 
         public static Color GetLineColor(ushort lineIdx, bool regional) => regional
                 ? TLMController.Instance.BuildingLines[lineIdx]?.LineDataObject?.LineColor ?? Color.clear

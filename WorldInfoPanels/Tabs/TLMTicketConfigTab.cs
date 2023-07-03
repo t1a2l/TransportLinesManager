@@ -11,8 +11,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
     public class TLMTicketConfigTab : TLMBaseTimedConfigTab<TLMTicketConfigTab, TLMTicketPriceTimeChart, TLMTicketPriceEditorLine, TicketPriceEntryXml>
     {
-        public override string GetTitleLocale() => "K45_TLM_PER_HOUR_TICKET_PRICE_TITLE";
-        public override string GetValueColumnLocale() => "K45_TLM_TICKET_PRICE";
+        public override string GetTitleLocale() => "TLM_PER_HOUR_TICKET_PRICE_TITLE";
+        public override string GetValueColumnLocale() => "TLM_TICKET_PRICE";
 
         public override void ExtraAwake() => m_uiHelper.AddSpace(20);
 

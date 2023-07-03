@@ -185,7 +185,7 @@ namespace TransportLinesManager
                 {
                     continue;
                 }
-                KlyteMonoUtils.CreateUIElement(out UIPanel parent2, parent.transform, "TLMSidePanels", new Vector4(parent.width + 15, 50, 300, 0));
+                MonoUtils.CreateUIElement(out UIPanel parent2, parent.transform, "TLMSidePanels", new Vector4(parent.width + 15, 50, 300, 0));
                 parent2.autoLayout = true;
                 parent2.autoLayoutPadding.bottom = 5;
                 parent2.autoFitChildrenVertically = true;
@@ -234,8 +234,8 @@ namespace TransportLinesManager
         internal void Awake()
         {
             SharedInstance = gameObject.AddComponent<TLMFacade>();
-            ConnectorADR = PluginUtils.GetImplementationTypeForMod<BridgeADRFallback, IBridgeADR>(gameObject, "KlyteAddresses", "2.99.99.0", "TransportLinesManager.ModShared.BridgeADR");
-            ConnectorWTS = PluginUtils.GetImplementationTypeForMod<BridgeWTSFallback, IBridgeWTS>(gameObject, "KlyteWriteTheSigns", "0.3.0.0", "TransportLinesManager.ModShared.BridgeWTS");
+            ConnectorADR = PluginUtils.GetImplementationTypeForMod<BridgeADRFallback, IBridgeADR>(gameObject, "Addresses", "2.99.99.0", "TransportLinesManager.ModShared.BridgeADR");
+            ConnectorWTS = PluginUtils.GetImplementationTypeForMod<BridgeWTSFallback, IBridgeWTS>(gameObject, "WriteTheSigns", "0.3.0.0", "TransportLinesManager.ModShared.BridgeWTS");
         }
 
 

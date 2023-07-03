@@ -13,7 +13,7 @@ namespace TransportLinesManager.Data.Tsd
             new TransferManager.TransferReason[] { TransferManager.TransferReason.Monorail },
             new Color32(217, 51, 89, 255),
             180,
-            LineIconSpriteNames.K45_RoundedSquareIcon,
+            LineIconSpriteNames.RoundedSquareIcon,
             true);
     }
 }

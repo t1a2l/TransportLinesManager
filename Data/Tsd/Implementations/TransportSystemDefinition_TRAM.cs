@@ -13,7 +13,7 @@ namespace TransportLinesManager.Data.Tsd
             new TransferManager.TransferReason[] { TransferManager.TransferReason.Tram },
             new Color32(73, 27, 137, 255),
             90,
-            LineIconSpriteNames.K45_TrapezeIcon,
+            LineIconSpriteNames.TrapezeIcon,
             true);
     }
 

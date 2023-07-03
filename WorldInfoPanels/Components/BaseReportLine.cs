@@ -30,7 +30,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_container.name = "WealthReportLine";
             m_container.eventSizeChanged += (x, y) => m_background.size = y;
 
-            KlyteMonoUtils.CreateUIElement(out m_background, transform, "BG");
+            MonoUtils.CreateUIElement(out m_background, transform, "BG");
             m_background.backgroundSprite = "InfoviewPanel";
 
             Color32 backgroundColor = BackgroundColor;
@@ -41,7 +41,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
             float xAdvance = 0;
 
-            KlyteMonoUtils.CreateUIElement(out m_dateTime, m_container.transform, "DateTime");
+            MonoUtils.CreateUIElement(out m_dateTime, m_container.transform, "DateTime");
             m_dateTime.autoSize = true;
             m_dateTime.minimumSize = new Vector2(DATE_COLUMN_WIDTH, 30);
             m_dateTime.textScale = 0.7f;
@@ -50,7 +50,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_dateTime.verticalAlignment = UIVerticalAlignment.Middle;
             m_dateTime.padding = new RectOffset(3, 3, 5, 3);
             m_dateTime.text = "00:00\n25/12/2020";
-            KlyteMonoUtils.LimitWidthAndBox(m_dateTime);
+            MonoUtils.LimitWidthAndBox(m_dateTime);
             xAdvance += m_dateTime.minimumSize.x;
             AddColumns(ref xAdvance);
 
@@ -60,7 +60,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         protected float InitField(out UILabel label, string name, string tooltipLocale, float xAdvance, float columnWidth)
         {
-            KlyteMonoUtils.CreateUIElement(out label, m_container.transform, name);
+            MonoUtils.CreateUIElement(out label, m_container.transform, name);
             label.autoSize = false;
             label.minimumSize = new Vector2(columnWidth, 24);
             label.textScale = 1f;
@@ -70,7 +70,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             label.padding = new RectOffset(3, 3, 5, 3);
             label.isTooltipLocalized = true;
             label.tooltipLocaleID = tooltipLocale;
-            KlyteMonoUtils.LimitWidthAndBox(label, columnWidth);
+            MonoUtils.LimitWidthAndBox(label, columnWidth);
             return columnWidth;
         }
 
@@ -78,11 +78,11 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         {
             if (showDaytime && !realtimeEnabled)
             {
-                m_dateTime.text = $"{FloatToHour(data.StartDayTime)}\n{(m_container.zOrder == 0 ? Locale.Get("K45_TLM_BUDGET_REPORT_LIST_CURRENT_TIME") : FloatToHour(data.EndDayTime))}";
+                m_dateTime.text = $"{FloatToHour(data.StartDayTime)}\n{(m_container.zOrder == 0 ? Locale.Get("TLM_BUDGET_REPORT_LIST_CURRENT_TIME") : FloatToHour(data.EndDayTime))}";
             }
             else
             {
-                m_dateTime.text = $"{data.StartDate.ToString(realtimeEnabled ? "t" : "d", LocaleManager.cultureInfo)}\n{(m_container.zOrder == 0 ? Locale.Get("K45_TLM_BUDGET_REPORT_LIST_CURRENT_TIME") : data.EndDate.ToString(realtimeEnabled ? "t" : "d", LocaleManager.cultureInfo))}";
+                m_dateTime.text = $"{data.StartDate.ToString(realtimeEnabled ? "t" : "d", LocaleManager.cultureInfo)}\n{(m_container.zOrder == 0 ? Locale.Get("TLM_BUDGET_REPORT_LIST_CURRENT_TIME") : data.EndDate.ToString(realtimeEnabled ? "t" : "d", LocaleManager.cultureInfo))}";
             }
             SetDataInternal(data);
         }
@@ -91,14 +91,14 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         public void SetDataTotalizer(T data)
         {
-            m_dateTime.text = Locale.Get("K45_TLM_BUDGET_REPORT_TOTALIZER");
+            m_dateTime.text = Locale.Get("TLM_BUDGET_REPORT_TOTALIZER");
             SetDataInternal(data);
             m_background.color = new Color32(15, 20, 30, 255);
         }
 
         public void AsTitle()
         {
-            m_dateTime.localeID = "K45_TLM_FINANCE_REPORT_TITLE_DATE";
+            m_dateTime.localeID = "TLM_FINANCE_REPORT_TITLE_DATE";
             m_dateTime.textAlignment = UIHorizontalAlignment.Center;
 
             AsTitleInternal();

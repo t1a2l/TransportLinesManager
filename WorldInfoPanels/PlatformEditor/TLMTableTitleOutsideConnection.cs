@@ -9,7 +9,7 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
     public class TLMTableTitleOutsideConnection : UICustomControl
     {
 
-        public const string ITEM_TEMPLATE = "K45_TLM_TLMTableTitleOutsideConnection";
+        public const string ITEM_TEMPLATE = "TLM_TLMTableTitleOutsideConnection";
 
         public static void EnsureTemplate()
         {
@@ -39,7 +39,7 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
         private ushort buildingId;
 
         public void Awake() => content = GetComponent<UILabel>();
-        public void Start() => KlyteMonoUtils.LimitWidthNoBox(content, 88);
+        public void Start() => MonoUtils.LimitWidthNoBox(content, 88);
 
         public void ResetData(ushort buildingId)
         {

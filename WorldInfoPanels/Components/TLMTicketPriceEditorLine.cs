@@ -11,7 +11,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         public static void EnsureTemplate() => EnsureTemplate(TICKET_PRICE_LINE_TEMPLATE);
         public override uint GetValueAsInt(ref TransportLine t) => Entry.Value;
-        public override string GetValueFormat(ref TransportLine t) => Entry.Value == 0 ? Locale.Get("K45_TLM_DEFAULT_TICKET_VALUE") : (Entry.Value / 100f).ToString(Settings.moneyFormat, LocaleManager.cultureInfo);
+        public override string GetValueFormat(ref TransportLine t) => Entry.Value == 0 ? Locale.Get("TLM_DEFAULT_TICKET_VALUE") : (Entry.Value / 100f).ToString(Settings.moneyFormat, LocaleManager.cultureInfo);
         public override void SetValueFromTyping(ref TransportLine t, uint value) => SetValue(value);
     }
 

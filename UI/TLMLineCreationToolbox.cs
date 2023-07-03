@@ -32,7 +32,7 @@ namespace TransportLinesManager.UI
         #endregion
 
         private static FieldInfo tt_nextLineNum = typeof(TransportManager).GetField("m_lineNumber", Patcher.allFlags);
-        private static readonly SavedBool m_showLineCreationToolBox = new SavedBool("K45_TLM_showLineToolbox", Settings.gameSettingsFile, true);
+        private static readonly SavedBool m_showLineCreationToolBox = new SavedBool("TLM_showLineToolbox", Settings.gameSettingsFile, true);
 
         public TransportInfo.TransportType CurrentType => TransportTool.m_prefab?.m_transportType ?? TransportInfo.TransportType.Bus;
 
@@ -72,7 +72,7 @@ namespace TransportLinesManager.UI
         internal void Awake()
         {
             PublicTransportInfoViewPanel parent = GetComponent<PublicTransportInfoViewPanel>();
-            KlyteMonoUtils.CreateUIElement(out m_bg, parent.GetComponentInChildren<UISlicedSprite>().transform);
+            MonoUtils.CreateUIElement(out m_bg, parent.GetComponentInChildren<UISlicedSprite>().transform);
             m_bg.name = "TLMLineCreationToolboxBG";
             m_bg.height = 0;
             m_bg.width = 0;
@@ -93,7 +93,7 @@ namespace TransportLinesManager.UI
                UpdateToolBoxVisibility();
            });
 
-            KlyteMonoUtils.CreateUIElement(out mainContainer, m_bg.transform);
+            MonoUtils.CreateUIElement(out mainContainer, m_bg.transform);
             mainContainer.name = "TLMLineCreationToolbox";
             mainContainer.height = 130;
             mainContainer.width = 180;
@@ -101,7 +101,7 @@ namespace TransportLinesManager.UI
             mainContainer.relativePosition = new Vector3(parent.component.width, 0);
 
 
-            KlyteMonoUtils.CreateUIElement(out UILabel title, mainContainer.transform);
+            MonoUtils.CreateUIElement(out UILabel title, mainContainer.transform);
             title.autoSize = false;
             title.width = mainContainer.width;
             title.height = 30;
@@ -111,9 +111,9 @@ namespace TransportLinesManager.UI
             title.verticalAlignment = UIVerticalAlignment.Middle;
             title.name = "Title";
             title.relativePosition = new Vector3(0, 5);
-            title.localeID = "K45_TLM_PREFIX_SELECTOR_WIN_TITLE";
+            title.localeID = "TLM_PREFIX_SELECTOR_WIN_TITLE";
 
-            KlyteMonoUtils.CreateUIElement(out contentContainer, mainContainer.transform);
+            MonoUtils.CreateUIElement(out contentContainer, mainContainer.transform);
             contentContainer.relativePosition = new Vector3(2f, 32f);
             contentContainer.name = "TLMLineCreationToolboxContent";
             contentContainer.size = new Vector3(mainContainer.width - 4, mainContainer.height - 34);
@@ -139,7 +139,7 @@ namespace TransportLinesManager.UI
             linePrefixDropDown.normalBgSprite = "OptionsDropboxListbox";
             linePrefixDropDown.horizontalAlignment = UIHorizontalAlignment.Center;
 
-            KlyteMonoUtils.CreateUIElement(out lineNumberTxtBox, contentContainer.transform);
+            MonoUtils.CreateUIElement(out lineNumberTxtBox, contentContainer.transform);
             lineNumberTxtBox.autoSize = false;
             lineNumberTxtBox.horizontalAlignment = UIHorizontalAlignment.Center;
             lineNumberTxtBox.text = "";
@@ -150,7 +150,7 @@ namespace TransportLinesManager.UI
             lineNumberTxtBox.textScale = 1.6f;
             lineNumberTxtBox.padding = new RectOffset(0, 0, 0, 0);
             lineNumberTxtBox.color = new Color(0, 0, 0, 1);
-            KlyteMonoUtils.UiTextFieldDefaults(lineNumberTxtBox);
+            MonoUtils.UiTextFieldDefaults(lineNumberTxtBox);
             lineNumberTxtBox.numericalOnly = true;
             lineNumberTxtBox.maxLength = 4;
             lineNumberTxtBox.eventLostFocus += SetNextLineNumber;
@@ -159,7 +159,7 @@ namespace TransportLinesManager.UI
             lineNumberTxtBox.relativePosition = new Vector3(85f, 13f);
 
 
-            prefixIncrementChk = uiHelper.AddCheckboxLocale("K45_TLM_AUTOINCREMENT_PREFIX", false, delegate (bool value)
+            prefixIncrementChk = uiHelper.AddCheckboxLocale("TLM_AUTOINCREMENT_PREFIX", false, delegate (bool value)
              {
                  if (!alreadySyncing)
                  {
@@ -326,7 +326,7 @@ namespace TransportLinesManager.UI
                 ? TLMPrefixesUtils.CalculateAutoColor((ushort)(NextLineNumber + 1), tsd, true)
                 : tsd.Color;
             lineNumberTxtBox.color = color;
-            m_toolboxToggleButton.SetFixed(KlyteResourceLoader.GetDefaultSpriteNameFor(TLMPrefixesUtils.GetLineIcon((ushort)(NextLineNumber + 1), tsd), true), TLMPrefixesUtils.GetString(prefixo, sep, sufixo, nonPrefix, (NextLineNumber + 1) & 0xFFFF, zeros, invertPrefixSuffix), color);
+            m_toolboxToggleButton.SetFixed(ResourceLoader.GetDefaultSpriteNameFor(TLMPrefixesUtils.GetLineIcon((ushort)(NextLineNumber + 1), tsd), true), TLMPrefixesUtils.GetString(prefixo, sep, sufixo, nonPrefix, (NextLineNumber + 1) & 0xFFFF, zeros, invertPrefixSuffix), color);
             m_isDirty = false;
         }
 

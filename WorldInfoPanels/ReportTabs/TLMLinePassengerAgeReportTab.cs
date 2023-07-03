@@ -8,7 +8,7 @@ namespace TransportLinesManager.WorldInfoPanels.ReportTabs
 
     internal class TLMLinePassengerAgeReportTab : BasicReportTab<TLMPassengerAgeReportLine, AgePassengerReport>
     {
-        protected override string TitleLocaleID { get; } = "K45_TLM_PASSENGERS_AGE_LINE_REPORT";
+        protected override string TitleLocaleID { get; } = "TLM_PASSENGERS_AGE_LINE_REPORT";
         public override bool MayBeVisible() =>true;
         protected override List<AgePassengerReport> GetReportData(ushort lineId) => TLMTransportLineStatusesManager.instance.GetLineAgeReport(lineId);
         protected override void AddToTotalizer(ref AgePassengerReport totalizer, AgePassengerReport data)

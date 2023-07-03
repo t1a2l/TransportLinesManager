@@ -62,11 +62,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             titleLabel.localeID = GetTitleLocale();
 
             m_uiHelper.AddSpace(5);
-            KlyteMonoUtils.CreateElement(out m_clockChart, m_uiHelper.Self.transform, "DailyClock");
+            MonoUtils.CreateElement(out m_clockChart, m_uiHelper.Self.transform, "DailyClock");
             ExtraAwake();
-            KlyteMonoUtils.CreateElement(out m_titleContainer, m_uiHelper.Self.transform, "Title");
+            MonoUtils.CreateElement(out m_titleContainer, m_uiHelper.Self.transform, "Title");
             PopulateTitlePanel(m_titleContainer);
-            KlyteMonoUtils.CreateScrollPanel(m_uiHelper.Self, out m_entryListContainer, out _, m_uiHelper.Self.width - 20f, m_uiHelper.Self.height - 150, Vector3.zero);
+            MonoUtils.CreateScrollPanel(m_uiHelper.Self, out m_entryListContainer, out _, m_uiHelper.Self.width - 20f, m_uiHelper.Self.height - 150, Vector3.zero);
             EnsureTemplate();
             m_timeRows = new UITemplateList<UIPanel>(m_entryListContainer, GetTemplateName());
         }
@@ -87,33 +87,33 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             container.wrapLayout = false;
             container.name = "AzimuthEditorTitle";
 
-            CreateTitleLabel(container, out UILabel cityId, "StartHour", Locale.Get("K45_TLM_START_HOUR"), 50);
+            CreateTitleLabel(container, out UILabel cityId, "StartHour", Locale.Get("TLM_START_HOUR"), 50);
             CreateTitleLabel(container, out UILabel generatedName, "GenName", Locale.Get(GetValueColumnLocale()), 269);
 
-            KlyteMonoUtils.CreateUIElement(out UIButton add, container.transform, "RegenName");
+            MonoUtils.CreateUIElement(out UIButton add, container.transform, "RegenName");
             add.textScale = 1f;
             add.width = 25;
             add.height = 25;
-            add.tooltip = Locale.Get("K45_TLM_ADD_ENTRY");
-            KlyteMonoUtils.InitButton(add, true, "OptionBase");
+            add.tooltip = Locale.Get("TLM_ADD_ENTRY");
+            MonoUtils.InitButton(add, true, "OptionBase");
             add.isVisible = true;
             add.foregroundSpriteMode = UIForegroundSpriteMode.Scale;
-            add.normalFgSprite = KlyteResourceLoader.GetDefaultSpriteNameFor(CommonsSpriteNames.K45_Plus);
+            add.normalFgSprite = ResourceLoader.GetDefaultSpriteNameFor(CommonsSpriteNames.Plus);
             add.eventClick += (component, eventParam) => AddEntry();
         }
 
         private void CreateTitleLabel(UIPanel container, out UILabel label, string name, string text, uint width)
         {
 
-            KlyteMonoUtils.CreateUIElement(out UIPanel nameContainer, container.transform, "GenNameContainer");
+            MonoUtils.CreateUIElement(out UIPanel nameContainer, container.transform, "GenNameContainer");
             nameContainer.autoSize = false;
             nameContainer.width = width;
             nameContainer.height = 30;
             nameContainer.autoLayout = true;
             nameContainer.autoLayoutDirection = LayoutDirection.Horizontal;
 
-            KlyteMonoUtils.CreateUIElement(out label, nameContainer.transform, name);
-            KlyteMonoUtils.LimitWidthAndBox(label, width);
+            MonoUtils.CreateUIElement(out label, nameContainer.transform, name);
+            MonoUtils.LimitWidthAndBox(label, width);
             label.autoSize = true;
             label.height = 30;
             label.padding = new RectOffset(3, 3, 4, 3);

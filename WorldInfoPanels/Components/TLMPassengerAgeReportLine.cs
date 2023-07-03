@@ -26,12 +26,12 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         protected override void AsTitleInternal()
         {
-            m_child.text = Locale.Get("K45_TLM_AGE_REPORT_COLUMN_CHILD_SHORT");
-            m_teens.text = Locale.Get("K45_TLM_AGE_REPORT_COLUMN_TEENS_SHORT");
-            m_young.text = Locale.Get("K45_TLM_AGE_REPORT_COLUMN_YOUNG_SHORT");
-            m_adult.text = Locale.Get("K45_TLM_AGE_REPORT_COLUMN_ADULT_SHORT");
-            m_elder.text = Locale.Get("K45_TLM_AGE_REPORT_COLUMN_ELDER_SHORT");
-            m_total.text = Locale.Get("K45_TLM_AGE_REPORT_COLUMN_TOTAL_SHORT");
+            m_child.text = Locale.Get("TLM_AGE_REPORT_COLUMN_CHILD_SHORT");
+            m_teens.text = Locale.Get("TLM_AGE_REPORT_COLUMN_TEENS_SHORT");
+            m_young.text = Locale.Get("TLM_AGE_REPORT_COLUMN_YOUNG_SHORT");
+            m_adult.text = Locale.Get("TLM_AGE_REPORT_COLUMN_ADULT_SHORT");
+            m_elder.text = Locale.Get("TLM_AGE_REPORT_COLUMN_ELDER_SHORT");
+            m_total.text = Locale.Get("TLM_AGE_REPORT_COLUMN_TOTAL_SHORT");
 
             m_child.textAlignment = UIHorizontalAlignment.Center;
             m_teens.textAlignment = UIHorizontalAlignment.Center;

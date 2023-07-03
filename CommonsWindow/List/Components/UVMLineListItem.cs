@@ -134,7 +134,7 @@ namespace TransportLinesManager.CommonsWindow.List.Components
                         m_lineBalance.isVisible = true;
 
                         m_lineBudgetLabel.text = string.Format("{0:0%}", TLMLineUtils.GetEffectiveBudget(LineID));
-                        m_lineBudgetLabel.tooltip = string.Format(Locale.Get("K45_TLM_LINE_BUDGET_EXPLAIN_2"),
+                        m_lineBudgetLabel.tooltip = string.Format(Locale.Get("TLM_LINE_BUDGET_EXPLAIN_2"),
                             Locale.Get("TRANSPORT_LINE", Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].Info.m_transportType.ToString()),
                             overallBudget, Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_budget / 100f, TLMLineUtils.GetEffectiveBudget(LineID));
                         m_lineBudgetLabel.isVisible = true;
@@ -150,7 +150,7 @@ namespace TransportLinesManager.CommonsWindow.List.Components
                 else
                 {
                     var currentTSD = TLMPanel.Instance.m_linesPanel.TSD;
-                    m_lineName.text = string.Format(Locale.Get("K45_TLM_OUTSIDECONNECTION_LISTNAMETEMPLATE"), currentTSD.GetTransportName());
+                    m_lineName.text = string.Format(Locale.Get("TLM_OUTSIDECONNECTION_LISTNAMETEMPLATE"), currentTSD.GetTransportName());
                     LineNumber = 0;
                     m_linePassengers.isVisible = false;
                     m_lineColor.isVisible = false;
@@ -200,7 +200,7 @@ namespace TransportLinesManager.CommonsWindow.List.Components
 
         private static void CreateLabel(out UILabel label, Transform transform)
         {
-            KlyteMonoUtils.CreateUIElement(out label, transform, "LineStops");
+            MonoUtils.CreateUIElement(out label, transform, "LineStops");
             label.textAlignment = UIHorizontalAlignment.Center;
             label.textColor = ForegroundColor;
             label.minimumSize = new Vector2(80, 18);
@@ -385,11 +385,11 @@ namespace TransportLinesManager.CommonsWindow.List.Components
             m_lineIsVisible.eventCheckChanged += (x, y) => ChangeLineVisibility(y);
             m_lineColor.eventSelectedColorReleased += OnColorChanged;
 
-            KlyteMonoUtils.LimitWidthAndBox(m_lineStops, out UIPanel containerLineStops);
-            KlyteMonoUtils.LimitWidthAndBox(m_linePassengers, out UIPanel containerPassenger);
-            KlyteMonoUtils.LimitWidthAndBox(m_lineBalance, out UIPanel containerLineBalance);
-            KlyteMonoUtils.LimitWidthAndBox(m_lineVehicles, out UIPanel containerVehicles);
-            KlyteMonoUtils.LimitWidthAndBox(m_lineBudgetLabel, out UIPanel containerBudget);
+            MonoUtils.LimitWidthAndBox(m_lineStops, out UIPanel containerLineStops);
+            MonoUtils.LimitWidthAndBox(m_linePassengers, out UIPanel containerPassenger);
+            MonoUtils.LimitWidthAndBox(m_lineBalance, out UIPanel containerLineBalance);
+            MonoUtils.LimitWidthAndBox(m_lineVehicles, out UIPanel containerVehicles);
+            MonoUtils.LimitWidthAndBox(m_lineBudgetLabel, out UIPanel containerBudget);
 
             containerLineBalance.relativePosition = new Vector3(625, 10);
             containerPassenger.relativePosition = new Vector3(540, 10);
@@ -416,7 +416,7 @@ namespace TransportLinesManager.CommonsWindow.List.Components
 
         protected void Start() => m_lineColor.gameObject.AddComponent<UIColorFieldExtension>();
 
-        public const string LINE_LIST_ITEM_TEMPLATE = "K45_TLM_LineListItemTemplate";
+        public const string LINE_LIST_ITEM_TEMPLATE = "TLM_LineListItemTemplate";
         public static void EnsureTemplate()
         {
             if (UITemplateUtils.GetTemplateDict().ContainsKey(LINE_LIST_ITEM_TEMPLATE))
@@ -427,7 +427,7 @@ namespace TransportLinesManager.CommonsWindow.List.Components
             var go = new GameObject();
             var transform = go.transform;
             var m_uIHelper = new UIHelperExtension(go.AddComponent<UIPanel>());
-            KlyteMonoUtils.CreateUIElement(out UIPanel m_background, transform, "BG");
+            MonoUtils.CreateUIElement(out UIPanel m_background, transform, "BG");
             m_background.width = 844;
             m_background.height = 38;
 
@@ -435,12 +435,12 @@ namespace TransportLinesManager.CommonsWindow.List.Components
             m_uIHelper.Self.height = 38;
             m_background.backgroundSprite = "InfoviewPanel";
 
-            KlyteMonoUtils.CreateUIElement(out UILabel m_lineName, transform, "LineName", new Vector4(146, 2, 198, 35));
+            MonoUtils.CreateUIElement(out UILabel m_lineName, transform, "LineName", new Vector4(146, 2, 198, 35));
             m_lineName.textColor = ForegroundColor;
             m_lineName.textAlignment = UIHorizontalAlignment.Center;
             m_lineName.verticalAlignment = UIVerticalAlignment.Middle;
             m_lineName.wordWrap = true;
-            KlyteMonoUtils.CreateUIElement(out UITextField m_lineNameField, transform, "LineNameField", new Vector4(146, 10, 198, 20));
+            MonoUtils.CreateUIElement(out UITextField m_lineNameField, transform, "LineNameField", new Vector4(146, 10, 198, 20));
             m_lineNameField.maxLength = 256;
             m_lineNameField.isVisible = false;
             m_lineNameField.verticalAlignment = UIVerticalAlignment.Middle;
@@ -460,15 +460,15 @@ namespace TransportLinesManager.CommonsWindow.List.Components
             m_lineBalance.minimumSize = new Vector2(145, 18);
 
 
-            KlyteMonoUtils.CreateUIElement(out UIButton view, transform, "ViewLine", new Vector4(784, 5, 28, 28));
-            KlyteMonoUtils.InitButton(view, true, "LineDetailButton");
+            MonoUtils.CreateUIElement(out UIButton view, transform, "ViewLine", new Vector4(784, 5, 28, 28));
+            MonoUtils.InitButton(view, true, "LineDetailButton");
 
 
-            KlyteMonoUtils.CreateUIElement(out UIButton view2, transform, "DeleteLine", new Vector4(816, 5, 28, 28));
-            KlyteMonoUtils.InitButton(view2, true, "DeleteLineButton");
+            MonoUtils.CreateUIElement(out UIButton view2, transform, "DeleteLine", new Vector4(816, 5, 28, 28));
+            MonoUtils.InitButton(view2, true, "DeleteLineButton");
 
 
-            KlyteMonoUtils.CreateUIElement(out UILabel m_lineVehicles, transform, "LineVehicles");
+            MonoUtils.CreateUIElement(out UILabel m_lineVehicles, transform, "LineVehicles");
             m_lineVehicles.autoSize = true;
             m_lineVehicles.pivot = UIPivotPoint.TopLeft;
             m_lineVehicles.verticalAlignment = UIVerticalAlignment.Middle;
@@ -476,7 +476,7 @@ namespace TransportLinesManager.CommonsWindow.List.Components
             m_lineVehicles.textAlignment = UIHorizontalAlignment.Center;
             m_lineVehicles.textColor = ForegroundColor;
 
-            KlyteMonoUtils.CreateUIElement(out UILabel m_lineBudgetLabel, transform, "LineBudget");
+            MonoUtils.CreateUIElement(out UILabel m_lineBudgetLabel, transform, "LineBudget");
             m_lineBudgetLabel.autoSize = true;
             m_lineBudgetLabel.pivot = UIPivotPoint.TopLeft;
             m_lineBudgetLabel.verticalAlignment = UIVerticalAlignment.Middle;
@@ -512,27 +512,27 @@ namespace TransportLinesManager.CommonsWindow.List.Components
             m_lineColor.relativePosition = new Vector3(90, 0);
 
             //Auto color & Auto Name
-            KlyteMonoUtils.CreateUIElement(out UIButton buttonAutoName, transform, "AutoNameBtn");
+            MonoUtils.CreateUIElement(out UIButton buttonAutoName, transform, "AutoNameBtn");
             buttonAutoName.pivot = UIPivotPoint.TopRight;
             buttonAutoName.relativePosition = new Vector3(164, 0);
             buttonAutoName.text = "A";
             buttonAutoName.textScale = 0.6f;
             buttonAutoName.width = 15;
             buttonAutoName.height = 15;
-            buttonAutoName.tooltip = Locale.Get("K45_TLM_AUTO_NAME_SIMPLE_BUTTON_TOOLTIP");
-            KlyteMonoUtils.InitButton(buttonAutoName, true, "ButtonMenu");
+            buttonAutoName.tooltip = Locale.Get("TLM_AUTO_NAME_SIMPLE_BUTTON_TOOLTIP");
+            MonoUtils.InitButton(buttonAutoName, true, "ButtonMenu");
             buttonAutoName.isVisible = true;
 
 
-            KlyteMonoUtils.CreateUIElement(out UIButton buttonAutoColor, transform, "AutoColorBtn");
+            MonoUtils.CreateUIElement(out UIButton buttonAutoColor, transform, "AutoColorBtn");
             buttonAutoColor.pivot = UIPivotPoint.TopRight;
             buttonAutoColor.relativePosition = new Vector3(83, 0);
             buttonAutoColor.text = "A";
             buttonAutoColor.textScale = 0.6f;
             buttonAutoColor.width = 15;
             buttonAutoColor.height = 15;
-            buttonAutoColor.tooltip = Locale.Get("K45_TLM_AUTO_COLOR_SIMPLE_BUTTON_TOOLTIP");
-            KlyteMonoUtils.InitButton(buttonAutoColor, true, "ButtonMenu");
+            buttonAutoColor.tooltip = Locale.Get("TLM_AUTO_COLOR_SIMPLE_BUTTON_TOOLTIP");
+            MonoUtils.InitButton(buttonAutoColor, true, "ButtonMenu");
             buttonAutoColor.isVisible = true;
 
             go.AddComponent<UVMLineListItem>();

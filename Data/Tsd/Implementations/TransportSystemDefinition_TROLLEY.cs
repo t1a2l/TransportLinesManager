@@ -13,7 +13,7 @@ namespace TransportLinesManager.Data.Tsd
             new TransferManager.TransferReason[] { TransferManager.TransferReason.Trolleybus },
             new Color(1, .517f, 0, 1),
             30,
-            LineIconSpriteNames.K45_OvalIcon,
+            LineIconSpriteNames.OvalIcon,
             true);
     }
 

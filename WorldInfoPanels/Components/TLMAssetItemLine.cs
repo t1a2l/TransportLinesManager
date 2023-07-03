@@ -16,7 +16,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 {
     public class TLMAssetItemLine : UICustomControl
     {
-        public const string TEMPLATE_NAME = "K45_TLM_AssetSelectionTabLineTemplate";
+        public const string TEMPLATE_NAME = "TLM_AssetSelectionTabLineTemplate";
         private bool m_isLoading;
         private UICheckBox m_checkbox;
         private UITextField m_capacityEditor;
@@ -49,7 +49,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                     }
                 }
             };
-            KlyteMonoUtils.LimitWidthAndBox(m_checkbox.label, 265, out UIPanel container);
+            MonoUtils.LimitWidthAndBox(m_checkbox.label, 265, out UIPanel container);
             container.relativePosition = new Vector3(container.relativePosition.x, 0);
             m_capacityEditor.eventTextSubmitted += CapacityEditor_eventTextSubmitted;
 
@@ -109,11 +109,11 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             uiCheckbox.label.verticalAlignment = UIVerticalAlignment.Middle;
             uiCheckbox.label.minimumSize = new Vector2(0, 32);
 
-            KlyteMonoUtils.CreateUIElement(out UITextField capEditField, panel.transform, "Cap", new Vector4(0, 0, 50, 32));
-            KlyteMonoUtils.UiTextFieldDefaults(capEditField);
-            KlyteMonoUtils.InitButtonFull(capEditField, false, "OptionsDropboxListbox");
+            MonoUtils.CreateUIElement(out UITextField capEditField, panel.transform, "Cap", new Vector4(0, 0, 50, 32));
+            MonoUtils.UiTextFieldDefaults(capEditField);
+            MonoUtils.InitButtonFull(capEditField, false, "OptionsDropboxListbox");
             capEditField.isTooltipLocalized = true;
-            capEditField.tooltipLocaleID = "K45_TLM_ASSET_CAPACITY_FIELD_DESCRIPTION";
+            capEditField.tooltipLocaleID = "TLM_ASSET_CAPACITY_FIELD_DESCRIPTION";
             capEditField.numericalOnly = true;
             capEditField.maxLength = 5;
             capEditField.padding = new RectOffset(2, 2, 9, 2);

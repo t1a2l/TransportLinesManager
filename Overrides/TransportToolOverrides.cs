@@ -177,9 +177,9 @@ namespace TransportLinesManager.Overrides
 
                         text +=
                             $"\n<color #{TransportManager.instance.GetLineColor(lastEditLine).SetBrightness(1).ClampSaturation(.5f).ToRGB()}>{TransportManager.instance.GetLineName(lastEditLine)}</color>" +
-                            $"\n{Locale.Get("K45_TLM_TOOLINFO_PREVSTOP")}: {TLMStationUtils.GetFullStationName(prevStopId, lastEditLine, tt.m_prefab.m_class.m_subService,false)}" +
-                            $"\n{Locale.Get("K45_TLM_TOOLINFO_NEXTSTOP")}: {TLMStationUtils.GetFullStationName(nextStopId, lastEditLine, tt.m_prefab.m_class.m_subService,false)}" +
-                            $"\n{Locale.Get("K45_TLM_TOOLINFO_SEGMENTLENGHT")}: {d0}";
+                            $"\n{Locale.Get("TLM_TOOLINFO_PREVSTOP")}: {TLMStationUtils.GetFullStationName(prevStopId, lastEditLine, tt.m_prefab.m_class.m_subService,false)}" +
+                            $"\n{Locale.Get("TLM_TOOLINFO_NEXTSTOP")}: {TLMStationUtils.GetFullStationName(nextStopId, lastEditLine, tt.m_prefab.m_class.m_subService,false)}" +
+                            $"\n{Locale.Get("TLM_TOOLINFO_SEGMENTLENGHT")}: {d0}";
                     }
                 }
             }
@@ -208,8 +208,8 @@ namespace TransportLinesManager.Overrides
             var d0 = $"<color {c0}>{seg0.m_averageLength.ToString("N0")}m</color>";
             var d1 = $"<color {c1}>{seg1.m_averageLength.ToString("N0")}m</color>";
 
-            return (seg0Id > 0 ? $"\n{Locale.Get("K45_TLM_TOOLINFO_PREVSTOP")}: {d0} @ {TLMStationUtils.GetFullStationName(seg0.GetOtherNode(stopId), lastEditLine, tt.m_prefab.m_class.m_subService,false)}" : "") +
-                (seg1Id > 0 ? $"\n{Locale.Get("K45_TLM_TOOLINFO_NEXTSTOP")}: {d1} @ {TLMStationUtils.GetFullStationName(seg1.GetOtherNode(stopId), lastEditLine, tt.m_prefab.m_class.m_subService,false)}" : "");
+            return (seg0Id > 0 ? $"\n{Locale.Get("TLM_TOOLINFO_PREVSTOP")}: {d0} @ {TLMStationUtils.GetFullStationName(seg0.GetOtherNode(stopId), lastEditLine, tt.m_prefab.m_class.m_subService,false)}" : "") +
+                (seg1Id > 0 ? $"\n{Locale.Get("TLM_TOOLINFO_NEXTSTOP")}: {d1} @ {TLMStationUtils.GetFullStationName(seg1.GetOtherNode(stopId), lastEditLine, tt.m_prefab.m_class.m_subService,false)}" : "");
         }
 
         private static string GetDistanceColor(float averageLength) => averageLength < 100 ? "red" : averageLength < 250 ? "yellow" : averageLength > 2500 ? "yellow" : "green";

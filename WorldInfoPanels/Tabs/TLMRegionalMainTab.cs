@@ -41,13 +41,13 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_helper = new UIHelperExtension(MainPanel);
 
             LogUtils.DoLog("Name");
-            m_lineCode = CreateMiniTextField("K45_TLM_REGIONALLINE_CODE", OnRegionalLineCodeChanged);
+            m_lineCode = CreateMiniTextField("TLM_REGIONALLINE_CODE", OnRegionalLineCodeChanged);
 
             LogUtils.DoLog("ColorSel");
             CreateColorSelector();
 
             LogUtils.DoLog("Format");
-            m_formatDD = CreateMiniDropdown("K45_TLM_ICON", SetFormatPrefix, TLMLineIconExtension.GetDropDownOptions(Locale.Get("K45_TLM_LINE_ICON_ENUM_TT_DEFAULT")));
+            m_formatDD = CreateMiniDropdown("TLM_ICON", SetFormatPrefix, TLMLineIconExtension.GetDropDownOptions(Locale.Get("TLM_LINE_ICON_ENUM_TT_DEFAULT")));
 
         }
 
@@ -71,7 +71,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             ddObj.listPosition = UIDropDown.PopupListPosition.Automatic;
             ddObj.horizontalAlignment = UIHorizontalAlignment.Center;
 
-            KlyteMonoUtils.LimitWidthAndBox(label, 130);
+            MonoUtils.LimitWidthAndBox(label, 130);
             label.textScale = 1;
             label.padding.top = 4;
             label.position = Vector3.zero;
@@ -98,7 +98,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             ddObj.textScale = 1;
 
 
-            KlyteMonoUtils.LimitWidthAndBox(label, 130);
+            MonoUtils.LimitWidthAndBox(label, 130);
             label.textScale = 1;
             label.padding.top = 4;
             label.position = Vector3.zero;
@@ -132,9 +132,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             m_prefixColor = m_helper.AddColorPicker("A", Color.clear, OnChangePrefixColor, out UILabel lbl, out UIPanel container);
 
-            KlyteMonoUtils.LimitWidthAndBox(lbl, 260, true);
+            MonoUtils.LimitWidthAndBox(lbl, 260, true);
             lbl.isLocalized = true;
-            lbl.localeID = "K45_TLM_REGIONALLINE_COLOR_LABEL";
+            lbl.localeID = "TLM_REGIONALLINE_COLOR_LABEL";
             lbl.verticalAlignment = UIVerticalAlignment.Middle;
             lbl.font = UIHelperExtension.defaultFontCheckbox;
             lbl.textScale = 1;

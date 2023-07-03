@@ -13,7 +13,7 @@ namespace TransportLinesManager.Data.Tsd
             new TransferManager.TransferReason[] { TransferManager.TransferReason.TouristA, TransferManager.TransferReason.TouristB, TransferManager.TransferReason.TouristC, TransferManager.TransferReason.TouristD },
             new Color32(83, 157, 48, 255),
             1,
-            LineIconSpriteNames.K45_MountainIcon,
+            LineIconSpriteNames.MountainIcon,
             true);
     }
 

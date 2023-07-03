@@ -42,7 +42,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             CreateTemplateList();
         }
 
-        private void CreateTemplateList() => m_checkboxTemplateList = new UITemplateList<UIPanel>(m_scrollablePanel, "K45_TLM_DepotSelectionTabLineTemplate");
+        private void CreateTemplateList() => m_checkboxTemplateList = new UITemplateList<UIPanel>(m_scrollablePanel, "TLM_DepotSelectionTabLineTemplate");
 
         private void CreateDepotLineTemplate()
         {
@@ -60,10 +60,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             uiCheckbox.label.processMarkup = true;
             uiCheckbox.label.textScale = 0.8f;
 
-            KlyteMonoUtils.CreateUIElement(out UIButton gotoButton, panel.transform, "GoTo", new Vector4(0, 0, 30, 30));
-            KlyteMonoUtils.InitButton(gotoButton, true, "LineDetailButton");
+            MonoUtils.CreateUIElement(out UIButton gotoButton, panel.transform, "GoTo", new Vector4(0, 0, 30, 30));
+            MonoUtils.InitButton(gotoButton, true, "LineDetailButton");
 
-            TLMUiTemplateUtils.GetTemplateDict()["K45_TLM_DepotSelectionTabLineTemplate"] = panel;
+            TLMUiTemplateUtils.GetTemplateDict()["TLM_DepotSelectionTabLineTemplate"] = panel;
         }
 
         private void CreateMainPanel()
@@ -81,19 +81,19 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             MainPanel.wrapLayout = false;
             MainPanel.canFocus = true;
 
-            KlyteMonoUtils.CreateUIElement(out m_title, MainPanel.transform);
+            MonoUtils.CreateUIElement(out m_title, MainPanel.transform);
             m_title.textAlignment = UIHorizontalAlignment.Center;
             m_title.autoSize = false;
             m_title.autoHeight = true;
             m_title.width = MainPanel.width - 30f;
             m_title.relativePosition = new Vector3(5, 5);
             m_title.textScale = 0.9f;
-            m_title.localeID = "K45_TLM_ASSETS_FOR_PREFIX";
+            m_title.localeID = "TLM_ASSETS_FOR_PREFIX";
         }
 
         private void CreateScrollPanel()
         {
-            KlyteMonoUtils.CreateUIElement(out m_scrollablePanel, MainPanel.transform);
+            MonoUtils.CreateUIElement(out m_scrollablePanel, MainPanel.transform);
             m_scrollablePanel.width = MainPanel.width - 20f;
             m_scrollablePanel.height = MainPanel.height - 40f;
             m_scrollablePanel.autoLayoutDirection = LayoutDirection.Vertical;
@@ -105,7 +105,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_scrollablePanel.relativePosition = new Vector3(5, 40);
             m_scrollablePanel.backgroundSprite = "ScrollbarTrack";
 
-            KlyteMonoUtils.CreateUIElement(out UIPanel trackballPanel, MainPanel.transform);
+            MonoUtils.CreateUIElement(out UIPanel trackballPanel, MainPanel.transform);
             trackballPanel.width = 10f;
             trackballPanel.height = m_scrollablePanel.height;
             trackballPanel.autoLayoutDirection = LayoutDirection.Horizontal;
@@ -115,7 +115,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             trackballPanel.relativePosition = new Vector3(MainPanel.width - 15, m_scrollablePanel.relativePosition.y);
 
 
-            KlyteMonoUtils.CreateUIElement(out m_scrollbar, trackballPanel.transform);
+            MonoUtils.CreateUIElement(out m_scrollbar, trackballPanel.transform);
             m_scrollbar.width = 10f;
             m_scrollbar.height = m_scrollbar.parent.height;
             m_scrollbar.orientation = UIOrientation.Vertical;
@@ -125,7 +125,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_scrollbar.value = 0f;
             m_scrollbar.incrementAmount = 25f;
 
-            KlyteMonoUtils.CreateUIElement(out UISlicedSprite scrollBg, m_scrollbar.transform);
+            MonoUtils.CreateUIElement(out UISlicedSprite scrollBg, m_scrollbar.transform);
             scrollBg.relativePosition = Vector2.zero;
             scrollBg.autoSize = true;
             scrollBg.size = scrollBg.parent.size;
@@ -133,7 +133,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             scrollBg.spriteName = "ScrollbarTrack";
             m_scrollbar.trackObject = scrollBg;
 
-            KlyteMonoUtils.CreateUIElement(out UISlicedSprite scrollFg, scrollBg.transform);
+            MonoUtils.CreateUIElement(out UISlicedSprite scrollFg, scrollBg.transform);
             scrollFg.relativePosition = Vector2.zero;
             scrollFg.fillDirection = UIFillDirection.Vertical;
             scrollFg.autoSize = true;
@@ -209,7 +209,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                             }
                         }
                     };
-                    KlyteMonoUtils.LimitWidthAndBox(uiCheck.label, 280, true);
+                    MonoUtils.LimitWidthAndBox(uiCheck.label, 280, true);
                     UIButton gotoButton = depotChecks[idx].Find<UIButton>("GoTo");
                     gotoButton.eventClick += delegate (UIComponent c, UIMouseEventParameter r)
                     {
@@ -226,12 +226,12 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             if (config is TLMTransportLineConfiguration)
             {
-                m_title.text = string.Format(Locale.Get("K45_TLM_DEPOT_SELECT_WINDOW_TITLE"), TLMLineUtils.GetLineStringId(GetLineID(out bool fromBuilding), fromBuilding));
+                m_title.text = string.Format(Locale.Get("TLM_DEPOT_SELECT_WINDOW_TITLE"), TLMLineUtils.GetLineStringId(GetLineID(out bool fromBuilding), fromBuilding));
             }
             else
             {
                 int prefix = (int)TLMPrefixesUtils.GetPrefix(GetLineID(out _));
-                m_title.text = string.Format(Locale.Get("K45_TLM_DEPOT_SELECT_WINDOW_TITLE_PREFIX"), prefix > 0 ? NumberingUtils.GetStringFromNumber(TLMPrefixesUtils.GetStringOptionsForPrefix(tsd), prefix + 1) : Locale.Get("K45_TLM_UNPREFIXED"), tsd.GetTransportName());
+                m_title.text = string.Format(Locale.Get("TLM_DEPOT_SELECT_WINDOW_TITLE_PREFIX"), prefix > 0 ? NumberingUtils.GetStringFromNumber(TLMPrefixesUtils.GetStringOptionsForPrefix(tsd), prefix + 1) : Locale.Get("TLM_UNPREFIXED"), tsd.GetTransportName());
             }
 
 

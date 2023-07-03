@@ -51,7 +51,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnect
                 }
                 catch
                 {
-                    LineBgSprite = LineIconSpriteNames.K45_TriangleIcon;
+                    LineBgSprite = LineIconSpriteNames.TriangleIcon;
                 }
             }
         }
@@ -77,6 +77,6 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnect
 
         private Color lineColor;
         private string identifier;
-        private LineIconSpriteNames lineBgSprite = LineIconSpriteNames.K45_TriangleIcon;
+        private LineIconSpriteNames lineBgSprite = LineIconSpriteNames.TriangleIcon;
     }
 }

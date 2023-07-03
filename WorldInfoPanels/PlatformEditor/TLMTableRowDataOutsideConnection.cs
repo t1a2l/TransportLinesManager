@@ -9,7 +9,7 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
     public class TLMTableRowDataOutsideConnection : UICustomControl
     {
 
-        public const string ITEM_TEMPLATE = "K45_TLM_TLMTableRowDataOutsideConnection";
+        public const string ITEM_TEMPLATE = "TLM_TLMTableRowDataOutsideConnection";
 
         public static void EnsureTemplate()
         {

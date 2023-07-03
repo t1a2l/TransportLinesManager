@@ -56,18 +56,18 @@ namespace TransportLinesManager.UI
 
         private void AwakeActionButtons()
         {
-            m_copyButton = ConfigureActionButton(m_container, CommonsSpriteNames.K45_Copy);
+            m_copyButton = ConfigureActionButton(m_container, CommonsSpriteNames.Copy);
             m_copyButton.eventClick += (x, y) => ActionCopy();
-            m_pasteButton = ConfigureActionButton(m_container, CommonsSpriteNames.K45_Paste);
+            m_pasteButton = ConfigureActionButton(m_container, CommonsSpriteNames.Paste);
             m_pasteButton.eventClick += (x, y) => ActionPaste();
             m_pasteButton.isVisible = false;
-            m_eraseButton = ConfigureActionButton(m_container, CommonsSpriteNames.K45_Delete);
+            m_eraseButton = ConfigureActionButton(m_container, CommonsSpriteNames.Delete);
             m_eraseButton.eventClick += (x, y) => ActionDelete();
             m_eraseButton.color = Color.red;
 
-            m_copyButton.tooltip = Locale.Get("K45_TLM_COPY_CURRENT_LIST_CLIPBOARD");
-            m_pasteButton.tooltip = Locale.Get("K45_TLM_PASTE_CLIPBOARD_TO_CURRENT_LIST");
-            m_eraseButton.tooltip = Locale.Get("K45_TLM_DELETE_CURRENT_LIST");
+            m_copyButton.tooltip = Locale.Get("TLM_COPY_CURRENT_LIST_CLIPBOARD");
+            m_pasteButton.tooltip = Locale.Get("TLM_PASTE_CLIPBOARD_TO_CURRENT_LIST");
+            m_eraseButton.tooltip = Locale.Get("TLM_DELETE_CURRENT_LIST");
 
             m_copyButton.relativePosition = new Vector3(-50, 0);
             m_pasteButton.relativePosition = new Vector3(-50, 25);
@@ -96,14 +96,14 @@ namespace TransportLinesManager.UI
         }
         protected static UIButton ConfigureActionButton(UIComponent parent, CommonsSpriteNames spriteName)
         {
-            KlyteMonoUtils.CreateUIElement(out UIButton actionButton, parent.transform, "Btn");
-            KlyteMonoUtils.InitButton(actionButton, false, "ButtonMenu");
+            MonoUtils.CreateUIElement(out UIButton actionButton, parent.transform, "Btn");
+            MonoUtils.InitButton(actionButton, false, "ButtonMenu");
             actionButton.focusedBgSprite = "";
             actionButton.autoSize = false;
             actionButton.width = 20;
             actionButton.height = 20;
             actionButton.foregroundSpriteMode = UIForegroundSpriteMode.Scale;
-            actionButton.normalFgSprite = KlyteResourceLoader.GetDefaultSpriteNameFor(spriteName);
+            actionButton.normalFgSprite = ResourceLoader.GetDefaultSpriteNameFor(spriteName);
             return actionButton;
         }
         public void SetValues(List<Tuple<int, Color, uint>> steps)
@@ -158,7 +158,7 @@ namespace TransportLinesManager.UI
             panel.wrapLayout = false;
             panel.tooltipLocaleID = ClockTooltip;
 
-            KlyteMonoUtils.CreateUIElement(out m_container, transform, "ClockContainer");
+            MonoUtils.CreateUIElement(out m_container, transform, "ClockContainer");
             m_container.relativePosition = new Vector3((panel.width / 2f) - 70, 0);
             m_container.width = 140;
             m_container.height = 70;
@@ -167,13 +167,13 @@ namespace TransportLinesManager.UI
             m_container.wrapLayout = false;
             m_container.tooltipLocaleID = ClockTooltip;
 
-            KlyteMonoUtils.CreateUIElement(out m_clock, m_container.transform, "Clock");
-            m_clock.spriteName = "K45_24hClock";
+            MonoUtils.CreateUIElement(out m_clock, m_container.transform, "Clock");
+            m_clock.spriteName = "24hClock";
             m_clock.relativePosition = new Vector3(0, 0);
             m_clock.width = 70;
             m_clock.height = 70;
 
-            KlyteMonoUtils.CreateUIElement(out m_minutePointer, m_container.transform, "Minute");
+            MonoUtils.CreateUIElement(out m_minutePointer, m_container.transform, "Minute");
             m_minutePointer.width = 2;
             m_minutePointer.height = 27;
             m_minutePointer.pivot = UIPivotPoint.TopCenter;
@@ -181,7 +181,7 @@ namespace TransportLinesManager.UI
             m_minutePointer.spriteName = "EmptySprite";
             m_minutePointer.color = new Color32(35, 35, 35, 255);
 
-            KlyteMonoUtils.CreateUIElement(out m_hourPointer, m_container.transform, "Hour");
+            MonoUtils.CreateUIElement(out m_hourPointer, m_container.transform, "Hour");
             m_hourPointer.width = 3;
             m_hourPointer.height = 14;
             m_hourPointer.pivot = UIPivotPoint.TopCenter;

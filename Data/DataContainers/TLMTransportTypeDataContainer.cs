@@ -12,24 +12,24 @@ namespace TransportLinesManager.Data.DataContainers
     [XmlRoot("TransportTypeDataContainer")]
     public class TLMTransportTypeDataContainer : ExtensionInterfaceIndexableImpl<TLMTransportTypeConfigurations, TLMTransportTypeDataContainer>
     {
-        public override string SaveId => "K45_TLM_TLMTransportTypeDataContainer";
+        public override string SaveId => "TLM_TLMTransportTypeDataContainer";
 
         private static readonly Dictionary<string, TransportSystemDefinition> legacyLinks = new Dictionary<string, TransportSystemDefinition>
         {
-            ["K45_TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorBus"] = TransportSystemDefinition.BUS,
-            ["K45_TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorBlp"] = TransportSystemDefinition.BLIMP,
-            ["K45_TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionEvcBus"] = TransportSystemDefinition.EVAC_BUS,
-            ["K45_TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorFer"] = TransportSystemDefinition.FERRY,
-            ["K45_TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorMet"] = TransportSystemDefinition.METRO,
-            ["K45_TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorMnr"] = TransportSystemDefinition.MONORAIL,
-            ["K45_TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorPln"] = TransportSystemDefinition.PLANE,
-            ["K45_TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorShp"] = TransportSystemDefinition.SHIP,
-            ["K45_TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorTrn"] = TransportSystemDefinition.TRAIN,
-            ["K45_TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorTrm"] = TransportSystemDefinition.TRAM,
-            ["K45_TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionTouBus"] = TransportSystemDefinition.TOUR_BUS,
-            ["K45_TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionTouPed"] = TransportSystemDefinition.TOUR_PED,
-            ["K45_TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorTrl"] = TransportSystemDefinition.TROLLEY,
-            ["K45_TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorHel"] = TransportSystemDefinition.HELICOPTER,
+            ["TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorBus"] = TransportSystemDefinition.BUS,
+            ["TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorBlp"] = TransportSystemDefinition.BLIMP,
+            ["TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionEvcBus"] = TransportSystemDefinition.EVAC_BUS,
+            ["TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorFer"] = TransportSystemDefinition.FERRY,
+            ["TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorMet"] = TransportSystemDefinition.METRO,
+            ["TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorMnr"] = TransportSystemDefinition.MONORAIL,
+            ["TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorPln"] = TransportSystemDefinition.PLANE,
+            ["TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorShp"] = TransportSystemDefinition.SHIP,
+            ["TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorTrn"] = TransportSystemDefinition.TRAIN,
+            ["TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorTrm"] = TransportSystemDefinition.TRAM,
+            ["TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionTouBus"] = TransportSystemDefinition.TOUR_BUS,
+            ["TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionTouPed"] = TransportSystemDefinition.TOUR_PED,
+            ["TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorTrl"] = TransportSystemDefinition.TROLLEY,
+            ["TLM_TransportLinesManager.Extensions.TLMTransportTypeExtensionNorHel"] = TransportSystemDefinition.HELICOPTER,
         };
 
         public void RefreshCapacities()

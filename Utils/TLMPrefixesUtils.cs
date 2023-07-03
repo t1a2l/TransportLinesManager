@@ -108,7 +108,7 @@ namespace TransportLinesManager.Utils
             var saida = new List<string>(new string[noneOption ? 1 : 0]);
             if (!noneOption)
             {
-                string unprefixedName = Locale.Get("K45_TLM_UNPREFIXED");
+                string unprefixedName = Locale.Get("TLM_UNPREFIXED");
                 if (useNameRefSystem)
                 {
                     string prefixName = tsd.GetTransportExtension().GetName(0);
@@ -269,7 +269,7 @@ namespace TransportLinesManager.Utils
             var saida = new List<string>();
             if (addDefaults)
             {
-                saida.AddRange(new string[] { Locale.Get("K45_TLM_ALL"), Locale.Get("K45_TLM_UNPREFIXED") });
+                saida.AddRange(new string[] { Locale.Get("TLM_ALL"), Locale.Get("TLM_UNPREFIXED") });
             }
             else
             {

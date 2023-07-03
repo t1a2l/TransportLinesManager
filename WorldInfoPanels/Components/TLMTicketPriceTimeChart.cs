@@ -40,25 +40,25 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         public override void CreateLabels()
         {
-            KlyteMonoUtils.CreateUIElement(out UILabel titleEffective, m_container.transform, "TitleEffective");
+            MonoUtils.CreateUIElement(out UILabel titleEffective, m_container.transform, "TitleEffective");
             titleEffective.width = 70;
             titleEffective.height = 30;
-            KlyteMonoUtils.LimitWidthAndBox(titleEffective, 70, out UIPanel container, true);
+            MonoUtils.LimitWidthAndBox(titleEffective, 70, out UIPanel container, true);
             container.relativePosition = new Vector3(70, 0);
             titleEffective.textScale = 0.8f;
             titleEffective.color = Color.white;
             titleEffective.isLocalized = true;
-            titleEffective.localeID = "K45_TLM_EFFECTIVE_TICKET_PRICE_NOW";
+            titleEffective.localeID = "TLM_EFFECTIVE_TICKET_PRICE_NOW";
             titleEffective.textAlignment = UIHorizontalAlignment.Center;
 
-            KlyteMonoUtils.CreateUIElement(out UIPanel effectiveContainer, m_container.transform, "ValueEffectiveContainer");
+            MonoUtils.CreateUIElement(out UIPanel effectiveContainer, m_container.transform, "ValueEffectiveContainer");
             effectiveContainer.width = 70;
             effectiveContainer.height = 40;
             effectiveContainer.relativePosition = new Vector3(70, 30);
             effectiveContainer.color = Color.white;
             effectiveContainer.autoLayout = false;
 
-            KlyteMonoUtils.CreateUIElement(out m_effectiveLabel, effectiveContainer.transform, "BarLabel");
+            MonoUtils.CreateUIElement(out m_effectiveLabel, effectiveContainer.transform, "BarLabel");
             m_effectiveLabel.width = 70;
             m_effectiveLabel.height = 40;
             m_effectiveLabel.relativePosition = new Vector3(0, 0);
@@ -69,7 +69,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_effectiveLabel.useOutline = true;
             m_effectiveLabel.backgroundSprite = "PlainWhite";
             m_effectiveLabel.padding.top = 3;
-            KlyteMonoUtils.LimitWidthAndBox(m_effectiveLabel, 70, true);
+            MonoUtils.LimitWidthAndBox(m_effectiveLabel, 70, true);
         }
 
         public override void OnUpdate()
@@ -85,7 +85,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         }
 
 
-        public override string ClockTooltip { get; } = "K45_TLM_TICKET_PRICE_CLOCK";
+        public override string ClockTooltip { get; } = "TLM_TICKET_PRICE_CLOCK";
 
     }
 }

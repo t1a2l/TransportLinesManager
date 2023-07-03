@@ -57,10 +57,10 @@ namespace TransportLinesManager.OptionsMenu
         {
             LogUtils.DoLog("Loading Options");
 
-            KlyteMonoUtils.CreateUIElement(out UITabstrip strip, helper.Self.transform, "TabListTLMopt", new Vector4(5, 0, 730, 40));
+            MonoUtils.CreateUIElement(out UITabstrip strip, helper.Self.transform, "TabListTLMopt", new Vector4(5, 0, 730, 40));
             float effectiveOffsetY = strip.height;
 
-            KlyteMonoUtils.CreateUIElement(out tabContainer, helper.Self.transform, "TabContainerTLMopt", new Vector4(0, 40, 725, 710));
+            MonoUtils.CreateUIElement(out tabContainer, helper.Self.transform, "TabContainerTLMopt", new Vector4(0, 40, 725, 710));
             tabContainer.autoSize = true;
             strip.tabPages = tabContainer;
 
@@ -87,8 +87,8 @@ namespace TransportLinesManager.OptionsMenu
                 superTab.normalFgSprite = tab.GetTabFgSprite();
                 superTab.tooltip = tab.GetTabName();
 
-                KlyteMonoUtils.CreateUIElement(out UIPanel contentParent, null);
-                KlyteMonoUtils.CreateScrollPanel(contentParent, out UIScrollablePanel content, out _, tabContainer.width, tabContainer.height, Vector3.zero);
+                MonoUtils.CreateUIElement(out UIPanel contentParent, null);
+                MonoUtils.CreateScrollPanel(contentParent, out UIScrollablePanel content, out _, tabContainer.width, tabContainer.height, Vector3.zero);
                 content.name = "Container";
                 content.area = new Vector4(0, 0, tabContainer.width, tabContainer.height);
                 content.autoLayout = true;
@@ -105,8 +105,8 @@ namespace TransportLinesManager.OptionsMenu
 
         private static UIButton CreateTabTemplate()
         {
-            KlyteMonoUtils.CreateUIElement(out UIButton tabTemplate, null, "TLMTabTemplate");
-            KlyteMonoUtils.InitButton(tabTemplate, false, "GenericTab");
+            MonoUtils.CreateUIElement(out UIButton tabTemplate, null, "TLMTabTemplate");
+            MonoUtils.InitButton(tabTemplate, false, "GenericTab");
             tabTemplate.autoSize = false;
             tabTemplate.width = 40;
             tabTemplate.height = 40;
@@ -152,13 +152,13 @@ namespace TransportLinesManager.OptionsMenu
         {
             switch (tab)
             {
-                case ConfigTabs.TransportSystem: return Locale.Get("K45_TLM_TRANSPORT_SYSTEM");
-                case ConfigTabs.NearLines: return Locale.Get("K45_TLM_NEAR_LINES_CONFIG");
-                case ConfigTabs.Automation: return Locale.Get("K45_TLM_AUTOMATION_CONFIG");
-                case ConfigTabs.AutoName_BD: return Locale.Get("K45_TLM_AUTO_NAME_SETTINGS_OTHER");
-                case ConfigTabs.AutoName_PA: return Locale.Get("K45_TLM_AUTO_NAME_SETTINGS_PUBLIC_AREAS");
-                case ConfigTabs.Palettes: return Locale.Get("K45_TLM_CUSTOM_PALETTE_CONFIG");
-                case ConfigTabs.About: return Locale.Get("K45_TLM_BETAS_EXTRA_INFO");
+                case ConfigTabs.TransportSystem: return Locale.Get("TLM_TRANSPORT_SYSTEM");
+                case ConfigTabs.NearLines: return Locale.Get("TLM_NEAR_LINES_CONFIG");
+                case ConfigTabs.Automation: return Locale.Get("TLM_AUTOMATION_CONFIG");
+                case ConfigTabs.AutoName_BD: return Locale.Get("TLM_AUTO_NAME_SETTINGS_OTHER");
+                case ConfigTabs.AutoName_PA: return Locale.Get("TLM_AUTO_NAME_SETTINGS_PUBLIC_AREAS");
+                case ConfigTabs.Palettes: return Locale.Get("TLM_CUSTOM_PALETTE_CONFIG");
+                case ConfigTabs.About: return Locale.Get("TLM_BETAS_EXTRA_INFO");
                 default: throw new Exception($"Not supported: {tab}");
             };
         }

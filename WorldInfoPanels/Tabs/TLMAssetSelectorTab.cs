@@ -49,10 +49,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             CreateMainPanel();
 
-            KlyteMonoUtils.CreateUIElement(out m_nameFilter, MainPanel.transform);
-            KlyteMonoUtils.UiTextFieldDefaults(m_nameFilter);
-            KlyteMonoUtils.InitButtonFull(m_nameFilter, false, "OptionsDropboxListbox");
-            m_nameFilter.tooltipLocaleID = "K45_TLM_ASSET_FILTERBY";
+            MonoUtils.CreateUIElement(out m_nameFilter, MainPanel.transform);
+            MonoUtils.UiTextFieldDefaults(m_nameFilter);
+            MonoUtils.InitButtonFull(m_nameFilter, false, "OptionsDropboxListbox");
+            m_nameFilter.tooltipLocaleID = "TLM_ASSET_FILTERBY";
             m_nameFilter.relativePosition = new Vector3(5, 50);
             m_nameFilter.height = 23;
             m_nameFilter.width = MainPanel.width - 10f;
@@ -79,21 +79,21 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void CreateButtons()
         {
-            var removeUndesired = ConfigureActionButton(MainPanel, CommonsSpriteNames.K45_RemoveUnwantedIcon);
+            var removeUndesired = ConfigureActionButton(MainPanel, CommonsSpriteNames.RemoveUnwantedIcon);
             removeUndesired.eventClick += (component, eventParam) => TLMVehicleUtils.RemoveAllUnwantedVehicles();
 
-            m_copyButton = ConfigureActionButton(MainPanel, CommonsSpriteNames.K45_Copy);
+            m_copyButton = ConfigureActionButton(MainPanel, CommonsSpriteNames.Copy);
             m_copyButton.eventClick += (x, y) => ActionCopy();
-            m_pasteButton = ConfigureActionButton(MainPanel, CommonsSpriteNames.K45_Paste);
+            m_pasteButton = ConfigureActionButton(MainPanel, CommonsSpriteNames.Paste);
             m_pasteButton.eventClick += (x, y) => ActionPaste();
-            m_eraseButton = ConfigureActionButton(MainPanel, CommonsSpriteNames.K45_Delete);
+            m_eraseButton = ConfigureActionButton(MainPanel, CommonsSpriteNames.Delete);
             m_eraseButton.eventClick += (x, y) => ActionDelete();
             m_eraseButton.color = Color.red;
 
-            removeUndesired.tooltip = Locale.Get("K45_TLM_REMOVE_UNWANTED_TOOLTIP");
-            m_copyButton.tooltip = Locale.Get("K45_TLM_COPY_CURRENT_LIST_CLIPBOARD");
-            m_pasteButton.tooltip = Locale.Get("K45_TLM_PASTE_CLIPBOARD_TO_CURRENT_LIST");
-            m_eraseButton.tooltip = Locale.Get("K45_TLM_DELETE_CURRENT_LIST");
+            removeUndesired.tooltip = Locale.Get("TLM_REMOVE_UNWANTED_TOOLTIP");
+            m_copyButton.tooltip = Locale.Get("TLM_COPY_CURRENT_LIST_CLIPBOARD");
+            m_pasteButton.tooltip = Locale.Get("TLM_PASTE_CLIPBOARD_TO_CURRENT_LIST");
+            m_eraseButton.tooltip = Locale.Get("TLM_DELETE_CURRENT_LIST");
 
             removeUndesired.relativePosition = new Vector3(MainPanel.width - 50, 0f);
             m_copyButton.relativePosition = new Vector3(MainPanel.width - 50f, 25);
@@ -131,14 +131,14 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         protected static UIButton ConfigureActionButton(UIComponent parent, CommonsSpriteNames spriteName)
         {
-            KlyteMonoUtils.CreateUIElement(out UIButton actionButton, parent.transform, "Btn");
-            KlyteMonoUtils.InitButton(actionButton, false, "OptionBase");
+            MonoUtils.CreateUIElement(out UIButton actionButton, parent.transform, "Btn");
+            MonoUtils.InitButton(actionButton, false, "OptionBase");
             actionButton.focusedBgSprite = "";
             actionButton.autoSize = false;
             actionButton.width = 20;
             actionButton.height = 20;
             actionButton.foregroundSpriteMode = UIForegroundSpriteMode.Scale;
-            actionButton.normalFgSprite = KlyteResourceLoader.GetDefaultSpriteNameFor(spriteName);
+            actionButton.normalFgSprite = ResourceLoader.GetDefaultSpriteNameFor(spriteName);
             actionButton.canFocus = false;
             return actionButton;
         }
@@ -158,7 +158,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             MainPanel.wrapLayout = false;
             MainPanel.canFocus = true;
 
-            KlyteMonoUtils.CreateUIElement(out m_title, MainPanel.transform);
+            MonoUtils.CreateUIElement(out m_title, MainPanel.transform);
             m_title.textAlignment = UIHorizontalAlignment.Center;
             m_title.autoSize = false;
             m_title.autoHeight = false;
@@ -166,12 +166,12 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_title.height = 45f;
             m_title.relativePosition = new Vector3(5, 10);
             m_title.textScale = 0.9f;
-            m_title.localeID = "K45_TLM_ASSETS_FOR_PREFIX";
+            m_title.localeID = "TLM_ASSETS_FOR_PREFIX";
         }
 
         private void CreateScrollPanel()
         {
-            KlyteMonoUtils.CreateScrollPanel(MainPanel, out m_scrollablePanel, out _, MainPanel.width - 25f, MainPanel.height - 220f, new Vector3(5, 75));
+            MonoUtils.CreateScrollPanel(MainPanel, out m_scrollablePanel, out _, MainPanel.width - 25f, MainPanel.height - 220f, new Vector3(5, 75));
             m_scrollablePanel.backgroundSprite = "ScrollbarTrack";
             m_scrollablePanel.scrollPadding.top = 10;
             m_scrollablePanel.scrollPadding.bottom = 10;
@@ -200,16 +200,16 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             if (GetLineID() == 0)
             {
-                m_title.text = Locale.Get("K45_TLM_ASSET_SELECT_WINDOW_TITLE_OUTSIDECONNECTION");
+                m_title.text = Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE_OUTSIDECONNECTION");
             }
             else if (config is TLMTransportLineConfiguration)
             {
-                m_title.text = string.Format(Locale.Get("K45_TLM_ASSET_SELECT_WINDOW_TITLE"), TLMLineUtils.GetLineStringId(GetLineID(), false));
+                m_title.text = string.Format(Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE"), TLMLineUtils.GetLineStringId(GetLineID(), false));
             }
             else
             {
                 int prefix = (int)TLMPrefixesUtils.GetPrefix(GetLineID());
-                m_title.text = string.Format(Locale.Get("K45_TLM_ASSET_SELECT_WINDOW_TITLE_PREFIX"), prefix > 0 ? NumberingUtils.GetStringFromNumber(TLMPrefixesUtils.GetStringOptionsForPrefix(tsd), prefix + 1) : Locale.Get("K45_TLM_UNPREFIXED"), tsd.GetTransportName());
+                m_title.text = string.Format(Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE_PREFIX"), prefix > 0 ? NumberingUtils.GetStringFromNumber(TLMPrefixesUtils.GetStringOptionsForPrefix(tsd), prefix + 1) : Locale.Get("TLM_UNPREFIXED"), tsd.GetTransportName());
             }
         }
 
@@ -242,15 +242,15 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void SetPreviewWindow()
         {
-            KlyteMonoUtils.CreateUIElement(out m_previewPanel, MainPanel.transform);
+            MonoUtils.CreateUIElement(out m_previewPanel, MainPanel.transform);
             m_previewPanel.backgroundSprite = "GenericPanel";
             m_previewPanel.width = MainPanel.width - 15;
             m_previewPanel.height = 140;
             m_previewPanel.relativePosition = new Vector3(7.5f, MainPanel.height - 142);
-            KlyteMonoUtils.CreateUIElement(out m_preview, m_previewPanel.transform);
+            MonoUtils.CreateUIElement(out m_preview, m_previewPanel.transform);
             m_preview.size = m_previewPanel.size;
             m_preview.relativePosition = Vector3.zero;
-            KlyteMonoUtils.CreateElement(out m_previewRenderer, MainPanel.transform);
+            MonoUtils.CreateElement(out m_previewRenderer, MainPanel.transform);
             m_previewRenderer.Size = m_preview.size * 2f;
             m_preview.texture = m_previewRenderer.Texture;
             m_previewRenderer.Zoom = 3;

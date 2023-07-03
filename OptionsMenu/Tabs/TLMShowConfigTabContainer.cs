@@ -15,8 +15,8 @@ namespace TransportLinesManager.OptionsMenu.Tabs
 
             int parentWidth = 730;
 
-            KlyteMonoUtils.CreateUIElement(out UITabstrip strip, parent.transform, "TLMTabstrip", new Vector4(5, 0, parentWidth - 10, 40));
-            KlyteMonoUtils.CreateUIElement(out tabContainer, parent.transform, "TLMTabContainer", new Vector4(0, 40, parentWidth - 10, 660));
+            MonoUtils.CreateUIElement(out UITabstrip strip, parent.transform, "TLMTabstrip", new Vector4(5, 0, parentWidth - 10, 40));
+            MonoUtils.CreateUIElement(out tabContainer, parent.transform, "TLMTabContainer", new Vector4(0, 40, parentWidth - 10, 660));
 
             strip.tabPages = tabContainer;
 
@@ -32,7 +32,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
                 GameObject tab = Instantiate(tabTemplate.gameObject);
                 GameObject body = Instantiate(bodyContent.gameObject);
                 string name = tsd.GetTransportName();
-                string bgIcon = KlyteResourceLoader.GetDefaultSpriteNameFor(tsd.DefaultIcon, true);
+                string bgIcon = ResourceLoader.GetDefaultSpriteNameFor(tsd.DefaultIcon, true);
                 string fgIcon = tsd.GetTransportTypeIcon();
                 UIButton tabButton = tab.GetComponent<UIButton>();
                 tabButton.tooltip = name;
@@ -46,7 +46,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
                 tabButton.disabledColor = Color.gray;
                 if (!string.IsNullOrEmpty(fgIcon))
                 {
-                    KlyteMonoUtils.CreateUIElement(out UIButton secSprite, tabButton.transform, "OverSprite", new Vector4(5, 5, 30, 30));
+                    MonoUtils.CreateUIElement(out UIButton secSprite, tabButton.transform, "OverSprite", new Vector4(5, 5, 30, 30));
                     secSprite.normalFgSprite = fgIcon;
                     secSprite.foregroundSpriteMode = UIForegroundSpriteMode.Scale;
                     secSprite.isInteractive = false;
@@ -60,8 +60,8 @@ namespace TransportLinesManager.OptionsMenu.Tabs
 
         private static UIButton CreateTabSubStripTemplate()
         {
-            KlyteMonoUtils.CreateUIElement(out UIButton tabTemplate, null, "TLMTabTemplate");
-            KlyteMonoUtils.InitButton(tabTemplate, false, "GenericTab");
+            MonoUtils.CreateUIElement(out UIButton tabTemplate, null, "TLMTabTemplate");
+            MonoUtils.InitButton(tabTemplate, false, "GenericTab");
             tabTemplate.autoSize = false;
             tabTemplate.width = 40;
             tabTemplate.height = 40;
@@ -72,12 +72,12 @@ namespace TransportLinesManager.OptionsMenu.Tabs
 
         private static UIComponent CreateContentTemplate(float width, float height, bool scrollable)
         {
-            KlyteMonoUtils.CreateUIElement(out UIPanel contentContainer, null);
+            MonoUtils.CreateUIElement(out UIPanel contentContainer, null);
             contentContainer.name = "Container";
             contentContainer.size = new Vector3(width, height);
             if (scrollable)
             {
-                KlyteMonoUtils.CreateUIElement(out UIScrollablePanel scrollPanel, contentContainer.transform, "ScrollPanel");
+                MonoUtils.CreateUIElement(out UIScrollablePanel scrollPanel, contentContainer.transform, "ScrollPanel");
                 scrollPanel.width = contentContainer.width - 20f;
                 scrollPanel.height = contentContainer.height;
                 scrollPanel.autoLayoutDirection = LayoutDirection.Vertical;
@@ -87,7 +87,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
                 scrollPanel.clipChildren = true;
                 scrollPanel.relativePosition = new Vector3(5, 0);
 
-                KlyteMonoUtils.CreateUIElement(out UIPanel trackballPanel, contentContainer.transform, "Trackball");
+                MonoUtils.CreateUIElement(out UIPanel trackballPanel, contentContainer.transform, "Trackball");
                 trackballPanel.width = 10f;
                 trackballPanel.height = scrollPanel.height;
                 trackballPanel.autoLayoutDirection = LayoutDirection.Horizontal;
@@ -96,7 +96,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
                 trackballPanel.autoLayout = true;
                 trackballPanel.relativePosition = new Vector3(contentContainer.width - 15, 0);
 
-                KlyteMonoUtils.CreateUIElement(out UIScrollbar scrollBar, trackballPanel.transform, "Scrollbar");
+                MonoUtils.CreateUIElement(out UIScrollbar scrollBar, trackballPanel.transform, "Scrollbar");
                 scrollBar.width = 10f;
                 scrollBar.height = scrollBar.parent.height;
                 scrollBar.orientation = UIOrientation.Vertical;
@@ -106,7 +106,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
                 scrollBar.value = 0f;
                 scrollBar.incrementAmount = 25f;
 
-                KlyteMonoUtils.CreateUIElement(out UISlicedSprite scrollBg, scrollBar.transform, "ScrollbarBg");
+                MonoUtils.CreateUIElement(out UISlicedSprite scrollBg, scrollBar.transform, "ScrollbarBg");
                 scrollBg.relativePosition = Vector2.zero;
                 scrollBg.autoSize = true;
                 scrollBg.size = scrollBg.parent.size;
@@ -114,7 +114,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
                 scrollBg.spriteName = "ScrollbarTrack";
                 scrollBar.trackObject = scrollBg;
 
-                KlyteMonoUtils.CreateUIElement(out UISlicedSprite scrollFg, scrollBg.transform, "ScrollbarFg");
+                MonoUtils.CreateUIElement(out UISlicedSprite scrollFg, scrollBg.transform, "ScrollbarFg");
                 scrollFg.relativePosition = Vector2.zero;
                 scrollFg.fillDirection = UIFillDirection.Vertical;
                 scrollFg.autoSize = true;

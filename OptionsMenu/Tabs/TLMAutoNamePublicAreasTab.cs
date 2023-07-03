@@ -26,16 +26,16 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             ((UIScrollablePanel)group15.Self).wrapLayout = true;
             ((UIScrollablePanel)group15.Self).width = parent.width;
 
-            group15.AddLabel(Locale.Get("K45_TLM_AUTO_NAME_SETTINGS_PUBLIC_AREAS"));
+            group15.AddLabel(Locale.Get("TLM_AUTO_NAME_SETTINGS_PUBLIC_AREAS"));
             group15.AddSpace(1);
-            group15.AddLabel(Locale.Get("K45_TLM_AUTO_NAME_SETTINGS_PUBLIC_TRANSPORT_DESC"));
+            group15.AddLabel(Locale.Get("TLM_AUTO_NAME_SETTINGS_PUBLIC_TRANSPORT_DESC"));
             group15.AddSpace(15);
 
             foreach (var serviceIt in Enum.GetValues(typeof(TLMSpecialNamingClass)).OfType<TLMSpecialNamingClass>().Where(x => x != TLMSpecialNamingClass.None))
             {
                 var service = serviceIt;
                 AddCheckbox(TLMSpecialNamingClassExtensions.GetLocalizedName(service), out UICheckBox check, group15, (x) => SetUseAutoName(service, x));
-                AddTextField(Locale.Get("K45_TLM_PREFIX_BUILDING_NAMES"), out UITextField textField, group15, (x) => SetPrefix(service, x));
+                AddTextField(Locale.Get("TLM_PREFIX_BUILDING_NAMES"), out UITextField textField, group15, (x) => SetPrefix(service, x));
                 m_checks[service] = check;
                 m_textFields[service] = textField;
                 group15.AddSpace(5);

@@ -178,7 +178,7 @@ namespace TransportLinesManager.Data.Tsd
             uint levelBitmask = (1u << ((byte)Level)) | (LevelAdditional is null ? 0u : (1u << ((byte)LevelAdditional)));
 
             return (((uint)TransportType & 0x1fu) << 19)
-                       | ((((uint)KlyteMathUtils.BitScanForward((uint)VehicleType) + 1u) & 0x1Fu) << 14)
+                       | ((((uint)Commons.Utils.TLMMathUtils.BitScanForward((uint)VehicleType) + 1u) & 0x1Fu) << 14)
                        | (((uint)SubService & 0x3fu) << 8)
                        | ((levelBitmask & 0x1fu) << 3)
                        | ((LevelIntercity is null ? 7u : (uint)LevelIntercity) & 0x7u);
@@ -189,11 +189,11 @@ namespace TransportLinesManager.Data.Tsd
             TransportType = (TransportInfo.TransportType)((num >> 19) & 0x1f);
             SubService = (ItemClass.SubService)((num >> 8) & 0x3f);
             VehicleType = (VehicleInfo.VehicleType)(1 << (int)(((num >> 14) & 0x1f) - 1));
-            Level = (ItemClass.Level)(KlyteMathUtils.BitScanForward((num >> 3) & 0x1f));
+            Level = (ItemClass.Level)(TLMMathUtils.BitScanForward((num >> 3) & 0x1f));
 
             var restLevel = (ulong)(((num >> 3) & 0x1f) - (1 << (int)Level));
 
-            LevelAdditional = restLevel == 0 ? null : (ItemClass.Level?)KlyteMathUtils.BitScanForward(restLevel);
+            LevelAdditional = restLevel == 0 ? null : (ItemClass.Level?)TLMMathUtils.BitScanForward(restLevel);
             LevelIntercity = (num & 0x7) == 7 ? null : (ItemClass.Level?)(num & 0x7);
         }
 
