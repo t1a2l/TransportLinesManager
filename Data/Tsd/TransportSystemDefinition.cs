@@ -131,7 +131,7 @@ namespace TransportLinesManager.Data.Tsd
         public uint Id { get => Index_Internal; set { } }
         long? IIdentifiable.Id { get => Id; set { } }
 
-        public TransportSystemDefinition(
+        private TransportSystemDefinition(
         ItemClass.SubService subService,
             VehicleInfo.VehicleType vehicleType,
             TransportInfo.TransportType transportType,
@@ -178,7 +178,7 @@ namespace TransportLinesManager.Data.Tsd
             uint levelBitmask = (1u << ((byte)Level)) | (LevelAdditional is null ? 0u : (1u << ((byte)LevelAdditional)));
 
             return (((uint)TransportType & 0x1fu) << 19)
-                       | ((((uint)Commons.Utils.TLMMathUtils.BitScanForward((uint)VehicleType) + 1u) & 0x1Fu) << 14)
+                       | ((((uint)TLMMathUtils.BitScanForward((uint)VehicleType) + 1u) & 0x1Fu) << 14)
                        | (((uint)SubService & 0x3fu) << 8)
                        | ((levelBitmask & 0x1fu) << 3)
                        | ((LevelIntercity is null ? 7u : (uint)LevelIntercity) & 0x7u);
@@ -431,7 +431,7 @@ namespace TransportLinesManager.Data.Tsd
         public static TransportSystemDefinition From(TransportInfo.TransportType TransportType, ItemClass.SubService SubService, VehicleInfo.VehicleType VehicleType, ItemClass.Level Level)
         {
             var targetMask = GetTsdIndex(TransportType, SubService, VehicleType, Level, null, null);
-            LogUtils.DoLog($"Index ({TransportType},{SubService},{VehicleType},{Level}) == {targetMask.ToString("X8")}\n{Environment.StackTrace}");
+            //LogUtils.DoLog($"Index ({TransportType},{SubService},{VehicleType},{Level}) == {targetMask.ToString("X8")}\n{Environment.StackTrace}");
             return FromIndex(targetMask);
         }
 

@@ -5,6 +5,7 @@ using static Commons.Extensions.Patcher;
 
 namespace TransportLinesManager.UI
 {
+    [HarmonyPatch(typeof(GeneratedScrollPanel))]
     internal class TLMLineCreationToolboxHooks : MonoBehaviour, IPatcher
     {
 
