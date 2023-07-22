@@ -109,7 +109,7 @@ namespace TransportLinesManager
         }
         public override string IconName => "TLM_Icon";
 
-        protected override Tuple<string, string> GetButtonLink() => Tuple.New("View details of v14.1 at TLM's GitHub", "https://github.com/45/TransportLinesManager/issues?q=milestone%3Av14.1+is%3Aclosed");
+        protected override Tuple<string, string> GetButtonLink() => Tuple.New("TLM's GitHub", "https://github.com/t1a2l/TransportLinesManager");
     }
 
     public class UIButtonLineInfo : UIButton
