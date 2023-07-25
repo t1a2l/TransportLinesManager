@@ -108,10 +108,10 @@ namespace TransportLinesManager.Overrides
                     inst[i - 1].opcode == OpCodes.Br
                     && inst[i].opcode == OpCodes.Ldloc_S
                     && inst[i].operand is LocalBuilder lb1
-                    && lb1.LocalIndex == 11
+                    && lb1.LocalIndex == 12
                     && inst[i + 1].opcode == OpCodes.Ldloc_S
                     && inst[i + 1].operand is LocalBuilder lb2
-                    && lb2.LocalIndex == 32
+                    && lb2.LocalIndex == 37
                     && inst[i + 2].opcode == OpCodes.Ble
              )
                 {
