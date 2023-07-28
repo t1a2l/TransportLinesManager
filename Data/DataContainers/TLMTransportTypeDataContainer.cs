@@ -14,6 +14,8 @@ namespace TransportLinesManager.Data.DataContainers
     {
         public override string SaveId => "TLM_TLMTransportTypeDataContainer";
 
+        public override string LegacySaveId => "K45_TLM_TLMTransportTypeDataContainer";
+
         private static readonly Dictionary<string, TransportSystemDefinition> legacyLinks = new Dictionary<string, TransportSystemDefinition>
         {
             ["TLM.TransportLinesManager.Extensions.TLMTransportTypeExtensionNorBus"] = TransportSystemDefinition.BUS,

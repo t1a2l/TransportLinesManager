@@ -8,5 +8,8 @@ namespace TransportLinesManager.Data.DataContainers
     public class TLMBuildingDataContainer : ExtensionInterfaceIndexableImpl<TLMBuildingsConfiguration, TLMBuildingDataContainer>
     {
         public override string SaveId => "TLM_TLMBuildingDataContainer";
+
+        public override string LegacySaveId => "K45_TLM_TLMBuildingDataContainer";
+
     }
 }

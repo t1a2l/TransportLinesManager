@@ -8,5 +8,7 @@ namespace TransportLinesManager.Data.DataContainers
     public class TLMStopDataContainer : ExtensionInterfaceIndexableImpl<TLMStopsConfiguration, TLMStopDataContainer>
     {
         public override string SaveId => "TLM_TLMTransportStopDataContainer";
+
+        public override string LegacySaveId => "K45_TLM_TLMTransportStopDataContainer";
     }
 }

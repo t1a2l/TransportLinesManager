@@ -12,6 +12,8 @@ namespace TransportLinesManager.Data.Managers
         {
             public abstract string SaveId { get; }
 
+            public abstract string LegacySaveId { get; }
+
             protected abstract Enum[] LoadOrder { get; }
 
             public IDataExtension Deserialize(Type type, byte[] rawData)
@@ -221,6 +223,8 @@ namespace TransportLinesManager.Data.Managers
         {
             public override string SaveId => "TLM_TLMTransportLineStorageEconomyData";
 
+            public override string LegacySaveId => "K45_TLM_TLMTransportLineStorageEconomyData";
+
             protected override Enum[] LoadOrder { get; } = new Enum[]
                                                             {
                                                                 LineDataLong.EXPENSE,
@@ -231,6 +235,8 @@ namespace TransportLinesManager.Data.Managers
         public class TLMTransportLineStorageEconomyData_Vehicle : TransportLineStorageBasicData
         {
             public override string SaveId => "TLM_TLMTransportLineStorageEconomyData_Vehicle";
+
+            public override string LegacySaveId => "K45_TLM_TLMTransportLineStorageEconomyData_Vehicle";
 
             protected override Enum[] LoadOrder { get; } = new Enum[]
                                                             {
@@ -244,6 +250,8 @@ namespace TransportLinesManager.Data.Managers
         {
             public override string SaveId => "TLM_TLMTransportLineStoragePassengerData";
 
+            public override string LegacySaveId => "K45_TLM_TLMTransportLineStoragePassengerData";
+
             protected override Enum[] LoadOrder { get; } = new Enum[]
                                                             {
                                                                  VehicleDataSmallInt.TOTAL_PASSENGERS,
@@ -256,6 +264,8 @@ namespace TransportLinesManager.Data.Managers
         public class TLMTransportLineStoragePassengerData_LineStop : TransportLineStorageBasicData
         {
             public override string SaveId => "TLM_TLMTransportLineStoragePassengerData_LineStop";
+
+            public override string LegacySaveId => "K45_TLM_TLMTransportLineStoragePassengerData_LineStop";
 
             protected override Enum[] LoadOrder { get; } = new Enum[]
                                                             {
@@ -272,6 +282,8 @@ namespace TransportLinesManager.Data.Managers
         public class TLMTransportLineStorageDetailedPassengerData_W1 : TransportLineStorageBasicData
         {
             public override string SaveId => "TLM_TLMTransportLineStorageDetailedPassengerData_W1";
+
+            public override string LegacySaveId => "K45_TLM_TLMTransportLineStorageDetailedPassengerData_W1";
 
             protected override Enum[] LoadOrder { get; } = new Enum[]
                                                             {
@@ -293,6 +305,8 @@ namespace TransportLinesManager.Data.Managers
         {
             public override string SaveId => "TLM_TLMTransportLineStorageDetailedPassengerData_W2";
 
+            public override string LegacySaveId => "K45_TLM_TLMTransportLineStorageDetailedPassengerData_W2";
+
             protected override Enum[] LoadOrder { get; } = new Enum[]
                                                             {
                                                               LineDataUshort.W2_CHILD_MALE_PASSENGERS,
@@ -311,6 +325,8 @@ namespace TransportLinesManager.Data.Managers
         public class TLMTransportLineStorageDetailedPassengerData_W3 : TransportLineStorageBasicData
         {
             public override string SaveId => "TLM_TLMTransportLineStorageDetailedPassengerData_W3";
+
+            public override string LegacySaveId => "K45_TLM_TLMTransportLineStorageDetailedPassengerData_W3";
 
             protected override Enum[] LoadOrder { get; } = new Enum[]
                                                             {
