@@ -16,7 +16,7 @@ namespace TransportLinesManager.Cache.BuildingData
         internal NonSequentialList<InnerBuildingLine> RegionalLines { get; } = new NonSequentialList<InnerBuildingLine>();
         private ushort BuildingId { get; }
         public int RegionalLinesCount => RegionalLines.Count;
-        public StopPointDescriptorLanes[] StopPoints { get; }
+        public StopPointDescriptorLanes[] StopPoints { get; private set; }
 
         public TLMBuildingsConfiguration BuildingData => TLMBuildingDataContainer.Instance.SafeGet(BuildingId);
 
@@ -26,8 +26,6 @@ namespace TransportLinesManager.Cache.BuildingData
             RemapLines(buildingId, ref b, tsai);
             StopPoints = MapStopPoints();
         }
-
-
 
         public void RemapLines()
         {
@@ -58,9 +56,12 @@ namespace TransportLinesManager.Cache.BuildingData
         public void RenderStopPoints(RenderManager.CameraInfo cameraInfo)
         {
             NetManager instance = NetManager.instance;
+            if(StopPoints.Length == 0 && RegionalLinesCount > 0)
+            {
+                StopPoints = MapStopPoints();
+            }
             for (int i = 0; i < StopPoints.Length; i++)
             {
-
                 RenderManager.instance.OverlayEffect.DrawCircle(cameraInfo,
                    TLMController.COLOR_ORDER[i % TLMController.COLOR_ORDER.Length],
                      instance.m_lanes.m_buffer[StopPoints[i].laneId].m_bezier.Position(0.5f),
@@ -85,7 +86,7 @@ namespace TransportLinesManager.Cache.BuildingData
                 var currentNode = nextNodeId;
                 ref NetNode node = ref NetManager.instance.m_nodes.m_buffer[currentNode];
 
-                if (!(node.Info.m_netAI is TransportLineAI))
+                if (node.Info.m_netAI is not TransportLineAI)
                 {
                     break;
                 }

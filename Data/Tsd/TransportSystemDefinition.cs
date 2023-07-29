@@ -424,9 +424,17 @@ namespace TransportLinesManager.Data.Tsd
               || IsIntercityBusConnectionTrack(netInfo);
 
         internal static TransportSystemDefinition FromOutsideConnection(ItemClass.SubService subService, ItemClass.Level level, VehicleInfo.VehicleType type)
-            => subService == ItemClass.SubService.PublicTransportTrain ? //TEMPORARY!
-             registeredTsd.Where(x => x.Value.LevelIntercity == level && x.Value.SubService == subService && (type == VehicleInfo.VehicleType.None || x.Value.VehicleType == type)).FirstOrDefault().Value
-            : null;
+        {
+            if(subService == ItemClass.SubService.PublicTransportTrain) // train connection
+            {
+                return registeredTsd.Where(x => x.Value.LevelIntercity == level && x.Value.SubService == subService && (type == VehicleInfo.VehicleType.None || x.Value.VehicleType == type)).FirstOrDefault().Value;
+            }
+            else if(subService == ItemClass.SubService.None && level == ItemClass.Level.Level5 && type == VehicleInfo.VehicleType.None) // road connection
+            {
+                return registeredTsd.Where(x => x.Value.LevelIntercity == ItemClass.Level.Level3 && x.Value.SubService == ItemClass.SubService.PublicTransportBus && x.Value.VehicleType == VehicleInfo.VehicleType.Car).FirstOrDefault().Value;
+            }
+            return null;
+        }
 
         public static TransportSystemDefinition From(TransportInfo.TransportType TransportType, ItemClass.SubService SubService, VehicleInfo.VehicleType VehicleType, ItemClass.Level Level)
         {

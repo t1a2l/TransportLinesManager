@@ -95,7 +95,7 @@ namespace TransportLinesManager.Cache.BuildingData
             {
                 return SafeGet(Building.FindParentBuilding(buildingId));
             }
-            if (!(info.m_buildingAI is TransportStationAI tsai))
+            if (info.m_buildingAI is not TransportStationAI tsai)
             {
                 return null;
             }
@@ -112,7 +112,7 @@ namespace TransportLinesManager.Cache.BuildingData
         {
             get
             {
-                if (InnerBuildingLinesIndex is null)
+				if (InnerBuildingLinesIndex is null)
                 {
                     InnerBuildingLinesIndex = BuildingTransportDataCache.SelectMany(x => x.Value.RegionalLines).ToDictionary(x => (ushort)x.Key, x => x.Value);
                 }

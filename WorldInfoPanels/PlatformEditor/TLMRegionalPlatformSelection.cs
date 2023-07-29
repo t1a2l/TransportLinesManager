@@ -115,13 +115,14 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
         }
 
         internal void EventWIPChanged() => m_dirty = true;
+
         private void Update()
         {
             if (m_dirty)
             {
                 m_title.eventCheckChanged -= OnToggleUseTlmSettings;
                 var building = WorldInfoPanel.GetCurrentInstanceID().Building;
-                var show = BuildingManager.instance.m_buildings.m_buffer[building].Info.m_buildingAI is TransportStationAI tsai && (tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportTrain);
+                var show = BuildingManager.instance.m_buildings.m_buffer[building].Info.m_buildingAI is TransportStationAI tsai && (tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportTrain || tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportBus);
 
                 UpdateNearPlatforms(show);
                 m_title.eventCheckChanged += OnToggleUseTlmSettings;
@@ -152,7 +153,7 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
             var instance = BuildingManager.instance;
             var nm = NetManager.instance;
             ref Building b = ref instance.m_buildings.m_buffer[buildingId];
-            if (!(b.Info.m_buildingAI is TransportStationAI tsai))
+            if (b.Info.m_buildingAI is not TransportStationAI tsai)
             {
                 m_containerParent.isVisible = false;
                 return;

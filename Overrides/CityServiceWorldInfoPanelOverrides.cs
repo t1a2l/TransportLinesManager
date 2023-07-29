@@ -66,6 +66,6 @@ namespace TransportLinesManager.Overrides
             return inst;
         }
 
-        private static bool CanAllowVanillaRegionalLines(TransportStationAI stationAI, ushort buildingId) => !(stationAI is null) && !TLMBuildingDataContainer.Instance.SafeGet(buildingId).TlmManagedRegionalLines;
+        private static bool CanAllowVanillaRegionalLines(TransportStationAI stationAI, ushort buildingId) => stationAI is not null && !TLMBuildingDataContainer.Instance.SafeGet(buildingId).TlmManagedRegionalLines;
     }
 }
