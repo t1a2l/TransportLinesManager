@@ -38,6 +38,7 @@
     <EmbeddedResource Include="UI\i18n\*.properties" />
     <EmbeddedResource Include="UI\Images\*.png" />
     <EmbeddedResource Include="UI\Images\*.txt" />
+    <EmbeddedResource Remove="UI\Images\PreviewImage.png" />
     <EmbeddedResource Include="MapDrawer\app.js" />
     <EmbeddedResource Include="MapDrawer\lineDrawBasicCss.css" />
     <EmbeddedResource Include="UI\VersionNotes.txt" />
@@ -68,8 +69,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="UI\Images\PreviewImage.png">
+    <None Update="UI\Images\PreviewImage.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    </None>
   </ItemGroup>
 </Project>
