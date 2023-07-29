@@ -38,6 +38,8 @@
     <EmbeddedResource Include="UI\i18n\*.properties" />
     <EmbeddedResource Include="UI\Images\*.png" />
     <EmbeddedResource Include="UI\Images\*.txt" />
+    <EmbeddedResource Include="MapDrawer\app.js" />
+    <EmbeddedResource Include="MapDrawer\lineDrawBasicCss.css" />
     <EmbeddedResource Include="UI\VersionNotes.txt" />
   </ItemGroup>
   <ItemGroup>

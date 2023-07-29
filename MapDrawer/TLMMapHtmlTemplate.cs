@@ -4,8 +4,8 @@ using System;
 using System.Globalization;
 using System.Linq;
 /**
-   OBS: Mudar a forma de pintar as linhas, criar caminhos comuns entre estações iguais (ajuda no tram)
-   ver como fazer linhas de sentido único no tram
+   OBS: Change the way of painting the lines, create common paths between equal stations (helps on the tram)
+   see how to make one-way lines on the tram
 */
 namespace TransportLinesManager.MapDrawer
 {
