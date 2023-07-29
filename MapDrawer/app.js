@@ -400,10 +400,10 @@
                 <div class="lineNumber lineNumber">
                     <svg width="45" height="45" xmlns="http://www.w3.org/2000/svg"><path d="${getPathForTransportVehicle(lineObj.transportType, lineObj.vehicleType)}" style="fill: var(--lineColor)"/>
                         <text lengthAdjust="${lineObj.lineStringIdentifier.length > 2 ? "spacingAndGlyphs" : "spacing"}" x="22.5" y="22.5" textLength="42">${lineObj.lineStringIdentifier}</text>
-                    </svg>
+                    </svg> 
                 </div>
                 <div class="lineName">${lineObj.lineName}</div>
-                <div class="lineType">${lineObj.transportType} (${lineObj.vehicleType})</div></div>
+                <div class="lineType" style="top: 40px;">${lineObj.transportType} (${lineObj.vehicleType})</div></div>
             </div>`;
         }
 
