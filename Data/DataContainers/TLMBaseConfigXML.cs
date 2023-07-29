@@ -115,8 +115,6 @@ namespace TransportLinesManager.Data.DataContainers
 
         public override string SaveId => "TLM_BaseData";
 
-        public override string LegacySaveId => "K45_TLM_BaseData";
-
         public override void LoadDefaults(ISerializableData serializableData)
         {
             base.LoadDefaults(serializableData);

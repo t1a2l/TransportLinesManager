@@ -9,7 +9,5 @@ namespace TransportLinesManager.Data.DataContainers
     {
         public override string SaveId => "TLM_TLMBuildingDataContainer";
 
-        public override string LegacySaveId => "K45_TLM_TLMBuildingDataContainer";
-
     }
 }
