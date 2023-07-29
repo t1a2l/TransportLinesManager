@@ -61,10 +61,6 @@ namespace TransportLinesManager.Overrides
             {
                 return true;
             }
-            if (empty && CheckDespawn(vehicleID, ref vehicleData))
-            {
-                return true;
-            }
             var nextStop = TransportLine.GetNextStop(currentStop);
             vehicleData.m_targetBuilding = nextStop;
             var pathfindParams = new object[] { vehicleID, vehicleData };
