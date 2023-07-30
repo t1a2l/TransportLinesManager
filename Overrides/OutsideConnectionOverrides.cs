@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
 using Commons.Extensions;
+using ColossalFramework.Math;
+using System.Linq;
 
 namespace TransportLinesManager.Overrides
 {
@@ -15,7 +17,7 @@ namespace TransportLinesManager.Overrides
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> TranspileStartConnectionTransferImpl(IEnumerable<CodeInstruction> instructions)
         {
-            MethodInfo GetRandomVehicle = typeof(TransportStationAIOverrides).GetMethod("GetRandomVehicle", Patcher.allFlags);
+            MethodInfo GetRandomVehicle = typeof(OutsideConnectionOverrides).GetMethod("GetRandomVehicle", Patcher.allFlags);
 
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)
@@ -33,6 +35,17 @@ namespace TransportLinesManager.Overrides
             }
             LogUtils.PrintMethodIL(inst);
             return inst;
+        }
+
+        private static VehicleInfo GetRandomVehicle(VehicleManager vm, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, TransferManager.TransferReason reason)
+        {
+            if (TransportStationAIOverrides.m_managedReasons.Contains(reason))
+            {
+                LogUtils.DoLog("START TRANSFER OutsideConnectionAI!!!!!!!!");
+                return TransportStationAIOverrides.TryGetRandomVehicle(vm, ref r, service, subService, level, VehicleInfo.VehicleType.None);
+            }
+            return vm.GetRandomVehicleInfo(ref r, service, subService, level);
+
         }
     }
 }

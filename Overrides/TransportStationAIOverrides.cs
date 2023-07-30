@@ -13,7 +13,7 @@ namespace TransportLinesManager.Overrides
 	[HarmonyPatch(typeof(TransportStationAI))]
     public static class TransportStationAIOverrides
 	{
-        private static readonly TransferManager.TransferReason[] m_managedReasons = new TransferManager.TransferReason[]   
+        public static readonly TransferManager.TransferReason[] m_managedReasons = new TransferManager.TransferReason[]   
         {
                 TransferManager.TransferReason.DummyCar,
                 TransferManager.TransferReason.DummyTrain,
@@ -25,11 +25,11 @@ namespace TransportLinesManager.Overrides
 		[HarmonyPrefix]
 		public static bool CreateIncomingVehicle(TransportStationAI __instance, ushort buildingID, ref Building buildingData, ushort startStop, int gateIndex, ref bool __result)
 		{
-			TransportInfo transportInfo = ((!__instance.UseSecondaryTransportInfoForConnection()) ? __instance.m_transportInfo : __instance.m_secondaryTransportInfo);
-			if ((object)transportInfo != null && FindConnectionVehicle(__instance, buildingID, ref buildingData, startStop, 3000f) == 0)
+			TransportInfo transportInfo = (!__instance.UseSecondaryTransportInfoForConnection()) ? __instance.m_transportInfo : __instance.m_secondaryTransportInfo;
+			if (transportInfo != null && FindConnectionVehicle(__instance, buildingID, ref buildingData, startStop, 3000f) == 0)
 			{
-				VehicleInfo vehicleInfo = (((object)__instance.m_overrideVehicleClass == null) ? Singleton<VehicleManager>.instance.GetRandomVehicleInfo(ref Singleton<SimulationManager>.instance.m_randomizer, __instance.m_transportLineInfo.m_class.m_service, __instance.m_transportLineInfo.m_class.m_subService, __instance.m_transportLineInfo.m_class.m_level, transportInfo.m_vehicleType) : Singleton<VehicleManager>.instance.GetRandomVehicleInfo(ref Singleton<SimulationManager>.instance.m_randomizer, __instance.m_overrideVehicleClass.m_service, __instance.m_overrideVehicleClass.m_subService, __instance.m_overrideVehicleClass.m_level, transportInfo.m_vehicleType));
-				if ((object)vehicleInfo != null)
+				VehicleInfo vehicleInfo = (__instance.m_overrideVehicleClass is null) ? TryGetRandomVehicleStation(Singleton<VehicleManager>.instance, ref Singleton<SimulationManager>.instance.m_randomizer, __instance.m_transportLineInfo.m_class.m_service, __instance.m_transportLineInfo.m_class.m_subService, __instance.m_transportLineInfo.m_class.m_level, transportInfo.m_vehicleType) : TryGetRandomVehicleStation(Singleton<VehicleManager>.instance, ref Singleton<SimulationManager>.instance.m_randomizer, __instance.m_overrideVehicleClass.m_service, __instance.m_overrideVehicleClass.m_subService, __instance.m_overrideVehicleClass.m_level, transportInfo.m_vehicleType);
+				if (vehicleInfo != null)
 				{
 					ushort num = FindConnectionBuilding(__instance, startStop);
 					if (num != 0)
@@ -76,10 +76,10 @@ namespace TransportLinesManager.Overrides
 		[HarmonyPrefix]
 		public static bool CreateOutgoingVehicle(TransportStationAI __instance, ushort buildingID, ref Building buildingData, ushort startStop, int gateIndex, ref bool __result)
 		{
-			TransportInfo transportInfo = ((!__instance.UseSecondaryTransportInfoForConnection()) ? __instance.m_transportInfo : __instance.m_secondaryTransportInfo);
+			TransportInfo transportInfo = (!__instance.UseSecondaryTransportInfoForConnection()) ? __instance.m_transportInfo : __instance.m_secondaryTransportInfo;
 			if (__instance.m_transportLineInfo != null && FindConnectionVehicle(__instance, buildingID, ref buildingData, startStop, 3000f) == 0)
 			{
-				VehicleInfo vehicleInfo = (((object)__instance.m_overrideVehicleClass == null) ? Singleton<VehicleManager>.instance.GetRandomVehicleInfo(ref Singleton<SimulationManager>.instance.m_randomizer, __instance.m_transportLineInfo.m_class.m_service, __instance.m_transportLineInfo.m_class.m_subService, __instance.m_transportLineInfo.m_class.m_level, transportInfo.m_vehicleType) : Singleton<VehicleManager>.instance.GetRandomVehicleInfo(ref Singleton<SimulationManager>.instance.m_randomizer, __instance.m_overrideVehicleClass.m_service, __instance.m_overrideVehicleClass.m_subService, __instance.m_overrideVehicleClass.m_level, transportInfo.m_vehicleType));
+				VehicleInfo vehicleInfo = (__instance.m_overrideVehicleClass == null) ? TryGetRandomVehicleStation(Singleton<VehicleManager>.instance, ref Singleton<SimulationManager>.instance.m_randomizer, __instance.m_transportLineInfo.m_class.m_service, __instance.m_transportLineInfo.m_class.m_subService, __instance.m_transportLineInfo.m_class.m_level, transportInfo.m_vehicleType) : TryGetRandomVehicleStation(Singleton<VehicleManager>.instance, ref Singleton<SimulationManager>.instance.m_randomizer, __instance.m_overrideVehicleClass.m_service, __instance.m_overrideVehicleClass.m_subService, __instance.m_overrideVehicleClass.m_level, transportInfo.m_vehicleType);
 				if (vehicleInfo != null)
 				{
 					Array16<Vehicle> vehicles = Singleton<VehicleManager>.instance.m_vehicles;
@@ -167,45 +167,7 @@ namespace TransportLinesManager.Overrides
 			return 0;
 		}
 
-		private static bool IsIntercityBusConnection(TransportStationAI __instance, BuildingInfo connectionInfo)
-		{
-			return connectionInfo.m_class.m_service == ItemClass.Service.Road && __instance.m_transportLineInfo.m_class.m_service == ItemClass.Service.PublicTransport && connectionInfo.m_class.m_subService == ItemClass.SubService.None && __instance.m_transportLineInfo.m_class.m_subService == ItemClass.SubService.PublicTransportBus;
-		}
-
-		private static void SetRegionalLine(ushort vehicleId, ushort stopId)
-        {
-            ref Vehicle veh = ref VehicleManager.instance.m_vehicles.m_buffer[vehicleId];
-            if (TransportSystemDefinition.From(veh.Info) == TransportSystemDefinition.TRAIN)
-            {
-                if (TLMStationUtils.GetStationBuilding(stopId, 0, false) != veh.m_sourceBuilding)
-                {
-                    veh.m_custom = NetManager.instance.m_segments.m_buffer[NetManager.instance.m_nodes.m_buffer[stopId].GetSegment(0)].GetOtherNode(stopId);
-                }
-                else
-                {
-                    veh.m_custom = stopId;
-                }
-            }
-        }
-
-        private static VehicleInfo GetRandomVehicle(VehicleManager vm, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, TransferManager.TransferReason reason)
-        {
-            if (m_managedReasons.Contains(reason))
-            {
-                LogUtils.DoLog("START TRANSFER OutsideConnectionAI!!!!!!!!");
-                return TryGetRandomVehicle(vm, ref r, service, subService, level, VehicleInfo.VehicleType.None);
-            }
-            return vm.GetRandomVehicleInfo(ref r, service, subService, level);
-
-        }
-
-        private static VehicleInfo TryGetRandomVehicleStation(VehicleManager vm, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, VehicleInfo.VehicleType type)
-        {
-            LogUtils.DoLog("START TRANSFER StationAI!!!!!!!!");
-            return TryGetRandomVehicle(vm, ref r, service, subService, level, type);
-        }
-
-        private static VehicleInfo TryGetRandomVehicle(VehicleManager vm, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, VehicleInfo.VehicleType type)
+		public static VehicleInfo TryGetRandomVehicle(VehicleManager vm, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, VehicleInfo.VehicleType type)
         {
             var tsd = TransportSystemDefinition.FromOutsideConnection(subService, level, type);
             if (!(tsd is null))
@@ -218,5 +180,33 @@ namespace TransportLinesManager.Overrides
             }
             return vm.GetRandomVehicleInfo(ref r, service, subService, level);
         }
+
+		private static bool IsIntercityBusConnection(TransportStationAI __instance, BuildingInfo connectionInfo)
+		{
+			return connectionInfo.m_class.m_service == ItemClass.Service.Road && __instance.m_transportLineInfo.m_class.m_service == ItemClass.Service.PublicTransport && connectionInfo.m_class.m_subService == ItemClass.SubService.None && __instance.m_transportLineInfo.m_class.m_subService == ItemClass.SubService.PublicTransportBus;
+		}
+
+		private static void SetRegionalLine(ushort vehicleId, ushort stopId)
+        {
+            ref Vehicle veh = ref VehicleManager.instance.m_vehicles.m_buffer[vehicleId];
+            if (TransportSystemDefinition.From(veh.Info) == TransportSystemDefinition.TRAIN || TransportSystemDefinition.From(veh.Info) == TransportSystemDefinition.BUS)
+            {
+                if (TLMStationUtils.GetStationBuilding(stopId, 0, false) != veh.m_sourceBuilding)
+                {
+                    veh.m_custom = NetManager.instance.m_segments.m_buffer[NetManager.instance.m_nodes.m_buffer[stopId].GetSegment(0)].GetOtherNode(stopId);
+                }
+                else
+                {
+                    veh.m_custom = stopId;
+                }
+            }
+        }
+
+		private static VehicleInfo TryGetRandomVehicleStation(VehicleManager vm, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, VehicleInfo.VehicleType type)
+        {
+            LogUtils.DoLog("START TRANSFER StationAI!!!!!!!!");
+            return TryGetRandomVehicle(vm, ref r, service, subService, level, type);
+        }
+
 	}
 }
