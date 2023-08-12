@@ -428,7 +428,17 @@ namespace TransportLinesManager.WorldInfoPanels
                     }
                     // apply the basic relative position first
                     relativePosition.y = prevStationIdx * weightingPrev + nextStationIdx * weightingNext;
-                    relativePosition.y = ShiftVerticalPosition(relativePosition.y * m_kminStopDistance);
+                    // then, apply the adjustment for low-stop-count positioning
+                    int stopCount = m_cachedStopOrder.Length;
+                    float extraScaling = 1;
+                    if (stopCount < 8)
+                    {
+                        // logic should be the same as the stop position
+                        float uncheckedLineLen = m_kminStopDistance * stopCount;
+                        float acceptableLineLen = Mathf.Clamp(uncheckedLineLen, m_kminUILineLength, m_kmaxUILineLength);
+                        extraScaling = acceptableLineLen / uncheckedLineLen;
+                    }
+                    relativePosition.y = ShiftVerticalPosition(relativePosition.y * m_kminStopDistance * extraScaling);
                     m_vehicleButtons.items[idx].relativePosition = relativePosition;
                 }
                 else
