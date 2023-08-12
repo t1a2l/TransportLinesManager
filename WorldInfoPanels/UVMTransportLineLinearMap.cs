@@ -314,16 +314,8 @@ namespace TransportLinesManager.WorldInfoPanels
                 }
                 float stopDistanceFactor = m_kminStopDistance / minDistance;
                 m_uILineLength = stopDistanceFactor * lineLength;
-                if (m_uILineLength < m_kminUILineLength)
-                {
-                    m_uILineLength = m_kminUILineLength;
-                    stopDistanceFactor = m_uILineLength / lineLength;
-                }
-                else if (m_uILineLength > m_kmaxUILineLength)
-                {
-                    m_uILineLength = m_kmaxUILineLength;
-                    stopDistanceFactor = m_uILineLength / lineLength;
-                }
+                m_uILineLength = CalcClampedUILineLength(m_uILineLength, out float lineLenFactor);
+                stopDistanceFactor *= lineLenFactor;
                 if (stopsCount <= 2)
                 {
                     m_uILineOffset = (stopDistanceFactor * stopPositions[stopPositions.Length - 1]) - 30f;
@@ -435,8 +427,7 @@ namespace TransportLinesManager.WorldInfoPanels
                     {
                         // logic should be the same as the stop position
                         float uncheckedLineLen = m_kminStopDistance * stopCount;
-                        float acceptableLineLen = Mathf.Clamp(uncheckedLineLen, m_kminUILineLength, m_kmaxUILineLength);
-                        extraScaling = acceptableLineLen / uncheckedLineLen;
+                        CalcClampedUILineLength(uncheckedLineLen, out extraScaling);
                     }
                     relativePosition.y = ShiftVerticalPosition(relativePosition.y * m_kminStopDistance * extraScaling);
                     m_vehicleButtons.items[idx].relativePosition = relativePosition;
@@ -511,6 +502,13 @@ namespace TransportLinesManager.WorldInfoPanels
         private void OnGotFocusBind(UIComponent component, UIFocusEventParameter eventParam) => m_cachedScrollPosition = m_scrollPanel.scrollPosition;
 
         internal LineType GetLineType(ushort lineID, bool fromBuilding) => UVMPublicTransportWorldInfoPanel.GetLineType(lineID, fromBuilding);
+
+        private float CalcClampedUILineLength(float initialLineLen, out float lineLenFactor)
+        {
+            float acceptableLineLen = Mathf.Clamp(initialLineLen, m_kminUILineLength, m_kmaxUILineLength);
+            lineLenFactor = acceptableLineLen / initialLineLen;
+            return acceptableLineLen;
+        }
 
         private float ShiftVerticalPosition(float y)
         {
