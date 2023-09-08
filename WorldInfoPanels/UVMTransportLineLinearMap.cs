@@ -376,6 +376,16 @@ namespace TransportLinesManager.WorldInfoPanels
             {
                 return;
             }
+            int stopsCount;
+            if (fromBuilding)
+            {
+                var line = TransportLinesManagerMod.Controller.BuildingLines[lineID];
+                stopsCount = line.CountStops();
+            }
+            else
+			{
+                stopsCount = Singleton<TransportManager>.instance.m_lines.m_buffer[lineID].CountStops(lineID);
+            }
             VehicleManager instance = Singleton<VehicleManager>.instance;
             ushort vehicleId = Singleton<TransportManager>.instance.m_lines.m_buffer[lineID].m_vehicles;
             int idx = 0;
@@ -398,12 +408,31 @@ namespace TransportLinesManager.WorldInfoPanels
                     {
                         nextStationIdx += m_cachedStopOrder.Length;
                     }
+                    var vehicle_flags = Singleton<VehicleManager>.instance.m_vehicles.m_buffer[vehicleId].m_flags;
                     Vector3 relativePosition = m_vehicleButtons.items[idx].relativePosition;
-                    relativePosition.y
-                        = (Singleton<VehicleManager>.instance.m_vehicles.m_buffer[vehicleId].m_flags & (Vehicle.Flags.Leaving)) != 0 ? (prevStationIdx * 0.75f) + (nextStationIdx * 0.25f)
-                        : (Singleton<VehicleManager>.instance.m_vehicles.m_buffer[vehicleId].m_flags & (Vehicle.Flags.Arriving)) != 0 ? (prevStationIdx * 0.25f) + (nextStationIdx * 0.75f)
-                        : (Singleton<VehicleManager>.instance.m_vehicles.m_buffer[vehicleId].m_flags & (Vehicle.Flags.Stopped)) != 0 ? prevStationIdx
-                        : (prevStationIdx * 0.5f) + (nextStationIdx * 0.5f);
+                    var distance1 = 0.75f;
+                    var distance2 = 0.25f;
+                    //if(stopsCount <= 3)
+                    //{
+                    //    distance1 = 0.25f;
+                    //    distance2 = 0.75f;
+                    //}
+                    if((vehicle_flags & (Vehicle.Flags.Leaving)) != 0)
+                    {
+                        relativePosition.y = (prevStationIdx * distance1) + (nextStationIdx * distance2);
+                    }
+                    else if((vehicle_flags & (Vehicle.Flags.Arriving)) != 0)
+                    {
+                        relativePosition.y = (prevStationIdx * distance2) + (nextStationIdx * distance1);
+                    }
+                    else if((vehicle_flags & (Vehicle.Flags.Stopped)) != 0)
+                    {
+                        relativePosition.y = prevStationIdx;
+                    }
+                    else
+                    {
+                        relativePosition.y = (prevStationIdx * 0.5f) + (nextStationIdx * 0.5f);
+                    }
                     relativePosition.y = ShiftVerticalPosition(relativePosition.y * m_kminStopDistance);
                     m_vehicleButtons.items[idx].relativePosition = relativePosition;
                 }
