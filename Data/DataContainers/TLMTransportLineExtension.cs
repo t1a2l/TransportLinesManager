@@ -35,7 +35,7 @@ namespace TransportLinesManager.Data.DataContainers
 
         public override string SaveId => $"TLM_TLMTransportLineExtension";
 
-        private readonly Dictionary<TransportSystemDefinition, List<string>> m_basicAssetsList = new Dictionary<TransportSystemDefinition, List<string>>();
+        private readonly Dictionary<TransportSystemDefinition, List<TransportAsset>> m_basicAssetsList = new Dictionary<TransportSystemDefinition, List<TransportAsset>>();
 
         public void SetUseCustomConfig(ushort lineId, bool value)
         {
@@ -48,7 +48,7 @@ namespace TransportLinesManager.Data.DataContainers
         public void SetDisplayAbsoluteValues(ushort lineId, bool value) => SafeGet(lineId).DisplayAbsoluteValues = value;
         public bool IsDisplayAbsoluteValues(ushort lineId) => SafeGet(lineId).DisplayAbsoluteValues;
         #region Asset List
-        public List<string> GetBasicAssetListForLine(ushort lineId)
+        public List<TransportAsset> GetBasicAssetListForLine(ushort lineId)
         {
             var tsd = TransportSystemDefinition.FromLineId(lineId, false);
             if (!m_basicAssetsList.ContainsKey(tsd))
@@ -57,8 +57,8 @@ namespace TransportLinesManager.Data.DataContainers
             }
             return m_basicAssetsList[tsd];
         }
-        public Dictionary<string, string> GetSelectedBasicAssetsForLine(ushort lineId) => this.GetAssetListForLine(lineId).Where(x => PrefabCollection<VehicleInfo>.FindLoaded(x) != null).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x));
-        public Dictionary<string, string> GetAllBasicAssetsForLine(ushort lineId)
+        public Dictionary<TransportAsset, string> GetSelectedBasicAssetsForLine(ushort lineId) => this.GetAssetListForLine(lineId).Where(x => PrefabCollection<VehicleInfo>.FindLoaded(x.name) != null).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
+        public Dictionary<TransportAsset, string> GetAllBasicAssetsForLine(ushort lineId)
         {
             var tsd = TransportSystemDefinition.FromLineId(lineId, false);
             if (!m_basicAssetsList.ContainsKey(tsd))
@@ -66,19 +66,19 @@ namespace TransportLinesManager.Data.DataContainers
                 m_basicAssetsList[tsd] = TLMPrefabUtils.LoadBasicAssets(tsd);
             }
 
-            return m_basicAssetsList[tsd].ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x));
+            return m_basicAssetsList[tsd].ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
         }
         public VehicleInfo GetAModel(ushort lineId)
         {
             VehicleInfo info = null;
-            List<string> assetList = ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineId);
-            while (info == null && assetList.Count > 0)
+            List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineId);
+            while (info == null && assetTransportList.Count > 0)
             {
-                info = VehicleUtils.GetRandomModel(assetList, out string modelName);
+                info = VehicleUtils.GetModelByPercentage(assetTransportList, out string modelName);
                 if (info == null)
                 {
                     ExtensionStaticExtensionMethods.RemoveAssetFromLine(this, lineId, modelName);
-                    assetList = ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineId);
+                    assetTransportList = ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineId);
                 }
             }
             return info;

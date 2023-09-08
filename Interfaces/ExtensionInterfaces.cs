@@ -2,6 +2,7 @@
 using TransportLinesManager.Data.Base;
 using System.Collections.Generic;
 using UnityEngine;
+using TransportLinesManager.Utils;
 
 namespace TransportLinesManager.Interfaces
 {
@@ -39,13 +40,14 @@ namespace TransportLinesManager.Interfaces
 
     public interface IAssetSelectorExtension : ISafeGettable<IAssetSelectorStorage>, ILineNumberToIndexable
     {
-        Dictionary<string, string> GetAllBasicAssetsForLine(ushort lineId);
-        List<string> GetBasicAssetListForLine(ushort lineId);
+        Dictionary<TransportAsset, string> GetAllBasicAssetsForLine(ushort lineId);
+        List<TransportAsset> GetBasicAssetListForLine(ushort lineId);
         VehicleInfo GetAModel(ushort lineId);
     }
 
     public interface IAssetSelectorStorage
     {
+        SimpleXmlList<TransportAsset> AssetTransportList { get; set; }
         SimpleXmlList<string> AssetList { get; set; }
     }
 

@@ -20,6 +20,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         private bool m_isLoading;
         private UICheckBox m_checkbox;
         private UITextField m_capacityEditor;
+        private UITextField m_weightEditor;
         private string m_currentAsset;
         public Action OnMouseEnter;
 
@@ -27,6 +28,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         {
             m_checkbox = Find<UICheckBox>("AssetCheckbox");
             m_capacityEditor = Find<UITextField>("Cap");
+            m_weightEditor = Find<UITextField>("Weg");
             m_checkbox.eventCheckChanged += (x, y) =>
             {
                 if (m_isLoading)
@@ -52,9 +54,11 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             MonoUtils.LimitWidthAndBox(m_checkbox.label, 265, out UIPanel container);
             container.relativePosition = new Vector3(container.relativePosition.x, 0);
             m_capacityEditor.eventTextSubmitted += CapacityEditor_eventTextSubmitted;
+            m_weightEditor.eventTextSubmitted += WeightEditor_eventTextSubmitted;
 
             m_checkbox.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
             m_capacityEditor.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
+            m_weightEditor.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
         }
 
         public void SetAsset(string assetName, bool isAllowed)
@@ -71,6 +75,21 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         }
 
         private void CapacityEditor_eventTextSubmitted(UIComponent x, string y)
+        {
+            if (m_isLoading || !int.TryParse(y.IsNullOrWhiteSpace() ? "0" : y, out int value))
+            {
+                return;
+            }
+            VehicleInfo info = PrefabCollection<VehicleInfo>.FindLoaded(m_currentAsset);
+            var tsd = TransportSystemDefinition.From(info);
+            tsd.GetTransportExtension().SetVehicleCapacity(m_currentAsset, value);
+            m_capacityEditor.text = VehicleUtils.GetCapacity(info).ToString("0");
+            UpdateMaintenanceCost(info, tsd);
+
+            UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
+        }
+
+        private void WeightEditor_eventTextSubmitted(UIComponent x, string y)
         {
             if (m_isLoading || !int.TryParse(y.IsNullOrWhiteSpace() ? "0" : y, out int value))
             {
@@ -114,9 +133,20 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             MonoUtils.InitButtonFull(capEditField, false, "OptionsDropboxListbox");
             capEditField.isTooltipLocalized = true;
             capEditField.tooltipLocaleID = "TLM_ASSET_CAPACITY_FIELD_DESCRIPTION";
+            capEditField.tooltip = Locale.Get("TLM_ASSET_CAPACITY_FIELD_DESCRIPTION");
             capEditField.numericalOnly = true;
             capEditField.maxLength = 5;
             capEditField.padding = new RectOffset(2, 2, 9, 2);
+
+            MonoUtils.CreateUIElement(out UITextField wegEditField, panel.transform, "Weg", new Vector4(0, 0, 50, 32));
+            MonoUtils.UiTextFieldDefaults(wegEditField);
+            MonoUtils.InitButtonFull(wegEditField, false, "OptionsDropboxListbox");
+            wegEditField.isTooltipLocalized = true;
+            wegEditField.tooltipLocaleID = "TLM_ASSET_WEIGHT_FIELD_DESCRIPTION";
+            wegEditField.tooltip = Locale.Get("TLM_ASSET_WEIGHT_FIELD_DESCRIPTION");
+            wegEditField.numericalOnly = true;
+            wegEditField.maxLength = 5;
+            wegEditField.padding = new RectOffset(2, 2, 9, 2);
 
             go.AddComponent<TLMAssetItemLine>();
             TLMUiTemplateUtils.GetTemplateDict()[TEMPLATE_NAME] = panel;

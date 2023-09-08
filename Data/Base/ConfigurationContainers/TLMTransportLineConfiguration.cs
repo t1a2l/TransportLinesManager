@@ -2,6 +2,7 @@
 using Commons.Utils.UtilitiesClasses;
 using TransportLinesManager.Interfaces;
 using System.Xml.Serialization;
+using TransportLinesManager.Utils;
 
 namespace TransportLinesManager.Data.Base.ConfigurationContainers
 {
@@ -20,6 +21,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                     DisplayAbsoluteValues = false;
                     BudgetEntries = new TimeableList<BudgetEntryXml>();
                     AssetList = new SimpleXmlList<string>();
+                    AssetTransportList = new SimpleXmlList<TransportAsset>();
                     TicketPriceEntries = new TimeableList<TicketPriceEntryXml>();
                     DepotsAllowed = new SimpleXmlHashSet<ushort>();
                 }
@@ -32,6 +34,8 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         public TimeableList<BudgetEntryXml> BudgetEntries { get; set; } = new TimeableList<BudgetEntryXml>();
         [XmlElement("AssetsList")]
         public SimpleXmlList<string> AssetList { get; set; } = new SimpleXmlList<string>();
+        [XmlElement("AssetsTransportList")]
+        public SimpleXmlList<TransportAsset> AssetTransportList { get; set; } = new SimpleXmlList<TransportAsset>();
         [XmlElement("TicketPrices")]
         public TimeableList<TicketPriceEntryXml> TicketPriceEntries { get; set; } = new TimeableList<TicketPriceEntryXml>();
         [XmlElement("DepotsAllowed")]

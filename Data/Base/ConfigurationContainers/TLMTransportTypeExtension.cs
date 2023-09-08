@@ -22,8 +22,8 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
     public class TLMTransportTypeConfigurations : TsdIdentifiable, ITLMTransportTypeExtension
     {
 
-        private List<string> m_basicAssetsList;
-        private List<string> m_basicAssetsListIntercity;
+        private List<TransportAsset> m_basicAssetsList;
+        private List<TransportAsset> m_basicAssetsListIntercity;
 
         private TransportSystemDefinition Definition => TSD;
 
@@ -236,7 +236,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         #endregion
 
         #region Asset List
-        public Dictionary<string, string> GetSelectedBasicAssetsForLine(ushort lineId)
+        public Dictionary<TransportAsset, string> GetSelectedBasicAssetsForLine(ushort lineId)
         {
             if (lineId > 0)
             {
@@ -244,7 +244,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 {
                     LoadBasicAssets();
                 }
-                return ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineId).Intersect(m_basicAssetsList).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x));
+                return ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineId).Intersect(m_basicAssetsList).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
             }
             else
             {
@@ -252,10 +252,10 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 {
                     LoadBasicAssetsInterCity();
                 }
-                return ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineId).Intersect(m_basicAssetsListIntercity).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x));
+                return ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineId).Intersect(m_basicAssetsListIntercity).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
             }
         }
-        public Dictionary<string, string> GetAllBasicAssetsForLine(ushort lineId)
+        public Dictionary<TransportAsset, string> GetAllBasicAssetsForLine(ushort lineId)
         {
             if (lineId > 0)
             {
@@ -263,7 +263,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 {
                     LoadBasicAssets();
                 }
-                return m_basicAssetsList.ToDictionary(x => x, x => Locale.GetUnchecked("VEHICLE_TITLE", x));
+                return m_basicAssetsList.ToDictionary(x => x, x => Locale.GetUnchecked("VEHICLE_TITLE", x.name));
             }
             else
             {
@@ -271,10 +271,10 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 {
                     LoadBasicAssetsInterCity();
                 }
-                return m_basicAssetsListIntercity.ToDictionary(x => x, x => Locale.GetUnchecked("VEHICLE_TITLE", x));
+                return m_basicAssetsListIntercity.ToDictionary(x => x, x => Locale.GetUnchecked("VEHICLE_TITLE", x.name));
             }
         }
-        public List<string> GetBasicAssetListForLine(ushort lineId)
+        public List<TransportAsset> GetBasicAssetListForLine(ushort lineId)
         {
             if (m_basicAssetsList == null)
             {
@@ -285,10 +285,10 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         public VehicleInfo GetAModel(ushort lineID)
         {
             VehicleInfo info = null;
-            List<string> assetList = ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineID);
+            List<TransportAsset> assetList = ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineID);
             while (info == null && assetList.Count > 0)
             {
-                info = VehicleUtils.GetRandomModel(assetList, out string modelName);
+                info = VehicleUtils.GetModelByPercentage(assetList, out string modelName);
                 if (info == null)
                 {
                     ExtensionStaticExtensionMethods.RemoveAssetFromLine(this, lineID, modelName);

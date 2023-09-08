@@ -13,25 +13,29 @@ namespace TransportLinesManager.Data.Extensions
     public static class ExtensionStaticExtensionMethods
     {
         #region Assets List
-        public static List<string> GetAssetListForLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList;
-        public static void SetAssetListForLine<T>(this T it, ushort lineId, List<string> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList = new SimpleXmlList<string>(list);
+        public static List<TransportAsset> GetAssetListForLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetTransportList;
+        public static void SetAssetListForLine<T>(this T it, ushort lineId, List<string> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetTransportList = new SimpleXmlList<TransportAsset>();
         public static void AddAssetToLine<T>(this T it, ushort lineId, string assetId) where T : IAssetSelectorExtension
         {
-            List<string> list = it.GetAssetListForLine(lineId);
-            if (list.Contains(assetId))
+            List<TransportAsset> list = it.GetAssetListForLine(lineId);
+            if (list.Any(item => item.name == assetId))
             {
                 return;
             }
-            list.Add(assetId);
+            var item = new TransportAsset
+            {
+                name = assetId
+            };
+            list.Add(item);
         }
         public static void RemoveAssetFromLine<T>(this T it, ushort lineId, string assetId) where T : IAssetSelectorExtension
         {
-            List<string> list = it.GetAssetListForLine(lineId);
-            if (!list.Contains(assetId))
+            List<TransportAsset> list = it.GetAssetListForLine(lineId);
+            if (!list.Any(item => item.name == assetId))
             {
                 return;
             }
-            list.RemoveAll(x => x == assetId);
+            list.RemoveAll(x => x.name == assetId);
         }
         public static void UseDefaultAssetsAtLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.GetAssetListForLine(lineId).Clear();
         #endregion
