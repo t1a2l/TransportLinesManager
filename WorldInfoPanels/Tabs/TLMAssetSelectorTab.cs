@@ -132,14 +132,14 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
             var lineId = GetLineID();
             IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
-            config.SetAssetListForLine(lineId, XmlUtils.DefaultXmlDeserialize<List<string>>(m_clipboard[TransportSystem]));
+            config.SetAssetTransportListForLine(lineId, XmlUtils.DefaultXmlDeserialize<List<TransportAsset>>(m_clipboard[TransportSystem]));
             UpdateAssetList(config);
         }
         private void ActionDelete()
         {
             var lineId = GetLineID();
             IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
-            config.SetAssetListForLine(lineId, new List<string>());
+            config.SetAssetTransportListForLine(lineId, new List<TransportAsset>());
             UpdateAssetList(config);
         }
 
