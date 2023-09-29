@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TransportLinesManager.Data.DataContainers;
-using System.Collections;
 
 namespace TransportLinesManager.Data.Extensions
 {
@@ -32,12 +31,15 @@ namespace TransportLinesManager.Data.Extensions
             {
                 name = assetId,
                 capacity = int.Parse(capacity),
-                count = new List<int>(currentConfig.BudgetEntries.Count),
+                count = new Dictionary<int, Count>(currentConfig.BudgetEntries.Count),
                 spawn_percent = new List<int>(currentConfig.BudgetEntries.Count)
             };
             for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
             {
-                item.count[i] = 0;
+                var item_count = item.count[i];
+                item_count.totalCount = 0;
+                item_count.usedCount = 0;
+                item.count[i] = item_count;
                 item.spawn_percent[i] = 0;
             }
             var index = 0;
@@ -54,7 +56,7 @@ namespace TransportLinesManager.Data.Extensions
                 var totalCount = 0;
                 for (int i = 0; i < list.Count; i++)
                 {
-                    totalCount += list[i].count[index];
+                    totalCount += list[i].count[index].totalCount;
                 }
                 var newCount = int.Parse(weight);
                 // check if the new total is more then allowed if so make it zero
@@ -62,7 +64,9 @@ namespace TransportLinesManager.Data.Extensions
                 {
                     newCount = 0;
                 }
-                item.count[index] = newCount;
+                var item_count = item.count[index];
+                item_count.totalCount = newCount;
+                item.count[index] = item_count;
             }
             else
             {

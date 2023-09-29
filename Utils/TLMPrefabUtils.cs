@@ -19,8 +19,8 @@ namespace TransportLinesManager.Utils
                     var item = new TransportAsset
                     {
                         name = prefab.name,
-                        spawn_percent = new List<int> { 0 },
-                        count = new List<int> { 0 }
+                        spawn_percent = new List<int>(),
+                        count = new Dictionary<int, Count>()
                     };
                     basicAssetsList.Add(item);
                 }
@@ -43,8 +43,8 @@ namespace TransportLinesManager.Utils
                     var item = new TransportAsset
                     {
                         name = prefab.name,
-                        spawn_percent = new List<int> { 0 },
-                        count = new List<int> { 0 }
+                        spawn_percent = new List<int>(),
+                        count = new Dictionary<int, Count>()
                     };
                     basicAssetsList.Add(item);
                 }

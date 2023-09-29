@@ -294,12 +294,17 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 name = assetName,
                 capacity = VehicleUtils.GetCapacity(PrefabCollection<VehicleInfo>.FindLoaded(assetName)),
-                count = new List<int>(),
+                count = new Dictionary<int, Count>(),
                 spawn_percent = new List<int>()
             };
             for (int i = 0; i < budgetCount; ++i)
             {
-                item.count.Add(0);
+                var item_count = new Count
+                {
+                    totalCount = 0,
+                    usedCount = 0
+                };
+                item.count.Add(i, item_count);
                 item.spawn_percent.Add(0);
             }
             return item;

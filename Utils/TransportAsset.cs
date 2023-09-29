@@ -8,9 +8,16 @@ namespace TransportLinesManager.Utils
 
 		public List<int> spawn_percent;
 
-		public List<int> count;
+		public Dictionary<int, Count> count;
 
 		public int capacity;
 
+	}
+
+    public struct Count
+	{
+        public int totalCount;
+
+        public int usedCount;
 	}
 }
