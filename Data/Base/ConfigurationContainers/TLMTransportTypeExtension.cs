@@ -325,6 +325,8 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 asset_count.usedCount--;
             }
             assetTransportList[asset_index].count[index] = asset_count;
+
+            ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
         }
 
 

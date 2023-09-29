@@ -110,6 +110,8 @@ namespace TransportLinesManager.Data.DataContainers
                 asset_count.usedCount--;
             }
             assetTransportList[asset_index].count[index] = asset_count;
+
+            ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
         }
 
         #endregion
