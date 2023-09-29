@@ -16,8 +16,12 @@ namespace TransportLinesManager.Data.Extensions
         #region Assets List
         public static List<TransportAsset> GetAssetTransportListForLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetTransportList;
 
-        public static List<string> GetAssetListForLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList;
         public static void SetAssetTransportListForLine<T>(this T it, ushort lineId, List<TransportAsset> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetTransportList = new SimpleXmlList<TransportAsset>(list);
+
+        public static List<string> GetAssetListForLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList;
+
+        public static void SetAssetListForLine<T>(this T it, ushort lineId, List<string> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList = new SimpleXmlList<string>(list);
+
         public static void AddAssetToLine<T>(this T it, ushort lineId, string assetId, string capacity, string weight) where T : IAssetSelectorExtension
         {
             List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);

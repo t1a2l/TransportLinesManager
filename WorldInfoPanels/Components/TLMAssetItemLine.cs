@@ -71,13 +71,20 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             var tsd = TransportSystemDefinition.From(info);
             UpdateMaintenanceCost(info, tsd);
             m_capacityEditor.text = asset.capacity.ToString() != "" ? asset.capacity.ToString() : VehicleUtils.GetCapacity(PrefabCollection<VehicleInfo>.FindLoaded(asset.name)).ToString("0");
-            if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
+            if(isAllowed)
             {
-                m_weightEditor.text = asset.count[index].ToString();
+                if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
+                {
+                    m_weightEditor.text = asset.count[index].ToString();
+                }
+                else
+                {
+                    m_weightEditor.text = asset.spawn_percent[index].ToString();
+                }
             }
             else
             {
-                m_weightEditor.text = asset.spawn_percent[index].ToString();
+                m_weightEditor.text = "0";
             }
             m_isLoading = false;
         }

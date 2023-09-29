@@ -245,7 +245,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     var item = InitTransportItem(asset, currentConfig.BudgetEntries.Count);
                     allowedTransportAssets.Add(item);
                 }
-                allowedAssets = null;
+                config.SetAssetListForLine(lineId, new List<string>());
+                config.SetAssetTransportListForLine(lineId, allowedTransportAssets);
             }
             string[] budgetArr = new string[currentConfig.BudgetEntries.Count];
             int index = 0;
