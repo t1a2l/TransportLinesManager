@@ -57,7 +57,7 @@ namespace TransportLinesManager.Data.DataContainers
             }
             return m_basicAssetsList[tsd];
         }
-        public Dictionary<TransportAsset, string> GetSelectedBasicAssetsForLine(ushort lineId) => this.GetAssetListForLine(lineId).Where(x => PrefabCollection<VehicleInfo>.FindLoaded(x.name) != null).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
+        public Dictionary<TransportAsset, string> GetSelectedBasicAssetsForLine(ushort lineId) => this.GetAssetTransportListForLine(lineId).Where(x => PrefabCollection<VehicleInfo>.FindLoaded(x.name) != null).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
         public Dictionary<TransportAsset, string> GetAllBasicAssetsForLine(ushort lineId)
         {
             var tsd = TransportSystemDefinition.FromLineId(lineId, false);
@@ -71,14 +71,14 @@ namespace TransportLinesManager.Data.DataContainers
         public VehicleInfo GetAModel(ushort lineId)
         {
             VehicleInfo info = null;
-            List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineId);
+            List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineId);
             while (info == null && assetTransportList.Count > 0)
             {
-                info = VehicleUtils.GetModelByPercentage(assetTransportList, out string modelName);
+                info = VehicleUtils.GetModelByPercentageOrCount(assetTransportList, lineId, out string modelName);
                 if (info == null)
                 {
                     ExtensionStaticExtensionMethods.RemoveAssetFromLine(this, lineId, modelName);
-                    assetTransportList = ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineId);
+                    assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineId);
                 }
             }
             return info;

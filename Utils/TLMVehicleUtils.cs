@@ -110,7 +110,7 @@ namespace TransportLinesManager.Utils
                 {
                     IBasicExtension extension = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
                     ref TransportLine tl = ref Singleton<TransportManager>.instance.m_lines.m_buffer[lineId];
-                    List<TransportAsset> modelList = extension.GetAssetListForLine(lineId);
+                    List<TransportAsset> modelList = extension.GetAssetTransportListForLine(lineId);
 
                     if (TransportLinesManagerMod.DebugMode)
                     {

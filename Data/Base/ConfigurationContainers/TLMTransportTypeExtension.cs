@@ -244,7 +244,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 {
                     LoadBasicAssets();
                 }
-                return ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineId).Intersect(m_basicAssetsList).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
+                return ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineId).Intersect(m_basicAssetsList).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
             }
             else
             {
@@ -252,7 +252,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 {
                     LoadBasicAssetsInterCity();
                 }
-                return ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineId).Intersect(m_basicAssetsListIntercity).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
+                return ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineId).Intersect(m_basicAssetsListIntercity).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
             }
         }
         public Dictionary<TransportAsset, string> GetAllBasicAssetsForLine(ushort lineId)
@@ -285,14 +285,14 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         public VehicleInfo GetAModel(ushort lineID)
         {
             VehicleInfo info = null;
-            List<TransportAsset> assetList = ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineID);
+            List<TransportAsset> assetList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
             while (info == null && assetList.Count > 0)
             {
-                info = VehicleUtils.GetModelByPercentage(assetList, out string modelName);
+                info = VehicleUtils.GetModelByPercentageOrCount(assetList, lineID, out string modelName);
                 if (info == null)
                 {
                     ExtensionStaticExtensionMethods.RemoveAssetFromLine(this, lineID, modelName);
-                    assetList = ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineID);
+                    assetList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
                 }
             }
             return info;

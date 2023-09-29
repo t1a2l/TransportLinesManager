@@ -7,30 +7,73 @@ using TransportLinesManager.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using TransportLinesManager.Data.DataContainers;
+using System.Collections;
 
 namespace TransportLinesManager.Data.Extensions
 {
     public static class ExtensionStaticExtensionMethods
     {
         #region Assets List
-        public static List<TransportAsset> GetAssetListForLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetTransportList;
+        public static List<TransportAsset> GetAssetTransportListForLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetTransportList;
+
+        public static List<string> GetAssetListForLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList;
         public static void SetAssetListForLine<T>(this T it, ushort lineId, List<string> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetTransportList = new SimpleXmlList<TransportAsset>();
-        public static void AddAssetToLine<T>(this T it, ushort lineId, string assetId) where T : IAssetSelectorExtension
+        public static void AddAssetToLine<T>(this T it, ushort lineId, string assetId, string capacity, string weight) where T : IAssetSelectorExtension
         {
-            List<TransportAsset> list = it.GetAssetListForLine(lineId);
+            List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
+            Tuple<float, int, int, float, bool> lineBudget = TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineId);
+            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
             if (list.Any(item => item.name == assetId))
             {
                 return;
             }
             var item = new TransportAsset
             {
-                name = assetId
+                name = assetId,
+                capacity = int.Parse(capacity),
+                count = new List<int>(currentConfig.BudgetEntries.Count),
+                spawn_percent = new List<int>(currentConfig.BudgetEntries.Count)
             };
+            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
+            {
+                item.count[i] = 0;
+                item.spawn_percent[i] = 0;
+            }
+            var index = 0;
+            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
+            {
+                if (currentConfig.BudgetEntries[i].HourOfDay == lineBudget.Second)
+                {
+                    index = i;
+                    break;
+                }
+            }
+            if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
+            {
+                var totalCount = 0;
+                for (int i = 0; i < list.Count; i++)
+                {
+                    totalCount += list[i].count[index];
+                }
+                var newCount = int.Parse(weight);
+                // check if the new total is more then allowed if so make it zero
+                if(totalCount + newCount > lineBudget.Second)
+                {
+                    newCount = 0;
+                }
+                item.count[index] = newCount;
+            }
+            else
+            {
+                item.spawn_percent[index] = int.Parse(weight);
+            }
             list.Add(item);
         }
+
         public static void RemoveAssetFromLine<T>(this T it, ushort lineId, string assetId) where T : IAssetSelectorExtension
         {
-            List<TransportAsset> list = it.GetAssetListForLine(lineId);
+            List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
             if (!list.Any(item => item.name == assetId))
             {
                 return;
