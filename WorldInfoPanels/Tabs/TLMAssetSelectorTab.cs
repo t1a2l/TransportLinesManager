@@ -280,7 +280,12 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 var asset = targetAssets[i].Key;
                 var controller = assetsCheck[i].GetComponent<TLMAssetItemLine>();
-                controller.SetAsset(asset, allowedTransportAssets.Any(item => item.name == asset.name), lineId, m_timeBudgetSelect.selectedIndex);
+                var isAllowed = allowedTransportAssets.Any(item => item.name == asset.name);
+                if (isAllowed)
+                {
+                    asset = allowedTransportAssets.Find(item => item.name == asset.name);
+                }
+                controller.SetAsset(asset, isAllowed, lineId, m_timeBudgetSelect.selectedIndex);
                 controller.OnMouseEnter = () =>
                 {
                     m_lastInfo = PrefabCollection<VehicleInfo>.FindLoaded(asset.name);
@@ -329,7 +334,12 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 {
                     var asset = targetAssets[i].Key;
                     var controller = assetsCheck[i].GetComponent<TLMAssetItemLine>();
-                    controller.SetAsset(asset, allowedTransportAssets.Any(item => item.name == asset.name), lineId, m_timeBudgetSelect.selectedIndex);
+                    var isAllowed = allowedTransportAssets.Any(item => item.name == asset.name);
+                    if (isAllowed)
+                    {
+                        asset = allowedTransportAssets.Find(item => item.name == asset.name);
+                    }
+                    controller.SetAsset(asset, isAllowed, lineId, m_timeBudgetSelect.selectedIndex);
                     controller.OnMouseEnter = () =>
                     {
                         m_lastInfo = PrefabCollection<VehicleInfo>.FindLoaded(asset.name);
