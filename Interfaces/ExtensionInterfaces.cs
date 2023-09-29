@@ -42,7 +42,8 @@ namespace TransportLinesManager.Interfaces
     {
         Dictionary<TransportAsset, string> GetAllBasicAssetsForLine(ushort lineId);
         List<TransportAsset> GetBasicAssetListForLine(ushort lineId);
-        VehicleInfo GetAModel(ushort lineId);
+        VehicleInfo GetAModel(ushort lineId, string status);
+        void EditVehicleUsedCount(ushort lineID, string selectedModel, string status);
     }
 
     public interface IAssetSelectorStorage

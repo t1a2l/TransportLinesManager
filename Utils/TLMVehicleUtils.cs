@@ -136,7 +136,9 @@ namespace TransportLinesManager.Utils
                         {
                             if (item.Value.m_vehicleAI is BusAI)
                             {
-                                VehicleUtils.ReplaceVehicleModel(item.Key, extension.GetAModel(lineId));
+                                var info = extension.GetAModel(lineId, "Add");
+                                VehicleUtils.ReplaceVehicleModel(item.Key, info);
+                                extension.EditVehicleUsedCount(lineId, info.name, "Add");
                             }
                             else
                             {

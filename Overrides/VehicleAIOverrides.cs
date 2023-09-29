@@ -142,17 +142,23 @@ namespace TransportLinesManager.Overrides
             {
                 int currentVehicleCount = TransportManager.instance.m_lines.m_buffer[vehicleData.m_transportLine].CountVehicles(vehicleData.m_transportLine);
                 int targetVehicleCount = TransportLineOverrides.NewCalculateTargetVehicleCount(vehicleData.m_transportLine);
+                IBasicExtension extension = TLMLineUtils.GetEffectiveExtensionForLine(vehicleData.m_transportLine);
                 if (currentVehicleCount > targetVehicleCount)
                 {
-                    if (isEmpty)
+                    var info = extension.GetAModel(vehicleData.m_transportLine, "Remove");
+                    if(vehicleData.Info == info)
                     {
-                        vehicleData.Info.m_vehicleAI.SetTransportLine(vehicleID, ref vehicleData, 0);
+                        extension.EditVehicleUsedCount(vehicleData.m_transportLine, info.name, "Remove");
+                        if (isEmpty)
+                        {
+                            vehicleData.Info.m_vehicleAI.SetTransportLine(vehicleID, ref vehicleData, 0);
+                        }
+                        else
+                        {
+                            TLMVehicleUtils.DoSoftDespawn(vehicleID, ref vehicleData);
+                        }
+                        return true;
                     }
-                    else
-                    {
-                        TLMVehicleUtils.DoSoftDespawn(vehicleID, ref vehicleData);
-                    }
-                    return true;
                 }
             }
             return false;

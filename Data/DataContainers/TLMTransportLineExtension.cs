@@ -68,13 +68,13 @@ namespace TransportLinesManager.Data.DataContainers
 
             return m_basicAssetsList[tsd].ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
         }
-        public VehicleInfo GetAModel(ushort lineId)
+        public VehicleInfo GetAModel(ushort lineId, string status)
         {
             VehicleInfo info = null;
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineId);
             while (info == null && assetTransportList.Count > 0)
             {
-                info = VehicleUtils.GetModelByPercentageOrCount(assetTransportList, lineId, out string modelName);
+                info = VehicleUtils.GetModelByPercentageOrCount(assetTransportList, lineId, out string modelName, status);
                 if (info == null)
                 {
                     ExtensionStaticExtensionMethods.RemoveAssetFromLine(this, lineId, modelName);
@@ -82,6 +82,34 @@ namespace TransportLinesManager.Data.DataContainers
                 }
             }
             return info;
+        }
+
+        public void EditVehicleUsedCount(ushort lineID, string selectedModel, string status)
+        {
+            Tuple<float, int, int, float, bool> lineBudget = TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineID);
+            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineID);
+            List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
+            var index = 0;
+            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
+            {
+                if (currentConfig.BudgetEntries[i].HourOfDay == lineBudget.Second)
+                {
+                    index = i;
+                    break;
+                }
+            }
+            var asset_index = assetTransportList.FindIndex(item => item.name == selectedModel);
+
+            var asset_count = assetTransportList[asset_index].count[index];
+            if (status == "Add")
+            {
+                asset_count.usedCount++;
+            }
+            else if (status == "Remove")
+            {
+                asset_count.usedCount--;
+            }
+            assetTransportList[asset_index].count[index] = asset_count;
         }
 
         #endregion
