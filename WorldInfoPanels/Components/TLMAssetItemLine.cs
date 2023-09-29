@@ -70,9 +70,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             var info = PrefabCollection<VehicleInfo>.FindLoaded(m_currentAsset);
             var tsd = TransportSystemDefinition.From(info);
             UpdateMaintenanceCost(info, tsd);
-            m_capacityEditor.text = asset.capacity.ToString() != "" ? asset.capacity.ToString() : VehicleUtils.GetCapacity(PrefabCollection<VehicleInfo>.FindLoaded(asset.name)).ToString("0");
             if(isAllowed)
             {
+                m_capacityEditor.text = asset.capacity.ToString() != "" ? asset.capacity.ToString() : VehicleUtils.GetCapacity(PrefabCollection<VehicleInfo>.FindLoaded(asset.name)).ToString("0");
                 if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
                 {
                     m_weightEditor.text = asset.count[index].ToString();
@@ -84,6 +84,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             }
             else
             {
+                m_capacityEditor.text = VehicleUtils.GetCapacity(PrefabCollection<VehicleInfo>.FindLoaded(asset.name)).ToString("0");
                 m_weightEditor.text = "0";
             }
             m_isLoading = false;

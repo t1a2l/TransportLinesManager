@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Commons.Extensions.UI;
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
@@ -62,9 +63,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_nameFilter.eventTextCancelled += (x, y) => UpdateAssetList(TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem));
             m_nameFilter.horizontalAlignment = UIHorizontalAlignment.Left;
             m_nameFilter.padding = new RectOffset(2, 2, 4, 2);
-            MonoUtils.CreateUIElement(out m_timeBudgetSelect, MainPanel.transform);
+            m_timeBudgetSelect = UIHelperExtension.CloneBasicDropDownNoLabel(new string[0], ChangeBudgetTime, MainPanel);
             m_timeBudgetSelect.tooltipLocaleID = "TLM_TIME_PERCENT_LABEL";
-            m_timeBudgetSelect.relativePosition = new Vector3(30, 50);
+            m_timeBudgetSelect.relativePosition = new Vector3(280, 50);
             m_timeBudgetSelect.height = 23;
             m_timeBudgetSelect.width = 90f;
             m_timeBudgetSelect.horizontalAlignment = UIHorizontalAlignment.Left;
