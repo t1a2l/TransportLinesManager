@@ -1,6 +1,7 @@
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Commons.Utils;
+using System;
 using TransportLinesManager.Data.Managers;
 using UnityEngine;
 
@@ -28,7 +29,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_container.autoLayoutPadding = new RectOffset(2, 2, 2, 2);
             m_container.wrapLayout = false;
             m_container.name = "WealthReportLine";
-            m_container.eventSizeChanged += (x, y) => m_background.size = y;
+            m_container.eventSizeChanged += (x, y) => ChangeSize(y);
 
             MonoUtils.CreateUIElement(out m_background, transform, "BG");
             m_background.backgroundSprite = "InfoviewPanel";
@@ -54,6 +55,14 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             xAdvance += m_dateTime.minimumSize.x;
             AddColumns(ref xAdvance);
 
+        }
+
+        private void ChangeSize(Vector2 y)
+        {
+            if (m_background != null)
+            {
+                m_background.size = y;
+            }
         }
 
         protected abstract void AddColumns(ref float xAdvance);
