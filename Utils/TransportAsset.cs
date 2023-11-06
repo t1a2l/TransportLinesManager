@@ -6,7 +6,7 @@ namespace TransportLinesManager.Utils
 	{
 		public string name;
 
-		public List<int> spawn_percent;
+		public Dictionary<int, int> spawn_percent;
 
 		public Dictionary<int, Count> count;
 

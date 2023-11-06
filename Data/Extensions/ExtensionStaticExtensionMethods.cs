@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TransportLinesManager.Data.DataContainers;
+using static ColossalFramework.Packaging.Package;
 
 namespace TransportLinesManager.Data.Extensions
 {
@@ -35,21 +36,24 @@ namespace TransportLinesManager.Data.Extensions
             {
                 name = assetId,
                 capacity = int.Parse(capacity),
-                count = new Dictionary<int, Count>(currentConfig.BudgetEntries.Count),
-                spawn_percent = new List<int>(currentConfig.BudgetEntries.Count)
+                count = new Dictionary<int, Count>(),
+                spawn_percent = new Dictionary<int, int>(),
             };
             for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
             {
-                var item_count = item.count[i];
-                item_count.totalCount = 0;
-                item_count.usedCount = 0;
-                item.count[i] = item_count;
-                item.spawn_percent[i] = 0;
+                var count = new Count
+                {
+                    totalCount = 0,
+                    usedCount = 0
+                };
+                var hourOfDay = currentConfig.BudgetEntries[i].HourOfDay.Value;
+                item.count.Add(hourOfDay, count);
+                item.spawn_percent.Add(hourOfDay, 100);
             }
             var index = 0;
             for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
             {
-                if (currentConfig.BudgetEntries[i].HourOfDay == lineBudget.Second)
+                if (currentConfig.BudgetEntries[i].HourOfDay.Value == lineBudget.Second)
                 {
                     index = i;
                     break;
@@ -77,7 +81,47 @@ namespace TransportLinesManager.Data.Extensions
                 item.spawn_percent[index] = int.Parse(weight);
             }
             list.Add(item);
+            SetAssetTransportListForLine(it, lineId, list);
         }
+
+        public static void AddDefaultToNewBudgetEntry<T>(this T it, ushort lineId) where T : IAssetSelectorExtension
+        {
+            List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
+            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+            for (int i = 0; i < list.Count; i++)
+            {
+                var count = new Count
+                {
+                    totalCount = 0,
+                    usedCount = 0
+                };
+                list[i].count.Add(currentConfig.BudgetEntries.Count - 1, count);
+                list[i].spawn_percent.Add(currentConfig.BudgetEntries.Count - 1, 100);
+            }
+            SetAssetTransportListForLine(it, lineId, list);
+        }
+
+        public static void RemoveBudgetEntry<T, V>(this T it, ushort lineId, V entry) where T : IAssetSelectorExtension where V : UintValueHourEntryXml<V>
+        {
+            List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
+            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+            var index = 0;
+            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
+            {
+                if (currentConfig.BudgetEntries[i].HourOfDay.Value == entry.HourOfDay)
+                {
+                    index = i;
+                    break;
+                }
+            }
+            for (int i = 0; i < list.Count; i++)
+            {
+                list[i].count.Remove(index);
+                list[i].spawn_percent.Remove(index);
+            }
+            SetAssetTransportListForLine(it, lineId, list);
+        }
+
 
         public static void RemoveAssetFromLine<T>(this T it, ushort lineId, string assetId) where T : IAssetSelectorExtension
         {
@@ -162,10 +206,7 @@ namespace TransportLinesManager.Data.Extensions
         private static IDepotSelectionStorage EnsureCreationDepotConfig<T>(T it, uint idx) where T : IDepotSelectableExtension
         {
             IDepotSelectionStorage config = it.SafeGet(idx);
-            if (config.DepotsAllowed == null)
-            {
-                config.DepotsAllowed = new SimpleXmlHashSet<ushort>();
-            }
+            config.DepotsAllowed ??= new SimpleXmlHashSet<ushort>();
 
             return config;
         }

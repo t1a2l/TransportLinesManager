@@ -155,7 +155,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
             SimulationManager.instance.StartCoroutine(TLMVehicleUtils.UpdateCapacityUnitsFromTSD());
         }
 
-        private static readonly Dictionary<string, int> m_defaultCapacities = new Dictionary<string, int>();
+        private static readonly Dictionary<string, int> m_defaultCapacities = new();
 
         public Dictionary<string, MutableTuple<float, int>> GetCapacityRelative(VehicleInfo info)
         {
@@ -405,24 +405,22 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 LogUtils.DoLog($"Savegame has no legacy {ID} (default)");
                 return null;
             }
-            using (var memoryStream = new MemoryStream(serializableData.LoadData(ID)))
+            using var memoryStream = new MemoryStream(serializableData.LoadData(ID));
+            try
             {
-                try
+                byte[] storage = memoryStream.ToArray();
+                var file = System.Text.Encoding.UTF8.GetString(storage);
+                if (!file.StartsWith("<"))
                 {
-                    byte[] storage = memoryStream.ToArray();
-                    var file = System.Text.Encoding.UTF8.GetString(storage);
-                    if (!file.StartsWith("<"))
-                    {
-                        file = ZipUtils.Unzip(storage);
-                    }
-                    file = file.Replace(ID.Split('.').Last(), "TransportTypeExtension");
-                    return XmlUtils.DefaultXmlDeserialize<TLMTransportTypeConfigurations>(file);
+                    file = ZipUtils.Unzip(storage);
                 }
-                catch (Exception e)
-                {
-                    LogUtils.DoErrorLog($"Error trying to load legacy TLMTransportTypeExtension (ID = {ID}): {e.Message}\n{e.StackTrace}");
-                    return null;
-                }
+                file = file.Replace(ID.Split('.').Last(), "TransportTypeExtension");
+                return XmlUtils.DefaultXmlDeserialize<TLMTransportTypeConfigurations>(file);
+            }
+            catch (Exception e)
+            {
+                LogUtils.DoErrorLog($"Error trying to load legacy TLMTransportTypeExtension (ID = {ID}): {e.Message}\n{e.StackTrace}");
+                return null;
             }
         }
     }

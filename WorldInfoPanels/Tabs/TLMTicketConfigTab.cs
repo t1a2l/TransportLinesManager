@@ -45,7 +45,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     ? TLMLineUtils.GetEffectiveConfigForLine(lineId).TicketPriceEntries
                     : null;
 
-        protected override TicketPriceEntryXml DefaultEntry() => new TicketPriceEntryXml()
+        protected override TicketPriceEntryXml DefaultEntry() => new()
         {
             HourOfDay = 0,
             Value = 0

@@ -35,7 +35,7 @@ namespace TransportLinesManager.Data.DataContainers
 
         public override string SaveId => $"TLM_TLMTransportLineExtension";
 
-        private readonly Dictionary<TransportSystemDefinition, List<TransportAsset>> m_basicAssetsList = new Dictionary<TransportSystemDefinition, List<TransportAsset>>();
+        private readonly Dictionary<TransportSystemDefinition, List<TransportAsset>> m_basicAssetsList = new();
 
         public void SetUseCustomConfig(ushort lineId, bool value)
         {

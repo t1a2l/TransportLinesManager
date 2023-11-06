@@ -10,9 +10,10 @@ using System;
 using UnityEngine;
 using TransportLinesManager.Data.DataContainers;
 using System.Collections.Generic;
-using static ColossalFramework.Packaging.Package;
 using ColossalFramework;
 using TransportLinesManager.WorldInfoPanels.Tabs;
+using System.Linq;
+using Commons.Utils.UtilitiesClasses;
 
 namespace TransportLinesManager.WorldInfoPanels.Components
 {
@@ -55,6 +56,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             };
             MonoUtils.LimitWidthAndBox(m_checkbox.label, 225, out UIPanel container);
             container.relativePosition = new Vector3(container.relativePosition.x, 0);
+            m_capacityEditor.eventTextSubmitted += CapacityEditor_eventTextSubmitted;
+            m_weightEditor.eventTextSubmitted += WeightEditor_eventTextSubmitted;
 
             m_checkbox.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
             m_capacityEditor.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
@@ -88,6 +91,99 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 m_weightEditor.text = "0";
             }
             m_isLoading = false;
+        }
+
+        private void CapacityEditor_eventTextSubmitted(UIComponent x, string y)
+        {
+            if (m_isLoading || !int.TryParse(y.IsNullOrWhiteSpace() ? "0" : y, out int value))
+            {
+                return;
+            }
+            VehicleInfo info = PrefabCollection<VehicleInfo>.FindLoaded(m_currentAsset);
+            var tsd = TransportSystemDefinition.From(info);
+            if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
+            {
+                if(!fromBuilding)
+                {
+                    IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
+                    List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
+                    
+                    if(allowedTransportAssets.Any(item => item.name == m_currentAsset))
+                    {
+                        var asset_index = allowedTransportAssets.FindIndex(item => item.name == m_currentAsset);
+                        var asset = allowedTransportAssets[asset_index];
+                        asset.capacity = value;
+                        allowedTransportAssets[asset_index] = asset;
+                        config.SetAssetTransportListForLine(lineId, allowedTransportAssets);
+                        tsd.GetTransportExtension().SetVehicleCapacity(m_currentAsset, value);
+                        m_capacityEditor.text = VehicleUtils.GetCapacity(info).ToString("0");
+                        UpdateMaintenanceCost(info, tsd);
+                        UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
+                    }
+                }
+            }
+        }
+
+        private void WeightEditor_eventTextSubmitted(UIComponent x, string y)
+        {
+            if (m_isLoading || !int.TryParse(y.IsNullOrWhiteSpace() ? "0" : y, out int value))
+            {
+                return;
+            }
+            VehicleInfo info = PrefabCollection<VehicleInfo>.FindLoaded(m_currentAsset);
+            var tsd = TransportSystemDefinition.From(info);
+            if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
+            {
+                if (!fromBuilding)
+                {
+                    IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
+                    List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
+                    Tuple<float, int, int, float, bool> lineBudget = TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineId);
+                    if (allowedTransportAssets.Any(item => item.name == m_currentAsset))
+                    {
+                        IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+
+                        var asset_index = allowedTransportAssets.FindIndex(item => item.name == m_currentAsset);
+                        var asset = allowedTransportAssets[asset_index];
+                        var index = 0;
+                        for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
+                        {
+                            if (currentConfig.BudgetEntries[i].HourOfDay.Value == lineBudget.Second)
+                            {
+                                index = i;
+                                break;
+                            }
+                        }
+                        if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
+                        {
+                            var totalCount = 0;
+                            for (int i = 0; i < allowedTransportAssets.Count; i++)
+                            {
+                                totalCount += allowedTransportAssets[i].count[index].totalCount;
+                            }
+                            // check if the new total is more then allowed if so make it zero
+                            if (totalCount + value > lineBudget.Second)
+                            {
+                                value = 0;
+                            }
+                            var item_count = asset.count[index];
+                            item_count.totalCount = value;
+                            asset.count[index] = item_count;
+                        }
+                        else
+                        {
+                            asset.spawn_percent[index] = value;
+                        }
+
+                        asset.capacity = value;
+                        allowedTransportAssets[asset_index] = asset;
+                        config.SetAssetTransportListForLine(lineId, allowedTransportAssets);
+                        m_weightEditor.text = value.ToString("0");
+                        UpdateMaintenanceCost(info, tsd);
+                        UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
+                    }
+                }
+            }
         }
 
         private void UpdateMaintenanceCost(VehicleInfo info, TransportSystemDefinition tsd)

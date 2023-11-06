@@ -32,11 +32,12 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private VehicleInfo m_lastInfo;
         private UITemplateList<UIPanel> m_checkboxTemplateList;
         private UITextField m_nameFilter;
-        private Dictionary<TransportSystemDefinition, string> m_clipboard = new Dictionary<TransportSystemDefinition, string>();
+        private readonly Dictionary<TransportSystemDefinition, string> m_clipboard = new();
 
         private UIButton m_copyButton;
         private UIButton m_pasteButton;
         private UIButton m_eraseButton;
+
         private UIDropDown m_timeBudgetSelect;
 
 
@@ -65,8 +66,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_nameFilter.padding = new RectOffset(2, 2, 4, 2);
             m_timeBudgetSelect = UIHelperExtension.CloneBasicDropDownNoLabel(new string[0], ChangeBudgetTime, MainPanel);
             m_timeBudgetSelect.tooltipLocaleID = "TLM_TIME_PERCENT_LABEL";
-            m_timeBudgetSelect.relativePosition = new Vector3(280, 50);
-            m_timeBudgetSelect.height = 23;
+            m_timeBudgetSelect.relativePosition = new Vector3(280, 45);
+            m_timeBudgetSelect.height = 30f;
             m_timeBudgetSelect.width = 90f;
             m_timeBudgetSelect.horizontalAlignment = UIHorizontalAlignment.Left;
             m_timeBudgetSelect.listPosition = UIDropDown.PopupListPosition.Automatic;
@@ -243,7 +244,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 foreach (var asset in allowedAssets)
                 {
-                    var item = InitTransportItem(asset, currentConfig.BudgetEntries.Count);
+                    var item = InitTransportItem(asset, currentConfig);
                     allowedTransportAssets.Add(item);
                 }
                 config.SetAssetListForLine(lineId, new List<string>());
@@ -295,24 +296,25 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
         }
 
-        private TransportAsset InitTransportItem(string assetName, int budgetCount)
+        private TransportAsset InitTransportItem(string assetName, IBasicExtensionStorage currentConfig)
         {
             var item = new TransportAsset
             {
                 name = assetName,
                 capacity = VehicleUtils.GetCapacity(PrefabCollection<VehicleInfo>.FindLoaded(assetName)),
                 count = new Dictionary<int, Count>(),
-                spawn_percent = new List<int>()
+                spawn_percent = new Dictionary<int, int>()
             };
-            for (int i = 0; i < budgetCount; ++i)
+            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
             {
                 var item_count = new Count
                 {
                     totalCount = 0,
                     usedCount = 0
                 };
-                item.count.Add(i, item_count);
-                item.spawn_percent.Add(0);
+                var hourOfDay = currentConfig.BudgetEntries[i].HourOfDay.Value;
+                item.count.Add(hourOfDay, item_count);
+                item.spawn_percent.Add(hourOfDay, 100);
             }
             return item;
         }

@@ -254,7 +254,7 @@ namespace TransportLinesManager.Utils
             }
         }
 
-        public static void GetLineNamingParameters(ushort lineIdx, bool regional, out NamingMode prefix, out Separator s, out NamingMode suffix, out NamingMode nonPrefix, out bool zeros, out bool invertPrefixSuffix) => GetLineNamingParameters(lineIdx, regional, out prefix, out s, out suffix, out nonPrefix, out zeros, out invertPrefixSuffix, out string nil);
+        public static void GetLineNamingParameters(ushort lineIdx, bool regional, out NamingMode prefix, out Separator s, out NamingMode suffix, out NamingMode nonPrefix, out bool zeros, out bool invertPrefixSuffix) => GetLineNamingParameters(lineIdx, regional, out prefix, out s, out suffix, out nonPrefix, out zeros, out invertPrefixSuffix, out _);
 
 
         public static TransportSystemDefinition GetLineNamingParameters(ushort lineIdx, bool regional, out NamingMode prefix, out Separator s, out NamingMode suffix, out NamingMode nonPrefix, out bool zeros, out bool invertPrefixSuffix, out string icon)
@@ -402,10 +402,7 @@ namespace TransportLinesManager.Utils
                 return false;
             }
 
-            if (subservicesAllowed == null)
-            {
-                subservicesAllowed = new ItemClass.SubService[] { ItemClass.SubService.PublicTransportTrain, ItemClass.SubService.PublicTransportMetro };
-            }
+            subservicesAllowed ??= new ItemClass.SubService[] { ItemClass.SubService.PublicTransportTrain, ItemClass.SubService.PublicTransportMetro };
             int num = Mathf.Max((int)(((pos.x - maxDistance) / 64f) + 135f), 0);
             int num2 = Mathf.Max((int)(((pos.z - maxDistance) / 64f) + 135f), 0);
             int num3 = Mathf.Min((int)(((pos.x + maxDistance) / 64f) + 135f), 269);
@@ -592,7 +589,7 @@ namespace TransportLinesManager.Utils
 
 
         private static int colorChangeCooldown = 0;
-        private static readonly Dictionary<ushort, Color> colorChangeTarget = new Dictionary<ushort, Color>();
+        private static readonly Dictionary<ushort, Color> colorChangeTarget = new();
         internal static void SetLineColor(MonoBehaviour parent, ushort lineId, Color color) => parent.StartCoroutine(ChangeColorCoroutine(parent, lineId, color));
 
         private static IEnumerator ChangeColorCoroutine(MonoBehaviour comp, ushort id, Color newColor)
@@ -634,9 +631,9 @@ namespace TransportLinesManager.Utils
 
         public static AsyncTask<bool> SetLineName(ushort lineIdx, string name) => Singleton<SimulationManager>.instance.AddAction(TransportManager.instance.SetLineName(lineIdx, name));
 
-        private static TransportInfo.TransportType[] m_roadTransportTypes = new TransportInfo.TransportType[] { TransportInfo.TransportType.Bus, TransportInfo.TransportType.Tram, TransportInfo.TransportType.Trolleybus };
+        private static readonly TransportInfo.TransportType[] m_roadTransportTypes = new TransportInfo.TransportType[] { TransportInfo.TransportType.Bus, TransportInfo.TransportType.Tram, TransportInfo.TransportType.Trolleybus };
         internal static bool IsRoadLine(ushort lineId, bool regional) => regional
-            ? (NetManager.instance.m_nodes.m_buffer[lineId].Info.m_netAI as TransportLineAI)?.m_vehicleType == VehicleInfo.VehicleType.Car
+            ? NetManager.instance.m_nodes.m_buffer[lineId].Info.m_netAI is TransportLineAI { m_vehicleType: VehicleInfo.VehicleType.Car }
             : m_roadTransportTypes.Contains(TransportManager.instance.m_lines.m_buffer[lineId].Info.m_transportType);
         public static string CalculateAutoName(ushort lineIdx, bool regionalLine, out List<DestinationPoco> stationDestinations)
         {
