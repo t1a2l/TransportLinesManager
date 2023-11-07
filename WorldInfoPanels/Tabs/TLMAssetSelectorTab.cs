@@ -312,9 +312,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     totalCount = 0,
                     usedCount = 0
                 };
-                var hourOfDay = currentConfig.BudgetEntries[i].HourOfDay.Value;
-                item.count.Add(hourOfDay, item_count);
-                item.spawn_percent.Add(hourOfDay, 100);
+                item.count.Add(i, item_count);
+                item.spawn_percent.Add(i, 100);
             }
             return item;
         }

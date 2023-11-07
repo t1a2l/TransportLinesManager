@@ -47,8 +47,8 @@ namespace TransportLinesManager.Data.Extensions
                     usedCount = 0
                 };
                 var hourOfDay = currentConfig.BudgetEntries[i].HourOfDay.Value;
-                item.count.Add(hourOfDay, count);
-                item.spawn_percent.Add(hourOfDay, 100);
+                item.count.Add(i, count);
+                item.spawn_percent.Add(i, 100);
             }
             var index = 0;
             for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
