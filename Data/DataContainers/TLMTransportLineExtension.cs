@@ -11,6 +11,7 @@ using TransportLinesManager.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 
 namespace TransportLinesManager.Data.DataContainers
 {
@@ -86,13 +87,12 @@ namespace TransportLinesManager.Data.DataContainers
 
         public void EditVehicleUsedCount(ushort lineID, string selectedModel, string status)
         {
-            Tuple<float, int, int, float, bool> lineBudget = TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineID);
             IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineID);
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
             var index = 0;
             for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
             {
-                if (currentConfig.BudgetEntries[i].HourOfDay == lineBudget.Second)
+                if (currentConfig.BudgetEntries[i].HourOfDay == TLMAssetSelectorTab.GetBudgetSelectedIndex())
                 {
                     index = i;
                     break;

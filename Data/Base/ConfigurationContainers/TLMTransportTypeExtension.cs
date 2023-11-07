@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 
 namespace TransportLinesManager.Data.Base.ConfigurationContainers
 {
@@ -301,20 +302,9 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
 
         public void EditVehicleUsedCount(ushort lineID, string selectedModel, string status)
         {
-            Tuple<float, int, int, float, bool> lineBudget = TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineID);
-            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineID);
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
-            var index = 0;
-            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
-            {
-                if (currentConfig.BudgetEntries[i].HourOfDay == lineBudget.Second)
-                {
-                    index = i;
-                    break;
-                }
-            }
+            var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
             var asset_index = assetTransportList.FindIndex(item => item.name == selectedModel);
-
             var asset_count = assetTransportList[asset_index].count[index];
             if(status == "Add")
             {
@@ -325,7 +315,6 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 asset_count.usedCount--;
             }
             assetTransportList[asset_index].count[index] = asset_count;
-
             ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
         }
 

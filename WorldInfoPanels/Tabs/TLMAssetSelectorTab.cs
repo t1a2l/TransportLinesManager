@@ -38,7 +38,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private UIButton m_pasteButton;
         private UIButton m_eraseButton;
 
-        private UIDropDown m_timeBudgetSelect;
+        private static UIDropDown m_timeBudgetSelect;
 
 
         private TransportSystemDefinition TransportSystem => UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
@@ -385,6 +385,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
                 }
             }
+        }
+
+        public static int GetBudgetSelectedIndex()
+        {
+            return m_timeBudgetSelect.selectedIndex;
         }
 
         private void RedrawModel() => m_previewRenderer.RenderVehicle(m_lastInfo, m_lastColor == Color.clear ? Color.HSVToRGB(Math.Abs(m_previewRenderer.CameraRotation) / 360f, .5f, .5f) : m_lastColor, true);

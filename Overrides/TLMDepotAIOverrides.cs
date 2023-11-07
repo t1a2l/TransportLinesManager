@@ -85,7 +85,10 @@ namespace TransportLinesManager.Overrides
         {
             Interfaces.IBasicExtension extension = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
             VehicleInfo randomInfo = extension.GetAModel(lineId, "Add");
-            extension.EditVehicleUsedCount(lineId, randomInfo.name, "Add");
+            if(randomInfo != null)
+            {
+                extension.EditVehicleUsedCount(lineId, randomInfo.name, "Add");
+            }
             return randomInfo;
         }
 

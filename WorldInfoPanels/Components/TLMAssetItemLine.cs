@@ -138,22 +138,13 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 {
                     IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
                     List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
-                    Tuple<float, int, int, float, bool> lineBudget = TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineId);
                     if (allowedTransportAssets.Any(item => item.name == m_currentAsset))
                     {
                         IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
 
                         var asset_index = allowedTransportAssets.FindIndex(item => item.name == m_currentAsset);
                         var asset = allowedTransportAssets[asset_index];
-                        var index = 0;
-                        for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
-                        {
-                            if (currentConfig.BudgetEntries[i].HourOfDay.Value == lineBudget.Second)
-                            {
-                                index = i;
-                                break;
-                            }
-                        }
+                        var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
                         if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
                         {
                             var totalCount = 0;
@@ -162,7 +153,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                                 totalCount += allowedTransportAssets[i].count[index].totalCount;
                             }
                             // check if the new total is more then allowed if so make it zero
-                            if (totalCount + value > lineBudget.Second)
+                            if (totalCount + value > currentConfig.BudgetEntries[index].Value)
                             {
                                 value = 0;
                             }

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TransportLinesManager.Data.DataContainers;
-using static ColossalFramework.Packaging.Package;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 
 namespace TransportLinesManager.Data.Extensions
 {
@@ -26,7 +26,6 @@ namespace TransportLinesManager.Data.Extensions
         public static void AddAssetToLine<T>(this T it, ushort lineId, string assetId, string capacity, string weight) where T : IAssetSelectorExtension
         {
             List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
-            Tuple<float, int, int, float, bool> lineBudget = TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineId);
             IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
             if (list.Any(item => item.name == assetId))
             {
@@ -46,19 +45,10 @@ namespace TransportLinesManager.Data.Extensions
                     totalCount = 0,
                     usedCount = 0
                 };
-                var hourOfDay = currentConfig.BudgetEntries[i].HourOfDay.Value;
                 item.count.Add(i, count);
                 item.spawn_percent.Add(i, 100);
             }
-            var index = 0;
-            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
-            {
-                if (currentConfig.BudgetEntries[i].HourOfDay.Value == lineBudget.Second)
-                {
-                    index = i;
-                    break;
-                }
-            }
+            var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
             if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
             {
                 var totalCount = 0;
@@ -68,7 +58,7 @@ namespace TransportLinesManager.Data.Extensions
                 }
                 var newCount = int.Parse(weight);
                 // check if the new total is more then allowed if so make it zero
-                if(totalCount + newCount > lineBudget.Second)
+                if(totalCount + newCount > currentConfig.BudgetEntries[index].Value)
                 {
                     newCount = 0;
                 }
