@@ -304,6 +304,10 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         {
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
             var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
+            if (index == -1)
+            {
+                index = 0;
+            }
             var asset_index = assetTransportList.FindIndex(item => item.name == selectedModel);
             var asset_count = assetTransportList[asset_index].count[index];
             if(status == "Add")

@@ -145,6 +145,10 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                         var asset_index = allowedTransportAssets.FindIndex(item => item.name == m_currentAsset);
                         var asset = allowedTransportAssets[asset_index];
                         var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
+                        if (index == -1)
+                        {
+                            index = 0;
+                        }
                         if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
                         {
                             var totalCount = 0;

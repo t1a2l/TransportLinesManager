@@ -49,6 +49,10 @@ namespace TransportLinesManager.Data.Extensions
                 item.spawn_percent.Add(i, 100);
             }
             var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
+            if (index == -1)
+            {
+                index = 0;
+            }
             if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
             {
                 var totalCount = 0;

@@ -89,17 +89,12 @@ namespace TransportLinesManager.Data.DataContainers
         {
             IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineID);
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
-            var index = 0;
-            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
+            var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
+            if (index == -1)
             {
-                if (currentConfig.BudgetEntries[i].HourOfDay == TLMAssetSelectorTab.GetBudgetSelectedIndex())
-                {
-                    index = i;
-                    break;
-                }
+                index = 0;
             }
             var asset_index = assetTransportList.FindIndex(item => item.name == selectedModel);
-
             var asset_count = assetTransportList[asset_index].count[index];
             if (status == "Add")
             {
@@ -110,7 +105,6 @@ namespace TransportLinesManager.Data.DataContainers
                 asset_count.usedCount--;
             }
             assetTransportList[asset_index].count[index] = asset_count;
-
             ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
         }
 
