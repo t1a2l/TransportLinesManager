@@ -169,8 +169,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                         {
                             asset.spawn_percent[index] = value;
                         }
-
-                        asset.capacity = value;
                         allowedTransportAssets[asset_index] = asset;
                         config.SetAssetTransportListForLine(lineId, allowedTransportAssets);
                         m_weightEditor.text = value.ToString("0");
