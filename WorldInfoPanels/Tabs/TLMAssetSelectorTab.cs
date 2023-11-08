@@ -320,7 +320,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void ChangeBudgetTime(int idxSel)
         {
-            if (idxSel <= 0 || idxSel >= m_timeBudgetSelect.items.Length)
+            if (idxSel < 0 || idxSel >= m_timeBudgetSelect.items.Length)
             {
                 return;
             }
