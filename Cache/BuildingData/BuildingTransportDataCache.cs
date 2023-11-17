@@ -117,15 +117,31 @@ namespace TransportLinesManager.Cache.BuildingData
                     nextNodeId = node.m_nextBuildingNode;
                     continue;
                 }
-                InnerBuildingLine transportLine =
-                    new InnerBuildingLine
+                var info = tsd.GetTransportInfoIntercity();
+                InnerBuildingLine transportLine;
+                // support regional busses
+                if (info.m_class.m_subService == ItemClass.SubService.PublicTransportBus)
+                {
+                    transportLine = new InnerBuildingLine
                     {
-                        Info = tsd.GetTransportInfoIntercity(),
+                        Info = info,
                         SrcStop = otherNode,
                         DstStop = nextNodeId,
                         SrcBuildingId = otherNodeBuilding,
                         DstBuildingId = thisBuilding
                     };
+                } 
+                else
+                {
+                    transportLine = new InnerBuildingLine
+                    {
+                        Info = info,
+                        SrcStop = nextNodeId,
+                        DstStop = otherNode,
+                        SrcBuildingId = thisBuilding,
+                        DstBuildingId = otherNodeBuilding
+                    };
+                }
                 RegionalLines[transportLine.SrcStop] = transportLine;
                 nextNodeId = node.m_nextBuildingNode;
             } while (nextNodeId != 0);
