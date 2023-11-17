@@ -5,6 +5,8 @@ using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Data.DataContainers;
 using System.Linq;
 using UnityEngine;
+using System.Collections.Generic;
+using TransportLinesManager.Cache.BuildingData;
 
 namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
 {
@@ -158,12 +160,8 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
                 m_containerParent.isVisible = false;
                 return;
             }
-            var availableOutsideTransportInfo = data.StopPoints.Select(x =>
-            {
-                ref NetSegment segment = ref nm.m_segments.m_buffer[nm.m_lanes.m_buffer[x.laneId].m_segment];
-                var info = segment.Info;
-                return TransportSystemDefinition.FromNetInfo(info);
-            }).Where(x => x != null && x?.GetTransportInfoIntercity() != null).GroupBy(x => x).Select(x => x.First()).ToList();
+            var availableOutsideTransportInfo = OutsideTransportInfo(data, nm);
+
             if (availableOutsideTransportInfo.Count == 0)
             {
                 m_containerParent.isVisible = false;
@@ -194,6 +192,16 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
                     row.isVisible = false;
                 }
             }
+        }
+
+        private List<TransportSystemDefinition> OutsideTransportInfo(BuildingTransportDataCache data, NetManager nm)
+        {
+            return data.StopPoints.Select(x =>
+            {
+                ref NetSegment segment = ref nm.m_segments.m_buffer[nm.m_lanes.m_buffer[x.laneId].m_segment];
+                var info = segment.Info;
+                return TransportSystemDefinition.FromNetInfo(info);
+            }).Where(x => x != null && x?.GetTransportInfoIntercity() != null).GroupBy(x => x).Select(x => x.First()).ToList();
         }
     }
 }

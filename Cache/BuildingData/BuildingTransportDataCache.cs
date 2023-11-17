@@ -121,10 +121,10 @@ namespace TransportLinesManager.Cache.BuildingData
                     new InnerBuildingLine
                     {
                         Info = tsd.GetTransportInfoIntercity(),
-                        SrcStop = nextNodeId,
-                        DstStop = otherNode,
-                        SrcBuildingId = thisBuilding,
-                        DstBuildingId = otherNodeBuilding
+                        SrcStop = otherNode,
+                        DstStop = nextNodeId,
+                        SrcBuildingId = otherNodeBuilding,
+                        DstBuildingId = thisBuilding
                     };
                 RegionalLines[transportLine.SrcStop] = transportLine;
                 nextNodeId = node.m_nextBuildingNode;
@@ -249,8 +249,12 @@ namespace TransportLinesManager.Cache.BuildingData
             {
                 return false;
             }
-
-            segment.GetLeftAndRightLanes(segment.m_startNode, NetInfo.LaneType.Vehicle, refLane.m_stopType, VehicleInfo.VehicleCategory.All, laneIdx, false, out int leftIdx, out int rightIdx, out uint leftLane, out uint rightLane);
+            var laneType = NetInfo.LaneType.Vehicle;
+            if (refLane.m_stopType == VehicleInfo.VehicleType.Car)
+            {
+                laneType = NetInfo.LaneType.TransportVehicle;
+            }
+            segment.GetLeftAndRightLanes(segment.m_startNode, laneType, refLane.m_stopType, VehicleInfo.VehicleCategory.All, laneIdx, false, out int leftIdx, out int rightIdx, out uint leftLane, out uint rightLane);
             ref NetLane nl = ref NetManager.instance.m_lanes.m_buffer[laneId];
             if (leftIdx >= 0 && rightIdx >= 0)
             {

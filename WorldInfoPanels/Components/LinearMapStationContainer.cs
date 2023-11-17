@@ -261,7 +261,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 linesFound.Remove(m_lineId);
             }
             var targBuilding = TLMStationUtils.GetStationBuilding(m_stopId, m_lineId, m_fromBuilding);
-            var lines = BuildingManager.instance.m_buildings.m_buffer[targBuilding].Info.m_buildingAI is TransportStationAI tsai && tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportTrain ? TransportLinesManagerMod.Controller.BuildingLines.SafeGet(targBuilding) : null;
+            var lines = BuildingManager.instance.m_buildings.m_buffer[targBuilding].Info.m_buildingAI is TransportStationAI tsai && (tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportTrain || tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportBus) ? TransportLinesManagerMod.Controller.BuildingLines.SafeGet(targBuilding) : null;
 
             var buildingLines = lines is null ? new List<long>() : lines.RegionalLines.Keys.ToList();
             if (m_fromBuilding)

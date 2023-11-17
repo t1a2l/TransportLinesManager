@@ -357,11 +357,22 @@ namespace TransportLinesManager.Data.Tsd
             {
                 return default;
             }
-            TransportSystemDefinition result = registeredTsd.Values.FirstOrDefault(x =>
-            x.SubService == info.m_class.m_subService
-            && (info.m_lanes.Any(lane => (x.VehicleType & lane.m_stopType) != 0) || (info.m_netAI is TransportLineAI tlai && (tlai.m_vehicleType & x.VehicleType) != 0))
-            && (x.Level == info.GetClassLevel() || x.LevelAdditional == info.GetClassLevel() || x.LevelIntercity == info.GetClassLevel()));
-            return result;
+            if (info.name == "Bus Station Stop")
+            {
+                TransportSystemDefinition result = registeredTsd.Values.FirstOrDefault(x =>
+                x.TransportType.ToString() == info.m_publicTransportCategory.ToString() // Bus
+                && info.m_lanes.Any(lane => (x.VehicleType & lane.m_vehicleType) != 0)
+                && (x.Level == info.GetClassLevel() || x.LevelAdditional == info.GetClassLevel() || x.LevelIntercity == info.GetClassLevel()));
+                return result;
+            }
+            else
+            {
+                TransportSystemDefinition result = registeredTsd.Values.FirstOrDefault(x =>
+                x.SubService == info.m_class.m_subService
+                && (info.m_lanes.Any(lane => (x.VehicleType & lane.m_stopType) != 0) || (info.m_netAI is TransportLineAI tlai && (tlai.m_vehicleType & x.VehicleType) != 0))
+                && (x.Level == info.GetClassLevel() || x.LevelAdditional == info.GetClassLevel() || x.LevelIntercity == info.GetClassLevel()));
+                return result;
+            }
         }
 
         public static TransportSystemDefinition FromIntercity(TransportInfo info)
