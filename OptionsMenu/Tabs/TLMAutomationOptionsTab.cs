@@ -51,11 +51,11 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             group7.AddSpace(15);
 
             AddCheckboxLocale("TLM_ENABLE_EXPRESS_BUSES", out m_expressBuses, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.ExpressBusesEnabled = x);
-            m_expressBuses.tooltipLocaleID = "TLM_ENABLE_EXPRESS_BUSES_DESC";
+            m_expressBuses.tooltip = Locale.Get("TLM_ENABLE_EXPRESS_BUSES_DESC");
             AddCheckboxLocale("TLM_ENABLE_EXPRESS_TRAMS", out m_expressTrams, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.ExpressTramsEnabled = x);
-            m_expressTrams.tooltipLocaleID = "TLM_ENABLE_EXPRESS_TRAMS_DESC";
+            m_expressTrams.tooltip = Locale.Get("TLM_ENABLE_EXPRESS_TRAMS_DESC");
             AddCheckboxLocale("TLM_ENABLE_EXPRESS_TROLLEYS", out m_expressTrolleys, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.ExpressTrolleybusesEnabled = x);
-            m_expressTrolleys.tooltipLocaleID = "TLM_ENABLE_EXPRESS_TROLLEYS_DESC";
+            m_expressTrolleys.tooltip = Locale.Get("TLM_ENABLE_EXPRESS_TROLLEYS_DESC");
             group7.AddSpace(15);
 
             AddCheckboxLocale("TLM_USEGAMECLOCKIFDAYNIGHTDISABLED", out m_clockSwap, group7, (x) => TransportLinesManagerMod.UseGameClockAsReferenceIfNoDayNight = x);

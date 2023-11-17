@@ -76,7 +76,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             label.verticalAlignment = UIVerticalAlignment.Middle;
             label.padding = new RectOffset(3, 3, 5, 3);
             label.isTooltipLocalized = true;
-            label.tooltipLocaleID = tooltipLocale;
+            label.tooltip = Locale.Get(tooltipLocale);
             MonoUtils.LimitWidthAndBox(label, columnWidth);
             return columnWidth;
         }

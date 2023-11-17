@@ -113,7 +113,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             MonoUtils.UiTextFieldDefaults(capEditField);
             MonoUtils.InitButtonFull(capEditField, false, "OptionsDropboxListbox");
             capEditField.isTooltipLocalized = true;
-            capEditField.tooltipLocaleID = "TLM_ASSET_CAPACITY_FIELD_DESCRIPTION";
+            capEditField.tooltip = Locale.Get("TLM_ASSET_CAPACITY_FIELD_DESCRIPTION");
             capEditField.numericalOnly = true;
             capEditField.maxLength = 5;
             capEditField.padding = new RectOffset(2, 2, 9, 2);

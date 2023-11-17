@@ -203,7 +203,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     m_colorField.selectedColor = Singleton<TransportManager>.instance.GetLineColor(lineID);
                     LineType lineType = UVMPublicTransportWorldInfoPanel.GetLineType(lineID, fromBuilding);
                     m_weeklyPassengersString = ((lineType != LineType.WalkingTour) ? "TRANSPORT_LINE_PASSENGERS" : "TRANSPORT_LINE_PASSENGERS_WALKINGTOUR");
-                    m_ageChart.tooltipLocaleID = ((lineType != LineType.WalkingTour) ? "PUBLICTRANSPORT_PASSENGERAGEGROUPS_TOOLTIP" : "PUBLICTRANSPORT_PASSENGERAGEGROUPS_TOOLTIP_WALKINGTOUR");
+                    m_ageChart.tooltip = (lineType != LineType.WalkingTour) ? Locale.Get("PUBLICTRANSPORT_PASSENGERAGEGROUPS_TOOLTIP") : Locale.Get("PUBLICTRANSPORT_PASSENGERAGEGROUPS_TOOLTIP_WALKINGTOUR");
                     m_tripSaved.isVisible = (lineType == LineType.Default);
                     m_pullValuePanel.isVisible = (lineType == LineType.WalkingTour);
                     m_lineLengthLabel.text = StringUtils.SafeFormat(Locale.Get("LINEINFOPANEL_LINELENGTH"), (Singleton<TransportManager>.instance.m_lines.m_buffer[lineID].m_totalLength / 1000f).ToString("F2", LocaleManager.cultureInfo));

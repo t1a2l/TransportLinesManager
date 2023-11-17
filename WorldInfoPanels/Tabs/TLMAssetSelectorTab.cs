@@ -52,7 +52,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             MonoUtils.CreateUIElement(out m_nameFilter, MainPanel.transform);
             MonoUtils.UiTextFieldDefaults(m_nameFilter);
             MonoUtils.InitButtonFull(m_nameFilter, false, "OptionsDropboxListbox");
-            m_nameFilter.tooltipLocaleID = "TLM_ASSET_FILTERBY";
+            m_nameFilter.tooltip = Locale.Get("TLM_ASSET_FILTERBY");
             m_nameFilter.relativePosition = new Vector3(5, 50);
             m_nameFilter.height = 23;
             m_nameFilter.width = MainPanel.width - 10f;

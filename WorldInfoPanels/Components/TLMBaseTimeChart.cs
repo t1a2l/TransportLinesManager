@@ -156,7 +156,7 @@ namespace TransportLinesManager.UI
             panel.autoLayout = false;
             panel.useCenter = true;
             panel.wrapLayout = false;
-            panel.tooltipLocaleID = ClockTooltip;
+            panel.tooltip = Locale.Get(ClockTooltip);
 
             MonoUtils.CreateUIElement(out m_container, transform, "ClockContainer");
             m_container.relativePosition = new Vector3((panel.width / 2f) - 70, 0);
@@ -165,7 +165,7 @@ namespace TransportLinesManager.UI
             m_container.autoLayout = false;
             m_container.useCenter = true;
             m_container.wrapLayout = false;
-            m_container.tooltipLocaleID = ClockTooltip;
+            m_container.tooltip = Locale.Get(ClockTooltip);
 
             MonoUtils.CreateUIElement(out m_clock, m_container.transform, "Clock");
             m_clock.spriteName = "24hClock";

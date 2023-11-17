@@ -173,11 +173,11 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             dist.text = distance;
             UpdateConnectionPanel();
             UpdateTerminalStatus();
-            uibutton.tooltipLocaleID = m_fromBuilding || !TransportSystemDefinition.FromLineId(m_lineId, m_fromBuilding).CanHaveTerminals()
+            uibutton.tooltip = m_fromBuilding || !TransportSystemDefinition.FromLineId(m_lineId, m_fromBuilding).CanHaveTerminals()
                 ? ""
                 : m_stopId == TransportManager.instance.m_lines.m_buffer[m_lineId].m_stops
-                    ? "TLM_FIRSTSTOPALWAYSTERMINAL"
-                    : "TLM_RIGHTCLICKSETTERMINAL";
+                    ? Locale.Get("TLM_FIRSTSTOPALWAYSTERMINAL")
+                    : Locale.Get("TLM_RIGHTCLICKSETTERMINAL");
         }
 
 

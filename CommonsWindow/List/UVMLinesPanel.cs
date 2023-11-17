@@ -203,12 +203,12 @@ namespace TransportLinesManager.CommonsWindow.List
         {
             m_visibilityToggle = new UIHelperExtension(m_createdTitleLine).AddCheckboxNoLabel("LineVisibility");
             ((UISprite)m_visibilityToggle.checkedBoxObject).spriteName = "LineVisibilityToggleOn";
-            ((UISprite)m_visibilityToggle.checkedBoxObject).tooltipLocaleID = "PUBLICTRANSPORT_HIDELINE";
+            ((UISprite)m_visibilityToggle.checkedBoxObject).tooltip = Locale.Get("PUBLICTRANSPORT_HIDELINE");
             ((UISprite)m_visibilityToggle.checkedBoxObject).isTooltipLocalized = true;
 
             ((UISprite)m_visibilityToggle.checkedBoxObject).size = new Vector2(24, 24);
             ((UISprite)m_visibilityToggle.components[0]).spriteName = "LineVisibilityToggleOff";
-            ((UISprite)m_visibilityToggle.components[0]).tooltipLocaleID = "PUBLICTRANSPORT_SHOWLINE";
+            ((UISprite)m_visibilityToggle.components[0]).tooltip = Locale.Get("PUBLICTRANSPORT_SHOWLINE");
             ((UISprite)m_visibilityToggle.components[0]).isTooltipLocalized = true;
             ((UISprite)m_visibilityToggle.components[0]).size = new Vector2(24, 24);
             m_visibilityToggle.relativePosition = new Vector3(20, 10);
