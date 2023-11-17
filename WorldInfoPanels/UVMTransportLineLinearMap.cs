@@ -314,16 +314,8 @@ namespace TransportLinesManager.WorldInfoPanels
                 }
                 float stopDistanceFactor = m_kminStopDistance / minDistance;
                 m_uILineLength = stopDistanceFactor * lineLength;
-                if (m_uILineLength < m_kminUILineLength)
-                {
-                    m_uILineLength = m_kminUILineLength;
-                    stopDistanceFactor = m_uILineLength / lineLength;
-                }
-                else if (m_uILineLength > m_kmaxUILineLength)
-                {
-                    m_uILineLength = m_kmaxUILineLength;
-                    stopDistanceFactor = m_uILineLength / lineLength;
-                }
+                m_uILineLength = CalcClampedUILineLength(m_uILineLength, out float lineLenFactor);
+                stopDistanceFactor *= lineLenFactor;
                 if (stopsCount <= 2)
                 {
                     m_uILineOffset = (stopDistanceFactor * stopPositions[stopPositions.Length - 1]) - 30f;
@@ -399,12 +391,45 @@ namespace TransportLinesManager.WorldInfoPanels
                         nextStationIdx += m_cachedStopOrder.Length;
                     }
                     Vector3 relativePosition = m_vehicleButtons.items[idx].relativePosition;
-                    relativePosition.y
-                        = (Singleton<VehicleManager>.instance.m_vehicles.m_buffer[vehicleId].m_flags & (Vehicle.Flags.Leaving)) != 0 ? (prevStationIdx * 0.75f) + (nextStationIdx * 0.25f)
-                        : (Singleton<VehicleManager>.instance.m_vehicles.m_buffer[vehicleId].m_flags & (Vehicle.Flags.Arriving)) != 0 ? (prevStationIdx * 0.25f) + (nextStationIdx * 0.75f)
-                        : (Singleton<VehicleManager>.instance.m_vehicles.m_buffer[vehicleId].m_flags & (Vehicle.Flags.Stopped)) != 0 ? prevStationIdx
-                        : (prevStationIdx * 0.5f) + (nextStationIdx * 0.5f);
-                    relativePosition.y = ShiftVerticalPosition(relativePosition.y * m_kminStopDistance);
+                    // determine basic relative position
+                    // 4 switch cases for each of 4 unscaled display states
+                    float weightingPrev, weightingNext;
+                    var vehicle_flags = Singleton<VehicleManager>.instance.m_vehicles.m_buffer[vehicleId].m_flags;
+                    if ((vehicle_flags & (Vehicle.Flags.Leaving)) != 0)
+                    {
+                        // vehicle stopped at a stop; current stop is "prev" because next stop is "next"
+                        weightingPrev = 1;
+                        weightingNext = 0;
+                    }
+                    else if ((vehicle_flags & (Vehicle.Flags.Arriving)) != 0)
+                    {
+                        // vehicle departing from a stop
+                        weightingPrev = 0.75f;
+                        weightingNext = 0.25f;
+                    }
+                    else if ((vehicle_flags & (Vehicle.Flags.Stopped)) != 0)
+                    {
+                        // vehicle arriving at the next stop
+                        weightingPrev = 0.25f;
+                        weightingNext = 0.75f;
+                    }
+                    else
+                    {
+                        // vehicle in progress to next stop
+                        weightingPrev = weightingNext = 0.5f;
+                    }
+                    // apply the basic relative position first
+                    relativePosition.y = prevStationIdx * weightingPrev + nextStationIdx * weightingNext;
+                    // then, apply the adjustment for low-stop-count positioning
+                    int stopCount = m_cachedStopOrder.Length;
+                    float extraScaling = 1;
+                    if (stopCount < 8)
+                    {
+                        // logic should be the same as the stop position
+                        float uncheckedLineLen = m_kminStopDistance * stopCount;
+                        CalcClampedUILineLength(uncheckedLineLen, out extraScaling);
+                    }
+                    relativePosition.y = ShiftVerticalPosition(relativePosition.y * m_kminStopDistance * extraScaling);
                     m_vehicleButtons.items[idx].relativePosition = relativePosition;
                 }
                 else
@@ -471,12 +496,17 @@ namespace TransportLinesManager.WorldInfoPanels
             }
         }
 
-
-
         public void OnGotFocus() => m_cachedScrollPosition = m_scrollPanel.scrollPosition;
         private void OnGotFocusBind(UIComponent component, UIFocusEventParameter eventParam) => m_cachedScrollPosition = m_scrollPanel.scrollPosition;
 
         internal LineType GetLineType(ushort lineID, bool fromBuilding) => UVMPublicTransportWorldInfoPanel.GetLineType(lineID, fromBuilding);
+
+        private float CalcClampedUILineLength(float initialLineLen, out float lineLenFactor)
+        {
+            float acceptableLineLen = Mathf.Clamp(initialLineLen, m_kminUILineLength, m_kmaxUILineLength);
+            lineLenFactor = acceptableLineLen / initialLineLen;
+            return acceptableLineLen;
+        }
 
         private float ShiftVerticalPosition(float y)
         {
