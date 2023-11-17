@@ -12,6 +12,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using TransportLinesManager.Utils;
+using TransportLinesManager.Interfaces;
+using TransportLinesManager.Data.Extensions;
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
@@ -172,11 +175,15 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void RemoveTime(V entry)
         {
-            ;
             if (Config != default)
             {
                 Config.RemoveAtHour(entry.HourOfDay ?? -1);
                 m_isDirty = true;
+                if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
+                {
+                    IBasicExtension extension = lineId > 0 && !fromBuilding ? TLMLineUtils.GetEffectiveExtensionForLine(lineId) : UVMPublicTransportWorldInfoPanel.GetCurrentTSD().GetTransportExtension();
+                    extension.RemoveBudgetEntry(lineId, entry);
+                }
             }
         }
         private void SetTime(V idx, int val)
@@ -198,6 +205,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             Config.Add(DefaultEntry());
             RebuildList();
+            if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
+            {
+                IBasicExtension extension = lineId > 0 && !fromBuilding ? TLMLineUtils.GetEffectiveExtensionForLine(lineId) : UVMPublicTransportWorldInfoPanel.GetCurrentTSD().GetTransportExtension();
+                extension.AddDefaultToNewBudgetEntry(lineId);
+            }
         }
 
 

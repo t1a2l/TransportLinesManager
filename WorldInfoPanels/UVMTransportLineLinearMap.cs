@@ -394,20 +394,20 @@ namespace TransportLinesManager.WorldInfoPanels
                     // determine basic relative position
                     // 4 switch cases for each of 4 unscaled display states
                     float weightingPrev, weightingNext;
-                    Vehicle.Flags vehicleFlags = Singleton<VehicleManager>.instance.m_vehicles.m_buffer[vehicleId].m_flags;
-                    if ((vehicleFlags & (Vehicle.Flags.Stopped)) != 0)
+                    var vehicle_flags = Singleton<VehicleManager>.instance.m_vehicles.m_buffer[vehicleId].m_flags;
+                    if((vehicle_flags & (Vehicle.Flags.Leaving)) != 0)
                     {
                         // vehicle stopped at a stop; current stop is "prev" because next stop is "next"
                         weightingPrev = 1;
                         weightingNext = 0;
                     }
-                    else if ((vehicleFlags & (Vehicle.Flags.Leaving)) != 0)
+                    else if((vehicle_flags & (Vehicle.Flags.Arriving)) != 0)
                     {
                         // vehicle departing from a stop
                         weightingPrev = 0.75f;
                         weightingNext = 0.25f;
                     }
-                    else if ((vehicleFlags & Vehicle.Flags.Arriving) != 0)
+                    else if((vehicle_flags & (Vehicle.Flags.Stopped)) != 0)
                     {
                         // vehicle arriving at the next stop
                         weightingPrev = 0.25f;

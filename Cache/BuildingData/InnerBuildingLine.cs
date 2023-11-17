@@ -122,7 +122,7 @@ namespace TransportLinesManager.Cache.BuildingData
 
         public void RenderLine(RenderManager.CameraInfo cameraInfo)
         {
-            if (Info.m_transportType != TransportInfo.TransportType.Train) return;// TEMPORARY
+            if (Info.m_transportType != TransportInfo.TransportType.Train && Info.m_transportType != TransportInfo.TransportType.Bus) return;// TEMPORARY
             if (m_needsToBeCalculated && SimulationManager.instance.m_currentTickIndex - m_lastCheckTick > 50)
             {
                 UpdateMeshData();

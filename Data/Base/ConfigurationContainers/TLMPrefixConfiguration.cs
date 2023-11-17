@@ -6,6 +6,7 @@ using TransportLinesManager.Interfaces;
 using System;
 using System.Xml.Serialization;
 using UnityEngine;
+using TransportLinesManager.Utils;
 
 namespace TransportLinesManager.Data.Base.ConfigurationContainers
 {
@@ -17,6 +18,8 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         public TimeableList<TicketPriceEntryXml> TicketPriceEntries { get; set; } = new TimeableList<TicketPriceEntryXml>();
         [XmlElement("AssetsList")]
         public SimpleXmlList<string> AssetList { get; set; } = new SimpleXmlList<string>();
+        [XmlElement("AssetsTransportList")]
+        public SimpleXmlList<TransportAsset> AssetTransportList { get; set; } = new SimpleXmlList<TransportAsset>();
         [XmlAttribute("name")]
         public string Name { get; set; }
         [XmlAttribute("useColorForModel")]

@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 
 namespace TransportLinesManager.Data.Base.ConfigurationContainers
 {
@@ -22,8 +23,8 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
     public class TLMTransportTypeConfigurations : TsdIdentifiable, ITLMTransportTypeExtension
     {
 
-        private List<string> m_basicAssetsList;
-        private List<string> m_basicAssetsListIntercity;
+        private List<TransportAsset> m_basicAssetsList;
+        private List<TransportAsset> m_basicAssetsListIntercity;
 
         private TransportSystemDefinition Definition => TSD;
 
@@ -155,7 +156,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
             SimulationManager.instance.StartCoroutine(TLMVehicleUtils.UpdateCapacityUnitsFromTSD());
         }
 
-        private static readonly Dictionary<string, int> m_defaultCapacities = new Dictionary<string, int>();
+        private static readonly Dictionary<string, int> m_defaultCapacities = new();
 
         public Dictionary<string, MutableTuple<float, int>> GetCapacityRelative(VehicleInfo info)
         {
@@ -236,7 +237,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         #endregion
 
         #region Asset List
-        public Dictionary<string, string> GetSelectedBasicAssetsForLine(ushort lineId)
+        public Dictionary<TransportAsset, string> GetSelectedBasicAssetsForLine(ushort lineId)
         {
             if (lineId > 0)
             {
@@ -244,7 +245,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 {
                     LoadBasicAssets();
                 }
-                return ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineId).Intersect(m_basicAssetsList).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x));
+                return ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineId).Intersect(m_basicAssetsList).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
             }
             else
             {
@@ -252,10 +253,10 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 {
                     LoadBasicAssetsInterCity();
                 }
-                return ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineId).Intersect(m_basicAssetsListIntercity).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x));
+                return ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineId).Intersect(m_basicAssetsListIntercity).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
             }
         }
-        public Dictionary<string, string> GetAllBasicAssetsForLine(ushort lineId)
+        public Dictionary<TransportAsset, string> GetAllBasicAssetsForLine(ushort lineId)
         {
             if (lineId > 0)
             {
@@ -263,7 +264,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 {
                     LoadBasicAssets();
                 }
-                return m_basicAssetsList.ToDictionary(x => x, x => Locale.GetUnchecked("VEHICLE_TITLE", x));
+                return m_basicAssetsList.ToDictionary(x => x, x => Locale.GetUnchecked("VEHICLE_TITLE", x.name));
             }
             else
             {
@@ -271,10 +272,10 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 {
                     LoadBasicAssetsInterCity();
                 }
-                return m_basicAssetsListIntercity.ToDictionary(x => x, x => Locale.GetUnchecked("VEHICLE_TITLE", x));
+                return m_basicAssetsListIntercity.ToDictionary(x => x, x => Locale.GetUnchecked("VEHICLE_TITLE", x.name));
             }
         }
-        public List<string> GetBasicAssetListForLine(ushort lineId)
+        public List<TransportAsset> GetBasicAssetListForLine(ushort lineId)
         {
             if (m_basicAssetsList == null)
             {
@@ -282,21 +283,46 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
             }
             return m_basicAssetsList;
         }
-        public VehicleInfo GetAModel(ushort lineID)
+        public VehicleInfo GetAModel(ushort lineID, string status)
         {
             VehicleInfo info = null;
-            List<string> assetList = ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineID);
+            List<TransportAsset> assetList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
             while (info == null && assetList.Count > 0)
             {
-                info = VehicleUtils.GetRandomModel(assetList, out string modelName);
+                info = VehicleUtils.GetModelByPercentageOrCount(assetList, lineID, out string modelName, status);
                 if (info == null)
                 {
                     ExtensionStaticExtensionMethods.RemoveAssetFromLine(this, lineID, modelName);
-                    assetList = ExtensionStaticExtensionMethods.GetAssetListForLine(this, lineID);
+                    assetList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
                 }
             }
             return info;
         }
+
+
+        public void EditVehicleUsedCount(ushort lineID, string selectedModel, string status)
+        {
+            List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
+            var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
+            if (index == -1)
+            {
+                index = 0;
+            }
+            var asset_index = assetTransportList.FindIndex(item => item.name == selectedModel);
+            var asset_count = assetTransportList[asset_index].count[index];
+            if(status == "Add")
+            {
+                asset_count.usedCount++;
+            }
+            else if (status == "Remove")
+            {
+                asset_count.usedCount--;
+            }
+            assetTransportList[asset_index].count[index] = asset_count;
+            ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
+        }
+
+
         private void LoadBasicAssets()
         {
             TransportSystemDefinition tsd = Definition;
@@ -372,24 +398,22 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 LogUtils.DoLog($"Savegame has no legacy {ID} (default)");
                 return null;
             }
-            using (var memoryStream = new MemoryStream(serializableData.LoadData(ID)))
+            using var memoryStream = new MemoryStream(serializableData.LoadData(ID));
+            try
             {
-                try
+                byte[] storage = memoryStream.ToArray();
+                var file = System.Text.Encoding.UTF8.GetString(storage);
+                if (!file.StartsWith("<"))
                 {
-                    byte[] storage = memoryStream.ToArray();
-                    var file = System.Text.Encoding.UTF8.GetString(storage);
-                    if (!file.StartsWith("<"))
-                    {
-                        file = ZipUtils.Unzip(storage);
-                    }
-                    file = file.Replace(ID.Split('.').Last(), "TransportTypeExtension");
-                    return XmlUtils.DefaultXmlDeserialize<TLMTransportTypeConfigurations>(file);
+                    file = ZipUtils.Unzip(storage);
                 }
-                catch (Exception e)
-                {
-                    LogUtils.DoErrorLog($"Error trying to load legacy TLMTransportTypeExtension (ID = {ID}): {e.Message}\n{e.StackTrace}");
-                    return null;
-                }
+                file = file.Replace(ID.Split('.').Last(), "TransportTypeExtension");
+                return XmlUtils.DefaultXmlDeserialize<TLMTransportTypeConfigurations>(file);
+            }
+            catch (Exception e)
+            {
+                LogUtils.DoErrorLog($"Error trying to load legacy TLMTransportTypeExtension (ID = {ID}): {e.Message}\n{e.StackTrace}");
+                return null;
             }
         }
     }

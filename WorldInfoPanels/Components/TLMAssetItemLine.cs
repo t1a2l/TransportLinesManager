@@ -1,4 +1,3 @@
-using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Commons.Extensions.UI;
@@ -6,11 +5,15 @@ using Commons.Utils;
 using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Data.Extensions;
 using TransportLinesManager.Interfaces;
-using TransportLinesManager.UI;
 using TransportLinesManager.Utils;
-using TransportLinesManager.WorldInfoPanels.Tabs;
 using System;
 using UnityEngine;
+using TransportLinesManager.Data.DataContainers;
+using System.Collections.Generic;
+using ColossalFramework;
+using TransportLinesManager.WorldInfoPanels.Tabs;
+using System.Linq;
+using Commons.Utils.UtilitiesClasses;
 
 namespace TransportLinesManager.WorldInfoPanels.Components
 {
@@ -20,6 +23,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         private bool m_isLoading;
         private UICheckBox m_checkbox;
         private UITextField m_capacityEditor;
+        private UITextField m_weightEditor;
         private string m_currentAsset;
         public Action OnMouseEnter;
 
@@ -27,6 +31,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         {
             m_checkbox = Find<UICheckBox>("AssetCheckbox");
             m_capacityEditor = Find<UITextField>("Cap");
+            m_weightEditor = Find<UITextField>("Weg");
             m_checkbox.eventCheckChanged += (x, y) =>
             {
                 if (m_isLoading)
@@ -41,7 +46,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                     LogUtils.DoLog($"checkbox event: {x.objectUserData} => {y} at {extension}[{lineId}-{fromBuilding}]");
                     if (y)
                     {
-                        extension.AddAssetToLine(fromBuilding ? (ushort)0 : lineId, m_currentAsset);
+                        extension.AddAssetToLine(fromBuilding ? (ushort)0 : lineId, m_currentAsset, m_capacityEditor.text, m_weightEditor.text);
                     }
                     else
                     {
@@ -49,24 +54,42 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                     }
                 }
             };
-            MonoUtils.LimitWidthAndBox(m_checkbox.label, 265, out UIPanel container);
+            MonoUtils.LimitWidthAndBox(m_checkbox.label, 225, out UIPanel container);
             container.relativePosition = new Vector3(container.relativePosition.x, 0);
             m_capacityEditor.eventTextSubmitted += CapacityEditor_eventTextSubmitted;
+            m_weightEditor.eventTextSubmitted += WeightEditor_eventTextSubmitted;
 
             m_checkbox.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
             m_capacityEditor.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
+            m_weightEditor.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
         }
 
-        public void SetAsset(string assetName, bool isAllowed)
+        public void SetAsset(TransportAsset asset, bool isAllowed, ushort lineId, int index)
         {
             m_isLoading = true;
-            m_currentAsset = assetName;
-            m_checkbox.label.text = Locale.GetUnchecked("VEHICLE_TITLE", assetName);
+            m_currentAsset = asset.name;
+            m_checkbox.label.text = Locale.GetUnchecked("VEHICLE_TITLE", asset.name);
             m_checkbox.isChecked = isAllowed;
             var info = PrefabCollection<VehicleInfo>.FindLoaded(m_currentAsset);
             var tsd = TransportSystemDefinition.From(info);
             UpdateMaintenanceCost(info, tsd);
-            m_capacityEditor.text = VehicleUtils.GetCapacity(PrefabCollection<VehicleInfo>.FindLoaded(assetName)).ToString("0");
+            if(isAllowed)
+            {
+                m_capacityEditor.text = asset.capacity.ToString() != "" ? asset.capacity.ToString() : VehicleUtils.GetCapacity(PrefabCollection<VehicleInfo>.FindLoaded(asset.name)).ToString("0");
+                if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
+                {
+                    m_weightEditor.text = asset.count[index].ToString();
+                }
+                else
+                {
+                    m_weightEditor.text = asset.spawn_percent[index].ToString();
+                }
+            }
+            else
+            {
+                m_capacityEditor.text = VehicleUtils.GetCapacity(PrefabCollection<VehicleInfo>.FindLoaded(asset.name)).ToString("0");
+                m_weightEditor.text = "0";
+            }
             m_isLoading = false;
         }
 
@@ -78,11 +101,82 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             }
             VehicleInfo info = PrefabCollection<VehicleInfo>.FindLoaded(m_currentAsset);
             var tsd = TransportSystemDefinition.From(info);
-            tsd.GetTransportExtension().SetVehicleCapacity(m_currentAsset, value);
-            m_capacityEditor.text = VehicleUtils.GetCapacity(info).ToString("0");
-            UpdateMaintenanceCost(info, tsd);
+            if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
+            {
+                if(!fromBuilding)
+                {
+                    IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
+                    List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
+                    
+                    if(allowedTransportAssets.Any(item => item.name == m_currentAsset))
+                    {
+                        var asset_index = allowedTransportAssets.FindIndex(item => item.name == m_currentAsset);
+                        var asset = allowedTransportAssets[asset_index];
+                        asset.capacity = value;
+                        allowedTransportAssets[asset_index] = asset;
+                        config.SetAssetTransportListForLine(lineId, allowedTransportAssets);
+                        tsd.GetTransportExtension().SetVehicleCapacity(m_currentAsset, value);
+                        m_capacityEditor.text = VehicleUtils.GetCapacity(info).ToString("0");
+                        UpdateMaintenanceCost(info, tsd);
+                        UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
+                    }
+                }
+            }
+        }
 
-            UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
+        private void WeightEditor_eventTextSubmitted(UIComponent x, string y)
+        {
+            if (m_isLoading || !int.TryParse(y.IsNullOrWhiteSpace() ? "0" : y, out int value))
+            {
+                return;
+            }
+            VehicleInfo info = PrefabCollection<VehicleInfo>.FindLoaded(m_currentAsset);
+            var tsd = TransportSystemDefinition.From(info);
+            if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
+            {
+                if (!fromBuilding)
+                {
+                    IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
+                    List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
+                    if (allowedTransportAssets.Any(item => item.name == m_currentAsset))
+                    {
+                        IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+
+                        var asset_index = allowedTransportAssets.FindIndex(item => item.name == m_currentAsset);
+                        var asset = allowedTransportAssets[asset_index];
+                        var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
+                        if (index == -1)
+                        {
+                            index = 0;
+                        }
+                        if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
+                        {
+                            var totalCount = 0;
+                            for (int i = 0; i < allowedTransportAssets.Count; i++)
+                            {
+                                totalCount += allowedTransportAssets[i].count[index].totalCount;
+                            }
+                            // check if the new total is more then allowed if so make it zero
+                            if (totalCount + value > currentConfig.BudgetEntries[index].Value)
+                            {
+                                value = 0;
+                            }
+                            var item_count = asset.count[index];
+                            item_count.totalCount = value;
+                            asset.count[index] = item_count;
+                        }
+                        else
+                        {
+                            asset.spawn_percent[index] = value;
+                        }
+                        allowedTransportAssets[asset_index] = asset;
+                        config.SetAssetTransportListForLine(lineId, allowedTransportAssets);
+                        m_weightEditor.text = value.ToString("0");
+                        UpdateMaintenanceCost(info, tsd);
+                        UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
+                    }
+                }
+            }
         }
 
         private void UpdateMaintenanceCost(VehicleInfo info, TransportSystemDefinition tsd)
@@ -103,20 +197,31 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             UICheckBox uiCheckbox = UIHelperExtension.AddCheckbox(panel, "AAAAAA", false);
             uiCheckbox.name = "AssetCheckbox";
             uiCheckbox.height = 32;
-            uiCheckbox.width = 285f;
+            uiCheckbox.width = 225f;
             uiCheckbox.label.processMarkup = true;
             uiCheckbox.label.textScale = 0.8f;
             uiCheckbox.label.verticalAlignment = UIVerticalAlignment.Middle;
-            uiCheckbox.label.minimumSize = new Vector2(0, 32);
+            uiCheckbox.label.minimumSize = new Vector2(0, 24);
 
             MonoUtils.CreateUIElement(out UITextField capEditField, panel.transform, "Cap", new Vector4(0, 0, 50, 32));
             MonoUtils.UiTextFieldDefaults(capEditField);
             MonoUtils.InitButtonFull(capEditField, false, "OptionsDropboxListbox");
             capEditField.isTooltipLocalized = true;
             capEditField.tooltipLocaleID = "TLM_ASSET_CAPACITY_FIELD_DESCRIPTION";
+            capEditField.tooltip = Locale.Get("TLM_ASSET_CAPACITY_FIELD_DESCRIPTION");
             capEditField.numericalOnly = true;
             capEditField.maxLength = 5;
             capEditField.padding = new RectOffset(2, 2, 9, 2);
+
+            MonoUtils.CreateUIElement(out UITextField wegEditField, panel.transform, "Weg", new Vector4(0, 0, 50, 32));
+            MonoUtils.UiTextFieldDefaults(wegEditField);
+            MonoUtils.InitButtonFull(wegEditField, false, "OptionsDropboxListbox");
+            wegEditField.isTooltipLocalized = true;
+            wegEditField.tooltipLocaleID = "TLM_ASSET_WEIGHT_FIELD_DESCRIPTION";
+            wegEditField.tooltip = Locale.Get("TLM_ASSET_WEIGHT_FIELD_DESCRIPTION");
+            wegEditField.numericalOnly = true;
+            wegEditField.maxLength = 5;
+            wegEditField.padding = new RectOffset(2, 2, 9, 2);
 
             go.AddComponent<TLMAssetItemLine>();
             TLMUiTemplateUtils.GetTemplateDict()[TEMPLATE_NAME] = panel;

@@ -112,10 +112,7 @@ namespace TransportLinesManager.Cache.BuildingData
         {
             get
             {
-				if (InnerBuildingLinesIndex is null)
-                {
-                    InnerBuildingLinesIndex = BuildingTransportDataCache.SelectMany(x => x.Value.RegionalLines).ToDictionary(x => (ushort)x.Key, x => x.Value);
-                }
+                InnerBuildingLinesIndex ??= BuildingTransportDataCache.SelectMany(x => x.Value.RegionalLines).ToDictionary(x => (ushort)x.Key, x => x.Value);
                 return InnerBuildingLinesIndex.TryGetValue(nodeId, out InnerBuildingLine result) ? result : null;
             }
         }

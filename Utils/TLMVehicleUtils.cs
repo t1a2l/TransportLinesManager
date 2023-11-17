@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace TransportLinesManager.Utils
 {
@@ -109,7 +110,7 @@ namespace TransportLinesManager.Utils
                 {
                     IBasicExtension extension = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
                     ref TransportLine tl = ref Singleton<TransportManager>.instance.m_lines.m_buffer[lineId];
-                    List<string> modelList = extension.GetAssetListForLine(lineId);
+                    List<TransportAsset> modelList = extension.GetAssetTransportListForLine(lineId);
 
                     if (TransportLinesManagerMod.DebugMode)
                     {
@@ -125,7 +126,7 @@ namespace TransportLinesManager.Utils
                             if (vehicle != 0)
                             {
                                 VehicleInfo info2 = vm.m_vehicles.m_buffer[vehicle].Info;
-                                if (!modelList.Contains(info2.name))
+                                if (!modelList.Any(item => item.name == info2.name))
                                 {
                                     vehiclesToRemove[vehicle] = info2;
                                 }
@@ -135,7 +136,9 @@ namespace TransportLinesManager.Utils
                         {
                             if (item.Value.m_vehicleAI is BusAI)
                             {
-                                VehicleUtils.ReplaceVehicleModel(item.Key, extension.GetAModel(lineId));
+                                var info = extension.GetAModel(lineId, "Add");
+                                VehicleUtils.ReplaceVehicleModel(item.Key, info);
+                                extension.EditVehicleUsedCount(lineId, info.name, "Add");
                             }
                             else
                             {

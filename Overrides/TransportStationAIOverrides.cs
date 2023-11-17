@@ -170,11 +170,12 @@ namespace TransportLinesManager.Overrides
 		public static VehicleInfo TryGetRandomVehicle(VehicleManager vm, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, VehicleInfo.VehicleType type)
         {
             var tsd = TransportSystemDefinition.FromOutsideConnection(subService, level, type);
-            if (!(tsd is null))
+            if (tsd is not null)
             {
-                VehicleInfo randomVehicleInfo = tsd.GetTransportExtension().GetAModel(0);
+                VehicleInfo randomVehicleInfo = tsd.GetTransportExtension().GetAModel(0, "Add");
                 if (randomVehicleInfo != null)
                 {
+                    tsd.GetTransportExtension().EditVehicleUsedCount(0, randomVehicleInfo.name, "Add");
                     return randomVehicleInfo;
                 }
             }

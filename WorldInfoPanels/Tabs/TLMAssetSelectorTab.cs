@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Commons.Extensions.UI;
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
@@ -31,11 +32,13 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private VehicleInfo m_lastInfo;
         private UITemplateList<UIPanel> m_checkboxTemplateList;
         private UITextField m_nameFilter;
-        private Dictionary<TransportSystemDefinition, string> m_clipboard = new Dictionary<TransportSystemDefinition, string>();
+        private readonly Dictionary<TransportSystemDefinition, string> m_clipboard = new();
 
         private UIButton m_copyButton;
         private UIButton m_pasteButton;
         private UIButton m_eraseButton;
+
+        private static UIDropDown m_timeBudgetSelect;
 
 
         private TransportSystemDefinition TransportSystem => UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
@@ -55,12 +58,20 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_nameFilter.tooltipLocaleID = "TLM_ASSET_FILTERBY";
             m_nameFilter.relativePosition = new Vector3(5, 50);
             m_nameFilter.height = 23;
-            m_nameFilter.width = MainPanel.width - 10f;
+            m_nameFilter.width = 170f;
             m_nameFilter.eventKeyUp += (x, y) => UpdateAssetList(TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem));
             m_nameFilter.eventTextSubmitted += (x, y) => UpdateAssetList(TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem));
             m_nameFilter.eventTextCancelled += (x, y) => UpdateAssetList(TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem));
             m_nameFilter.horizontalAlignment = UIHorizontalAlignment.Left;
             m_nameFilter.padding = new RectOffset(2, 2, 4, 2);
+            m_timeBudgetSelect = UIHelperExtension.CloneBasicDropDownNoLabel(new string[0], ChangeBudgetTime, MainPanel);
+            m_timeBudgetSelect.tooltipLocaleID = "TLM_TIME_PERCENT_LABEL";
+            m_timeBudgetSelect.relativePosition = new Vector3(280, 45);
+            m_timeBudgetSelect.height = 30f;
+            m_timeBudgetSelect.width = 90f;
+            m_timeBudgetSelect.horizontalAlignment = UIHorizontalAlignment.Left;
+            m_timeBudgetSelect.listPosition = UIDropDown.PopupListPosition.Automatic;
+            m_timeBudgetSelect.eventSelectedIndexChanged += TimeBudgetSelect_eventSelectedIndexChanged;
 
             CreateScrollPanel();
 
@@ -69,6 +80,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             CreateButtons();
 
             CreateTemplateList();
+        }
+
+        private void TimeBudgetSelect_eventSelectedIndexChanged(UIComponent component, int value)
+        {
+            ChangeBudgetTime(value);
         }
 
         private void CreateTemplateList()
@@ -118,14 +134,14 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
             var lineId = GetLineID();
             IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
-            config.SetAssetListForLine(lineId, XmlUtils.DefaultXmlDeserialize<List<string>>(m_clipboard[TransportSystem]));
+            config.SetAssetTransportListForLine(lineId, XmlUtils.DefaultXmlDeserialize<List<TransportAsset>>(m_clipboard[TransportSystem]));
             UpdateAssetList(config);
         }
         private void ActionDelete()
         {
             var lineId = GetLineID();
             IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
-            config.SetAssetListForLine(lineId, new List<string>());
+            config.SetAssetTransportListForLine(lineId, new List<TransportAsset>());
             UpdateAssetList(config);
         }
 
@@ -163,7 +179,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_title.autoSize = false;
             m_title.autoHeight = false;
             m_title.width = MainPanel.width - 55f;
-            m_title.height = 45f;
+            m_title.height = 45f; 
             m_title.relativePosition = new Vector3(5, 10);
             m_title.textScale = 0.9f;
             m_title.localeID = "TLM_ASSETS_FOR_PREFIX";
@@ -205,6 +221,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             else if (config is TLMTransportLineConfiguration)
             {
                 m_title.text = string.Format(Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE"), TLMLineUtils.GetLineStringId(GetLineID(), false));
+                
             }
             else
             {
@@ -220,23 +237,117 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_pasteButton.isVisible = m_clipboard.ContainsKey(TransportSystem);
             var targetAssets = TransportSystem.GetTransportExtension().GetAllBasicAssetsForLine(lineId).Where(x => x.Value.Contains(m_nameFilter.text)).ToList();
             UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(targetAssets.Count);
+            List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
             List<string> allowedAssets = config.GetAssetListForLine(lineId);
+            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+            if (allowedAssets.Count > 0)
+            {
+                foreach (var asset in allowedAssets)
+                {
+                    var item = InitTransportItem(asset, currentConfig);
+                    allowedTransportAssets.Add(item);
+                }
+                config.SetAssetListForLine(lineId, new List<string>());
+                config.SetAssetTransportListForLine(lineId, allowedTransportAssets);
+            }
+            string[] budgetArr = new string[currentConfig.BudgetEntries.Count];
+            int index = 0;
+            int[] temp = new int[currentConfig.BudgetEntries.Count];
+            foreach (var item in currentConfig.BudgetEntries)
+            {
+                temp[index] = (int)item.HourOfDay;
+                index++;
+            }
+            Array.Sort(temp);
+            for (int i = 0; i < temp.Length; i++)
+            {
+                budgetArr[i] = temp[i].ToString();
+            }
+            m_timeBudgetSelect.items = budgetArr;
+            m_timeBudgetSelect.selectedIndex = 0;
 
             if (TransportLinesManagerMod.DebugMode)
             {
-                LogUtils.DoLog($"selectedAssets Size = {allowedAssets?.Count} ({ string.Join(",", allowedAssets?.ToArray() ?? new string[0])}) {config?.GetType()}");
-            }
+                var arr = new string[allowedTransportAssets.Count];
+                var i = 0;
+                foreach (var asset in allowedTransportAssets)
+                {
+                    arr[i] = asset.name;
+                    i++;
+                }
+                LogUtils.DoLog($"selectedAssets Size = {allowedTransportAssets?.Count} ({string.Join(",", arr ?? new string[0])}) {config?.GetType()}");
 
+            }
             for (int i = 0; i < assetsCheck.Length; i++)
             {
-                string assetName = targetAssets[i].Key;
+                var asset = targetAssets[i].Key;
                 var controller = assetsCheck[i].GetComponent<TLMAssetItemLine>();
-                controller.SetAsset(assetName, allowedAssets.Contains(assetName));
+                var isAllowed = allowedTransportAssets.Any(item => item.name == asset.name);
+                if (isAllowed)
+                {
+                    asset = allowedTransportAssets.Find(item => item.name == asset.name);
+                }
+                controller.SetAsset(asset, isAllowed, lineId, m_timeBudgetSelect.selectedIndex);
                 controller.OnMouseEnter = () =>
                 {
-                    m_lastInfo = PrefabCollection<VehicleInfo>.FindLoaded(assetName);
+                    m_lastInfo = PrefabCollection<VehicleInfo>.FindLoaded(asset.name);
                     RedrawModel();
                 };
+            }
+        }
+
+        private TransportAsset InitTransportItem(string assetName, IBasicExtensionStorage currentConfig)
+        {
+            var item = new TransportAsset
+            {
+                name = assetName,
+                capacity = VehicleUtils.GetCapacity(PrefabCollection<VehicleInfo>.FindLoaded(assetName)),
+                count = new Dictionary<int, Count>(),
+                spawn_percent = new Dictionary<int, int>()
+            };
+            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
+            {
+                var item_count = new Count
+                {
+                    totalCount = 0,
+                    usedCount = 0
+                };
+                item.count.Add(i, item_count);
+                item.spawn_percent.Add(i, 100);
+            }
+            return item;
+        }
+
+        private void ChangeBudgetTime(int idxSel)
+        {
+            if (idxSel < 0 || idxSel >= m_timeBudgetSelect.items.Length)
+            {
+                return;
+            }
+            m_timeBudgetSelect.selectedIndex = idxSel;
+            UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding);
+            if (!fromBuilding)
+            {
+                var targetAssets = TransportSystem.GetTransportExtension().GetAllBasicAssetsForLine(lineId).Where(x => x.Value.Contains(m_nameFilter.text)).ToList();
+                UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(targetAssets.Count);
+                IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
+                List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
+                for (int i = 0; i < assetsCheck.Length; i++)
+                {
+                    var asset = targetAssets[i].Key;
+                    var controller = assetsCheck[i].GetComponent<TLMAssetItemLine>();
+                    var isAllowed = allowedTransportAssets.Any(item => item.name == asset.name);
+                    if (isAllowed)
+                    {
+                        asset = allowedTransportAssets.Find(item => item.name == asset.name);
+                    }
+                    controller.SetAsset(asset, isAllowed, lineId, m_timeBudgetSelect.selectedIndex);
+                    controller.OnMouseEnter = () =>
+                    {
+                        m_lastInfo = PrefabCollection<VehicleInfo>.FindLoaded(asset.name);
+                        RedrawModel();
+                    };
+                }
             }
         }
 
@@ -274,6 +385,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
                 }
             }
+        }
+
+        public static int GetBudgetSelectedIndex()
+        {
+            return m_timeBudgetSelect.selectedIndex;
         }
 
         private void RedrawModel() => m_previewRenderer.RenderVehicle(m_lastInfo, m_lastColor == Color.clear ? Color.HSVToRGB(Math.Abs(m_previewRenderer.CameraRotation) / 360f, .5f, .5f) : m_lastColor, true);
