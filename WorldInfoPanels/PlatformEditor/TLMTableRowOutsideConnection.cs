@@ -89,7 +89,7 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
             {
                 UIPanel column = columns[i];
                 var outsideConnId = targetOutsideConnections[i];
-                if (m_tsd.IsValidOutsideConnection(outsideConnId))
+                if (m_tsd != null && m_tsd.IsValidOutsideConnection(outsideConnId))
                 {
                     column.Enable();
                     column.GetComponent<TLMTableRowDataOutsideConnection>().ResetData(dataObj?.TargetOutsideConnections.ContainsKey(outsideConnId) ?? false, (x) => ToggleOutsideConnection(x, outsideConnId));
