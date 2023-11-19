@@ -117,31 +117,14 @@ namespace TransportLinesManager.Cache.BuildingData
                     nextNodeId = node.m_nextBuildingNode;
                     continue;
                 }
-                var info = tsd.GetTransportInfoIntercity();
-                InnerBuildingLine transportLine;
-                // support regional busses
-                if (info.m_class.m_subService == ItemClass.SubService.PublicTransportBus)
+                InnerBuildingLine transportLine = new InnerBuildingLine
                 {
-                    transportLine = new InnerBuildingLine
-                    {
-                        Info = info,
-                        SrcStop = otherNode,
-                        DstStop = nextNodeId,
-                        SrcBuildingId = otherNodeBuilding,
-                        DstBuildingId = thisBuilding
-                    };
-                } 
-                else
-                {
-                    transportLine = new InnerBuildingLine
-                    {
-                        Info = info,
-                        SrcStop = nextNodeId,
-                        DstStop = otherNode,
-                        SrcBuildingId = thisBuilding,
-                        DstBuildingId = otherNodeBuilding
-                    };
-                }
+                    Info = tsd.GetTransportInfoIntercity(),
+                    SrcStop = otherNode,
+                    DstStop = nextNodeId,
+                    SrcBuildingId = otherNodeBuilding,
+                    DstBuildingId = thisBuilding
+                };
                 RegionalLines[transportLine.SrcStop] = transportLine;
                 nextNodeId = node.m_nextBuildingNode;
             } while (nextNodeId != 0);
@@ -214,22 +197,22 @@ namespace TransportLinesManager.Cache.BuildingData
             }
             if (!isSubBuilding)
             {
-            var subBuildingId = b.m_subBuilding;
-            var subbuildingIndex = 0;
-            while (subBuildingId > 0)
-            {
-                    StopPointDescriptorLanes[] subPlats = MapStopPoints(subBuildingId, thresold, true);
-                if (subPlats != null)
+                var subBuildingId = b.m_subBuilding;
+                var subbuildingIndex = 0;
+                while (subBuildingId > 0)
                 {
-                    result.AddRange(subPlats.Select(x =>
+                        StopPointDescriptorLanes[] subPlats = MapStopPoints(subBuildingId, thresold, true);
+                    if (subPlats != null)
                     {
-                        x.subbuildingId = (sbyte)subbuildingIndex;
-                        return x;
-                    }));
+                        result.AddRange(subPlats.Select(x =>
+                        {
+                            x.subbuildingId = (sbyte)subbuildingIndex;
+                            return x;
+                        }));
+                    }
+                    subBuildingId = BuildingManager.instance.m_buildings.m_buffer[subBuildingId].m_subBuilding;
+                    subbuildingIndex++;
                 }
-                subBuildingId = BuildingManager.instance.m_buildings.m_buffer[subBuildingId].m_subBuilding;
-                subbuildingIndex++;
-            }
             }
             result = result.OrderByDescending(x => x.subbuildingId).GroupBy(x => x.platformLaneId).Select(x => x.First()).ToList();
             result.Sort((x, y) =>
