@@ -12,6 +12,7 @@ using System.Linq;
 using UnityEngine;
 using static TransferManager;
 using TransportLinesManager.Data.DataContainers;
+using ICities;
 
 namespace TransportLinesManager.Data.Tsd
 {
@@ -417,40 +418,31 @@ namespace TransportLinesManager.Data.Tsd
             }
         }
 
-        public bool IsIntercityBusConnection(BuildingInfo connectionInfo)
-            => connectionInfo.m_class.m_service == ItemClass.Service.Road && this == BUS && connectionInfo.m_class.m_subService == ItemClass.SubService.None;
-        
-        public bool IsIntercityBusConnectionTrack(NetInfo trackInfo)
-            => trackInfo.m_class.m_service == ItemClass.Service.Road && this == BUS && trackInfo.m_class.m_subService == ItemClass.SubService.None;
-        
         public bool IsValidOutsideConnection(ushort outsideConnectionBuildingId)
-            => BuildingManager.instance.m_buildings.m_buffer[outsideConnectionBuildingId].Info is BuildingInfo outsideConn
-            && outsideConn.m_buildingAI is OutsideConnectionAI
-         && (
-             FromOutsideConnection(outsideConn.m_class.m_subService, outsideConn.m_class.m_level, VehicleInfo.VehicleType.None) == this
-             || IsIntercityBusConnection(outsideConn));
-        
-        public bool IsValidOutsideConnectionTrack(NetInfo netInfo) =>
-              FromOutsideConnection(netInfo.m_class.m_subService, netInfo.m_class.m_level, VehicleInfo.VehicleType.None) == this
-              || IsIntercityBusConnectionTrack(netInfo);
-
-        internal static TransportSystemDefinition FromOutsideConnection(ItemClass.SubService subService, ItemClass.Level level, VehicleInfo.VehicleType type)
         {
-            if(subService == ItemClass.SubService.PublicTransportTrain) // train connection
+            return BuildingManager.instance.m_buildings.m_buffer[outsideConnectionBuildingId].Info is BuildingInfo outsideConn
+            && outsideConn.m_buildingAI is OutsideConnectionAI
+            && FromOutsideConnection(outsideConn.m_class.m_service, outsideConn.m_class.m_subService, outsideConn.m_class.m_level, VehicleInfo.VehicleType.None) == this;
+        }
+
+        public bool IsValidOutsideConnectionNetwork(NetInfo netInfo) => FromOutsideConnection(netInfo.m_class.m_service, netInfo.m_class.m_subService, netInfo.m_class.m_level, VehicleInfo.VehicleType.None) == this;
+
+        internal static TransportSystemDefinition FromOutsideConnection(ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, VehicleInfo.VehicleType type)
+        {
+            if (subService == ItemClass.SubService.PublicTransportTrain) // tracks outside connection
             {
                 return registeredTsd.Where(x => x.Value.LevelIntercity == level && x.Value.SubService == subService && (type == VehicleInfo.VehicleType.None || x.Value.VehicleType == type)).FirstOrDefault().Value;
             }
-            else if(subService == ItemClass.SubService.None && level == ItemClass.Level.Level5 && type == VehicleInfo.VehicleType.None) // road connection
+            if (service == ItemClass.Service.Road && subService == ItemClass.SubService.None) // road outside connection
             {
-                return registeredTsd.Where(x => x.Value.LevelIntercity == ItemClass.Level.Level3 && x.Value.SubService == ItemClass.SubService.PublicTransportBus && x.Value.VehicleType == VehicleInfo.VehicleType.Car).FirstOrDefault().Value;
+                return registeredTsd.Where(x => x.Value.LevelIntercity == ItemClass.Level.Level3 && x.Value.SubService == ItemClass.SubService.PublicTransportBus && (type == VehicleInfo.VehicleType.None || x.Value.VehicleType == type)).FirstOrDefault().Value;
             }
             return null;
         }
 
-        public static TransportSystemDefinition From(TransportInfo.TransportType TransportType, ItemClass.SubService SubService, VehicleInfo.VehicleType VehicleType, ItemClass.Level Level)
+         public static TransportSystemDefinition From(TransportInfo.TransportType TransportType, ItemClass.SubService SubService, VehicleInfo.VehicleType VehicleType, ItemClass.Level Level)
         {
             var targetMask = GetTsdIndex(TransportType, SubService, VehicleType, Level, null, null);
-            //LogUtils.DoLog($"Index ({TransportType},{SubService},{VehicleType},{Level}) == {targetMask.ToString("X8")}\n{Environment.StackTrace}");
             return FromIndex(targetMask);
         }
 

@@ -168,7 +168,7 @@ namespace TransportLinesManager.Overrides
 
 		public static VehicleInfo TryGetRandomVehicle(VehicleManager vm, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, VehicleInfo.VehicleType type)
         {
-            var tsd = TransportSystemDefinition.FromOutsideConnection(subService, level, type);
+            var tsd = TransportSystemDefinition.FromOutsideConnection(service, subService, level, type);
             if (tsd is not null)
             {
                 VehicleInfo randomVehicleInfo = tsd.GetTransportExtension().GetAModel(0);

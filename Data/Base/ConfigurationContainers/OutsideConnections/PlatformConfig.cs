@@ -7,6 +7,8 @@ using System;
 using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
+using ColossalFramework;
+using Epic.OnlineServices.Presence;
 
 namespace TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections
 {
@@ -127,7 +129,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnect
         {
             ref Building stationBuilding = ref BuildingManager.instance.m_buildings.m_buffer[stationId];
             ref Building outsideConnectionBuilding = ref BuildingManager.instance.m_buildings.m_buffer[outsideConnectionId];
-            var outsideConnectionTSD = TransportSystemDefinition.FromOutsideConnection(outsideConnectionBuilding.Info.GetSubService(), outsideConnectionBuilding.Info.GetClassLevel(), VehicleInfo.VehicleType.None);
+            var outsideConnectionTSD = TransportSystemDefinition.FromOutsideConnection(outsideConnectionBuilding.Info.GetService(), outsideConnectionBuilding.Info.GetSubService(), outsideConnectionBuilding.Info.GetClassLevel(), VehicleInfo.VehicleType.None);
             if ((stationBuilding.Info.m_buildingAI is TransportStationAI) && (outsideConnectionBuilding.m_flags & Building.Flags.IncomingOutgoing) != Building.Flags.None && outsideConnectionTSD != null)
             {
                 var stationPlatformPosition = StationPlatformPosition;
@@ -157,22 +159,60 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnect
                     instance.m_nodes.m_buffer[result.m_nodeOutsideConnection].m_nextBuildingNode = stationBuilding.m_netNode;
                     stationBuilding.m_netNode = result.m_nodeOutsideConnection;
                 }
+                result.m_nodeVirtual = 0;
+                if (stationBuilding.Info != null && stationBuilding.Info.m_class.m_subService == ItemClass.SubService.PublicTransportBus && stationBuilding.Info.m_class.m_level == ItemClass.Level.Level3)
+                {
+                    ushort num = 0;
+                    Vector3 position2 = outsideConnectionPlatformPosition;
+                    if ((outsideConnectionBuilding.m_flags & Building.Flags.IncomingOutgoing) == Building.Flags.IncomingOutgoing)
+                    {
+                        position2 = TransportStationAIExtension.FindStopPosition(outsideConnectionId, ref outsideConnectionBuilding, Building.Flags.Outgoing);
+                    }
+                    else
+                    {
+                        num = TransportStationAIExtension.FindNearestConnection(outsideConnectionId, outsideConnectionBuilding.m_flags & ~Building.Flags.IncomingOutgoing);
+                    }
+                    if (num != 0)
+                    {
+                        position2 = TransportStationAIExtension.FindStopPosition(num, ref Singleton<BuildingManager>.instance.m_buildings.m_buffer[num], incomingOutgoing);
+                    }
+                    if (outsideConnectionTSD.CreateConnectionNode(out result.m_nodeVirtual, position2))
+                    {
+                        if ((stationBuilding.m_flags & Building.Flags.Active) == 0)
+                        {
+                            instance.m_nodes.m_buffer[result.m_nodeVirtual].m_flags |= NetNode.Flags.Disabled;
+                        }
+                        instance.UpdateNode(result.m_nodeVirtual);
+                        instance.m_nodes.m_buffer[result.m_nodeVirtual].m_nextBuildingNode = stationBuilding.m_netNode;
+                        stationBuilding.m_netNode = result.m_nodeVirtual;
+                    }
+                }
                 if (result.m_nodeStation != 0 && result.m_nodeOutsideConnection != 0)
                 {
                     if ((outsideConnectionBuilding.m_flags & Building.Flags.Incoming) != Building.Flags.None)
                     {
-                        if (outsideConnectionTSD.CreateConnectionSegment(out result.m_segmentToStation, result.m_nodeStation, result.m_nodeOutsideConnection, 0))
+                        if (outsideConnectionTSD.CreateConnectionSegment(out result.m_segmentFromStationToOutsideConnection, result.m_nodeStation, result.m_nodeOutsideConnection, 0))
                         {
-                            instance.m_segments.m_buffer[result.m_segmentToStation].m_flags |= NetSegment.Flags.Untouchable;
-                            instance.UpdateSegment(result.m_segmentToStation);
+                            instance.m_segments.m_buffer[result.m_segmentFromStationToOutsideConnection].m_flags |= NetSegment.Flags.Untouchable;
+                            instance.UpdateSegment(result.m_segmentFromStationToOutsideConnection);
+                        }
+                        if (result.m_nodeVirtual != 0 && outsideConnectionTSD.CreateConnectionSegment(out result.m_segmentFromVirtualToStation, result.m_nodeVirtual, result.m_nodeStation, 0))
+                        {
+                            instance.m_segments.m_buffer[result.m_segmentFromVirtualToStation].m_flags |= NetSegment.Flags.Untouchable;
+                            instance.UpdateSegment(result.m_segmentFromVirtualToStation);
                         }
                     }
                     if ((outsideConnectionBuilding.m_flags & Building.Flags.Outgoing) != Building.Flags.None)
                     {
-                        if (outsideConnectionTSD.CreateConnectionSegment(out result.m_segmentToOutsideConnection, result.m_nodeOutsideConnection, result.m_nodeStation, 0))
+                        if (outsideConnectionTSD.CreateConnectionSegment(out result.m_segmentFromOutsideConnectionToStation, result.m_nodeOutsideConnection, result.m_nodeStation, 0))
                         {
-                            instance.m_segments.m_buffer[result.m_segmentToOutsideConnection].m_flags |= NetSegment.Flags.Untouchable;
-                            instance.UpdateSegment(result.m_segmentToOutsideConnection);
+                            instance.m_segments.m_buffer[result.m_segmentFromOutsideConnectionToStation].m_flags |= NetSegment.Flags.Untouchable;
+                            instance.UpdateSegment(result.m_segmentFromOutsideConnectionToStation);
+                        }
+                        if (result.m_nodeVirtual != 0 && outsideConnectionTSD.CreateConnectionSegment(out result.m_segmentStationToVirtual, result.m_nodeStation, result.m_nodeVirtual, 0))
+                        {
+                            instance.m_segments.m_buffer[result.m_segmentStationToVirtual].m_flags |= NetSegment.Flags.Untouchable;
+                            instance.UpdateSegment(result.m_segmentStationToVirtual);
                         }
                     }
                     return result;

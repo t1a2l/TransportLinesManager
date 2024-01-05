@@ -86,6 +86,36 @@ namespace TransportLinesManager.Utils
             segment = 0;
             return false;
         }
+
+
+        public static ushort FindNearestConnection(ushort outsideConnection, Building.Flags incomingOutgoing)
+        {
+            ushort result = 0;
+            BuildingManager instance = Singleton<BuildingManager>.instance;
+            float num = float.PositiveInfinity;
+            Vector3 position = instance.m_buildings.m_buffer[outsideConnection].m_position;
+            FastList<ushort> outsideConnections = instance.GetOutsideConnections();
+            BuildingInfo info = instance.m_buildings.m_buffer[outsideConnection].Info;
+            foreach (ushort item in outsideConnections)
+            {
+                if ((instance.m_buildings.m_buffer[item].m_flags & incomingOutgoing) != incomingOutgoing)
+                {
+                    continue;
+                }
+                BuildingInfo info2 = instance.m_buildings.m_buffer[item].Info;
+                if (info != null && info2 != null && info.m_class.m_service == info2.m_class.m_service && item != outsideConnection)
+                {
+                    float sqrMagnitude = (instance.m_buildings.m_buffer[item].m_position - position).sqrMagnitude;
+                    if (sqrMagnitude < num)
+                    {
+                        num = sqrMagnitude;
+                        result = item;
+                    }
+                }
+            }
+            return result;
+        }
+
     }
 }
 

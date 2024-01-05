@@ -13,17 +13,26 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnect
         [XmlAttribute("outsideConnectionId")]
         public long? Id { get; set; }
 
-        [XmlAttribute("nodeOC")]
+        [XmlAttribute("nodeOutsideConnection")]
         public ushort m_nodeOutsideConnection;
 
         [XmlAttribute("nodeStation")]
         public ushort m_nodeStation;
 
-        [XmlAttribute("segmentToOC")]
-        public ushort m_segmentToOutsideConnection;
+        [XmlAttribute("nodeVirtual")]
+        public ushort m_nodeVirtual;
 
-        [XmlAttribute("segmentToStation")]
-        public ushort m_segmentToStation;
+        [XmlAttribute("segmentFromStationToOutsideConnection")]
+        public ushort m_segmentFromStationToOutsideConnection;
+
+        [XmlAttribute("segmentFromVirtualToStation")]
+        public ushort m_segmentFromVirtualToStation;
+
+        [XmlAttribute("segmentFromOutsideConnectionToStation")]
+        public ushort m_segmentFromOutsideConnectionToStation;
+
+        [XmlAttribute("segmentStationToVirtual")]
+        public ushort m_segmentStationToVirtual;
 
         [XmlAttribute("stringIdentifier")]
         public string Identifier
