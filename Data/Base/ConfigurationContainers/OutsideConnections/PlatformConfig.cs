@@ -8,7 +8,6 @@ using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
 using ColossalFramework;
-using Epic.OnlineServices.Presence;
 
 namespace TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections
 {

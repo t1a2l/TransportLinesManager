@@ -112,7 +112,7 @@ namespace TransportLinesManager.Cache.BuildingData
 
                 ref Building outsideConnectionBuilding = ref BuildingManager.instance.m_buildings.m_buffer[otherNodeBuilding];
                 var tsd = TransportSystemDefinition.FromOutsideConnection(outsideConnectionBuilding.Info.GetService(), outsideConnectionBuilding.Info.GetSubService(), outsideConnectionBuilding.Info.GetClassLevel(), VehicleInfo.VehicleType.None);
-                if(tsd is null) // Unsupported regional line type
+                if(tsd is null || thisBuilding == 0 || otherNodeBuilding == 0) // Unsupported regional line type
                 {
                     nextNodeId = node.m_nextBuildingNode;
                     continue;
@@ -125,7 +125,10 @@ namespace TransportLinesManager.Cache.BuildingData
                     SrcBuildingId = otherNodeBuilding,
                     DstBuildingId = thisBuilding
                 };
-                RegionalLines[transportLine.SrcStop] = transportLine;
+                if(transportLine.CountStops() > 1)
+                {
+                    RegionalLines[transportLine.SrcStop] = transportLine;
+                }
                 nextNodeId = node.m_nextBuildingNode;
             } while (nextNodeId != 0);
         }

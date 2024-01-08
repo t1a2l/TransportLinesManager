@@ -252,6 +252,11 @@ namespace TransportLinesManager.Data.Tsd
             if(info.m_class.m_subService == SubService && (info.m_vehicleType == VehicleType || info.m_class.m_level == LevelAdditional))
 			{
                 TransportInfo transportInfo = VehicleUtils.GetTransportInfoField(info.m_vehicleAI)?.GetValue(info.m_vehicleAI) as TransportInfo;
+                // ignore cargo helicopters
+                if(transportInfo.m_vehicleType == VehicleInfo.VehicleType.Helicopter && transportInfo.m_class.m_level == ItemClass.Level.Level5)
+                {
+                    return false;
+                }
                 var fieldInfo = VehicleUtils.GetVehicleCapacityField(info.m_vehicleAI);
                 if(transportInfo.m_transportType == TransportType && fieldInfo != null)
 				{
