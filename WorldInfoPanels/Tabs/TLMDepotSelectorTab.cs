@@ -9,6 +9,9 @@ using TransportLinesManager.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using TransportLinesManager.Interfaces;
+using System.Reflection.Emit;
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
@@ -24,6 +27,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private UIScrollbar m_scrollbar;
         private Dictionary<string, UICheckBox> m_checkboxes = new Dictionary<string, UICheckBox>();
         private bool m_isLoading;
+        private UITextField m_nameFilter;
         private TransportSystemDefinition TransportSystem => TransportSystemDefinition.FromLineId(GetLineID(out bool fromBuilding), fromBuilding);
         internal static ushort GetLineID(out bool fromBuilding)
         {
@@ -34,6 +38,19 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private void CreateWindow()
         {
             CreateMainPanel();
+
+            MonoUtils.CreateUIElement(out m_nameFilter, MainPanel.transform);
+            MonoUtils.UiTextFieldDefaults(m_nameFilter);
+            MonoUtils.InitButtonFull(m_nameFilter, false, "OptionsDropboxListbox");
+            m_nameFilter.tooltip = Locale.Get("TLM_DEPOT_FILTERBY");
+            m_nameFilter.relativePosition = new Vector3(5, 50);
+            m_nameFilter.height = 23;
+            m_nameFilter.width = MainPanel.width - 10f;
+            m_nameFilter.eventKeyUp += (x, y) => UpdateDepotList(TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(out _), TransportSystem));
+            m_nameFilter.eventTextSubmitted += (x, y) => UpdateDepotList(TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(out _), TransportSystem));
+            m_nameFilter.eventTextCancelled += (x, y) => UpdateDepotList(TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(out _), TransportSystem));
+            m_nameFilter.horizontalAlignment = UIHorizontalAlignment.Left;
+            m_nameFilter.padding = new RectOffset(2, 2, 4, 2);
 
             CreateScrollPanel();
 
@@ -95,14 +112,14 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             MonoUtils.CreateUIElement(out m_scrollablePanel, MainPanel.transform);
             m_scrollablePanel.width = MainPanel.width - 20f;
-            m_scrollablePanel.height = MainPanel.height - 40f;
+            m_scrollablePanel.height = MainPanel.height - 220f;
             m_scrollablePanel.autoLayoutDirection = LayoutDirection.Vertical;
             m_scrollablePanel.autoLayoutStart = LayoutStart.TopLeft;
             m_scrollablePanel.autoLayoutPadding = new RectOffset(0, 0, 0, 0);
             m_scrollablePanel.scrollPadding = new RectOffset(10, 10, 10, 10);
             m_scrollablePanel.autoLayout = true;
             m_scrollablePanel.clipChildren = true;
-            m_scrollablePanel.relativePosition = new Vector3(5, 40);
+            m_scrollablePanel.relativePosition = new Vector3(5, 75);
             m_scrollablePanel.backgroundSprite = "ScrollbarTrack";
 
             MonoUtils.CreateUIElement(out UIPanel trackballPanel, MainPanel.transform);
@@ -145,10 +162,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 m_scrollablePanel.scrollPosition += new Vector2(0f, Mathf.Sign(param.wheelDelta) * -1f * m_scrollbar.incrementAmount);
             };
-
-
         }
-
 
         public void OnSetTarget(Type source)
         {
@@ -164,11 +178,28 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 return;
             }
             m_isLoading = true;
+            IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(out _), TransportSystem);
 
+            UpdateDepotList(config);
+
+            if (config is TLMTransportLineConfiguration)
+            {
+                m_title.text = string.Format(Locale.Get("TLM_DEPOT_SELECT_WINDOW_TITLE"), TLMLineUtils.GetLineStringId(GetLineID(out bool fromBuilding), fromBuilding));
+            }
+            else
+            {
+                int prefix = (int)TLMPrefixesUtils.GetPrefix(GetLineID(out _));
+                m_title.text = string.Format(Locale.Get("TLM_DEPOT_SELECT_WINDOW_TITLE_PREFIX"), prefix > 0 ? NumberingUtils.GetStringFromNumber(TLMPrefixesUtils.GetStringOptionsForPrefix(tsd), prefix + 1) : Locale.Get("TLM_UNPREFIXED"), tsd.GetTransportName());
+            }
+
+            m_isLoading = false;
+        }
+
+        private void UpdateDepotList(IBasicExtension config)
+        {
             var lineId = GetLineID(out _);
-            List<ushort> cityDepotList = TLMDepotUtils.GetAllDepotsFromCity(tsd);
-            Interfaces.IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
-            List<ushort> targetDepotList = config.GetAllowedDepots(tsd, lineId);
+            List<ushort> cityDepotList = TLMDepotUtils.GetAllDepotsFromCity(TransportSystem).Where(x => BuildingUtils.GetBuildingName(x, out _, out _).Contains(m_nameFilter.text)).ToList();
+            List<ushort> targetDepotList = config.GetAllowedDepots(TransportSystem, lineId);
             UIPanel[] depotChecks = m_checkboxTemplateList.SetItemCount(cityDepotList.Count);
             LogUtils.DoLog($"depotChecks = {depotChecks.Length}");
             for (int idx = 0; idx < cityDepotList.Count; idx++)
@@ -186,8 +217,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 TransportLinesManagerMod.Controller.ConnectorADR.GetAddressStreetAndNumber(sidewalk, depotBuilding.m_position, out int number, out string streetName);
                 byte districtId = DistrictManager.instance.GetDistrict(sidewalk);
                 uilabel.text = $"\n<color gray>{streetName}, {number} - {(districtId == 0 ? SimulationManager.instance.m_metaData.m_CityName : DistrictManager.instance.GetDistrictName(districtId))}</color>";
-
-
 
                 if (uilabel.objectUserData == null)
                 {
@@ -223,28 +252,16 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     uilabel.objectUserData = true;
                 }
             }
-
-            if (config is TLMTransportLineConfiguration)
-            {
-                m_title.text = string.Format(Locale.Get("TLM_DEPOT_SELECT_WINDOW_TITLE"), TLMLineUtils.GetLineStringId(GetLineID(out bool fromBuilding), fromBuilding));
-            }
-            else
-            {
-                int prefix = (int)TLMPrefixesUtils.GetPrefix(GetLineID(out _));
-                m_title.text = string.Format(Locale.Get("TLM_DEPOT_SELECT_WINDOW_TITLE_PREFIX"), prefix > 0 ? NumberingUtils.GetStringFromNumber(TLMPrefixesUtils.GetStringOptionsForPrefix(tsd), prefix + 1) : Locale.Get("TLM_UNPREFIXED"), tsd.GetTransportName());
-            }
-
-
-            m_isLoading = false;
-
         }
 
-
-
         public void UpdateBindings() { }
+
         public void OnEnable() { }
+
         public void OnDisable() { }
+
         public void OnGotFocus() { }
+
         public bool MayBeVisible() => UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && !fromBuilding && lineId > 0 && TransportSystem.HasVehicles();
 
         public void Hide() => MainPanel.isVisible = false;

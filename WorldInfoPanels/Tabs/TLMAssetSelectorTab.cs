@@ -110,6 +110,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_pasteButton.isVisible = true;
             UpdateAssetList(config);
         }
+
         private void ActionPaste()
         {
             if (!m_clipboard.ContainsKey(TransportSystem))
@@ -121,6 +122,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             config.SetAssetListForLine(lineId, XmlUtils.DefaultXmlDeserialize<List<string>>(m_clipboard[TransportSystem]));
             UpdateAssetList(config);
         }
+
         private void ActionDelete()
         {
             var lineId = GetLineID();
@@ -277,10 +279,13 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         }
 
         private void RedrawModel() => m_previewRenderer.RenderVehicle(m_lastInfo, m_lastColor == Color.clear ? Color.HSVToRGB(Math.Abs(m_previewRenderer.CameraRotation) / 360f, .5f, .5f) : m_lastColor, true);
+        
         public void OnEnable()
         { }
+
         public void OnDisable()
         { }
+
         public void OnGotFocus()
         { }
 
