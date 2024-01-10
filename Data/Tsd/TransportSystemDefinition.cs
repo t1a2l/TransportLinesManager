@@ -253,7 +253,7 @@ namespace TransportLinesManager.Data.Tsd
 			{
                 TransportInfo transportInfo = VehicleUtils.GetTransportInfoField(info.m_vehicleAI)?.GetValue(info.m_vehicleAI) as TransportInfo;
                 // ignore cargo helicopters
-                if(transportInfo.m_vehicleType == VehicleInfo.VehicleType.Helicopter && transportInfo.m_class.m_level == ItemClass.Level.Level5)
+                if(transportInfo.m_vehicleType == VehicleInfo.VehicleType.Helicopter && info.m_class.m_level == ItemClass.Level.Level5)
                 {
                     return false;
                 }
