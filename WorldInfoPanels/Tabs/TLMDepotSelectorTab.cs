@@ -198,7 +198,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private void UpdateDepotList(IBasicExtension config)
         {
             var lineId = GetLineID(out _);
-            List<ushort> cityDepotList = TLMDepotUtils.GetAllDepotsFromCity(TransportSystem).Where(x => BuildingUtils.GetBuildingName(x, out _, out _).Contains(m_nameFilter.text)).ToList();
+            List<ushort> cityDepotList = TLMDepotUtils.GetAllDepotsFromCity(TransportSystem).Where(x => BuildingUtils.GetBuildingName(x, out _, out _).ToLower().Contains(m_nameFilter.text.ToLower())).ToList();
             List<ushort> targetDepotList = config.GetAllowedDepots(TransportSystem, lineId);
             UIPanel[] depotChecks = m_checkboxTemplateList.SetItemCount(cityDepotList.Count);
             LogUtils.DoLog($"depotChecks = {depotChecks.Length}");

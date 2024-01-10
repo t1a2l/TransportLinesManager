@@ -220,7 +220,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             var lineId = GetLineID();
             m_lastInfo = default;
             m_pasteButton.isVisible = m_clipboard.ContainsKey(TransportSystem);
-            var targetAssets = TransportSystem.GetTransportExtension().GetAllBasicAssetsForLine(lineId).Where(x => x.Value.Contains(m_nameFilter.text)).ToList();
+            var targetAssets = TransportSystem.GetTransportExtension().GetAllBasicAssetsForLine(lineId).Where(x => x.Value.ToLower().Contains(m_nameFilter.text.ToLower())).ToList();
             UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(targetAssets.Count);
             List<string> allowedAssets = config.GetAssetListForLine(lineId);
 
