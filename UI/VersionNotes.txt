@@ -1,19 +1,19 @@
-﻿<extended><color #9999FF>TLM 14.5 - 30/JUL/23</color>
+﻿<extended><color #9999FF>TLM 14.5 - 11/JAN/24</color>
+	- UI Resolution error fix.
+	- Unscaled bug fix when there are less then 4 stops.
+	- Depot search support.
+	- Depot and Asset lowercase search support.
+	- Consistancy in all translations.
+	- Fix regional buses bug.
+	- Now Support the Train-Bus Hub regional lines.
+	- Attempt to fix reginal trains bug.
+	
+<color #9999FF>TLM 14.5 - 22/JUL/23</color> 
+	- Treasure Hunt Updated.
+	- Now using harmony 2.2.
+	- Fix checkboxes not saving state.
+<color #9999FF>TLM 14.5 - 30/JUL/23</color>
 	- Bus will only return to depot from terminal stop.
 	- Support Old version Saves.
 	- Fix the linear map.
 	- Intercity bus terminals will now show regional lines.
-	
-<color #9999FF>r1 - 14/SEP/22</color> - Fixes for P&P DLC
-<color #9999FF>r2 - 16/SEP/22</color> - Fixed issues related to failing saving/loading settings
-<color #9999FF>r3 - 16/SEP/22</color> 
-	- Fixed loading issues with strange characters (and failing to load TLM stuff)
-	- Small fixes
-<color #9999FF>r3 - 25/JAN/22</color> 
-	- Airport DLC Update
-	- Fixing bugs related to infine loop that may freeze the game
-	- Minor improvements
-<color #9999FF>TLM 14.5 - 22/JUL/23</color>
-	- Treasure Hunt Updated
-	- Now using harmony 2.2
-	- Fix checkboxes not saving state
