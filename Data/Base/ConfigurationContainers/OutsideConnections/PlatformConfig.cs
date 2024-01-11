@@ -159,7 +159,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnect
                     stationBuilding.m_netNode = result.m_nodeOutsideConnection;
                 }
                 result.m_nodeVirtual = 0;
-                if (stationBuilding.Info != null && stationBuilding.Info.m_class.m_subService == ItemClass.SubService.PublicTransportBus && stationBuilding.Info.m_class.m_level == ItemClass.Level.Level3)
+                if (stationBuilding.Info != null && stationBuilding.Info.m_class.m_subService == ItemClass.SubService.PublicTransportBus && outsideConnectionBuilding.Info.m_class.m_service == ItemClass.Service.Road)
                 {
                     ushort num = 0;
                     Vector3 position2 = outsideConnectionPlatformPosition;

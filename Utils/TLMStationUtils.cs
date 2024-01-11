@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static ItemClass;
+using static ItemClass;using static ItemClass;
 using TransportLinesManager.Data.Extensions;
 using TransportLinesManager.Data.Base.Interfaces;
 
@@ -280,6 +280,19 @@ namespace TransportLinesManager.Utils
             {
                 tempBuildingId = BuildingUtils.FindBuilding(position, 100f, ItemClass.Service.PublicTransport, ss, m_defaultAllowedVehicleTypes, Building.Flags.None, Building.Flags.None);
 
+                if (BuildingManager.instance.m_buildings.m_buffer[tempBuildingId].m_parentBuilding != 0)
+                {
+                    tempBuildingId = Building.FindParentBuilding(tempBuildingId);
+                }
+                if (BuildingUtils.IsBuildingValidForStation(true, bm, tempBuildingId))
+                {
+                    return tempBuildingId;
+                }
+            }
+
+            if(fromBuilding && nm.m_nodes.m_buffer[stopId].Info.m_class.m_subService == SubService.PublicTransportBus && nm.m_nodes.m_buffer[(int)stopId].Info.m_class.name == "Intercity Bus Line")
+            {
+                tempBuildingId = BuildingUtils.FindBuilding(position, 100f, ItemClass.Service.Road, ItemClass.SubService.None, null, Building.Flags.None, Building.Flags.None);
                 if (BuildingManager.instance.m_buildings.m_buffer[tempBuildingId].m_parentBuilding != 0)
                 {
                     tempBuildingId = Building.FindParentBuilding(tempBuildingId);
