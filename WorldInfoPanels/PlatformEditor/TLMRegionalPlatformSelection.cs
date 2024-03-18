@@ -124,8 +124,11 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
             {
                 m_title.eventCheckChanged -= OnToggleUseTlmSettings;
                 var building = WorldInfoPanel.GetCurrentInstanceID().Building;
-                var show = BuildingManager.instance.m_buildings.m_buffer[building].Info.m_buildingAI is TransportStationAI tsai && (tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportTrain || tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportBus);
-
+                var show = false;
+                if (building != 0)
+                {
+                    show = BuildingManager.instance.m_buildings.m_buffer[building].Info.m_buildingAI is TransportStationAI tsai && (tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportTrain || tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportBus);
+                }
                 UpdateNearPlatforms(show);
                 m_title.eventCheckChanged += OnToggleUseTlmSettings;
                 m_dirty = false;
