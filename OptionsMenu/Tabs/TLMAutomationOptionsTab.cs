@@ -13,6 +13,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
         private UICheckBox m_autoName;
         private UICheckBox m_circular;
         private UICheckBox m_addLineCode;
+        private UICheckBox m_busLinesUseSoftDespawn;
         private UICheckBox m_expressTrams;
         private UICheckBox m_expressBuses;
         private UICheckBox m_expressTrolleys;
@@ -27,6 +28,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             m_autoName.isChecked = TLMBaseConfigXML.CurrentContextConfig.UseAutoName;
             m_circular.isChecked = TLMBaseConfigXML.CurrentContextConfig.CircularIfSingleDistrictLine;
             m_addLineCode.isChecked = TLMBaseConfigXML.CurrentContextConfig.AddLineCodeInAutoname;
+            m_busLinesUseSoftDespawn.isChecked = TLMBaseConfigXML.CurrentContextConfig.BusLinesUseSoftDespawn;
             m_expressBuses.isChecked = TLMBaseConfigXML.CurrentContextConfig.ExpressBusesEnabled;
             m_expressTrams.isChecked = TLMBaseConfigXML.CurrentContextConfig.ExpressTramsEnabled;
             m_expressTrolleys.isChecked = TLMBaseConfigXML.CurrentContextConfig.ExpressTrolleybusesEnabled;
@@ -48,6 +50,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             AddCheckboxLocale("TLM_AUTO_NAME_ENABLED", out m_autoName, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.UseAutoName = x);
             AddCheckboxLocale("TLM_USE_CIRCULAR_AUTO_NAME", out m_circular, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.CircularIfSingleDistrictLine = x);
             AddCheckboxLocale("TLM_ADD_LINE_NUMBER_AUTO_NAME", out m_addLineCode, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.AddLineCodeInAutoname = x);
+            AddCheckboxLocale("TLM_BUS_LINES_USE_SOFT_DESPAWN", out m_busLinesUseSoftDespawn, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.BusLinesUseSoftDespawn = x);
             group7.AddSpace(15);
 
             AddCheckboxLocale("TLM_ENABLE_EXPRESS_BUSES", out m_expressBuses, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.ExpressBusesEnabled = x);
@@ -59,6 +62,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             group7.AddSpace(15);
 
             AddCheckboxLocale("TLM_USEGAMECLOCKIFDAYNIGHTDISABLED", out m_clockSwap, group7, (x) => TransportLinesManagerMod.UseGameClockAsReferenceIfNoDayNight = x);
+
 
 
         }

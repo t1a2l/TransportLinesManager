@@ -12,7 +12,7 @@ using TransportLinesManager.OptionsMenu;
 using System.Collections.Generic;
 using System.Reflection;
 
-[assembly: AssemblyVersion("14.5.1.*")]
+[assembly: AssemblyVersion("14.5.2.*")]
 namespace TransportLinesManager
 {
     public class TransportLinesManagerMod : BasicIUserMod<TransportLinesManagerMod, TLMController, TLMPanel>

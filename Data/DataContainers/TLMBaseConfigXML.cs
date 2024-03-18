@@ -74,6 +74,8 @@ namespace TransportLinesManager.Data.DataContainers
         [XmlAttribute("autoName")]
         public bool UseAutoName { get; set; }
         [XmlAttribute("lineCodeInAutoname")]
+        public bool BusLinesUseSoftDespawn { get; set; } = false;
+        [XmlAttribute("BusLinesUseSoftDespawn")]
         public bool AddLineCodeInAutoname { get; set; }
 
         [Obsolete("XML Export only!", true)]
