@@ -138,31 +138,31 @@ namespace TransportLinesManager.Cache.BuildingData
             NetManager instance2 = NetManager.instance;
             PathManager instance3 = PathManager.instance;
             TerrainManager instance4 = TerrainManager.instance;
-            TransportLine.TempUpdateMeshData[] array = Info.m_requireSurfaceLine ? (new TransportLine.TempUpdateMeshData[81]) : (new TransportLine.TempUpdateMeshData[1]);
+            TransportLine.TempUpdateMeshData[] data = Info.m_requireSurfaceLine ? (new TransportLine.TempUpdateMeshData[81]) : (new TransportLine.TempUpdateMeshData[1]);
             bool flag = true;
             int num = 0;
-            int num2 = 0;
-            float num3 = 0f;
+            int curveCount = 0;
+            float totalLength = 0f;
             ushort stops = SrcStop;
-            ushort num4 = stops;
-            int num5 = 0;
+            ushort num2 = stops;
+            int num3 = 0;
             m_needsToBeCalculated = false;
-            while (num4 != 0)
+            while (num2 != 0)
             {
-                ushort num6 = 0;
+                ushort num4 = 0;
                 for (int i = 0; i < 8; i++)
                 {
-                    ushort segment = instance2.m_nodes.m_buffer[num4].GetSegment(i);
-                    if (segment != 0 && instance2.m_segments.m_buffer[segment].m_startNode == num4)
+                    ushort segment = instance2.m_nodes.m_buffer[num2].GetSegment(i);
+                    if (segment != 0 && instance2.m_segments.m_buffer[segment].m_startNode == num2)
                     {
                         uint path = instance2.m_segments.m_buffer[segment].m_path;
                         if (path != 0U)
                         {
                             byte pathFindFlags = instance3.m_pathUnits.m_buffer[path].m_pathFindFlags;
-                            if ((pathFindFlags & 4) != 0)//not calculated
+                            if ((pathFindFlags & 4u) != 0)//not calculated
                             {
-                                Vector3 zero = Vector3.zero;
-                                if (!TransportLine.CalculatePathSegmentCount(path, 0, NetInfo.LaneType.All, VehicleInfo.VehicleType.All, VehicleInfo.VehicleCategory.All, ref array, ref num2, ref num3, ref zero))
+                                Vector3 position = Vector3.zero;
+                                if (!TransportLine.CalculatePathSegmentCount(path, 0, NetInfo.LaneType.All, VehicleInfo.VehicleType.All, VehicleInfo.VehicleCategory.All, ref data, ref curveCount, ref totalLength, ref position))
                                 {
                                     TransportLineAI.StartPathFind(segment, ref instance2.m_segments.m_buffer[segment], Info.m_netService, Info.m_secondaryNetService, Info.m_vehicleType, Info.vehicleCategory, false);
                                     flag = false;
@@ -171,7 +171,7 @@ namespace TransportLinesManager.Cache.BuildingData
                             }
                             else if ((pathFindFlags & 8) == 0) //invalid
                             {
-                                if (num4 == stops)
+                                if (num2 == stops)
                                 {
                                     BrokenFromSrc = true;
                                 }
@@ -188,49 +188,40 @@ namespace TransportLinesManager.Cache.BuildingData
                             flag = false;
                             m_needsToBeCalculated = true;
                         }
-                        num6 = instance2.m_segments.m_buffer[segment].m_endNode;
+                        num4 = instance2.m_segments.m_buffer[segment].m_endNode;
                         break;
                     }
                 }
                 if (Info.m_requireSurfaceLine)
                 {
-                    TransportLine.TempUpdateMeshData[] array2 = array;
-                    int patchIndex = instance4.GetPatchIndex(instance2.m_nodes.m_buffer[num4].m_position);
-                    array2[patchIndex].m_pathSegmentCount = array2[patchIndex].m_pathSegmentCount + 1;
+                    TransportLine.TempUpdateMeshData[] data2 = data;
+                    int patchIndex = instance4.GetPatchIndex(instance2.m_nodes.m_buffer[num2].m_position);
+                    data2[patchIndex].m_pathSegmentCount++;
                 }
                 else
                 {
-                    TransportLine.TempUpdateMeshData[] array3 = array;
-                    int num7 = 0;
-                    array3[num7].m_pathSegmentCount = array3[num7].m_pathSegmentCount + 1;
+                    TransportLine.TempUpdateMeshData[] data3 = data;
+                    data3[0].m_pathSegmentCount++;
                 }
                 num++;
-                num4 = num6;
-                if (num4 == stops)
+                num2 = num4;
+                if (num2 == stops)
                 {
                     break;
                 }
-                //if (!flag)
-                //{
-                //    break;
-                //}
-                if (++num5 >= 32768)
+                if (++num3 >= 32768)
                 {
                     LogUtils.DoErrorLog("Invalid list detected!\n" + Environment.StackTrace);
                     break;
                 }
             }
-            //if (!flag)
-            //{
-            //    return flag;
-            //}
-            int num8 = 0;
-            for (int j = 0; j < array.Length; j++)
+            int num5 = 0;
+            for (int j = 0; j < data.Length; j++)
             {
-                int pathSegmentCount = array[j].m_pathSegmentCount;
+                int pathSegmentCount = data[j].m_pathSegmentCount;
                 if (pathSegmentCount != 0)
                 {
-                    RenderGroup.MeshData meshData = new RenderGroup.MeshData
+                    RenderGroup.MeshData meshData = new()
                     {
                         m_vertices = new Vector3[pathSegmentCount * 8],
                         m_normals = new Vector3[pathSegmentCount * 8],
@@ -240,92 +231,90 @@ namespace TransportLinesManager.Cache.BuildingData
                         m_colors = new Color32[pathSegmentCount * 8],
                         m_triangles = new int[pathSegmentCount * 30]
                     };
-                    array[j].m_meshData = meshData;
-                    num8++;
+                    data[j].m_meshData = meshData;
+                    num5++;
                 }
             }
-            TransportManager.LineSegment[] array4 = new TransportManager.LineSegment[num];
-            Bezier3[] array5 = new Bezier3[num2];
-            int num9 = 0;
-            int num10 = 0;
-            float lengthScale = Mathf.Ceil(num3 / 64f) / num3;
-            float num11 = 0f;
-            num4 = stops;
-            Vector3 vector = new Vector3(100000f, 100000f, 100000f);
-            Vector3 vector2 = new Vector3(-100000f, -100000f, -100000f);
-            num5 = 0;
-            while (num4 != 0)
+            TransportManager.LineSegment[] array = new TransportManager.LineSegment[num];
+            Bezier3[] curves = new Bezier3[curveCount];
+            int num6 = 0;
+            int curveIndex = 0;
+            float lengthScale = Mathf.Ceil(totalLength / 64f) / totalLength;
+            float currentLength = 0f;
+            num2 = stops;
+            Vector3 vector = new(100000f, 100000f, 100000f);
+            Vector3 vector2 = new(-100000f, -100000f, -100000f);
+            num3 = 0;
+            while (num2 != 0)
             {
-                ushort num12 = 0;
+                ushort num7 = 0;
                 for (int k = 0; k < 8; k++)
                 {
-                    ushort segment2 = instance2.m_nodes.m_buffer[num4].GetSegment(k);
-                    if (segment2 != 0 && instance2.m_segments.m_buffer[segment2].m_startNode == num4)
+                    ushort segment2 = instance2.m_nodes.m_buffer[num2].GetSegment(k);
+                    if (segment2 != 0 && instance2.m_segments.m_buffer[segment2].m_startNode == num2)
                     {
                         uint path2 = instance2.m_segments.m_buffer[segment2].m_path;
-                        if (path2 != 0U && (instance3.m_pathUnits.m_buffer[(int)((UIntPtr)path2)].m_pathFindFlags & 4) != 0)
+                        if(curveIndex >= curveCount)
                         {
-                            array4[num9].m_curveStart = num10;
-                            TransportLine.FillPathSegments(path2, 0, NetInfo.LaneType.All, VehicleInfo.VehicleType.All, VehicleInfo.VehicleCategory.All, ref array, array5, null, ref num10, ref num11, lengthScale, out Vector3 vector3, out Vector3 vector4, Info.m_requireSurfaceLine, true);
-                            vector = Vector3.Min(vector, vector3);
-                            vector2 = Vector3.Max(vector2, vector4);
-                            array4[num9].m_bounds.SetMinMax(vector3, vector4);
-                            array4[num9].m_curveEnd = num10;
+                            continue;
                         }
-                        num12 = instance2.m_segments.m_buffer[segment2].m_endNode;
+                        if (path2 != 0U && (instance3.m_pathUnits.m_buffer[(int)(UIntPtr)path2].m_pathFindFlags & 4u) != 0)
+                        {
+                            array[num6].m_curveStart = curveIndex;
+                            TransportLine.FillPathSegments(path2, 0, NetInfo.LaneType.All, VehicleInfo.VehicleType.All, VehicleInfo.VehicleCategory.All, ref data, curves, null, ref curveIndex, ref currentLength, lengthScale, out Vector3 minPos, out Vector3 maxPos, Info.m_requireSurfaceLine, true);
+                            vector = Vector3.Min(vector, minPos);
+                            vector2 = Vector3.Max(vector2, maxPos);
+                            array[num6].m_bounds.SetMinMax(minPos, maxPos);
+                            array[num6].m_curveEnd = curveIndex;
+                        }
+                        num7 = instance2.m_segments.m_buffer[segment2].m_endNode;
                         break;
                     }
                 }
                 if (Info.m_requireSurfaceLine)
                 {
-                    int patchIndex2 = instance4.GetPatchIndex(instance2.m_nodes.m_buffer[num4].m_position);
-                    TransportLine.FillPathNode(instance2.m_nodes.m_buffer[num4].m_position, array[patchIndex2].m_meshData, array[patchIndex2].m_pathSegmentIndex, 4f, 20f, true);
-                    TransportLine.TempUpdateMeshData[] array6 = array;
-                    int num13 = patchIndex2;
-                    array6[num13].m_pathSegmentIndex = array6[num13].m_pathSegmentIndex + 1;
+                    int patchIndex = instance4.GetPatchIndex(instance2.m_nodes.m_buffer[num2].m_position);
+                    TransportLine.FillPathNode(instance2.m_nodes.m_buffer[num2].m_position, data[patchIndex].m_meshData, data[patchIndex].m_pathSegmentIndex, 4f, 20f, true);
+                    TransportLine.TempUpdateMeshData[] data4 = data;
+                    data4[patchIndex].m_pathSegmentIndex++;
                 }
                 else
                 {
-                    TransportLine.FillPathNode(instance2.m_nodes.m_buffer[num4].m_position, array[0].m_meshData, array[0].m_pathSegmentIndex, 4f, 5f, false);
-                    TransportLine.TempUpdateMeshData[] array7 = array;
-                    int num14 = 0;
-                    array7[num14].m_pathSegmentIndex = array7[num14].m_pathSegmentIndex + 1;
+                    TransportLine.FillPathNode(instance2.m_nodes.m_buffer[num2].m_position, data[0].m_meshData, data[0].m_pathSegmentIndex, 4f, 5f, false);
+                    TransportLine.TempUpdateMeshData[] data5 = data;
+                    data[0].m_pathSegmentIndex++;
                 }
-                num9++;
-                num4 = num12;
-                if (num4 == stops)
+                num6++;
+                num2 = num7;
+                if (num2 == stops)
                 {
                     break;
                 }
-                if (++num5 >= 32768)
+                if (++num3 >= 32768)
                 {
                     LogUtils.DoErrorLog("Invalid list detected!\n" + Environment.StackTrace);
                     break;
                 }
             }
-            RenderGroup.MeshData[] array8 = new RenderGroup.MeshData[num8];
-            int num15 = 0;
-            for (int l = 0; l < array.Length; l++)
+            RenderGroup.MeshData[] array3 = new RenderGroup.MeshData[num5];
+            int num8 = 0;
+            for (int l = 0; l < data.Length; l++)
             {
-                if (array[l].m_meshData != null)
+                if (data[l].m_meshData != null)
                 {
-                    array[l].m_meshData.UpdateBounds();
+                    data[l].m_meshData.UpdateBounds();
                     if (Info.m_requireSurfaceLine)
                     {
-                        Vector3 min = array[l].m_meshData.m_bounds.min;
-                        Vector3 max = array[l].m_meshData.m_bounds.max;
+                        Vector3 min = data[l].m_meshData.m_bounds.min;
+                        Vector3 max = data[l].m_meshData.m_bounds.max;
                         max.y += 1024f;
-                        array[l].m_meshData.m_bounds.SetMinMax(min, max);
+                        data[l].m_meshData.m_bounds.SetMinMax(min, max);
                     }
-                    array8[num15++] = array[l].m_meshData;
+                    array3[num8++] = data[l].m_meshData;
                 }
             }
-            m_lineMeshData = array8;
+            m_lineMeshData = array3;
             m_lastCheckTick = SimulationManager.instance.m_currentTickIndex;
-            //m_lineSegments[lineID] = array4;
-            //m_lineCurves[lineID] = array5;
-            //tl.m_bounds.SetMinMax(vector, vector2);
-
             return flag;
         }
 

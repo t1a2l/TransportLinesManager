@@ -14,7 +14,7 @@ namespace TransportLinesManager.Overrides
     [HarmonyPatch(typeof(DepotAI))]
     public static class TLMDepotAIOverrides
     {
-        private static readonly TransferManager.TransferReason[] m_managedReasons = new TransferManager.TransferReason[]   {
+        private static readonly TransferManager.TransferReason[] m_managedReasons = [
             TransferManager.TransferReason.Tram,
             TransferManager.TransferReason.PassengerTrain,
             TransferManager.TransferReason.PassengerShip,
@@ -28,7 +28,7 @@ namespace TransportLinesManager.Overrides
             TransferManager.TransferReason.Trolleybus,
             TransferManager.TransferReason.PassengerHelicopter,
             TransferManager.TransferReason.TouristBus,
-        };
+        ];
 
         [HarmonyPatch(typeof(DepotAI), "StartTransfer")]
         [HarmonyPrefix]

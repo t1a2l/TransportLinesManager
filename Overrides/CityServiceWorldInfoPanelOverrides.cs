@@ -40,7 +40,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(CityServiceWorldInfoPanel), "UpdateBindings")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TranspileUpdateBindingsCSWIP(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TranspileUpdateBindingsCSWIP(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             MethodInfo CanAllowRegionalLines = typeof(CityServiceWorldInfoPanelOverrides).GetMethod("CanAllowVanillaRegionalLines", Patcher.allFlags);
