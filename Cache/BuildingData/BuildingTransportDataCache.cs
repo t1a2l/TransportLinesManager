@@ -101,7 +101,7 @@ namespace TransportLinesManager.Cache.BuildingData
 
                 if (thisBuilding != buildingIdKey)
                 {
-                    var x = thisBuilding;
+                    ushort x = thisBuilding;
                     thisBuilding = otherNodeBuilding;
                     otherNodeBuilding = x;
 
@@ -125,7 +125,7 @@ namespace TransportLinesManager.Cache.BuildingData
                     SrcBuildingId = otherNodeBuilding,
                     DstBuildingId = thisBuilding
                 };
-                if(transportLine.CountStops() > 1)
+                if(transportLine.CountStops() > 1 && transportLine.CountStops() < 32768)
                 {
                     RegionalLines[transportLine.SrcStop] = transportLine;
                 }
