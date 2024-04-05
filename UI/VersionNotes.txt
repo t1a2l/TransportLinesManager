@@ -1,4 +1,7 @@
-﻿<extended><color #9999FF>TLM 14.5.2 - 13/MAR/24</color>
+﻿<extended><color #9999FF>TLM 14.5.3 - 05/APR/24</color>
+	- Fix intercity bus line bug with two way outside connection roads.
+
+<color #9999FF>TLM 14.5.2 - 13/MAR/24</color>
 	- Added a soft despanw option to buses - will drop of passengers and go back to the depot.
 
 <color #9999FF>TLM 14.5.1 - 11/JAN/24</color>
