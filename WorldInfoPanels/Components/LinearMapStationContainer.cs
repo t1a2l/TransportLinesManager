@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static TransportLinesManager.WorldInfoPanels.UVMPublicTransportWorldInfoPanel.UVMPublicTransportWorldInfoPanelObject;
+using System.Reflection.Emit;
 
 namespace TransportLinesManager.WorldInfoPanels.Components
 {
@@ -108,8 +109,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             bg = GetComponent<UIPanel>();
             connectionPanel = bg.Find<UIPanel>("ConnectionPanel");
             stopNameField = bg.Find<UITextField>("StopNameField");
+            uibutton = bg.GetComponentInChildren<UIButton>();
             uilabel = bg.Find<UILabel>("PassengerCount");
-            uibutton = bg.Find<UIButton>("StopButton");
             dist = bg.Find<UILabel>("Distance");
             TLMLineItemButtonControl.EnsureTemplate();
             connections = new UITemplateList<UIButton>(connectionPanel, TLMLineItemButtonControl.LINE_ITEM_TEMPLATE);

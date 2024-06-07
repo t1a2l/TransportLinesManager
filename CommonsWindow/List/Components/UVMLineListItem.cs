@@ -294,6 +294,7 @@ namespace TransportLinesManager.CommonsWindow.List.Components
         public void Awake()
         {
             m_mouseIsOver = false;
+            var panel = GetComponent<UIPanel>();
             m_background = Find<UIPanel>("BG");
             m_lineName = Find<UILabel>("LineName");
             m_lineNameField = Find<UITextField>("LineNameField");
@@ -301,12 +302,11 @@ namespace TransportLinesManager.CommonsWindow.List.Components
             m_linePassengers = Find<UILabel>("LinePassengers");
             m_lineBalance = Find<UILabel>("LineExpenses");
             m_lineVehicles = Find<UILabel>("LineVehicles");
-            m_lineVehicles = Find<UILabel>("LineVehicles");
             var viewLine = Find<UIButton>("ViewLine");
             m_deleteLine = Find<UIButton>("DeleteLine");
             m_lineBudgetLabel = Find<UILabel>("LineBudget");
-            m_lineIsVisible = Find<UICheckBox>("LineVisibility");
-            m_lineColor = Find<UIColorField>("LineColor");
+            m_lineIsVisible = panel.GetComponentInChildren<UICheckBox>();
+            m_lineColor = panel.GetComponentInChildren<UIColorField>();
             m_lineNumberFormatted = m_lineColor.GetComponentInChildren<UIButton>();
             m_buttonAutoName = Find<UIButton>("AutoNameBtn");
             m_buttonAutoColor = Find<UIButton>("AutoColorBtn");

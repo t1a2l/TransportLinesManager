@@ -45,7 +45,7 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
         public void Awake()
         {
             m_content = GetComponent<UIPanel>();
-            m_check = Find<UICheckBox>("Checkbox");
+            m_check = m_content.GetComponentInChildren<UICheckBox>();
             m_check.eventCheckChanged += (x, y) => m_onChangeCheck?.Invoke(y);
         }
 

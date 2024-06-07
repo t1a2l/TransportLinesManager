@@ -6,7 +6,6 @@ using Commons.Utils;
 using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Data.Extensions;
 using TransportLinesManager.Interfaces;
-using TransportLinesManager.UI;
 using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.Tabs;
 using System;
@@ -25,8 +24,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         public void Awake()
         {
-            m_checkbox = Find<UICheckBox>("AssetCheckbox");
-            m_capacityEditor = Find<UITextField>("Cap");
+            var panel = GetComponent<UIPanel>();
+            m_checkbox = panel.GetComponentInChildren<UICheckBox>();
+            m_capacityEditor = panel.GetComponentInChildren<UITextField>();
             m_checkbox.eventCheckChanged += (x, y) =>
             {
                 if (m_isLoading)
