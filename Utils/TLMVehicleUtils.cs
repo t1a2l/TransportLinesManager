@@ -7,7 +7,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TransportLinesManager.OptionsMenu;
 using TransportLinesManager.Data.DataContainers;
 
 namespace TransportLinesManager.Utils

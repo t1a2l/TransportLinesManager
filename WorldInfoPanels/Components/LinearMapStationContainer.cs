@@ -149,7 +149,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                     var newVal = TLMStopDataContainer.Instance.SafeGet(m_stopId).IsTerminal;
                     TLMStopDataContainer.Instance.SafeGet(m_stopId).IsTerminal = !newVal;
                     NetProperties properties = NetManager.instance.m_properties;
-                    if (!(properties is null) && !(properties.m_drawSound is null))
+                    if (properties is not null && properties.m_drawSound is not null)
                     {
                         AudioManager.instance.DefaultGroup.AddPlayer(0, properties.m_drawSound, 1f);
                     }
