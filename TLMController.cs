@@ -79,7 +79,6 @@ namespace TransportLinesManager
         public TLMFacade SharedInstance { get; internal set; }
         internal IBridgeADR ConnectorADR { get; private set; }
         internal IBridgeWTS ConnectorWTS { get; private set; }
-        internal IBridgeWE ConnectorWE { get; private set; }
 
         private bool m_dirtyRegionalLines;
 
@@ -237,7 +236,6 @@ namespace TransportLinesManager
             SharedInstance = gameObject.AddComponent<TLMFacade>();
             ConnectorADR = PluginUtils.GetImplementationTypeForMod<BridgeADRFallback, IBridgeADR>(gameObject, "Addresses", "2.99.99.0", "TransportLinesManager.ModShared.BridgeADR");
             ConnectorWTS = PluginUtils.GetImplementationTypeForMod<BridgeWTSFallback, IBridgeWTS>(gameObject, "WriteTheSigns", "0.3.0.0", "TransportLinesManager.ModShared.BridgeWTS");
-            ConnectorWE = PluginUtils.GetImplementationTypeForMod<BridgeWEFallback, IBridgeWE>(gameObject, "WriteEverywhere", "0.1.0.12", "TransportLinesManager.ModShared.BridgeWE");
         }
 
         internal static readonly Color[] COLOR_ORDER =

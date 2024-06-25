@@ -62,9 +62,6 @@
       <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ICities.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <Reference Include="KwyttoUtilityWE">
-      <HintPath>..\..\..\GamesDocuments\CitiesSkylines\KwyttoUtilityWE.dll</HintPath>
-    </Reference>
     <Reference Include="UnifiedUILib">
       <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\workshop\content\255710\2966990700\UnifiedUILib.dll</HintPath>
       <Private>false</Private>
@@ -72,9 +69,6 @@
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\UnityEngine.dll</HintPath>
       <Private>false</Private>
-    </Reference>
-    <Reference Include="WriteEverywhere">
-      <HintPath>..\..\..\GamesDocuments\CitiesSkylines\WE\WriteEverywhere.dll</HintPath>
     </Reference> 
     </ItemGroup>
   <ItemGroup>
