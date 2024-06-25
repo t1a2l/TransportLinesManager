@@ -11,7 +11,7 @@ using TransportLinesManager.Data.Tsd;
 
 namespace TLM2WE
 {
-    internal class BridgeWE : IBridgeWE
+    internal class BridgeWE : IBridgeTLM
     {
         public override int Priority => -1000;
 
