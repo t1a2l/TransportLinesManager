@@ -28,8 +28,11 @@
   </Target>
   <ItemGroup>
     <Compile Remove="Code\Icons\**" />
+    <Compile Remove="TLM2WE\**" />
     <EmbeddedResource Remove="Code\Icons\**" />
+    <EmbeddedResource Remove="TLM2WE\**" />
     <None Remove="Code\Icons\**" />
+    <None Remove="TLM2WE\**" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Commons\UI\i18n\*.properties" />
@@ -39,7 +42,6 @@
     <EmbeddedResource Include="UI\Images\*.png" />
     <EmbeddedResource Include="UI\Images\*.txt" />
     <EmbeddedResource Remove="UI\Images\PreviewImage.png" />
-    <Compile Include="TLM2WE\TLM2WE.csproj" />
     <EmbeddedResource Include="MapDrawer\app.js" />
     <EmbeddedResource Include="MapDrawer\lineDrawBasicCss.css" />
     <EmbeddedResource Include="UI\VersionNotes.txt" />
