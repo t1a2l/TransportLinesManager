@@ -57,7 +57,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="WriteEverywhere">
-      <HintPath>..\..\..\..\Users\User\AppData\Local\Colossal Order\Cities_Skylines\Addons\Mods\TransportLinesManager\WriteEverywhere.dll</HintPath>
+      <HintPath>..\..\WriteEverywhere\WriteEverywhere\bin\Debug\WriteEverywhere.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -118,7 +118,7 @@ namespace TransportLinesManager.Cache.BuildingData
         public OutsideConnectionLineInfo LineDataObject 
             => !TLMBuildingDataContainer.Instance.SafeGet(SrcBuildingId).TlmManagedRegionalLines 
             ? null 
-            : m_cachedLineInfoRef ?? (m_cachedLineInfoRef = TLMBuildingDataContainer.Instance.SafeGet(SrcBuildingId).PlatformMappings[NetManager.instance.m_nodes.m_buffer[SrcStop].m_lane].TargetOutsideConnections[DstBuildingId]);
+            : (m_cachedLineInfoRef ??= TLMBuildingDataContainer.Instance.SafeGet(SrcBuildingId).PlatformMappings[NetManager.instance.m_nodes.m_buffer[SrcStop].m_lane].TargetOutsideConnections[DstBuildingId]);
 
         public void RenderLine(RenderManager.CameraInfo cameraInfo)
         {
