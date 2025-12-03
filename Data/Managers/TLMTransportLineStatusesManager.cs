@@ -350,7 +350,7 @@ namespace TransportLinesManager.Data.Managers
                 {
                     currentFrameIndex--;
                     uint idxEnum = (currentFrameIndex >> BYTES_PER_CYCLE) & CYCLES_HISTORY_MASK;
-                    LogUtils.DoLog($"Stroring data for frame {(currentFrameIndex & ~FRAMES_PER_CYCLE_MASK).ToString("X8")} into idx {idxEnum.ToString("X1")}");
+                    LogUtils.DoLog($"Stroring data for frame {currentFrameIndex & ~FRAMES_PER_CYCLE_MASK:X8} into idx {idxEnum:X1}");
 
                     FinishCycle(idxEnum, ref instance.m_linesDataLong, TransportManager.MAX_LINE_COUNT);
                     FinishCycle(idxEnum, ref instance.m_vehiclesDataLong, (int)VehicleManager.instance.m_vehicles.m_size);
@@ -487,8 +487,8 @@ namespace TransportLinesManager.Data.Managers
 
         #region Enum grouping
 
-        private LineDataUshort[] LowWealthData = new LineDataUshort[]
-        {
+        private readonly LineDataUshort[] LowWealthData =
+        [
             LineDataUshort.W1_CHILD_MALE_PASSENGERS,
             LineDataUshort.W1_TEENS_MALE_PASSENGERS,
             LineDataUshort.W1_YOUNG_MALE_PASSENGERS,
@@ -499,9 +499,9 @@ namespace TransportLinesManager.Data.Managers
             LineDataUshort.W1_YOUNG_FEML_PASSENGERS,
             LineDataUshort.W1_ADULT_FEML_PASSENGERS,
             LineDataUshort.W1_ELDER_FEML_PASSENGERS,
-};
-        private LineDataUshort[] MedWealthData = new LineDataUshort[]
-         {
+];
+        private readonly LineDataUshort[] MedWealthData =
+         [
             LineDataUshort.W2_CHILD_MALE_PASSENGERS,
             LineDataUshort.W2_TEENS_MALE_PASSENGERS,
             LineDataUshort.W2_YOUNG_MALE_PASSENGERS,
@@ -512,9 +512,9 @@ namespace TransportLinesManager.Data.Managers
             LineDataUshort.W2_YOUNG_FEML_PASSENGERS,
             LineDataUshort.W2_ADULT_FEML_PASSENGERS,
             LineDataUshort.W2_ELDER_FEML_PASSENGERS,
-};
-        private LineDataUshort[] HghWealthData = new LineDataUshort[]
-         {
+];
+        private readonly LineDataUshort[] HghWealthData =
+         [
             LineDataUshort.W3_CHILD_MALE_PASSENGERS,
             LineDataUshort.W3_TEENS_MALE_PASSENGERS,
             LineDataUshort.W3_YOUNG_MALE_PASSENGERS,
@@ -525,57 +525,57 @@ namespace TransportLinesManager.Data.Managers
             LineDataUshort.W3_YOUNG_FEML_PASSENGERS,
             LineDataUshort.W3_ADULT_FEML_PASSENGERS,
             LineDataUshort.W3_ELDER_FEML_PASSENGERS,
-        };
+        ];
 
 
 
-        private LineDataUshort[] ChildData = new LineDataUshort[]
-        {
+        private readonly LineDataUshort[] ChildData =
+        [
             LineDataUshort.W1_CHILD_MALE_PASSENGERS,
             LineDataUshort.W1_CHILD_FEML_PASSENGERS,
             LineDataUshort.W2_CHILD_MALE_PASSENGERS,
             LineDataUshort.W2_CHILD_FEML_PASSENGERS,
             LineDataUshort.W3_CHILD_MALE_PASSENGERS,
             LineDataUshort.W3_CHILD_FEML_PASSENGERS,
-};
-        private LineDataUshort[] TeenData = new LineDataUshort[]
-         {
+];
+        private readonly LineDataUshort[] TeenData =
+         [
             LineDataUshort.W1_TEENS_MALE_PASSENGERS,
             LineDataUshort.W1_TEENS_FEML_PASSENGERS,
             LineDataUshort.W2_TEENS_MALE_PASSENGERS,
             LineDataUshort.W2_TEENS_FEML_PASSENGERS,
             LineDataUshort.W3_TEENS_MALE_PASSENGERS,
             LineDataUshort.W3_TEENS_FEML_PASSENGERS,
-};
-        private LineDataUshort[] YoungData = new LineDataUshort[]
-         {
+];
+        private readonly LineDataUshort[] YoungData =
+         [
             LineDataUshort.W1_YOUNG_MALE_PASSENGERS,
             LineDataUshort.W1_YOUNG_FEML_PASSENGERS,
             LineDataUshort.W2_YOUNG_MALE_PASSENGERS,
             LineDataUshort.W2_YOUNG_FEML_PASSENGERS,
             LineDataUshort.W3_YOUNG_MALE_PASSENGERS,
             LineDataUshort.W3_YOUNG_FEML_PASSENGERS,
-        };
-        private LineDataUshort[] AdultData = new LineDataUshort[]
-         {
+        ];
+        private readonly LineDataUshort[] AdultData =
+         [
             LineDataUshort.W1_ADULT_MALE_PASSENGERS,
             LineDataUshort.W1_ADULT_FEML_PASSENGERS,
             LineDataUshort.W2_ADULT_MALE_PASSENGERS,
             LineDataUshort.W2_ADULT_FEML_PASSENGERS,
             LineDataUshort.W3_ADULT_MALE_PASSENGERS,
             LineDataUshort.W3_ADULT_FEML_PASSENGERS,
-        };
-        private LineDataUshort[] ElderData = new LineDataUshort[]
-         {
+        ];
+        private readonly LineDataUshort[] ElderData =
+         [
             LineDataUshort.W1_ELDER_MALE_PASSENGERS,
             LineDataUshort.W1_ELDER_FEML_PASSENGERS,
             LineDataUshort.W2_ELDER_MALE_PASSENGERS,
             LineDataUshort.W2_ELDER_FEML_PASSENGERS,
             LineDataUshort.W3_ELDER_MALE_PASSENGERS,
             LineDataUshort.W3_ELDER_FEML_PASSENGERS,
-        };
-        private LineDataUshort[] MaleData = new LineDataUshort[]
-         {
+        ];
+        private readonly LineDataUshort[] MaleData =
+         [
             LineDataUshort.W1_CHILD_MALE_PASSENGERS,
             LineDataUshort.W1_TEENS_MALE_PASSENGERS,
             LineDataUshort.W1_YOUNG_MALE_PASSENGERS,
@@ -591,9 +591,9 @@ namespace TransportLinesManager.Data.Managers
             LineDataUshort.W3_YOUNG_MALE_PASSENGERS,
             LineDataUshort.W3_ADULT_MALE_PASSENGERS,
             LineDataUshort.W3_ELDER_MALE_PASSENGERS,
-        };
-        private LineDataUshort[] FemaleData = new LineDataUshort[]
-        {
+        ];
+        private readonly LineDataUshort[] FemaleData =
+        [
            LineDataUshort.W1_CHILD_FEML_PASSENGERS,
            LineDataUshort.W1_TEENS_FEML_PASSENGERS,
            LineDataUshort.W1_YOUNG_FEML_PASSENGERS,
@@ -609,7 +609,7 @@ namespace TransportLinesManager.Data.Managers
            LineDataUshort.W3_YOUNG_FEML_PASSENGERS,
            LineDataUshort.W3_ADULT_FEML_PASSENGERS,
            LineDataUshort.W3_ELDER_FEML_PASSENGERS,
-        };
+        ];
 
         #endregion
 

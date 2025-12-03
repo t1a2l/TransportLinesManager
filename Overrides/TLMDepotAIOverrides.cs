@@ -58,11 +58,7 @@ namespace TransportLinesManager.Overrides
 
 
                 LogUtils.DoLog("randomVehicleInfo");
-                VehicleInfo randomVehicleInfo = DoModelDraw(offer.TransportLine);
-                if (randomVehicleInfo == null)
-                {
-                    randomVehicleInfo = Singleton<VehicleManager>.instance.GetRandomVehicleInfo(ref Singleton<SimulationManager>.instance.m_randomizer, m_info.m_class.m_service, m_info.m_class.m_subService, m_info.m_class.m_level);
-                }
+                VehicleInfo randomVehicleInfo = DoModelDraw(offer.TransportLine) ?? Singleton<VehicleManager>.instance.GetRandomVehicleInfo(ref Singleton<SimulationManager>.instance.m_randomizer, m_info.m_class.m_service, m_info.m_class.m_subService, m_info.m_class.m_level);
                 if (randomVehicleInfo != null)
                 {
                     LogUtils.DoLog("randomVehicleInfo != null");
@@ -103,7 +99,7 @@ namespace TransportLinesManager.Overrides
             var r = new Randomizer(new System.Random().Next());
             if (TransportLinesManagerMod.DebugMode)
             {
-                LogUtils.DoLog("DEPOT POSSIBLE VALUES FOR {2} LINE {1}: {0} ", string.Join(",", allowedDepots.Select(x => x.ToString()).ToArray()), lineId, tsd);
+                LogUtils.DoLog("DEPOT POSSIBLE VALUES FOR {2} LINE {1}: {0} ", string.Join(",", [.. allowedDepots.Select(x => x.ToString())]), lineId, tsd);
             }
 
             currentId = allowedDepots[r.Int32(0, allowedDepots.Count - 1)];

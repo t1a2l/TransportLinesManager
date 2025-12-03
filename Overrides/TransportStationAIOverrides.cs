@@ -12,20 +12,20 @@ namespace TransportLinesManager.Overrides
 	[HarmonyPatch(typeof(TransportStationAI))]
     public static class TransportStationAIOverrides
 	{
-        public static readonly TransferManager.TransferReason[] m_managedReasons = new TransferManager.TransferReason[]   
-        {
+        public static readonly TransferManager.TransferReason[] m_managedReasons =
+        [
                 TransferManager.TransferReason.DummyCar,
                 TransferManager.TransferReason.DummyTrain,
                 TransferManager.TransferReason.DummyShip,
                 TransferManager.TransferReason.DummyPlane
-        };
+        ];
 
 		[HarmonyPatch(typeof(TransportStationAI), "CreateIncomingVehicle")]
 		[HarmonyPrefix]
 		public static bool CreateIncomingVehicle(TransportStationAI __instance, ushort buildingID, ref Building buildingData, ushort startStop, int gateIndex, ref bool __result)
 		{
 			TransportInfo transportInfo = (!__instance.UseSecondaryTransportInfoForConnection()) ? __instance.m_transportInfo : __instance.m_secondaryTransportInfo;
-			if (transportInfo != null && FindConnectionVehicle(__instance, buildingID, ref buildingData, startStop, 3000f) == 0)
+			if (transportInfo != null && FindConnectionVehicle(__instance, ref buildingData, startStop, 3000f) == 0)
 			{
 				VehicleInfo vehicleInfo = (__instance.m_overrideVehicleClass is null) ? TryGetRandomVehicleStation(Singleton<VehicleManager>.instance, ref Singleton<SimulationManager>.instance.m_randomizer, __instance.m_transportLineInfo.m_class.m_service, __instance.m_transportLineInfo.m_class.m_subService, __instance.m_transportLineInfo.m_class.m_level, transportInfo.m_vehicleType) : TryGetRandomVehicleStation(Singleton<VehicleManager>.instance, ref Singleton<SimulationManager>.instance.m_randomizer, __instance.m_overrideVehicleClass.m_service, __instance.m_overrideVehicleClass.m_subService, __instance.m_overrideVehicleClass.m_level, transportInfo.m_vehicleType);
 				if (vehicleInfo != null)
@@ -35,7 +35,7 @@ namespace TransportLinesManager.Overrides
 					{
 						Array16<Vehicle> vehicles = Singleton<VehicleManager>.instance.m_vehicles;
 						BuildingInfo info = Singleton<BuildingManager>.instance.m_buildings.m_buffer[num].Info;
-						Randomizer randomizer = default(Randomizer);
+						Randomizer randomizer = default;
 						randomizer.seed = (ulong)gateIndex;
 						info.m_buildingAI.CalculateSpawnPosition(num, ref Singleton<BuildingManager>.instance.m_buildings.m_buffer[num], ref randomizer, vehicleInfo, out var position, out var _);
 						if (vehicleInfo.m_vehicleAI.CanSpawnAt(position) && Singleton<VehicleManager>.instance.CreateVehicle(out var vehicle, ref Singleton<SimulationManager>.instance.m_randomizer, vehicleInfo, position, transportInfo.m_vehicleReason, transferToSource: true, transferToTarget: false))
@@ -76,7 +76,7 @@ namespace TransportLinesManager.Overrides
 		public static bool CreateOutgoingVehicle(TransportStationAI __instance, ushort buildingID, ref Building buildingData, ushort startStop, int gateIndex, ref bool __result)
 		{
 			TransportInfo transportInfo = (!__instance.UseSecondaryTransportInfoForConnection()) ? __instance.m_transportInfo : __instance.m_secondaryTransportInfo;
-			if (__instance.m_transportLineInfo != null && FindConnectionVehicle(__instance, buildingID, ref buildingData, startStop, 3000f) == 0)
+			if (__instance.m_transportLineInfo != null && FindConnectionVehicle(__instance, ref buildingData, startStop, 3000f) == 0)
 			{
 				VehicleInfo vehicleInfo = (__instance.m_overrideVehicleClass == null) ? TryGetRandomVehicleStation(Singleton<VehicleManager>.instance, ref Singleton<SimulationManager>.instance.m_randomizer, __instance.m_transportLineInfo.m_class.m_service, __instance.m_transportLineInfo.m_class.m_subService, __instance.m_transportLineInfo.m_class.m_level, transportInfo.m_vehicleType) : TryGetRandomVehicleStation(Singleton<VehicleManager>.instance, ref Singleton<SimulationManager>.instance.m_randomizer, __instance.m_overrideVehicleClass.m_service, __instance.m_overrideVehicleClass.m_subService, __instance.m_overrideVehicleClass.m_level, transportInfo.m_vehicleType);
 				if (vehicleInfo != null)
@@ -112,7 +112,7 @@ namespace TransportLinesManager.Overrides
 			return false;
 		}
 
-		private static ushort FindConnectionVehicle(TransportStationAI __instance, ushort buildingID, ref Building buildingData, ushort targetStop, float maxDistance)
+		private static ushort FindConnectionVehicle(TransportStationAI __instance, ref Building buildingData, ushort targetStop, float maxDistance)
         {
 	        VehicleManager instance = Singleton<VehicleManager>.instance;
 	        Vector3 position = Singleton<NetManager>.instance.m_nodes.m_buffer[targetStop].m_position;
@@ -140,7 +140,7 @@ namespace TransportLinesManager.Overrides
 
 		private static ushort FindConnectionBuilding(TransportStationAI __instance, ushort stop)
 		{
-			if ((object)__instance.m_transportLineInfo != null)
+			if (__instance.m_transportLineInfo is not null)
 			{
 				Vector3 position = Singleton<NetManager>.instance.m_nodes.m_buffer[stop].m_position;
 				BuildingManager instance = Singleton<BuildingManager>.instance;

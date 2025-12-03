@@ -20,7 +20,7 @@ namespace TransportLinesManager
 
         protected override string ID { get; } = "TLM_ConfigWarehouse";
         [XmlIgnore]
-        public static readonly ConfigIndex[] PALETTES_INDEXES = new ConfigIndex[] {
+        public static readonly ConfigIndex[] PALETTES_INDEXES = [
           SHIP_PALETTE_MAIN,
           TRAIN_PALETTE_MAIN,
           TRAM_PALETTE_MAIN,
@@ -32,7 +32,7 @@ namespace TransportLinesManager
           TOUR_PED_CONFIG_PALETTE_MAIN,
           TROLLEY_CONFIG_PALETTE_MAIN,
           HELICOPTER_CONFIG_PALETTE_MAIN
-       };
+       ];
         protected bool unsafeMode = false;
         public TLMConfigWarehouse() { }
 
@@ -113,46 +113,28 @@ namespace TransportLinesManager
 
         }
 
-        public static Color32 getColorForTransportType(ConfigIndex i)
+        public static Color32 GetColorForTransportType(ConfigIndex i)
         {
-            switch (i & SYSTEM_PART)
+            return (i & SYSTEM_PART) switch
             {
-                case TRAIN_CONFIG:
-                    return new Color32(250, 104, 0, 255);
-                case TRAM_CONFIG:
-                    return new Color32(73, 27, 137, 255);
-                case METRO_CONFIG:
-                    return new Color32(58, 224, 50, 255);
-                case BUS_CONFIG:
-                    return new Color32(53, 121, 188, 255);
-                case PLANE_CONFIG:
-                    return new Color32(0xa8, 0x01, 0x7a, 255);
-                case SHIP_CONFIG:
-                    return new Color32(0xa3, 0xb0, 0, 255);
-                case BLIMP_CONFIG:
-                    return new Color32(0xd8, 0x01, 0xaa, 255);
-                case FERRY_CONFIG:
-                    return new Color32(0xe3, 0xf0, 0, 255);
-                case MONORAIL_CONFIG:
-                    return new Color32(217, 51, 89, 255);
-                case CABLE_CAR_CONFIG:
-                    return new Color32(31, 96, 225, 255);
-                case TAXI_CONFIG:
-                    return new Color32(60, 184, 120, 255);
-                case EVAC_BUS_CONFIG:
-                    return new Color32(202, 162, 31, 255);
-                case TOUR_BUS_CONFIG:
-                    return new Color32(110, 152, 251, 255);
-                case TOUR_PED_CONFIG:
-                    return new Color32(83, 157, 48, 255);
-                case TROLLEY_CONFIG:
-                    return new Color(1, .517f, 0, 1);
-                case HELICOPTER_CONFIG:
-                    return new Color(.671f, .333f, .604f, 1);
-                default:
-                    return new Color();
-
-            }
+                TRAIN_CONFIG => new Color32(250, 104, 0, 255),
+                TRAM_CONFIG => new Color32(73, 27, 137, 255),
+                METRO_CONFIG => new Color32(58, 224, 50, 255),
+                BUS_CONFIG => new Color32(53, 121, 188, 255),
+                PLANE_CONFIG => new Color32(0xa8, 0x01, 0x7a, 255),
+                SHIP_CONFIG => new Color32(0xa3, 0xb0, 0, 255),
+                BLIMP_CONFIG => new Color32(0xd8, 0x01, 0xaa, 255),
+                FERRY_CONFIG => new Color32(0xe3, 0xf0, 0, 255),
+                MONORAIL_CONFIG => new Color32(217, 51, 89, 255),
+                CABLE_CAR_CONFIG => new Color32(31, 96, 225, 255),
+                TAXI_CONFIG => new Color32(60, 184, 120, 255),
+                EVAC_BUS_CONFIG => new Color32(202, 162, 31, 255),
+                TOUR_BUS_CONFIG => new Color32(110, 152, 251, 255),
+                TOUR_PED_CONFIG => new Color32(83, 157, 48, 255),
+                TROLLEY_CONFIG => (Color32)new Color(1, .517f, 0, 1),
+                HELICOPTER_CONFIG => (Color32)new Color(.671f, .333f, .604f, 1),
+                _ => (Color32)new Color(),
+            };
         }
 
 
@@ -229,56 +211,26 @@ namespace TransportLinesManager
                     key = "CampusAreas";
                     break;
             };
-            switch (i & DESC_DATA)
+            return (i & DESC_DATA) switch
             {
-                case RESIDENTIAL_SERVICE_CONFIG:
-                    return "DISTRICT_RESIDENTIAL";
-                case COMMERCIAL_SERVICE_CONFIG:
-                    return "DISTRICT_COMMERCIAL";
-                case INDUSTRIAL_SERVICE_CONFIG:
-                    return "DISTRICT_INDUSTRIAL";
-                case NATURAL_SERVICE_CONFIG:
-                    return "NATURAL_SERVICE";
+                RESIDENTIAL_SERVICE_CONFIG => "DISTRICT_RESIDENTIAL",
+                COMMERCIAL_SERVICE_CONFIG => "DISTRICT_COMMERCIAL",
+                INDUSTRIAL_SERVICE_CONFIG => "DISTRICT_INDUSTRIAL",
+                NATURAL_SERVICE_CONFIG => "NATURAL_SERVICE",
                 //case UNUSED2_SERVICE_CONFIG:
                 //return "Unused2";
-                case CITIZEN_SERVICE_CONFIG:
-                    return "INCOME_CITIZEN";
-                case TOURISM_SERVICE_CONFIG:
-                    return "INCOME_TOURIST";
-                case OFFICE_SERVICE_CONFIG:
-                    return "DISTRICT_OFFICE";
-                case ADDRESS_NAME_CONFIG:
-                    return "TLM_ROAD_NAMING_STOP";
-                case PARKAREA_NAME_CONFIG:
-                case CAMPUS_AREA_NAME_CONFIG:
-                case INDUSTRIAL_AREA_NAME_CONFIG:
-                    return "FEATURES";
-                case ROAD_SERVICE_CONFIG:
-                case BEAUTIFICATION_SERVICE_CONFIG:
-                case GARBAGE_SERVICE_CONFIG:
-                case ELECTRICITY_SERVICE_CONFIG:
-                case WATER_SERVICE_CONFIG:
-                case HEALTHCARE_SERVICE_CONFIG:
-                case POLICEDEPARTMENT_SERVICE_CONFIG:
-                case EDUCATION_SERVICE_CONFIG:
-                case MONUMENT_SERVICE_CONFIG:
-                case FIREDEPARTMENT_SERVICE_CONFIG:
-                case PUBLICTRANSPORT_SERVICE_CONFIG:
-                case DISTRICT_NAME_CONFIG:
-                case VARSITY_SPORTS_SERVICE_CONFIG:
-                    return "MAIN_TOOL";
-                case MUSEUMS_SERVICE_CONFIG:
-                    return "MAIN_CATEGORY";
-                case DISASTER_SERVICE_CONFIG:
-                    return "MAIN_TOOL_ND";
-                case PLAYER_INDUSTRY_SERVICE_CONFIG:
-                    return "PARKSOVERVIEW_TOOLTIP";
-                case PLAYER_EDUCATION_SERVICE_CONFIG:
-                    return "INFO_EDUCATION_BUILDING";
-                default:
-                    return "???";
-
-            }
+                CITIZEN_SERVICE_CONFIG => "INCOME_CITIZEN",
+                TOURISM_SERVICE_CONFIG => "INCOME_TOURIST",
+                OFFICE_SERVICE_CONFIG => "DISTRICT_OFFICE",
+                ADDRESS_NAME_CONFIG => "TLM_ROAD_NAMING_STOP",
+                PARKAREA_NAME_CONFIG or CAMPUS_AREA_NAME_CONFIG or INDUSTRIAL_AREA_NAME_CONFIG => "FEATURES",
+                ROAD_SERVICE_CONFIG or BEAUTIFICATION_SERVICE_CONFIG or GARBAGE_SERVICE_CONFIG or ELECTRICITY_SERVICE_CONFIG or WATER_SERVICE_CONFIG or HEALTHCARE_SERVICE_CONFIG or POLICEDEPARTMENT_SERVICE_CONFIG or EDUCATION_SERVICE_CONFIG or MONUMENT_SERVICE_CONFIG or FIREDEPARTMENT_SERVICE_CONFIG or PUBLICTRANSPORT_SERVICE_CONFIG or DISTRICT_NAME_CONFIG or VARSITY_SPORTS_SERVICE_CONFIG => "MAIN_TOOL",
+                MUSEUMS_SERVICE_CONFIG => "MAIN_CATEGORY",
+                DISASTER_SERVICE_CONFIG => "MAIN_TOOL_ND",
+                PLAYER_INDUSTRY_SERVICE_CONFIG => "PARKSOVERVIEW_TOOLTIP",
+                PLAYER_EDUCATION_SERVICE_CONFIG => "INFO_EDUCATION_BUILDING",
+                _ => "???",
+            };
         }
 
         //public static LineIconSpriteNames getBgIconForIndex(TLMConfigWarehouse.ConfigIndex transportType)
@@ -294,7 +246,8 @@ namespace TransportLinesManager
         //    }
         //}
         //public static int GetSettedTicketPrice(TLMConfigWarehouse.ConfigIndex transportType) => GetCurrentConfigInt((transportType & SYSTEM_PART) | DEFAULT_TICKET_PRICE);
-        private static LineIconSpriteNames getDefaultBgIconForIndex(TLMConfigWarehouse.ConfigIndex transportType)
+        
+        public static LineIconSpriteNames GetDefaultBgIconForIndex(TLMConfigWarehouse.ConfigIndex transportType)
         {
             switch (transportType & SYSTEM_PART)
             {
@@ -335,41 +288,39 @@ namespace TransportLinesManager
                     return LineIconSpriteNames.S09StarIcon;
             }
         }
-        public static string getNameForTransportType(ConfigIndex i)
+        public static string GetNameForTransportType(ConfigIndex i)
         {
-            switch (i & SYSTEM_PART)
+            return (i & SYSTEM_PART) switch
             {
-                case TRAIN_CONFIG: return Locale.Get("VEHICLE_TITLE", "Train Engine");
-                case TRAM_CONFIG: return Locale.Get("VEHICLE_TITLE", "Tram");
-                case METRO_CONFIG: return Locale.Get("VEHICLE_TITLE", "Metro");
-                case BUS_CONFIG: return Locale.Get("VEHICLE_TITLE", "Bus");
-                case PLANE_CONFIG: return Locale.Get("VEHICLE_TITLE", "Aircraft Passenger");
-                case SHIP_CONFIG: return Locale.Get("VEHICLE_TITLE", "Ship Passenger");
-                case BLIMP_CONFIG: return Locale.Get("VEHICLE_TITLE", "Blimp");
-                case FERRY_CONFIG: return Locale.Get("VEHICLE_TITLE", "Ferry");
-                case MONORAIL_CONFIG: return Locale.Get("VEHICLE_TITLE", "Monorail Front");
-                case EVAC_BUS_CONFIG: return Locale.Get("VEHICLE_TITLE", "Evacuation Bus");
-                case TOUR_BUS_CONFIG: return Locale.Get("TOOLTIP_TOURISTBUSLINES");
-                case TOUR_PED_CONFIG: return Locale.Get("TOOLTIP_WALKINGTOURS");
-                case CABLE_CAR_CONFIG: return Locale.Get("VEHICLE_TITLE", "Cable Car");
-                case TAXI_CONFIG: return Locale.Get("VEHICLE_TITLE", "Taxi");
-                case HELICOPTER_CONFIG: return Locale.Get("VEHICLE_TITLE", "Passenger Helicopter");
-                case TROLLEY_CONFIG: return Locale.Get("VEHICLE_TITLE", "Trolleybus 01");
-                default: return "???";
-            }
+                TRAIN_CONFIG => Locale.Get("VEHICLE_TITLE", "Train Engine"),
+                TRAM_CONFIG => Locale.Get("VEHICLE_TITLE", "Tram"),
+                METRO_CONFIG => Locale.Get("VEHICLE_TITLE", "Metro"),
+                BUS_CONFIG => Locale.Get("VEHICLE_TITLE", "Bus"),
+                PLANE_CONFIG => Locale.Get("VEHICLE_TITLE", "Aircraft Passenger"),
+                SHIP_CONFIG => Locale.Get("VEHICLE_TITLE", "Ship Passenger"),
+                BLIMP_CONFIG => Locale.Get("VEHICLE_TITLE", "Blimp"),
+                FERRY_CONFIG => Locale.Get("VEHICLE_TITLE", "Ferry"),
+                MONORAIL_CONFIG => Locale.Get("VEHICLE_TITLE", "Monorail Front"),
+                EVAC_BUS_CONFIG => Locale.Get("VEHICLE_TITLE", "Evacuation Bus"),
+                TOUR_BUS_CONFIG => Locale.Get("TOOLTIP_TOURISTBUSLINES"),
+                TOUR_PED_CONFIG => Locale.Get("TOOLTIP_WALKINGTOURS"),
+                CABLE_CAR_CONFIG => Locale.Get("VEHICLE_TITLE", "Cable Car"),
+                TAXI_CONFIG => Locale.Get("VEHICLE_TITLE", "Taxi"),
+                HELICOPTER_CONFIG => Locale.Get("VEHICLE_TITLE", "Passenger Helicopter"),
+                TROLLEY_CONFIG => Locale.Get("VEHICLE_TITLE", "Trolleybus 01"),
+                _ => "???",
+            };
         }
 
         public override bool GetDefaultBoolValueForProperty(ConfigIndex i) => defaultTrueBoolProperties.Contains(i);
 
         public override int GetDefaultIntValueForProperty(ConfigIndex i)
         {
-            switch (i)
+            return i switch
             {
-                case MAX_VEHICLES_SPECIFIC_CONFIG:
-                    return 50;
-                default:
-                    return 0;
-            }
+                MAX_VEHICLES_SPECIFIC_CONFIG => 50,
+                _ => 0,
+            };
         }
         public override string GetDefaultStringValueForProperty(ConfigIndex i)
         {
@@ -379,38 +330,20 @@ namespace TransportLinesManager
                 {
                     case VEHICLE_NUMBER_FORMAT_FOREIGN:
                     case VEHICLE_NUMBER_FORMAT_LOCAL:
-                        switch (i & SYSTEM_PART)
+                        return (i & SYSTEM_PART) switch
                         {
-                            case TRAIN_CONFIG:
-                            case TRAM_CONFIG:
-                            case METRO_CONFIG:
-                            case MONORAIL_CONFIG:
-                            case CABLE_CAR_CONFIG:
-                                return "FOTUL";
-                            case PLANE_CONFIG:
-                            case BALLOON_CONFIG:
-                            case BLIMP_CONFIG:
-                            case HELICOPTER_CONFIG:
-                                return "NO-XYZ";
-                            case SHIP_CONFIG:
-                            case FERRY_CONFIG:
-                                return "EFNOXYZ";
-                            case BUS_CONFIG:
-                            case EVAC_BUS_CONFIG:
-                            case TOUR_BUS_CONFIG:
-                            case TROLLEY_CONFIG:
-                                return "PQR EFSTU";
-                            default:
-                                return "VW.XYZ";
-                        }
+                            TRAIN_CONFIG or TRAM_CONFIG or METRO_CONFIG or MONORAIL_CONFIG or CABLE_CAR_CONFIG => "FOTUL",
+                            PLANE_CONFIG or BALLOON_CONFIG or BLIMP_CONFIG or HELICOPTER_CONFIG => "NO-XYZ",
+                            SHIP_CONFIG or FERRY_CONFIG => "EFNOXYZ",
+                            BUS_CONFIG or EVAC_BUS_CONFIG or TOUR_BUS_CONFIG or TROLLEY_CONFIG => "PQR EFSTU",
+                            _ => "VW.XYZ",
+                        };
                 }
             }
             return base.GetDefaultStringValueForProperty(i);
         }
 
-
-
-        public static ItemClass.SubService getSubserviceFromSystemId(ConfigIndex idx)
+        public static ItemClass.SubService GetSubserviceFromSystemId(ConfigIndex idx)
         {
             ConfigIndex systemIdx = idx & SYSTEM_PART;
             switch (systemIdx)
@@ -455,38 +388,33 @@ namespace TransportLinesManager
                     return ItemClass.SubService.None;
             }
         }
-        public static TransferManager.TransferReason[] getTransferReasonFromSystemId(ConfigIndex idx)
+        public static TransferManager.TransferReason[] GetTransferReasonFromSystemId(ConfigIndex idx)
         {
-
-
-
             ConfigIndex systemIdx = idx & SYSTEM_PART;
-            switch (systemIdx)
+            return systemIdx switch
             {
-                case TRAIN_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.PassengerTrain };
-                case TRAM_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.Tram };
-                case METRO_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.MetroTrain, TransferManager.TransferReason.PassengerTrain };
-                case BUS_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.Bus };
-                case EVAC_BUS_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.EvacuateA, TransferManager.TransferReason.EvacuateB, TransferManager.TransferReason.EvacuateC, TransferManager.TransferReason.EvacuateD, TransferManager.TransferReason.EvacuateVipA, TransferManager.TransferReason.EvacuateVipB, TransferManager.TransferReason.EvacuateVipC, TransferManager.TransferReason.EvacuateVipD };
-                case PLANE_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.PassengerPlane };
-                case SHIP_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.PassengerShip };
-                case MONORAIL_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.Monorail };
-                case TAXI_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.Taxi };
-                case CABLE_CAR_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.CableCar };
-                case TOUR_PED_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.TouristA, TransferManager.TransferReason.TouristB, TransferManager.TransferReason.TouristC, TransferManager.TransferReason.TouristD };
-                case TOUR_BUS_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.TouristBus };
-                case BALLOON_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.TouristA, TransferManager.TransferReason.TouristB, TransferManager.TransferReason.TouristC, TransferManager.TransferReason.TouristD };
-                case BLIMP_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.Blimp };
-                case FERRY_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.Ferry };
-                case TROLLEY_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.Trolleybus };
-                case HELICOPTER_CONFIG: return new TransferManager.TransferReason[] { TransferManager.TransferReason.PassengerHelicopter };
-
-                default:
-                    return null;
-            }
+                TRAIN_CONFIG => [TransferManager.TransferReason.PassengerTrain],
+                TRAM_CONFIG => [TransferManager.TransferReason.Tram],
+                METRO_CONFIG => [TransferManager.TransferReason.MetroTrain, TransferManager.TransferReason.PassengerTrain],
+                BUS_CONFIG => [TransferManager.TransferReason.Bus],
+                EVAC_BUS_CONFIG => [TransferManager.TransferReason.EvacuateA, TransferManager.TransferReason.EvacuateB, TransferManager.TransferReason.EvacuateC, TransferManager.TransferReason.EvacuateD, TransferManager.TransferReason.EvacuateVipA, TransferManager.TransferReason.EvacuateVipB, TransferManager.TransferReason.EvacuateVipC, TransferManager.TransferReason.EvacuateVipD],
+                PLANE_CONFIG => [TransferManager.TransferReason.PassengerPlane],
+                SHIP_CONFIG => [TransferManager.TransferReason.PassengerShip],
+                MONORAIL_CONFIG => [TransferManager.TransferReason.Monorail],
+                TAXI_CONFIG => [TransferManager.TransferReason.Taxi],
+                CABLE_CAR_CONFIG => [TransferManager.TransferReason.CableCar],
+                TOUR_PED_CONFIG => [TransferManager.TransferReason.TouristA, TransferManager.TransferReason.TouristB, TransferManager.TransferReason.TouristC, TransferManager.TransferReason.TouristD],
+                TOUR_BUS_CONFIG => [TransferManager.TransferReason.TouristBus],
+                BALLOON_CONFIG => [TransferManager.TransferReason.TouristA, TransferManager.TransferReason.TouristB, TransferManager.TransferReason.TouristC, TransferManager.TransferReason.TouristD],
+                BLIMP_CONFIG => [TransferManager.TransferReason.Blimp],
+                FERRY_CONFIG => [TransferManager.TransferReason.Ferry],
+                TROLLEY_CONFIG => [TransferManager.TransferReason.Trolleybus],
+                HELICOPTER_CONFIG => [TransferManager.TransferReason.PassengerHelicopter],
+                _ => null,
+            };
         }
 
-        public static ConfigIndex getConfigTransportSystemForDefinition(TransportSystemDefinition tsd)
+        public static ConfigIndex GetConfigTransportSystemForDefinition(TransportSystemDefinition tsd)
         {
             if (tsd == TransportSystemDefinition.BUS)
             {
@@ -564,41 +492,27 @@ namespace TransportLinesManager
         public static TransportSystemDefinition GetTransportSystemDefinitionForConfigTransport(ConfigIndex idx)
         {
             ConfigIndex systemIdx = idx & SYSTEM_PART;
-            switch (systemIdx)
+            return systemIdx switch
             {
-                case BUS_CONFIG:
-                    return TransportSystemDefinition.BUS;
-                case TRAIN_CONFIG:
-                    return TransportSystemDefinition.TRAIN;
-                case TRAM_CONFIG:
-                    return TransportSystemDefinition.TRAM;
-                case SHIP_CONFIG:
-                    return TransportSystemDefinition.SHIP;
-                case PLANE_CONFIG:
-                    return TransportSystemDefinition.PLANE;
-                case METRO_CONFIG:
-                    return TransportSystemDefinition.METRO;
-                case MONORAIL_CONFIG:
-                    return TransportSystemDefinition.MONORAIL;
-                case BLIMP_CONFIG:
-                    return TransportSystemDefinition.BLIMP;
-                case FERRY_CONFIG:
-                    return TransportSystemDefinition.FERRY;
-                case TOUR_BUS_CONFIG:
-                    return TransportSystemDefinition.TOUR_BUS;
-                case TOUR_PED_CONFIG:
-                    return TransportSystemDefinition.TOUR_PED;
-                case TROLLEY_CONFIG:
-                    return TransportSystemDefinition.TROLLEY;
-                case HELICOPTER_CONFIG:
-                    return TransportSystemDefinition.HELICOPTER;
-                default:
-                    return default;
-            }
+                BUS_CONFIG => TransportSystemDefinition.BUS,
+                TRAIN_CONFIG => TransportSystemDefinition.TRAIN,
+                TRAM_CONFIG => TransportSystemDefinition.TRAM,
+                SHIP_CONFIG => TransportSystemDefinition.SHIP,
+                PLANE_CONFIG => TransportSystemDefinition.PLANE,
+                METRO_CONFIG => TransportSystemDefinition.METRO,
+                MONORAIL_CONFIG => TransportSystemDefinition.MONORAIL,
+                BLIMP_CONFIG => TransportSystemDefinition.BLIMP,
+                FERRY_CONFIG => TransportSystemDefinition.FERRY,
+                TOUR_BUS_CONFIG => TransportSystemDefinition.TOUR_BUS,
+                TOUR_PED_CONFIG => TransportSystemDefinition.TOUR_PED,
+                TROLLEY_CONFIG => TransportSystemDefinition.TROLLEY,
+                HELICOPTER_CONFIG => TransportSystemDefinition.HELICOPTER,
+                _ => default,
+            };
         }
 
 
-        public static readonly ConfigIndex[] configurableTicketTransportCategories = {
+        public static readonly ConfigIndex[] configurableTicketTransportCategories = [
             TRAIN_CONFIG      ,
             TRAM_CONFIG       ,
             METRO_CONFIG      ,
@@ -612,9 +526,9 @@ namespace TransportLinesManager
             TOUR_BUS_CONFIG   ,
             TROLLEY_CONFIG       ,
             HELICOPTER_CONFIG       ,
-       };
+       ];
 
-        public static readonly ConfigIndex[] configurableAutoNameTransportCategories = {
+        public static readonly ConfigIndex[] configurableAutoNameTransportCategories = [
            PLANE_CONFIG,
            BLIMP_CONFIG,
            SHIP_CONFIG,
@@ -628,8 +542,8 @@ namespace TransportLinesManager
            TOUR_PED_CONFIG,
            TROLLEY_CONFIG,
            HELICOPTER_CONFIG,
-       };
-        public static readonly ConfigIndex[] configurableAutoNameCategories = {
+       ];
+        public static readonly ConfigIndex[] configurableAutoNameCategories = [
            MONUMENT_SERVICE_CONFIG,
            BEAUTIFICATION_SERVICE_CONFIG,
            HEALTHCARE_SERVICE_CONFIG,
@@ -642,15 +556,15 @@ namespace TransportLinesManager
            PLAYER_EDUCATION_SERVICE_CONFIG,
            VARSITY_SPORTS_SERVICE_CONFIG,
            MUSEUMS_SERVICE_CONFIG,
-       };
-        public static readonly ConfigIndex[] extraAutoNameCategories = {
+       ];
+        public static readonly ConfigIndex[] extraAutoNameCategories = [
            PARKAREA_NAME_CONFIG       ,
            CAMPUS_AREA_NAME_CONFIG       ,
            INDUSTRIAL_AREA_NAME_CONFIG       ,
            DISTRICT_NAME_CONFIG       ,
            ADDRESS_NAME_CONFIG
-       };
-        public static readonly ConfigIndex[] defaultTrueBoolProperties = {
+       ];
+        public static readonly ConfigIndex[] defaultTrueBoolProperties = [
             MONUMENT_USE_FOR_AUTO_NAMING_REF,
             BEAUTIFICATION_USE_FOR_AUTO_NAMING_REF,
             TRAIN_USE_FOR_AUTO_NAMING_REF,
@@ -672,9 +586,9 @@ namespace TransportLinesManager
             TOUR_BUS_CONFIG_SHOW_IN_LINEAR_MAP ,
             HELICOPTER_CONFIG_SHOW_IN_LINEAR_MAP ,
             TROLLEY_CONFIG_SHOW_IN_LINEAR_MAP ,
-       };
+       ];
         public static readonly ConfigIndex[] namingOrder =
-        {
+        [
            PLANE_CONFIG ,
            SHIP_CONFIG  ,
            TRAIN_CONFIG ,
@@ -710,7 +624,7 @@ namespace TransportLinesManager
            INDUSTRIAL_SERVICE_CONFIG    ,
            COMMERCIAL_SERVICE_CONFIG    ,
            RESIDENTIAL_SERVICE_CONFIG   ,
-       };
+       ];
 
         public static TLMSpecialNamingClass ToSpecial(ConfigIndex idx)
         {
@@ -1216,7 +1130,7 @@ namespace TransportLinesManager
                 {
                     case 0:
                         var tsd = GetTransportSystemDefinitionForConfigTransport(entry);
-                        if (!(tsd is null))
+                        if (tsd is not null)
                         {
                             switch (entry & (DESC_DATA | ConfigIndex.TYPE_PART))
                             {
@@ -1265,7 +1179,7 @@ namespace TransportLinesManager
                         break;
                     case USE_FOR_AUTO_NAMING_REF & ADC_DESC_PART:
                         var tsd3 = GetTransportSystemDefinitionForConfigTransport(entry);
-                        if (!(tsd3 is null))
+                        if (tsd3 is not null)
                         {
                             target.GetTransportData(tsd3).UseInAutoName = GetBool(entry); continue;
                         }
@@ -1282,7 +1196,7 @@ namespace TransportLinesManager
                         break;
                     case AUTO_NAMING_REF_TEXT & ADC_DESC_PART:
                         var tsd2 = GetTransportSystemDefinitionForConfigTransport(entry);
-                        if (!(tsd2 is null))
+                        if (tsd2 is not null)
                         {
                             target.GetTransportData(tsd2).NamingPrefix = GetString(entry); continue;
                         }
@@ -1298,7 +1212,7 @@ namespace TransportLinesManager
                         }
                         break;
                 }
-                LogUtils.DoWarnLog($"Invalid entry found - not copied to base XML: {entry} ({((int)entry).ToString("X8")})");
+                LogUtils.DoWarnLog($"Invalid entry found - not copied to base XML: {entry} ({(int)entry:X8})");
             }
         }
     }

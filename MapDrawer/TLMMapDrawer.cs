@@ -19,7 +19,7 @@ namespace TransportLinesManager.MapDrawer
 
             foreach (object type in Enum.GetValues(typeof(TransportInfo.TransportType)))
             {
-                linesByType[(TransportInfo.TransportType)type] = new List<ushort>();
+                linesByType[(TransportInfo.TransportType)type] = [];
             }
 
             int nextStationId = 1;
@@ -71,7 +71,7 @@ namespace TransportLinesManager.MapDrawer
                         else
                         {
                             var nearStops = new Dictionary<ushort, Vector3>();
-                            TLMLineUtils.GetNearStopPoints(worldPos, range, ref nearStops, new ItemClass.SubService[] {
+                            TLMLineUtils.GetNearStopPoints(worldPos, range, ref nearStops, [
                                 ItemClass.SubService.PublicTransportShip,
                                 ItemClass.SubService.PublicTransportPlane,
                                 ItemClass.SubService.PublicTransportTrain,
@@ -81,12 +81,12 @@ namespace TransportLinesManager.MapDrawer
                                 ItemClass.SubService.PublicTransportTram,
                                 ItemClass.SubService.PublicTransportBus,
                                 ItemClass.SubService.PublicTransportTrolleybus
-                            }, 15);
+                            ], 15);
                             if (!nearStops.ContainsKey(nextStop))
                             {
                                 nearStops[nextStop] = NetManager.instance.m_nodes.m_buffer[nextStop].m_position;
                             }
-                            var thisStation = new TLMMapStation(name, pos2D, worldPos, nearStops, nextStationId++, service, nextStop);
+                            var thisStation = new TLMMapStation(name, worldPos, nearStops, nextStationId++, service, nextStop);
                             stations.Add(thisStation);
                             transportLines[lineId].AddStation(ref thisStation);
                         }
@@ -117,8 +117,8 @@ namespace TransportLinesManager.MapDrawer
             return range;
         }
 
-        private static TransportInfo.TransportType[] allowedTypesToDraw =
-        {
+        private static readonly TransportInfo.TransportType[] allowedTypesToDraw =
+        [
             TransportInfo.TransportType.Monorail,
             TransportInfo.TransportType.Airplane,
             TransportInfo.TransportType.Metro,
@@ -130,14 +130,14 @@ namespace TransportLinesManager.MapDrawer
             TransportInfo.TransportType.Bus,
             TransportInfo.TransportType.Trolleybus,
             TransportInfo.TransportType.Helicopter,
-        };
+        ];
 
         private static string BuildHtml(List<TLMMapStation> stations, Dictionary<ushort, TLMMapTransportLine> transportLines, string cityName, string cityId, DateTime currentTime)
         {
             var svg = new TLMMapHtmlTemplate();
             string cityMapsFolder = TLMController.ExportedMapsFolder + Path.DirectorySeparatorChar + $"{cityName}_{cityId}";
             FileUtils.EnsureFolderCreation(cityMapsFolder);
-            string filename = cityMapsFolder + Path.DirectorySeparatorChar + $"{cityName}_{currentTime.ToString("yyyy-MM-dd-HH-mm-ss")}.html";
+            string filename = cityMapsFolder + Path.DirectorySeparatorChar + $"{cityName}_{currentTime:yyyy-MM-dd-HH-mm-ss}.html";
             if (File.Exists(filename))
             {
                 File.Delete(filename);
@@ -146,7 +146,7 @@ namespace TransportLinesManager.MapDrawer
             var cto = new TLMMapCityTransportObject
             {
                 transportLines = transportLines,
-                stations = stations.OrderBy(x => x.Id).ToList()
+                stations = [.. stations.OrderBy(x => x.Id)]
             };
             sr.WriteLine(svg.GetResult(cto, cityName, currentTime));
             sr.Close();

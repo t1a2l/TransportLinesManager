@@ -7,16 +7,16 @@ using UnityEngine;
 
 namespace TransportLinesManager.Palettes
 {
-    public class TLMAutoColorPalette
+    public class TLMAutoColorPalette(string name, IEnumerable<Color32> colors)
     {
         public const char ENTRY_SEPARATOR = '\n';
         public const string EXT_PALETTE = ".txt";
 
-        public string Name { get; set; }
+        public string Name { get; set; } = name;
 
         public int Count => Colors.Count;
 
-        public List<Color32> Colors { get; }
+        public List<Color32> Colors { get; } = [.. colors];
 
         public void Add() => Colors.Add(Color.white);
 
@@ -36,12 +36,6 @@ namespace TransportLinesManager.Palettes
             }
         }
 
-        public TLMAutoColorPalette(string name, IEnumerable<Color32> colors)
-        {
-            Name = name;
-            Colors = new List<Color32>(colors);
-        }
-
         public Color32 this[int key]
         {
             get => Colors[key];
@@ -58,7 +52,7 @@ namespace TransportLinesManager.Palettes
             }
         }
 
-        public string ToFileContent() => string.Join(ENTRY_SEPARATOR.ToString(), Colors.Select(x => x.ToRGB()).ToArray());
+        public string ToFileContent() => string.Join(ENTRY_SEPARATOR.ToString(), [.. Colors.Select(x => x.ToRGB())]);
 
         public static TLMAutoColorPalette FromFileContent(string name, string[] fileContentLines)
         {

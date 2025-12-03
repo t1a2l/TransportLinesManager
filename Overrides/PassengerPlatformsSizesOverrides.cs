@@ -11,7 +11,7 @@ namespace TransportLinesManager.Overrides
       
         [HarmonyPatch(typeof(PassengerTrainAI), "LoadPassengers")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TranspliePassengerTrainAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TranspliePassengerTrainAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)
@@ -43,7 +43,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(PassengerTrainAI), "CheckPassengers")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TranspliePassengerTrainAIRaiseHalfGrid1(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TranspliePassengerTrainAIRaiseHalfGrid1(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)
@@ -75,7 +75,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(PassengerBlimpAI), "LoadPassengers")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TranspliePassengerBlimpAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TranspliePassengerBlimpAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)
@@ -107,7 +107,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(PassengerFerryAI), "LoadPassengers")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TranspliePassengerFerryAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TranspliePassengerFerryAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)
@@ -139,7 +139,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(PassengerHelicopterAI), "LoadPassengers")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TranspliePassengerHelicopterAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TranspliePassengerHelicopterAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)
@@ -171,7 +171,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(PassengerPlaneAI), "LoadPassengers")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TranspliePassengerPlaneAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TranspliePassengerPlaneAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)
@@ -203,7 +203,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(PassengerPlaneAI), "CheckPassengers")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TranspliePassengerPlaneAIRaiseHalfGrid1(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TranspliePassengerPlaneAIRaiseHalfGrid1(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)
@@ -235,7 +235,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(PassengerShipAI), "LoadPassengers")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TranspliePassengerShipAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TranspliePassengerShipAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)
@@ -267,7 +267,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(PassengerShipAI), "CheckPassengers")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TranspliePassengerShipAIRaiseHalfGrid1(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TranspliePassengerShipAIRaiseHalfGrid1(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)
@@ -299,7 +299,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(TramAI), "LoadPassengers")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TransplieTramAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TransplieTramAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)
@@ -331,7 +331,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(TramAI), "CheckPassengers")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TransplieTramAIRaiseHalfGrid1(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TransplieTramAIRaiseHalfGrid1(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)
@@ -363,7 +363,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(TrolleybusAI), "LoadPassengers")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TransplieTrolleybusAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TransplieTrolleybusAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)
@@ -395,7 +395,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(TrolleybusAI), "CheckPassengers")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TransplieTrolleybusAIRaiseHalfGrid1(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TransplieTrolleybusAIRaiseHalfGrid1(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)
@@ -427,7 +427,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(BusAI), "LoadPassengers")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TransplieBusAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TransplieBusAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)
@@ -459,7 +459,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(CableCarAI), "LoadPassengers")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TransplieCableCarAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TransplieCableCarAIRaiseHalfGrid(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             for (int i = 0; i < inst.Count; i++)

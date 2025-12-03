@@ -17,14 +17,14 @@ namespace TransportLinesManager.Overrides
     public static class VehicleAIOverrides
     {
 
-        private static MethodInfo BusAI_StartPathFind = typeof(BusAI).GetMethod("StartPathFind", Patcher.allFlags, null, new Type[] { typeof(ushort), typeof(Vehicle).MakeByRefType() }, null);
-        private static MethodInfo TramAI_StartPathFind = typeof(TramAI).GetMethod("StartPathFind", Patcher.allFlags, null, new Type[] { typeof(ushort), typeof(Vehicle).MakeByRefType() }, null);
-        private static MethodInfo TrolleyAI_StartPathFind = typeof(TrolleybusAI).GetMethod("StartPathFind", Patcher.allFlags, null, new Type[] { typeof(ushort), typeof(Vehicle).MakeByRefType() }, null);
-        private static MethodInfo BusAI_UnloadPassengers = typeof(BusAI).GetMethod("UnloadPassengers", Patcher.allFlags);
-        private static MethodInfo TramAI_UnloadPassengers = typeof(TramAI).GetMethod("UnloadPassengers", Patcher.allFlags);
-        private static MethodInfo TrolleybusAI_UnloadPassengers = typeof(TrolleybusAI).GetMethod("UnloadPassengers", Patcher.allFlags);
+        private static readonly MethodInfo BusAI_StartPathFind = typeof(BusAI).GetMethod("StartPathFind", Patcher.allFlags, null, [typeof(ushort), typeof(Vehicle).MakeByRefType()], null);
+        private static readonly MethodInfo TramAI_StartPathFind = typeof(TramAI).GetMethod("StartPathFind", Patcher.allFlags, null, [typeof(ushort), typeof(Vehicle).MakeByRefType()], null);
+        private static readonly MethodInfo TrolleyAI_StartPathFind = typeof(TrolleybusAI).GetMethod("StartPathFind", Patcher.allFlags, null, [typeof(ushort), typeof(Vehicle).MakeByRefType()], null);
+        private static readonly MethodInfo BusAI_UnloadPassengers = typeof(BusAI).GetMethod("UnloadPassengers", Patcher.allFlags);
+        private static readonly MethodInfo TramAI_UnloadPassengers = typeof(TramAI).GetMethod("UnloadPassengers", Patcher.allFlags);
+        private static readonly MethodInfo TrolleybusAI_UnloadPassengers = typeof(TrolleybusAI).GetMethod("UnloadPassengers", Patcher.allFlags);
 
-        [HarmonyPatch(typeof(VehicleAI), "SimulationStep", new Type[] { typeof(ushort), typeof(Vehicle), typeof(ushort), typeof(Vehicle), typeof(int) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Normal })]
+        [HarmonyPatch(typeof(VehicleAI), "SimulationStep", [typeof(ushort), typeof(Vehicle), typeof(ushort), typeof(Vehicle), typeof(int)], [ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Normal])]
         [HarmonyPrefix]
         public static void SimulationStep(ushort vehicleID, ref Vehicle vehicleData)
         {
@@ -56,7 +56,7 @@ namespace TransportLinesManager.Overrides
                 return true;
             }
             TLMLineUtils.GetQuantityPassengerWaiting(currentStop, out int residents, out int tourists, out _);
-            var unloadPredict = GetQuantityPassengerUnloadOnNextStop(vehicleID, ref vehicleData, out bool full, out bool empty);
+            var unloadPredict = GetQuantityPassengerUnloadOnNextStop(vehicleID, ref vehicleData, out bool full, out _);
             if (unloadPredict > 0 || (!full && residents + tourists > 0))
             {
                 return true;
@@ -111,9 +111,11 @@ namespace TransportLinesManager.Overrides
             return false;
         }
 
-        [HarmonyPatch(typeof(VehicleAI), "GetColor", new Type[] { typeof(ushort), typeof(Vehicle), typeof(InfoManager.InfoMode), typeof(InfoManager.SubInfoMode) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Normal, ArgumentType.Normal })]
+        [HarmonyPatch(typeof(VehicleAI), "GetColor", [typeof(ushort), typeof(Vehicle), typeof(InfoManager.InfoMode), typeof(InfoManager.SubInfoMode)], [ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Normal, ArgumentType.Normal])]
         [HarmonyPrefix]
+#pragma warning disable IDE0060 // Remove unused parameter
         public static bool PreGetColor(VehicleAI __instance, ushort vehicleID, ref Vehicle data, InfoManager.InfoMode infoMode, InfoManager.SubInfoMode subInfoMode, ref Color __result)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             if (data.m_transportLine != 0 && infoMode == InfoManager.InfoMode.None)
             {

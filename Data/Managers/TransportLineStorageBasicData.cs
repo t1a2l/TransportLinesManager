@@ -45,7 +45,7 @@ namespace TransportLinesManager.Data.Managers
                         if (version >= GetMinVersion(e))
                         {
                             var isVehicleData = IsVehicleEnum(e);
-                            TLMTransportLineStatusesManager.instance.DoWithArray(e, (ref long[][] arrayRef) =>
+                            TLMTransportLineStatusesManager.instance.DoWithArray(e, (ref arrayRef) =>
                             {
                                 int idx = TLMTransportLineStatusesManager.instance.GetIdxFor(e);
 
@@ -53,7 +53,7 @@ namespace TransportLinesManager.Data.Managers
                                 {
                                     arrayRef[i][idx] = DeserializeFunction(s);
                                 }
-                            }, (ref int[][] arrayRef) =>
+                            }, (ref arrayRef) =>
                             {
                                 int idx = TLMTransportLineStatusesManager.instance.GetIdxFor(e);
 
@@ -61,7 +61,7 @@ namespace TransportLinesManager.Data.Managers
                                 {
                                     arrayRef[i][idx] = (int)DeserializeFunction(s);
                                 }
-                            }, (ref ushort[][] arrayRef) =>
+                            }, (ref arrayRef) =>
                             {
                                 int idx = TLMTransportLineStatusesManager.instance.GetIdxFor(e);
 
@@ -78,52 +78,48 @@ namespace TransportLinesManager.Data.Managers
 
             private bool IsVehicleEnum(Enum e)
             {
-                switch (e)
+                return e switch
                 {
-                    case VehicleDataLong _:
-                    case VehicleDataSmallInt _:
-                        return true;
-                }
-                return false;
+                    VehicleDataLong _ or VehicleDataSmallInt _ => true,
+                    _ => false,
+                };
             }
 
             public byte[] Serialize()
             {
-                using (var s = new MemoryStream())
+                using var s = new MemoryStream();
+
+                WriteLong(s, CURRENT_VERSION);
+                foreach (Enum e in LoadOrder)
                 {
-
-                    WriteLong(s, CURRENT_VERSION);
-                    foreach (Enum e in LoadOrder)
+                    TLMTransportLineStatusesManager.instance.DoWithArray(e, (ref arrayRef) =>
                     {
-                        TLMTransportLineStatusesManager.instance.DoWithArray(e, (ref long[][] arrayRef) =>
+                        int idx = TLMTransportLineStatusesManager.instance.GetIdxFor(e);
+                        for (int i = 0; i < arrayRef.Length; i++)
                         {
-                            int idx = TLMTransportLineStatusesManager.instance.GetIdxFor(e);
-                            for (int i = 0; i < arrayRef.Length; i++)
-                            {
-                                SerializeFunction(s, arrayRef[i][idx]);
-                            }
-                            LogUtils.DoWarnLog($"idxs= {arrayRef.Length};byte[] size: {s.Length} ({e.GetType()} {e})");
-                        }, (ref int[][] arrayRef) =>
+                            SerializeFunction(s, arrayRef[i][idx]);
+                        }
+                        LogUtils.DoWarnLog($"idxs= {arrayRef.Length};byte[] size: {s.Length} ({e.GetType()} {e})");
+                    }, (ref arrayRef) =>
+                    {
+                        int idx = TLMTransportLineStatusesManager.instance.GetIdxFor(e);
+                        for (int i = 0; i < arrayRef.Length; i++)
                         {
-                            int idx = TLMTransportLineStatusesManager.instance.GetIdxFor(e);
-                            for (int i = 0; i < arrayRef.Length; i++)
-                            {
-                                SerializeFunction(s, arrayRef[i][idx]);
-                            }
-                            LogUtils.DoWarnLog($"idxs= {arrayRef.Length};byte[] size: {s.Length} ({e.GetType()} {e})");
-                        }, (ref ushort[][] arrayRef) =>
+                            SerializeFunction(s, arrayRef[i][idx]);
+                        }
+                        LogUtils.DoWarnLog($"idxs= {arrayRef.Length};byte[] size: {s.Length} ({e.GetType()} {e})");
+                    }, (ref arrayRef) =>
+                    {
+                        int idx = TLMTransportLineStatusesManager.instance.GetIdxFor(e);
+                        for (int i = 0; i < arrayRef.Length; i++)
                         {
-                            int idx = TLMTransportLineStatusesManager.instance.GetIdxFor(e);
-                            for (int i = 0; i < arrayRef.Length; i++)
-                            {
-                                SerializeFunction(s, arrayRef[i][idx]);
-                            }
-                            LogUtils.DoWarnLog($"idxs= {arrayRef.Length}; byte[] size: {s.Length} ({e.GetType()} {e})");
-                        });
+                            SerializeFunction(s, arrayRef[i][idx]);
+                        }
+                        LogUtils.DoWarnLog($"idxs= {arrayRef.Length}; byte[] size: {s.Length} ({e.GetType()} {e})");
+                    });
 
-                    }
-                    return ZipUtils.ZipBytes(s.ToArray());
                 }
+                return ZipUtils.ZipBytes(s.ToArray());
             }
             protected static void WriteLong(Stream s, long value)
             {
@@ -221,22 +217,22 @@ namespace TransportLinesManager.Data.Managers
         {
             public override string SaveId => "TLM_TLMTransportLineStorageEconomyData";
 
-            protected override Enum[] LoadOrder { get; } = new Enum[]
-                                                            {
+            protected override Enum[] LoadOrder { get; } =
+                                                            [
                                                                 LineDataLong.EXPENSE,
                                                                 LineDataLong.INCOME,
                                                                 StopDataLong.INCOME,
-                                                            };
+                                                            ];
         }
         public class TLMTransportLineStorageEconomyData_Vehicle : TransportLineStorageBasicData
         {
             public override string SaveId => "TLM_TLMTransportLineStorageEconomyData_Vehicle";
 
-            protected override Enum[] LoadOrder { get; } = new Enum[]
-                                                            {
+            protected override Enum[] LoadOrder { get; } =
+                                                            [
                                                                 VehicleDataLong.EXPENSE,
                                                                 VehicleDataLong.INCOME,
-                                                            };
+                                                            ];
             protected override Action<Stream, long> SerializeFunction { get; } = WriteSemiLong;
             protected override Func<Stream, long> DeserializeFunction { get; } = ReadSemiLong;
         }
@@ -244,12 +240,12 @@ namespace TransportLinesManager.Data.Managers
         {
             public override string SaveId => "TLM_TLMTransportLineStoragePassengerData";
 
-            protected override Enum[] LoadOrder { get; } = new Enum[]
-                                                            {
+            protected override Enum[] LoadOrder { get; } =
+                                                            [
                                                                  VehicleDataSmallInt.TOTAL_PASSENGERS,
                                                                  VehicleDataSmallInt.TOURIST_PASSENGERS,
                                                                  VehicleDataSmallInt.STUDENT_PASSENGERS,
-                                                            };
+                                                            ];
             protected override Action<Stream, long> SerializeFunction { get; } = WriteInt24;
             protected override Func<Stream, long> DeserializeFunction { get; } = ReadInt24;
         }
@@ -257,15 +253,15 @@ namespace TransportLinesManager.Data.Managers
         {
             public override string SaveId => "TLM_TLMTransportLineStoragePassengerData_LineStop";
 
-            protected override Enum[] LoadOrder { get; } = new Enum[]
-                                                            {
+            protected override Enum[] LoadOrder { get; } =
+                                                            [
                                                                  LineDataSmallInt.TOTAL_PASSENGERS,
                                                                  LineDataSmallInt.TOURIST_PASSENGERS,
                                                                  LineDataSmallInt.STUDENT_PASSENGERS,
                                                                  StopDataSmallInt.TOTAL_PASSENGERS,
                                                                  StopDataSmallInt.TOURIST_PASSENGERS,
                                                                  StopDataSmallInt.STUDENT_PASSENGERS,
-                                                            };
+                                                            ];
             protected override Action<Stream, long> SerializeFunction { get; } = WriteInt24;
             protected override Func<Stream, long> DeserializeFunction { get; } = ReadInt24;
         }
@@ -273,8 +269,8 @@ namespace TransportLinesManager.Data.Managers
         {
             public override string SaveId => "TLM_TLMTransportLineStorageDetailedPassengerData_W1";
 
-            protected override Enum[] LoadOrder { get; } = new Enum[]
-                                                            {
+            protected override Enum[] LoadOrder { get; } =
+                                                            [
                                                               LineDataUshort.W1_CHILD_MALE_PASSENGERS,
                                                               LineDataUshort.W1_TEENS_MALE_PASSENGERS,
                                                               LineDataUshort.W1_YOUNG_MALE_PASSENGERS,
@@ -285,7 +281,7 @@ namespace TransportLinesManager.Data.Managers
                                                               LineDataUshort.W1_YOUNG_FEML_PASSENGERS,
                                                               LineDataUshort.W1_ADULT_FEML_PASSENGERS,
                                                               LineDataUshort.W1_ELDER_FEML_PASSENGERS,
-                                                            };
+                                                            ];
             protected override Action<Stream, long> SerializeFunction { get; } = WriteInt16;
             protected override Func<Stream, long> DeserializeFunction { get; } = ReadInt16;
         }
@@ -293,8 +289,8 @@ namespace TransportLinesManager.Data.Managers
         {
             public override string SaveId => "TLM_TLMTransportLineStorageDetailedPassengerData_W2";
 
-            protected override Enum[] LoadOrder { get; } = new Enum[]
-                                                            {
+            protected override Enum[] LoadOrder { get; } =
+                                                            [
                                                               LineDataUshort.W2_CHILD_MALE_PASSENGERS,
                                                               LineDataUshort.W2_TEENS_MALE_PASSENGERS,
                                                               LineDataUshort.W2_YOUNG_MALE_PASSENGERS,
@@ -304,7 +300,7 @@ namespace TransportLinesManager.Data.Managers
                                                               LineDataUshort.W2_TEENS_FEML_PASSENGERS,
                                                               LineDataUshort.W2_YOUNG_FEML_PASSENGERS,
                                                               LineDataUshort.W2_ADULT_FEML_PASSENGERS,
-                                                            };
+                                                            ];
             protected override Action<Stream, long> SerializeFunction { get; } = WriteInt16;
             protected override Func<Stream, long> DeserializeFunction { get; } = ReadInt16;
         }
@@ -312,8 +308,8 @@ namespace TransportLinesManager.Data.Managers
         {
             public override string SaveId => "TLM_TLMTransportLineStorageDetailedPassengerData_W3";
 
-            protected override Enum[] LoadOrder { get; } = new Enum[]
-                                                            {
+            protected override Enum[] LoadOrder { get; } =
+                                                            [
                                                               LineDataUshort.W3_CHILD_MALE_PASSENGERS,
                                                               LineDataUshort.W3_TEENS_MALE_PASSENGERS,
                                                               LineDataUshort.W3_YOUNG_MALE_PASSENGERS,
@@ -324,7 +320,7 @@ namespace TransportLinesManager.Data.Managers
                                                               LineDataUshort.W3_YOUNG_FEML_PASSENGERS,
                                                               LineDataUshort.W3_ADULT_FEML_PASSENGERS,
                                                               LineDataUshort.W3_ELDER_FEML_PASSENGERS,
-                                                            };
+                                                            ];
             protected override Action<Stream, long> SerializeFunction { get; } = WriteInt16;
             protected override Func<Stream, long> DeserializeFunction { get; } = ReadInt16;
         }

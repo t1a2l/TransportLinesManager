@@ -54,17 +54,14 @@ namespace TransportLinesManager
         }
         public static void VerifyIfIsRealTimeEnabled()
         {
-            if (Instance != null)
-            {
-                Instance.m_isRealTimeEnabled = VerifyModEnabled(REALTIME_MOD_ID);
-            }
+            Instance?.m_isRealTimeEnabled = VerifyModEnabled(REALTIME_MOD_ID);
         }
 
         public static bool IsIPT2Enabled() => VerifyModEnabled(IPT2_MOD_ID);
 
         private static bool VerifyModEnabled(ulong modId)
         {
-            PluginManager.PluginInfo pluginInfo = Singleton<PluginManager>.instance.GetPluginsInfo().FirstOrDefault((PluginManager.PluginInfo pi) => pi.publishedFileID.AsUInt64 == modId);
+            PluginManager.PluginInfo pluginInfo = Singleton<PluginManager>.instance.GetPluginsInfo().FirstOrDefault(pi => pi.publishedFileID.AsUInt64 == modId);
             return !(pluginInfo == null || !pluginInfo.isEnabled);
         }
 
@@ -175,7 +172,7 @@ namespace TransportLinesManager
         private static void InitWipSidePanels()
         {
             BuildingWorldInfoPanel[] panelList = UIView.GetAView().GetComponentsInChildren<BuildingWorldInfoPanel>();
-            LogUtils.DoLog("WIP LIST: [{0}]", string.Join(", ", panelList.Select(x => x.name).ToArray()));
+            LogUtils.DoLog("WIP LIST: [{0}]", string.Join(", ", [.. panelList.Select(x => x.name)]));
             TLMLineItemButtonControl.EnsureTemplate();
             foreach (BuildingWorldInfoPanel wip in panelList)
             {

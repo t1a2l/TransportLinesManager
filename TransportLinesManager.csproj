@@ -69,6 +69,9 @@
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\UnityEngine.dll</HintPath>
       <Private>false</Private>
+    </Reference>
+    <Reference Include="ValueTuple">
+      <HintPath>..\_managed\ValueTuple.dll</HintPath>
     </Reference> 
     </ItemGroup>
   <ItemGroup>

@@ -16,7 +16,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         public bool TlmManagedRegionalLines { get; set; }
 
         [XmlElement("platformMapping")]
-        public NonSequentialList<PlatformConfig> PlatformMappings { get; set; } = new NonSequentialList<PlatformConfig>();
+        public NonSequentialList<PlatformConfig> PlatformMappings { get; set; } = [];
 
         public TLMBuildingsConfiguration() => NetManagerOverrides.EventSegmentReleased += OnSegmentReleased;
         ~TLMBuildingsConfiguration() => NetManagerOverrides.EventSegmentReleased -= OnSegmentReleased;

@@ -82,7 +82,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             lineIdentifierLabel = Find<UILabel>("LineNumber");
             daytimeIndicatorLabel = Find<UILabel>("LineTime");
             button.eventClick += (x, y) => currentEvent?.Invoke(x, y);
-            currentEvent = (UIComponent x, UIMouseEventParameter y) =>
+            currentEvent = (x, y) =>
             {
                 if (!fromBuilding)
                 {
@@ -221,12 +221,12 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
         private void GetLineNumberCircleOnRefParams(string text, bool customConfig, out Color textColor, out float textScale, out Vector3 relativePosition)
         {
             var ratio = button.width / 50f;
-            string[] textParts = text.Split(new char[] { '\n' });
+            string[] textParts = text.Split(['\n']);
             int lenght = textParts.Max(x => x.Length);
             if (lenght >= 9 && textParts.Length == 1)
             {
                 text = text.Replace("·", "\n").Replace(".", "\n").Replace("-", "\n").Replace("/", "\n").Replace(" ", "\n");
-                textParts = text.Split(new char[] { '\n' });
+                textParts = text.Split(['\n']);
                 lenght = textParts.Max(x => x.Length);
             }
             if (lenght >= 8)

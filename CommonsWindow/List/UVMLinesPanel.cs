@@ -220,41 +220,41 @@ namespace TransportLinesManager.CommonsWindow.List
 
         private void LineName_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
         {
-            m_reverseOrder = m_lastSortCriterionLines == LineSortCriterion.NAME ? !m_reverseOrder : false;
+            m_reverseOrder = m_lastSortCriterionLines == LineSortCriterion.NAME && !m_reverseOrder;
             m_lastSortCriterionLines = LineSortCriterion.NAME;
             RefreshLines();
         }
 
         private void Passengers_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
         {
-            m_reverseOrder = m_lastSortCriterionLines == LineSortCriterion.PASSENGER ? !m_reverseOrder : true;
+            m_reverseOrder = m_lastSortCriterionLines != LineSortCriterion.PASSENGER || !m_reverseOrder;
             m_lastSortCriterionLines = LineSortCriterion.PASSENGER;
             RefreshLines();
         }
         private void Profit_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
         {
-            m_reverseOrder = m_lastSortCriterionLines == LineSortCriterion.PROFIT ? !m_reverseOrder : true;
+            m_reverseOrder = m_lastSortCriterionLines != LineSortCriterion.PROFIT || !m_reverseOrder;
             m_lastSortCriterionLines = LineSortCriterion.PROFIT;
             RefreshLines();
         }
 
         private void Vehicles_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
         {
-            m_reverseOrder = m_lastSortCriterionLines == LineSortCriterion.VEHICLE ? !m_reverseOrder : true;
+            m_reverseOrder = m_lastSortCriterionLines != LineSortCriterion.VEHICLE || !m_reverseOrder;
             m_lastSortCriterionLines = LineSortCriterion.VEHICLE;
             RefreshLines();
         }
 
         private void Stops_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
         {
-            m_reverseOrder = m_lastSortCriterionLines == LineSortCriterion.STOP ? !m_reverseOrder : true;
+            m_reverseOrder = m_lastSortCriterionLines != LineSortCriterion.STOP || !m_reverseOrder;
             m_lastSortCriterionLines = LineSortCriterion.STOP;
             RefreshLines();
         }
 
         private void CodColor_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
         {
-            m_reverseOrder = m_lastSortCriterionLines == LineSortCriterion.LINE_NUMBER ? !m_reverseOrder : false;
+            m_reverseOrder = m_lastSortCriterionLines == LineSortCriterion.LINE_NUMBER && !m_reverseOrder;
             m_lastSortCriterionLines = LineSortCriterion.LINE_NUMBER;
             RefreshLines();
         }
@@ -284,29 +284,16 @@ namespace TransportLinesManager.CommonsWindow.List
             {
                 return;
             }
-            List<ushort> result;
-            switch (m_lastSortCriterionLines)
+
+            List<ushort> result = m_lastSortCriterionLines switch
             {
-                case LineSortCriterion.NAME:
-                    result = ApplySort(lines, NameTupleMapper);
-                    break;
-                case LineSortCriterion.PASSENGER:
-                    result = ApplySort(lines, PassengerTupleMapper);
-                    break;
-                case LineSortCriterion.STOP:
-                    result = ApplySort(lines, StopTupleMapper);
-                    break;
-                case LineSortCriterion.VEHICLE:
-                    result = ApplySort(lines, VehicleTupleMapper);
-                    break;
-                case LineSortCriterion.PROFIT:
-                    result = ApplySort(lines, ProfitTupleMapper);
-                    break;
-                case LineSortCriterion.LINE_NUMBER:
-                default:
-                    result = ApplySort(lines, LineNumberMapper);
-                    break;
-            }
+                LineSortCriterion.NAME => ApplySort(lines, NameTupleMapper),
+                LineSortCriterion.PASSENGER => ApplySort(lines, PassengerTupleMapper),
+                LineSortCriterion.STOP => ApplySort(lines, StopTupleMapper),
+                LineSortCriterion.VEHICLE => ApplySort(lines, VehicleTupleMapper),
+                LineSortCriterion.PROFIT => ApplySort(lines, ProfitTupleMapper),
+                _ => ApplySort(lines, LineNumberMapper),
+            };
             for (int i = 0; i < lineItems.items.Count; i++)
             {
                 newItems[i].GetComponent<UVMLineListItem>().LineID = result[i];
@@ -318,9 +305,9 @@ namespace TransportLinesManager.CommonsWindow.List
 
         private List<ushort> TargetTsdLines()
         {
-            List<ushort> lines = new List<ushort>();
+            List<ushort> lines = [];
 
-            if (!(TSD.LevelIntercity is null))
+            if (TSD.LevelIntercity is not null)
             {
                 lines.Add(0);
             }
@@ -356,11 +343,11 @@ namespace TransportLinesManager.CommonsWindow.List
                  ? string.Compare(leftStr, rightStr, StringComparison.InvariantCulture)
                  : left.Second.CompareTo(right.Second);
         private List<ushort> ApplySort<T>(List<ushort> lines, Func<ushort, T> mapper) where T : IComparable
-            => SortingUtils.QuicksortList(
-                lines.Select(x => Tuple.New(GetEffectiveSortingLineId(x), mapper(x))).ToList(),
+            => [.. SortingUtils.QuicksortList(
+                [.. lines.Select(x => Tuple.New(GetEffectiveSortingLineId(x), mapper(x)))],
                 new Comparison<Tuple<ushort, T>>(Compare),
                 m_reverseOrder
-            ).Select(x => x.First == ushort.MaxValue ? (ushort)0 : x.First).ToList();
+            ).Select(x => x.First == ushort.MaxValue ? (ushort)0 : x.First)];
 
         private ushort GetEffectiveSortingLineId(ushort x) => x == 0 && m_reverseOrder ? ushort.MaxValue : x;
         private string NameTupleMapper(ushort x) => x == 0 ? default : Singleton<TransportManager>.instance.GetLineName(x);

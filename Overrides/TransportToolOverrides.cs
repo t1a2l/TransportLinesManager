@@ -19,12 +19,12 @@ namespace TransportLinesManager.Overrides
     {
         private static readonly FieldInfo m_lineNumField = typeof(TransportTool).GetField("m_line", Patcher.allFlags);
 
-        private static readonly ItemClass.SubService[] checkableTransportTypes = new ItemClass.SubService[]
-        {
+        private static readonly ItemClass.SubService[] checkableTransportTypes =
+        [
             ItemClass.SubService.PublicTransportBus,
             ItemClass.SubService.PublicTransportTrolleybus,
             ItemClass.SubService.PublicTransportTram
-        };
+        ];
 
         [HarmonyPatch(typeof(TransportTool), "OnEnable")]
         [HarmonyPostfix]
@@ -46,7 +46,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(TransportTool), "OnToolUpdate")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TranspileOnToolUpdate(IEnumerable<CodeInstruction> instr)
+        public static IEnumerable<CodeInstruction> TranspileOnToolUpdate(IEnumerable<CodeInstruction> instr)
         {
             bool transpiled = false;
             var instrList = instr.ToList();
@@ -60,21 +60,21 @@ namespace TransportLinesManager.Overrides
                     && instrList[i + 3].operand is MethodInfo mi
                     && mi.Name == "ShowToolInfo")
                 {
-                    instrList.InsertRange(i + 1, new List<CodeInstruction>
-                    {
-                        new CodeInstruction(OpCodes.Ldloc_S, 0),
-                        new CodeInstruction(OpCodes.Ldloc_S, 1),
-                        new CodeInstruction(OpCodes.Ldloc_S, 2),
-                        new CodeInstruction(OpCodes.Ldloc_S, 3),
-                        new CodeInstruction(OpCodes.Ldloc_S, 4),
-                        new CodeInstruction(OpCodes.Ldloc_S, 5),
-                        new CodeInstruction(OpCodes.Ldarg_0),
-                        new CodeInstruction(OpCodes.Ldfld,typeof(TransportTool).GetField("m_line", Patcher.allFlags)),
-                        new CodeInstruction(OpCodes.Ldarg_0),
-                        new CodeInstruction(OpCodes.Ldfld,typeof(TransportTool).GetField("m_errors", Patcher.allFlags)),
-                        new CodeInstruction(OpCodes.Ldarg_0),
-                        new CodeInstruction(OpCodes.Call, typeof(TransportToolOverrides).GetMethod("ProcessTextTool"))
-                    });
+                    instrList.InsertRange(i + 1,
+                    [
+                        new(OpCodes.Ldloc_S, 0),
+                        new(OpCodes.Ldloc_S, 1),
+                        new(OpCodes.Ldloc_S, 2),
+                        new(OpCodes.Ldloc_S, 3),
+                        new(OpCodes.Ldloc_S, 4),
+                        new(OpCodes.Ldloc_S, 5),
+                        new(OpCodes.Ldarg_0),
+                        new(OpCodes.Ldfld,typeof(TransportTool).GetField("m_line", Patcher.allFlags)),
+                        new(OpCodes.Ldarg_0),
+                        new(OpCodes.Ldfld,typeof(TransportTool).GetField("m_errors", Patcher.allFlags)),
+                        new(OpCodes.Ldarg_0),
+                        new(OpCodes.Call, typeof(TransportToolOverrides).GetMethod("ProcessTextTool"))
+                    ]);
                     transpiled = true;
                     break;
                 }
@@ -88,16 +88,16 @@ namespace TransportLinesManager.Overrides
             return instrList;
         }
 
-        private static IEnumerable<CodeInstruction> TranspileAfterEveryAction(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TranspileAfterEveryAction(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             MethodInfo AfterEveryAction = typeof(TransportToolOverrides).GetMethod("AfterEveryAction", Patcher.allFlags);
             inst.RemoveAt(inst.Count - 1);
-            inst.AddRange(new List<CodeInstruction> {
-                        new CodeInstruction(OpCodes.Ldarg_0),
-                        new CodeInstruction(OpCodes.Call, AfterEveryAction),
-                        new CodeInstruction(OpCodes.Ret),
-                    });
+            inst.AddRange([
+                        new(OpCodes.Ldarg_0),
+                        new(OpCodes.Call, AfterEveryAction),
+                        new(OpCodes.Ret),
+                    ]);
 
             LogUtils.PrintMethodIL(inst, true);
             return inst;
@@ -134,7 +134,9 @@ namespace TransportLinesManager.Overrides
             }
         }
 
+#pragma warning disable IDE0060 // Remove unused parameter
         public static string ProcessTextTool(string text, int mode, ushort lastEditLine, ushort tempLine, int hoverStopIndex, int hoverSegmentIndex, Vector3 hitPosition, ushort line, ToolBase.ToolErrors errors, TransportTool tt)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             if (errors != ToolBase.ToolErrors.Pending && errors != ToolBase.ToolErrors.RaycastFailed)
             {
@@ -173,7 +175,7 @@ namespace TransportLinesManager.Overrides
 
 
                         string c0 = checkableTransportTypes.Contains(tt.m_prefab.m_class.m_subService) ? GetDistanceColor(segm.m_averageLength) : "white";
-                        var d0 = $"<color {c0}>{segm.m_averageLength.ToString("N0")}m</color>";
+                        var d0 = $"<color {c0}>{segm.m_averageLength:N0}m</color>";
 
                         text +=
                             $"\n<color #{TransportManager.instance.GetLineColor(lastEditLine).SetBrightness(1).ClampSaturation(.5f).ToRGB()}>{TransportManager.instance.GetLineName(lastEditLine)}</color>" +
@@ -205,8 +207,8 @@ namespace TransportLinesManager.Overrides
         {
             string c0 = checkableTransportTypes.Contains(tt.m_prefab.m_class.m_subService) ? GetDistanceColor(seg0.m_averageLength) : "white";
             var c1 = checkableTransportTypes.Contains(tt.m_prefab.m_class.m_subService) ? GetDistanceColor(seg1.m_averageLength) : "white";
-            var d0 = $"<color {c0}>{seg0.m_averageLength.ToString("N0")}m</color>";
-            var d1 = $"<color {c1}>{seg1.m_averageLength.ToString("N0")}m</color>";
+            var d0 = $"<color {c0}>{seg0.m_averageLength:N0}m</color>";
+            var d1 = $"<color {c1}>{seg1.m_averageLength:N0}m</color>";
 
             return (seg0Id > 0 ? $"\n{Locale.Get("TLM_TOOLINFO_PREVSTOP")}: {d0} @ {TLMStationUtils.GetFullStationName(seg0.GetOtherNode(stopId), lastEditLine, tt.m_prefab.m_class.m_subService,false)}" : "") +
                 (seg1Id > 0 ? $"\n{Locale.Get("TLM_TOOLINFO_NEXTSTOP")}: {d1} @ {TLMStationUtils.GetFullStationName(seg1.GetOtherNode(stopId), lastEditLine, tt.m_prefab.m_class.m_subService,false)}" : "");

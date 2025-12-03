@@ -7,69 +7,39 @@ namespace TransportLinesManager.Utils
     {
         public static int GetNamePrecedenceRate(this NamingType namingType)
         {
-            switch (namingType)
+            return namingType switch
             {
-                case NamingType.NONE:
-                    return 0x7FFFFFFF;
-                case NamingType.PLANE:
-                    return -0x00000005;
-                case NamingType.BLIMP:
-                    return 0x00000001;
-                case NamingType.SHIP:
-                    return -0x00000002;
-                case NamingType.FERRY:
-                    return 0x00000001;
-                case NamingType.TRAIN:
-                    return 0x00000003;
-                case NamingType.MONORAIL:
-                    return 0x00000004;
-                case NamingType.TRAM:
-                    return 0x00000006;
-                case NamingType.METRO:
-                    return 0x00000005;
-                case NamingType.BUS:
-                    return 0x00000007;
-                case NamingType.TOUR_BUS:
-                    return 0x00000009;
-                case NamingType.MONUMENT:
-                    return 0x00000005;
-                case NamingType.CAMPUS:
-                    return 0x00000010;
-                case NamingType.BEAUTIFICATION:
-                    return 0x0000000a;
-                case NamingType.HEALTHCARE:
-                    return 0x0000000b;
-                case NamingType.POLICEDEPARTMENT:
-                    return 0x0000000b;
-                case NamingType.FIREDEPARTMENT:
-                    return 0x0000000b;
-                case NamingType.EDUCATION:
-                    return 0x0000000c;
-                case NamingType.DISASTER:
-                    return 0x0000000d;
-                case NamingType.GARBAGE:
-                    return 0x0000000f;
-                case NamingType.PARKAREA:
-                    return 0x00000010;
-                case NamingType.DISTRICT:
-                    return 0x00000010;
-                case NamingType.INDUSTRY_AREA:
-                    return 0x00000010;
-                case NamingType.ADDRESS:
-                    return 0x00000011;
-                case NamingType.RICO:
-                    return 0x000000e;
-                case NamingType.CABLE_CAR:
-                    return 0x00000004;
-                case NamingType.TROLLEY:
-                    return 0x00000006;
-                case NamingType.HELICOPTER:
-                    return 0x00000001;
-                case NamingType.TERMINAL:
-                    return -0x00000020;
-                default:
-                    return 0x7FFFFFFF;
-            }
+                NamingType.NONE => 0x7FFFFFFF,
+                NamingType.PLANE => -0x00000005,
+                NamingType.BLIMP => 0x00000001,
+                NamingType.SHIP => -0x00000002,
+                NamingType.FERRY => 0x00000001,
+                NamingType.TRAIN => 0x00000003,
+                NamingType.MONORAIL => 0x00000004,
+                NamingType.TRAM => 0x00000006,
+                NamingType.METRO => 0x00000005,
+                NamingType.BUS => 0x00000007,
+                NamingType.TOUR_BUS => 0x00000009,
+                NamingType.MONUMENT => 0x00000005,
+                NamingType.CAMPUS => 0x00000010,
+                NamingType.BEAUTIFICATION => 0x0000000a,
+                NamingType.HEALTHCARE => 0x0000000b,
+                NamingType.POLICEDEPARTMENT => 0x0000000b,
+                NamingType.FIREDEPARTMENT => 0x0000000b,
+                NamingType.EDUCATION => 0x0000000c,
+                NamingType.DISASTER => 0x0000000d,
+                NamingType.GARBAGE => 0x0000000f,
+                NamingType.PARKAREA => 0x00000010,
+                NamingType.DISTRICT => 0x00000010,
+                NamingType.INDUSTRY_AREA => 0x00000010,
+                NamingType.ADDRESS => 0x00000011,
+                NamingType.RICO => 0x000000e,
+                NamingType.CABLE_CAR => 0x00000004,
+                NamingType.TROLLEY => 0x00000006,
+                NamingType.HELICOPTER => 0x00000001,
+                NamingType.TERMINAL => -0x00000020,
+                _ => 0x7FFFFFFF,
+            };
         }
 
         public static NamingType From(TransportSystemDefinition tsd) => tsd == TransportSystemDefinition.PLANE ? NamingType.PLANE
@@ -87,7 +57,7 @@ namespace TransportLinesManager.Utils
                     : tsd == TransportSystemDefinition.TOUR_BUS ? NamingType.TOUR_BUS
                     : NamingType.NONE;
 
-        public static NamingType From(ItemClass.Service service, ItemClass.SubService subService)
+        public static NamingType From(ItemClass.Service service)
         {
             switch (service)
             {

@@ -31,7 +31,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private VehicleInfo m_lastInfo;
         private UITemplateList<UIPanel> m_checkboxTemplateList;
         private UITextField m_nameFilter;
-        private Dictionary<TransportSystemDefinition, string> m_clipboard = new Dictionary<TransportSystemDefinition, string>();
+        private readonly Dictionary<TransportSystemDefinition, string> m_clipboard = [];
 
         private UIButton m_copyButton;
         private UIButton m_pasteButton;
@@ -127,7 +127,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             var lineId = GetLineID();
             IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
-            config.SetAssetListForLine(lineId, new List<string>());
+            config.SetAssetListForLine(lineId, []);
             UpdateAssetList(config);
         }
 
@@ -226,7 +226,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             if (TransportLinesManagerMod.DebugMode)
             {
-                LogUtils.DoLog($"selectedAssets Size = {allowedAssets?.Count} ({ string.Join(",", allowedAssets?.ToArray() ?? new string[0])}) {config?.GetType()}");
+                LogUtils.DoLog($"selectedAssets Size = {allowedAssets?.Count} ({ string.Join(",", allowedAssets?.ToArray() ?? [])}) {config?.GetType()}");
             }
 
             for (int i = 0; i < assetsCheck.Length; i++)

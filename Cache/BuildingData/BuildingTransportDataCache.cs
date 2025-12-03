@@ -13,17 +13,17 @@ namespace TransportLinesManager.Cache.BuildingData
 {
     public class BuildingTransportDataCache
     {
-        internal NonSequentialList<InnerBuildingLine> RegionalLines { get; } = new NonSequentialList<InnerBuildingLine>();
+        internal NonSequentialList<InnerBuildingLine> RegionalLines { get; } = [];
         private ushort BuildingId { get; }
         public int RegionalLinesCount => RegionalLines.Count;
         public StopPointDescriptorLanes[] StopPoints { get; private set; }
 
         public TLMBuildingsConfiguration BuildingData => TLMBuildingDataContainer.Instance.SafeGet(BuildingId);
 
-        public BuildingTransportDataCache(ushort buildingId, ref Building b, TransportStationAI tsai)
+        public BuildingTransportDataCache(ushort buildingId, ref Building b)
         {
             BuildingId = buildingId;
-            RemapLines(buildingId, ref b, tsai);
+            RemapLines(buildingId, ref b);
             StopPoints = MapStopPoints();
         }
 
@@ -31,10 +31,10 @@ namespace TransportLinesManager.Cache.BuildingData
         {
             RegionalLines.Clear();
             ref Building b = ref BuildingManager.instance.m_buildings.m_buffer[BuildingId];
-            RemapLines(BuildingId, ref b, b.Info.m_buildingAI as TransportStationAI);
+            RemapLines(BuildingId, ref b);
         }
 
-        private void RemapLines(ushort buildingId, ref Building b, TransportStationAI tsai)
+        private void RemapLines(ushort buildingId, ref Building b)
         {
             MapBuildingLines(buildingId, buildingId);
             var nextSubBuildingId = b.m_subBuilding;
@@ -101,13 +101,8 @@ namespace TransportLinesManager.Cache.BuildingData
 
                 if (thisBuilding != buildingIdKey)
                 {
-                    ushort x = thisBuilding;
-                    thisBuilding = otherNodeBuilding;
-                    otherNodeBuilding = x;
-
-                    x = nextNodeId;
-                    nextNodeId = otherNode;
-                    otherNode = x;
+                    (otherNodeBuilding, thisBuilding) = (thisBuilding, otherNodeBuilding);
+                    (otherNode, nextNodeId) = (nextNodeId, otherNode);
                 }
 
                 ref Building outsideConnectionBuilding = ref BuildingManager.instance.m_buildings.m_buffer[otherNodeBuilding];
@@ -117,7 +112,7 @@ namespace TransportLinesManager.Cache.BuildingData
                     nextNodeId = node.m_nextBuildingNode;
                     continue;
                 }
-                InnerBuildingLine transportLine = new InnerBuildingLine
+                InnerBuildingLine transportLine = new()
                 {
                     Info = tsd.GetTransportInfoIntercity(),
                     SrcStop = otherNode,
@@ -217,7 +212,7 @@ namespace TransportLinesManager.Cache.BuildingData
                     subbuildingIndex++;
                 }
             }
-            result = result.OrderByDescending(x => x.subbuildingId).GroupBy(x => x.platformLaneId).Select(x => x.First()).ToList();
+            result = [.. result.OrderByDescending(x => x.subbuildingId).GroupBy(x => x.platformLaneId).Select(x => x.First())];
             result.Sort((x, y) =>
             {
                 int priorityX = StopSearchUtils.VehicleToPriority(x.vehicleType);
@@ -242,7 +237,7 @@ namespace TransportLinesManager.Cache.BuildingData
                 return -centerX.x.CompareTo(centerY.x);
             });
 
-            return result.ToArray();
+            return [.. result];
         }
         private static bool MapLane(uint laneId, int laneIdx, ref NetSegment segment, Vector3 directionPath, NetInfo.Lane refLane, out StopPointDescriptorLanes result)
         {

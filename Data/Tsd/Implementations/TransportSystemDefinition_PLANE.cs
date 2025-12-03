@@ -5,12 +5,12 @@ namespace TransportLinesManager.Data.Tsd
 {
     public partial class TransportSystemDefinition
     {
-        public static readonly TransportSystemDefinition PLANE = new TransportSystemDefinition(
+        public static readonly TransportSystemDefinition PLANE = new(
                     ItemClass.SubService.PublicTransportPlane,
             VehicleInfo.VehicleType.Plane,
             TransportInfo.TransportType.Airplane,
             ItemClass.Level.Level1,
-            new TransferManager.TransferReason[] { TransferManager.TransferReason.PassengerPlane },
+            [TransferManager.TransferReason.PassengerPlane],
             new Color32(0xa8, 0x01, 0x7a, 255),
             200,
             LineIconSpriteNames.PentagonIcon,

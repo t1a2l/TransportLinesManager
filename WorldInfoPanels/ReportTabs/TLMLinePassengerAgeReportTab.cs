@@ -5,7 +5,6 @@ using static TransportLinesManager.Data.Managers.TLMTransportLineStatusesManager
 
 namespace TransportLinesManager.WorldInfoPanels.ReportTabs
 {
-
     internal class TLMLinePassengerAgeReportTab : BasicReportTab<TLMPassengerAgeReportLine, AgePassengerReport>
     {
         protected override string TitleLocaleID { get; } = "TLM_PASSENGERS_AGE_LINE_REPORT";

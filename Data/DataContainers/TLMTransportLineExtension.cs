@@ -17,7 +17,7 @@ namespace TransportLinesManager.Data.DataContainers
     public class TLMTransportLineExtension : DataExtensionBase<TLMTransportLineExtension>, ISafeGettable<TLMTransportLineConfiguration>, IBasicExtension
     {
         [XmlElement("Configurations")]
-        public SimpleNonSequentialList<TLMTransportLineConfiguration> Configurations { get; set; } = new SimpleNonSequentialList<TLMTransportLineConfiguration>();
+        public SimpleNonSequentialList<TLMTransportLineConfiguration> Configurations { get; set; } = [];
         internal void SafeCleanEntry(ushort lineID) => Configurations[lineID] = new TLMTransportLineConfiguration();
         public TLMTransportLineConfiguration SafeGet(uint lineId)
         {
@@ -35,7 +35,7 @@ namespace TransportLinesManager.Data.DataContainers
 
         public override string SaveId => $"TLM_TLMTransportLineExtension";
 
-        private readonly Dictionary<TransportSystemDefinition, List<string>> m_basicAssetsList = new Dictionary<TransportSystemDefinition, List<string>>();
+        private readonly Dictionary<TransportSystemDefinition, List<string>> m_basicAssetsList = [];
 
         public void SetUseCustomConfig(ushort lineId, bool value)
         {

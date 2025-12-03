@@ -5,12 +5,12 @@ namespace TransportLinesManager.Data.Tsd
 {
     public partial class TransportSystemDefinition
     {
-        public static readonly TransportSystemDefinition TRAIN = new TransportSystemDefinition(
+        public static readonly TransportSystemDefinition TRAIN = new(
                     ItemClass.SubService.PublicTransportTrain,
             VehicleInfo.VehicleType.Train,
             TransportInfo.TransportType.Train,
             ItemClass.Level.Level1,
-            new TransferManager.TransferReason[] { TransferManager.TransferReason.PassengerTrain },
+            [TransferManager.TransferReason.PassengerTrain],
             new Color32(250, 104, 0, 255),
             240,
             LineIconSpriteNames.CircleIcon,

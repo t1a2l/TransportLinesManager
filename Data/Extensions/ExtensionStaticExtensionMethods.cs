@@ -5,7 +5,6 @@ using TransportLinesManager.Interfaces;
 using TransportLinesManager.ModShared;
 using TransportLinesManager.Utils;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace TransportLinesManager.Data.Extensions
@@ -14,7 +13,7 @@ namespace TransportLinesManager.Data.Extensions
     {
         #region Assets List
         public static List<string> GetAssetListForLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList;
-        public static void SetAssetListForLine<T>(this T it, ushort lineId, List<string> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList = new SimpleXmlList<string>(list);
+        public static void SetAssetListForLine<T>(this T it, ushort lineId, List<string> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList = [.. list];
         public static void AddAssetToLine<T>(this T it, ushort lineId, string assetId) where T : IAssetSelectorExtension
         {
             List<string> list = it.GetAssetListForLine(lineId);
@@ -55,19 +54,20 @@ namespace TransportLinesManager.Data.Extensions
             HourOfDay = hour
         });
         public static void RemoveBudgetMultiplierForLine<T>(this T it, ushort lineId, int hour) where T : IBudgetableExtension => it.SafeGet(it.LineToIndex(lineId)).BudgetEntries.RemoveAtHour(hour);
-        public static void RemoveAllBudgetMultipliersOfLine<T>(this T it, ushort lineId) where T : IBudgetableExtension => it.SafeGet(it.LineToIndex(lineId)).BudgetEntries = new TimeableList<BudgetEntryXml>()
-        {
-            new BudgetEntryXml(){HourOfDay=0,Value=100}
-        };
+        public static void RemoveAllBudgetMultipliersOfLine<T>(this T it, ushort lineId) where T : IBudgetableExtension => it.SafeGet(it.LineToIndex(lineId)).BudgetEntries =
+        [
+            new(){HourOfDay=0,Value=100}
+        ];
         public static void SetAllBudgetMultipliersForLine<T>(this T it, ushort lineId, TimeableList<BudgetEntryXml> newValue) where T : IBudgetableExtension => it.SafeGet(it.LineToIndex(lineId)).BudgetEntries = newValue;
         #endregion
+
         #region Ticket Price
         public static TimeableList<TicketPriceEntryXml> GetTicketPricesForLine<T>(this T it, ushort lineId) where T : ITicketPriceExtension => it.SafeGet(it.LineToIndex(lineId)).TicketPriceEntries;
         public static void SetTicketPricesForLine<T>(this T it, ushort lineId, TimeableList<TicketPriceEntryXml> newPrices) where T : ITicketPriceExtension => it.SafeGet(it.LineToIndex(lineId)).TicketPriceEntries = newPrices;
-        public static void ClearTicketPricesOfLine<T>(this T it, ushort lineId) where T : ITicketPriceExtension => it.SafeGet(it.LineToIndex(lineId)).TicketPriceEntries = new TimeableList<TicketPriceEntryXml>()
-        {
-            new TicketPriceEntryXml(){HourOfDay=0,Value=0}
-        };
+        public static void ClearTicketPricesOfLine<T>(this T it, ushort lineId) where T : ITicketPriceExtension => it.SafeGet(it.LineToIndex(lineId)).TicketPriceEntries =
+        [
+            new(){HourOfDay=0,Value=0}
+        ];
         public static Tuple<TicketPriceEntryXml, int> GetTicketPriceForHourForLine<T>(this T it, ushort lineId, float hour) where T : ITicketPriceExtension
         {
             TimeableList<TicketPriceEntryXml> ticketPrices = it.GetTicketPricesForLine(lineId);
@@ -107,11 +107,7 @@ namespace TransportLinesManager.Data.Extensions
         private static IDepotSelectionStorage EnsureCreationDepotConfig<T>(T it, uint idx) where T : IDepotSelectableExtension
         {
             IDepotSelectionStorage config = it.SafeGet(idx);
-            if (config.DepotsAllowed == null)
-            {
-                config.DepotsAllowed = new SimpleXmlHashSet<ushort>();
-            }
-
+            config.DepotsAllowed ??= [];
             return config;
         }
         public static void AddDepotForLine<T>(this T it, ushort lineId, ushort buildingID) where T : IDepotSelectableExtension => EnsureCreationDepotConfig(it, it.LineToIndex(lineId)).DepotsAllowed.Add(buildingID);
@@ -131,7 +127,7 @@ namespace TransportLinesManager.Data.Extensions
             }
             else
             {
-                return data.DepotsAllowed.ToList();
+                return [.. data.DepotsAllowed];
             }
         }
 

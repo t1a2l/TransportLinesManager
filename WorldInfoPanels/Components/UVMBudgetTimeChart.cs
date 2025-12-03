@@ -100,7 +100,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 int currentVehicleCount = Singleton<TransportManager>.instance.m_lines.m_buffer[lineID].CountVehicles(lineID);
                 int targetVehicleCount = TransportLineOverrides.NewCalculateTargetVehicleCount(lineID);
                 m_effectiveLabel.prefix = (value.First * 100).ToString("0");
-                m_effectiveLabel.suffix = $"{currentVehicleCount.ToString("0")}/{targetVehicleCount.ToString("0")}";
+                m_effectiveLabel.suffix = $"{currentVehicleCount:0}/{targetVehicleCount:0}";
             }
         }
 

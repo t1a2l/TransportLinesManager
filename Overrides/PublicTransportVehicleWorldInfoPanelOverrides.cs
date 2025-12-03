@@ -11,7 +11,9 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(PublicTransportVehicleWorldInfoPanel), "OnLinesOverviewClicked")]
         [HarmonyPrefix]
+#pragma warning disable IDE0060 // Remove unused parameter
         public static bool OnGoToLines(PublicTransportVehicleWorldInfoPanel __instance, ref InstanceID ___m_InstanceID)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             if (___m_InstanceID.Type != InstanceType.Vehicle || ___m_InstanceID.Vehicle == 0)
             {

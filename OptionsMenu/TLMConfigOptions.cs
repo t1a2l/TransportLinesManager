@@ -17,7 +17,7 @@ namespace TransportLinesManager.OptionsMenu
 
         private UITabContainer tabContainer;
 
-        internal static readonly NamingMode[] namingOptionsSuffix = new NamingMode[] {
+        internal static readonly NamingMode[] namingOptionsSuffix = [
              NamingMode.Number                  ,
              NamingMode.Roman                   ,
              NamingMode.LatinLower              ,
@@ -26,8 +26,8 @@ namespace TransportLinesManager.OptionsMenu
              NamingMode.GreekUpper              ,
              NamingMode.CyrillicLower           ,
              NamingMode.CyrillicUpper           ,
-            };
-        internal static readonly NamingMode[] namingOptionsPrefix = new NamingMode[] {
+            ];
+        internal static readonly NamingMode[] namingOptionsPrefix = [
                 NamingMode.None                    ,
                 NamingMode.Number                  ,
                 NamingMode.Roman                   ,
@@ -43,14 +43,14 @@ namespace TransportLinesManager.OptionsMenu
                 NamingMode.CyrillicLowerNumber     ,
                 NamingMode.CyrillicUpper           ,
                 NamingMode.CyrillicUpperUpper      ,
-            };
-        internal static readonly Separator[] namingOptionsSeparator = new Separator[] {
+            ];
+        internal static readonly Separator[] namingOptionsSeparator = [
              Separator.None,
              Separator.Hyphen,
              Separator.Dot,
              Separator.Slash,
              Separator.Space
-            };
+            ];
 
 
         public void GenerateOptionsMenu(UIHelperExtension helper)
@@ -150,46 +150,49 @@ namespace TransportLinesManager.OptionsMenu
     {
         public static string GetTabName(this ConfigTabs tab)
         {
-            switch (tab)
+            return tab switch
             {
-                case ConfigTabs.TransportSystem: return Locale.Get("TLM_TRANSPORT_SYSTEM");
-                case ConfigTabs.NearLines: return Locale.Get("TLM_NEAR_LINES_CONFIG");
-                case ConfigTabs.Automation: return Locale.Get("TLM_AUTOMATION_CONFIG");
-                case ConfigTabs.AutoName_BD: return Locale.Get("TLM_AUTO_NAME_SETTINGS_OTHER");
-                case ConfigTabs.AutoName_PA: return Locale.Get("TLM_AUTO_NAME_SETTINGS_PUBLIC_AREAS");
-                case ConfigTabs.Palettes: return Locale.Get("TLM_CUSTOM_PALETTE_CONFIG");
-                case ConfigTabs.About: return Locale.Get("TLM_BETAS_EXTRA_INFO");
-                default: throw new Exception($"Not supported: {tab}");
+                ConfigTabs.TransportSystem => Locale.Get("TLM_TRANSPORT_SYSTEM"),
+                ConfigTabs.NearLines => Locale.Get("TLM_NEAR_LINES_CONFIG"),
+                ConfigTabs.Automation => Locale.Get("TLM_AUTOMATION_CONFIG"),
+                ConfigTabs.AutoName_BD => Locale.Get("TLM_AUTO_NAME_SETTINGS_OTHER"),
+                ConfigTabs.AutoName_PA => Locale.Get("TLM_AUTO_NAME_SETTINGS_PUBLIC_AREAS"),
+                ConfigTabs.Palettes => Locale.Get("TLM_CUSTOM_PALETTE_CONFIG"),
+                ConfigTabs.About => Locale.Get("TLM_BETAS_EXTRA_INFO"),
+                _ => throw new Exception($"Not supported: {tab}"),
             };
+            ;
         }
         public static string GetTabFgSprite(this ConfigTabs tab)
         {
-            switch (tab)
+            return tab switch
             {
-                case ConfigTabs.TransportSystem: return "ParkLevelStar";
-                case ConfigTabs.NearLines: return "RelocateIcon";
-                case ConfigTabs.Automation: return "Options";
-                case ConfigTabs.AutoName_BD: return "ToolbarIconMonuments";
-                case ConfigTabs.AutoName_PA: return "ToolbarIconDistrict";
-                case ConfigTabs.Palettes: return "ZoningOptionFill";
-                case ConfigTabs.About: return "CityInfo";
-                default: throw new Exception($"Not supported: {tab}");
+                ConfigTabs.TransportSystem => "ParkLevelStar",
+                ConfigTabs.NearLines => "RelocateIcon",
+                ConfigTabs.Automation => "Options",
+                ConfigTabs.AutoName_BD => "ToolbarIconMonuments",
+                ConfigTabs.AutoName_PA => "ToolbarIconDistrict",
+                ConfigTabs.Palettes => "ZoningOptionFill",
+                ConfigTabs.About => "CityInfo",
+                _ => throw new Exception($"Not supported: {tab}"),
             };
+            ;
         }
 
         public static Type GetTabGenericContentImpl(this ConfigTabs tab)
         {
-            switch (tab)
+            return tab switch
             {
-                case ConfigTabs.TransportSystem: return typeof(TLMShowConfigTabContainer);
-                case ConfigTabs.NearLines: return typeof(TLMNearLinesConfigTab);
-                case ConfigTabs.Automation: return typeof(TLMAutomationOptionsTab);
-                case ConfigTabs.AutoName_BD: return typeof(TLMAutoNameBuildingsTab);
-                case ConfigTabs.AutoName_PA: return typeof(TLMAutoNamePublicAreasTab);
-                case ConfigTabs.Palettes: return typeof(TLMPaletteOptionsTab);
-                case ConfigTabs.About: return typeof(TLMModInfoTab);
-                default: return null;
+                ConfigTabs.TransportSystem => typeof(TLMShowConfigTabContainer),
+                ConfigTabs.NearLines => typeof(TLMNearLinesConfigTab),
+                ConfigTabs.Automation => typeof(TLMAutomationOptionsTab),
+                ConfigTabs.AutoName_BD => typeof(TLMAutoNameBuildingsTab),
+                ConfigTabs.AutoName_PA => typeof(TLMAutoNamePublicAreasTab),
+                ConfigTabs.Palettes => typeof(TLMPaletteOptionsTab),
+                ConfigTabs.About => typeof(TLMModInfoTab),
+                _ => null,
             };
+            ;
         }
     }
 

@@ -199,12 +199,12 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
 
         private List<TransportSystemDefinition> OutsideTransportInfo(BuildingTransportDataCache data, NetManager nm)
         {
-            return data.StopPoints.Select(x =>
+            return [.. data.StopPoints.Select(x =>
             {
                 ref NetSegment segment = ref nm.m_segments.m_buffer[nm.m_lanes.m_buffer[x.laneId].m_segment];
                 var info = segment.Info;
                 return TransportSystemDefinition.FromNetInfo(info);
-            }).Where(x => x != null && x?.GetTransportInfoIntercity() != null).GroupBy(x => x).Select(x => x.First()).ToList();
+            }).Where(x => x != null && x?.GetTransportInfoIntercity() != null).GroupBy(x => x).Select(x => x.First())];
         }
     }
 }

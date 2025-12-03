@@ -9,23 +9,21 @@ namespace TransportLinesManager.Cache.BuildingData
 {
     public class BuildingTransportLinesCache : MonoBehaviour
     {
-
-
         private SimpleNonSequentialList<BuildingTransportDataCache> BuildingTransportDataCache;
         private Dictionary<ushort, InnerBuildingLine> InnerBuildingLinesIndex;
 
         public void InvalidateLinesCache() => InnerBuildingLinesIndex = null;
 
-        private void Awake() => BuildingTransportDataCache = new SimpleNonSequentialList<BuildingTransportDataCache>();
+        public void Awake() => BuildingTransportDataCache = [];
 
-        private void OnEnable()
+        public void OnEnable()
         {
             BuildingManager.instance.EventBuildingReleased += ResetBuilding;
             BuildingManager.instance.EventBuildingRelocated += ResetBuilding;
             NetManagerOverrides.EventNodeChanged += ResetAllBuilding;
             NetManagerOverrides.EventSegmentChanged += ResetAllBuildingSegment;
         }
-        private void OnDisable()
+        public void OnDisable()
         {
             BuildingManager.instance.EventBuildingReleased -= ResetBuilding;
             BuildingManager.instance.EventBuildingRelocated -= ResetBuilding;
@@ -74,11 +72,11 @@ namespace TransportLinesManager.Cache.BuildingData
 
             ref Building b = ref BuildingManager.instance.m_buildings.m_buffer[targetBuildingId];
             var info = b.Info;
-            if (info.m_buildingAI is TransportStationAI tsai)
+            if (info.m_buildingAI is TransportStationAI)
             {
                 if (!BuildingTransportDataCache.ContainsKey(targetBuildingId))
                 {
-                    BuildingTransportDataCache[targetBuildingId] = new BuildingTransportDataCache(targetBuildingId, ref b, tsai);
+                    BuildingTransportDataCache[targetBuildingId] = new BuildingTransportDataCache(targetBuildingId, ref b);
                 }
                 BuildingTransportDataCache[targetBuildingId].RenderLines(cameraInfo);
             }
@@ -95,7 +93,7 @@ namespace TransportLinesManager.Cache.BuildingData
             {
                 return SafeGet(Building.FindParentBuilding(buildingId));
             }
-            if (info.m_buildingAI is not TransportStationAI tsai)
+            if (info.m_buildingAI is not TransportStationAI)
             {
                 return null;
             }
@@ -103,7 +101,7 @@ namespace TransportLinesManager.Cache.BuildingData
             {
                 return BuildingTransportDataCache[buildingId];
             }
-            BuildingTransportDataCache[buildingId] = new BuildingTransportDataCache(buildingId, ref b, tsai);
+            BuildingTransportDataCache[buildingId] = new BuildingTransportDataCache(buildingId, ref b);
             InnerBuildingLinesIndex = null;
             return BuildingTransportDataCache[buildingId];
         }
@@ -112,10 +110,7 @@ namespace TransportLinesManager.Cache.BuildingData
         {
             get
             {
-				if (InnerBuildingLinesIndex is null)
-                {
-                    InnerBuildingLinesIndex = BuildingTransportDataCache.SelectMany(x => x.Value.RegionalLines).ToDictionary(x => (ushort)x.Key, x => x.Value);
-                }
+				InnerBuildingLinesIndex ??= BuildingTransportDataCache.SelectMany(x => x.Value.RegionalLines).ToDictionary(x => (ushort)x.Key, x => x.Value);
                 return InnerBuildingLinesIndex.TryGetValue(nodeId, out InnerBuildingLine result) ? result : null;
             }
         }

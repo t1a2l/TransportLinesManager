@@ -22,7 +22,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnect
         public uint VehicleLaneId { get; set; }
 
         [XmlElement("targetOutsideConnectionBuildings")]
-        public NonSequentialList<OutsideConnectionLineInfo> TargetOutsideConnections { get; set; } = new NonSequentialList<OutsideConnectionLineInfo>();
+        public NonSequentialList<OutsideConnectionLineInfo> TargetOutsideConnections { get; set; } = [];
 
         public void ReleaseNodes(ushort sourceBuilding)
         {

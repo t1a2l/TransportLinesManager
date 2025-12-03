@@ -53,8 +53,8 @@ namespace TransportLinesManager.WorldInfoPanels
         internal float m_kmaxUILineLength = 10000f;
 
         internal float m_actualStopsX;
-        internal Vector2 m_kLineSSpritePosition = new Vector2(175f, 20f);
-        internal Vector2 m_kLineSSpritePositionForWalkingTours = new Vector2(175f, 20f);
+        internal Vector2 m_kLineSSpritePosition = new(175f, 20f);
+        internal Vector2 m_kLineSSpritePositionForWalkingTours = new(175f, 20f);
 
         internal UILabel m_stopsLabel;
 
@@ -90,8 +90,8 @@ namespace TransportLinesManager.WorldInfoPanels
             m_panelModeSelector.autoFitChildrenVertically = true;
             m_panelModeSelector.autoLayout = true;
             m_panelModeSelector.autoLayoutDirection = LayoutDirection.Horizontal;
-            m_mapModeDropDown = UIHelperExtension.CloneBasicDropDownNoLabel(Enum.GetValues(typeof(MapMode)).Cast<MapMode>().Where(x => x >= 0).Select(x => Locale.Get("TLM_LINEAR_MAP_VIEW_MODE", x.ToString())).ToArray(), (int idx) =>
-               {
+            m_mapModeDropDown = UIHelperExtension.CloneBasicDropDownNoLabel([.. Enum.GetValues(typeof(MapMode)).Cast<MapMode>().Where(x => x >= 0).Select(x => Locale.Get("TLM_LINEAR_MAP_VIEW_MODE", x.ToString()))], idx =>
+            {
                    m_currentMode = (MapMode)idx;
                    RefreshVehicleButtons(GetLineID(out bool fromBuilding), fromBuilding);
                    MarkDirty();

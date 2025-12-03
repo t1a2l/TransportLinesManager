@@ -395,11 +395,11 @@ namespace TransportLinesManager.WorldInfoPanels
 
         public class UVMPublicTransportWorldInfoPanelObject
         {
-            public readonly Dictionary<string, IUVMPTWIPChild> m_childControls = new Dictionary<string, IUVMPTWIPChild>();
+            public readonly Dictionary<string, IUVMPTWIPChild> m_childControls = [];
 
             internal PublicTransportWorldInfoPanel origInstance = null;
 
-            private Func<PublicTransportWorldInfoPanel, InstanceID> m_getterInstanceId = ReflectionUtils.GetGetFieldDelegate<PublicTransportWorldInfoPanel, InstanceID>("m_InstanceID", typeof(PublicTransportWorldInfoPanel));
+            private readonly Func<PublicTransportWorldInfoPanel, InstanceID> m_getterInstanceId = ReflectionUtils.GetGetFieldDelegate<PublicTransportWorldInfoPanel, InstanceID>("m_InstanceID", typeof(PublicTransportWorldInfoPanel));
             internal InstanceID CurrentInstanceID => origInstance is null ? (default) : m_getterInstanceId(origInstance);
 
             internal UITextField m_nameField;

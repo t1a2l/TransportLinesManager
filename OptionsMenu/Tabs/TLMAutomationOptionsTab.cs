@@ -38,7 +38,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
         private void Awake()
         {
             parent = GetComponentInParent<UIComponent>();
-            UIHelperExtension group7 = new UIHelperExtension(parent.GetComponentInChildren<UIScrollablePanel>());
+            UIHelperExtension group7 = new(parent.GetComponentInChildren<UIScrollablePanel>());
             ((UIScrollablePanel)group7.Self).autoLayoutDirection = LayoutDirection.Horizontal;
             ((UIScrollablePanel)group7.Self).wrapLayout = true;
             ((UIScrollablePanel)group7.Self).width = 730;

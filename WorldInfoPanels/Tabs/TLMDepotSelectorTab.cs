@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using TransportLinesManager.Interfaces;
-using System.Reflection.Emit;
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
@@ -25,7 +24,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private UIScrollablePanel m_scrollablePanel;
         private UIScrollbar m_scrollbar;
-        private Dictionary<string, UICheckBox> m_checkboxes = new Dictionary<string, UICheckBox>();
+        private readonly Dictionary<string, UICheckBox> m_checkboxes = [];
         private bool m_isLoading;
         private UITextField m_nameFilter;
         private TransportSystemDefinition TransportSystem => TransportSystemDefinition.FromLineId(GetLineID(out bool fromBuilding), fromBuilding);
@@ -198,7 +197,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private void UpdateDepotList(IBasicExtension config)
         {
             var lineId = GetLineID(out _);
-            List<ushort> cityDepotList = TLMDepotUtils.GetAllDepotsFromCity(TransportSystem).Where(x => BuildingUtils.GetBuildingName(x, out _, out _).ToLower().Contains(m_nameFilter.text.ToLower())).ToList();
+            List<ushort> cityDepotList = [.. TLMDepotUtils.GetAllDepotsFromCity(TransportSystem).Where(x => BuildingUtils.GetBuildingName(x, out _, out _).ToLower().Contains(m_nameFilter.text.ToLower()))];
             List<ushort> targetDepotList = config.GetAllowedDepots(TransportSystem, lineId);
             UIPanel[] depotChecks = m_checkboxTemplateList.SetItemCount(cityDepotList.Count);
             LogUtils.DoLog($"depotChecks = {depotChecks.Length}");

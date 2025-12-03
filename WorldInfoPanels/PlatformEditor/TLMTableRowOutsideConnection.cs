@@ -105,7 +105,7 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
         {
             if (allow)
             {
-                TransportLinesManagerMod.Controller.BuildingLines.SafeGet(m_buildingId).AddRegionalLine(m_platformIdx, outsideConnId, $"REG\n{m_buildingId.ToString("X4")}\n{outsideConnId.ToString("X4")}", TLMController.COLOR_ORDER[SimulationManager.instance.m_randomizer.Int32((uint)TLMController.COLOR_ORDER.Length)]);
+                TransportLinesManagerMod.Controller.BuildingLines.SafeGet(m_buildingId).AddRegionalLine(m_platformIdx, outsideConnId, $"REG\n{m_buildingId:X4}\n{outsideConnId:X4}", TLMController.COLOR_ORDER[SimulationManager.instance.m_randomizer.Int32((uint)TLMController.COLOR_ORDER.Length)]);
             }
             else
             {

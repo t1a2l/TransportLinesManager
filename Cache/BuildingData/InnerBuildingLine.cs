@@ -282,7 +282,7 @@ namespace TransportLinesManager.Cache.BuildingData
                 {
                     TransportLine.FillPathNode(instance2.m_nodes.m_buffer[num2].m_position, data[0].m_meshData, data[0].m_pathSegmentIndex, 4f, 5f, false);
                     TransportLine.TempUpdateMeshData[] data5 = data;
-                    data[0].m_pathSegmentIndex++;
+                    data5[0].m_pathSegmentIndex++;
                 }
                 num6++;
                 num2 = num7;

@@ -11,10 +11,8 @@ using TransportLinesManager.Overrides;
 using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.NearLines;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using static TransportLinesManager.WorldInfoPanels.UVMPublicTransportWorldInfoPanel.UVMPublicTransportWorldInfoPanelObject;
-using System.Reflection.Emit;
 
 namespace TransportLinesManager.WorldInfoPanels.Components
 {
@@ -264,7 +262,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             var targBuilding = TLMStationUtils.GetStationBuilding(m_stopId, m_lineId, m_fromBuilding);
             var lines = BuildingManager.instance.m_buildings.m_buffer[targBuilding].Info.m_buildingAI is TransportStationAI tsai && (tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportTrain || tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportBus) ? TransportLinesManagerMod.Controller.BuildingLines.SafeGet(targBuilding) : null;
 
-            var buildingLines = lines is null ? new List<long>() : lines.RegionalLines.Keys.ToList();
+            var buildingLines = lines is null ? new List<long>() : [.. lines.RegionalLines.Keys];
             if (m_fromBuilding)
             {
                 buildingLines.Remove(m_lineId);

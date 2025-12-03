@@ -15,10 +15,10 @@ namespace TransportLinesManager.CommonsWindow.List.Components
 {
     internal class UVMLineListItem : UICustomControl
     {
-        private static readonly Color32 BackgroundColor = new Color32(49, 52, 58, 255);
-        private static readonly Color32 BrokenBackgroundColor = new Color32(80, 26, 24, 255);
-        private static readonly Color32 Line0BackgroundColor = new Color32(88, 28, 124, 255);
-        private static readonly Color32 ForegroundColor = new Color32(185, 221, 254, 255);
+        private static readonly Color32 BackgroundColor = new(49, 52, 58, 255);
+        private static readonly Color32 BrokenBackgroundColor = new(80, 26, 24, 255);
+        private static readonly Color32 Line0BackgroundColor = new(88, 28, 124, 255);
+        private static readonly Color32 ForegroundColor = new(185, 221, 254, 255);
 
         private ushort m_lineID = ushort.MaxValue;
 
@@ -83,11 +83,11 @@ namespace TransportLinesManager.CommonsWindow.List.Components
                     m_linePassengers.isVisible = true;
                     m_linePassengers.text = (averageCount + averageCount2).ToString("N0");
 
-                    m_linePassengers.tooltip = LocaleFormatter.FormatGeneric("TRANSPORT_LINE_PASSENGERS", new object[]
-                    {
+                    m_linePassengers.tooltip = LocaleFormatter.FormatGeneric("TRANSPORT_LINE_PASSENGERS",
+                    [
                 averageCount,
                 averageCount2
-                    });
+                    ]);
                     TLMLineUtils.SetLineNumberCircleOnRef(LineID, false, m_lineNumberFormatted, 0.8f);
                     m_lineColor.atlas = m_linePassengers.atlas;
                     m_lineColor.normalFgSprite = TLMLineUtils.GetIconForLine(LineID, false);

@@ -18,10 +18,10 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 if (!value && isCustom)
                 {
                     DisplayAbsoluteValues = false;
-                    BudgetEntries = new TimeableList<BudgetEntryXml>();
-                    AssetList = new SimpleXmlList<string>();
-                    TicketPriceEntries = new TimeableList<TicketPriceEntryXml>();
-                    DepotsAllowed = new SimpleXmlHashSet<ushort>();
+                    BudgetEntries = [];
+                    AssetList = [];
+                    TicketPriceEntries = [];
+                    DepotsAllowed = [];
                 }
                 isCustom = value;
             }
@@ -29,13 +29,13 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         [XmlAttribute("displayAbsoluteValues")]
         public bool DisplayAbsoluteValues { get; set; } = false;
         [XmlElement("Budget")]
-        public TimeableList<BudgetEntryXml> BudgetEntries { get; set; } = new TimeableList<BudgetEntryXml>();
+        public TimeableList<BudgetEntryXml> BudgetEntries { get; set; } = [];
         [XmlElement("AssetsList")]
-        public SimpleXmlList<string> AssetList { get; set; } = new SimpleXmlList<string>();
+        public SimpleXmlList<string> AssetList { get; set; } = [];
         [XmlElement("TicketPrices")]
-        public TimeableList<TicketPriceEntryXml> TicketPriceEntries { get; set; } = new TimeableList<TicketPriceEntryXml>();
+        public TimeableList<TicketPriceEntryXml> TicketPriceEntries { get; set; } = [];
         [XmlElement("DepotsAllowed")]
-        public SimpleXmlHashSet<ushort> DepotsAllowed { get; set; } = new SimpleXmlHashSet<ushort>();
+        public SimpleXmlHashSet<ushort> DepotsAllowed { get; set; } = [];
 
         [XmlAttribute("isZeroed")]
         public bool IsZeroed { get; set; }
