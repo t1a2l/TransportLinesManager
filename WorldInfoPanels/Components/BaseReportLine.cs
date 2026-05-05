@@ -1,6 +1,7 @@
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Commons.Utils;
+using System;
 using TransportLinesManager.Data.Managers;
 using UnityEngine;
 
@@ -53,6 +54,14 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             MonoUtils.LimitWidthAndBox(m_dateTime);
             xAdvance += m_dateTime.minimumSize.x;
             AddColumns(ref xAdvance);
+        }
+
+        private void ChangeSize(Vector2 y)
+        {
+            if (m_background != null)
+            {
+                m_background.size = y;
+            }
         }
 
         protected abstract void AddColumns(ref float xAdvance);

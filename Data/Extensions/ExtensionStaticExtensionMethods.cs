@@ -6,31 +6,124 @@ using TransportLinesManager.ModShared;
 using TransportLinesManager.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 
 namespace TransportLinesManager.Data.Extensions
 {
     public static class ExtensionStaticExtensionMethods
     {
         #region Assets List
+        public static List<TransportAsset> GetAssetTransportListForLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetTransportList;
+
+        public static void SetAssetTransportListForLine<T>(this T it, ushort lineId, List<TransportAsset> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetTransportList = new SimpleXmlList<TransportAsset>(list);
+
         public static List<string> GetAssetListForLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList;
-        public static void SetAssetListForLine<T>(this T it, ushort lineId, List<string> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList = [.. list];
-        public static void AddAssetToLine<T>(this T it, ushort lineId, string assetId) where T : IAssetSelectorExtension
+
+        public static void SetAssetListForLine<T>(this T it, ushort lineId, List<string> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList = new SimpleXmlList<string>(list);
+
+        public static void AddAssetToLine<T>(this T it, ushort lineId, string assetId, string capacity, string weight) where T : IAssetSelectorExtension
         {
-            List<string> list = it.GetAssetListForLine(lineId);
-            if (list.Contains(assetId))
+            List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
+            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+            if (list.Any(item => item.name == assetId))
             {
                 return;
             }
-            list.Add(assetId);
+            var item = new TransportAsset
+            {
+                name = assetId,
+                capacity = int.Parse(capacity),
+                count = new Dictionary<int, Count>(),
+                spawn_percent = new Dictionary<int, int>(),
+            };
+            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
+            {
+                var count = new Count
+                {
+                    totalCount = 0,
+                    usedCount = 0
+                };
+                item.count.Add(i, count);
+                item.spawn_percent.Add(i, 100);
+            }
+            var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
+            if (index == -1)
+            {
+                index = 0;
+            }
+            if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
+            {
+                var totalCount = 0;
+                for (int i = 0; i < list.Count; i++)
+                {
+                    totalCount += list[i].count[index].totalCount;
+                }
+                var newCount = int.Parse(weight);
+                // check if the new total is more then allowed if so make it zero
+                if(totalCount + newCount > currentConfig.BudgetEntries[index].Value)
+                {
+                    newCount = 0;
+                }
+                var item_count = item.count[index];
+                item_count.totalCount = newCount;
+                item.count[index] = item_count;
+            }
+            else
+            {
+                item.spawn_percent[index] = int.Parse(weight);
+            }
+            list.Add(item);
+            SetAssetTransportListForLine(it, lineId, list);
         }
+
+        public static void AddDefaultToNewBudgetEntry<T>(this T it, ushort lineId) where T : IAssetSelectorExtension
+        {
+            List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
+            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+            for (int i = 0; i < list.Count; i++)
+            {
+                var count = new Count
+                {
+                    totalCount = 0,
+                    usedCount = 0
+                };
+                list[i].count.Add(currentConfig.BudgetEntries.Count - 1, count);
+                list[i].spawn_percent.Add(currentConfig.BudgetEntries.Count - 1, 100);
+            }
+            SetAssetTransportListForLine(it, lineId, list);
+        }
+
+        public static void RemoveBudgetEntry<T, V>(this T it, ushort lineId, V entry) where T : IAssetSelectorExtension where V : UintValueHourEntryXml<V>
+        {
+            List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
+            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+            var index = 0;
+            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
+            {
+                if (currentConfig.BudgetEntries[i].HourOfDay.Value == entry.HourOfDay)
+                {
+                    index = i;
+                    break;
+                }
+            }
+            for (int i = 0; i < list.Count; i++)
+            {
+                list[i].count.Remove(index);
+                list[i].spawn_percent.Remove(index);
+            }
+            SetAssetTransportListForLine(it, lineId, list);
+        }
+
+
         public static void RemoveAssetFromLine<T>(this T it, ushort lineId, string assetId) where T : IAssetSelectorExtension
         {
-            List<string> list = it.GetAssetListForLine(lineId);
-            if (!list.Contains(assetId))
+            List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
+            if (!list.Any(item => item.name == assetId))
             {
                 return;
             }
-            list.RemoveAll(x => x == assetId);
+            list.RemoveAll(x => x.name == assetId);
         }
         public static void UseDefaultAssetsAtLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.GetAssetListForLine(lineId).Clear();
         #endregion
