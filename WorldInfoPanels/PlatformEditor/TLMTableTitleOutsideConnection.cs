@@ -53,7 +53,7 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
             ref Building b = ref instance.m_buildings.m_buffer[buildingId];
             content.prefix = instance.GetBuildingName(buildingId, new InstanceID { Building = buildingId });
             var azimuth = (90 - b.m_position.GetAngleXZ() + 360) % 360;
-            content.suffix = $"{azimuth.ToString("0")}° - {CardinalPoint.GetCardinalPoint16LocalizedShort(azimuth)}";
+            content.suffix = $"{azimuth:0}° - {CardinalPoint.GetCardinalPoint16LocalizedShort(azimuth)}";
         }
     }
 }

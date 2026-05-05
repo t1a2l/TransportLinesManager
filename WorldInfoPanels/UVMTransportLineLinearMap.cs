@@ -53,8 +53,8 @@ namespace TransportLinesManager.WorldInfoPanels
         internal float m_kmaxUILineLength = 10000f;
 
         internal float m_actualStopsX;
-        internal Vector2 m_kLineSSpritePosition = new Vector2(175f, 20f);
-        internal Vector2 m_kLineSSpritePositionForWalkingTours = new Vector2(175f, 20f);
+        internal Vector2 m_kLineSSpritePosition = new(175f, 20f);
+        internal Vector2 m_kLineSSpritePositionForWalkingTours = new(175f, 20f);
 
         internal UILabel m_stopsLabel;
 
@@ -90,8 +90,8 @@ namespace TransportLinesManager.WorldInfoPanels
             m_panelModeSelector.autoFitChildrenVertically = true;
             m_panelModeSelector.autoLayout = true;
             m_panelModeSelector.autoLayoutDirection = LayoutDirection.Horizontal;
-            m_mapModeDropDown = UIHelperExtension.CloneBasicDropDownNoLabel(Enum.GetValues(typeof(MapMode)).Cast<MapMode>().Where(x => x >= 0).Select(x => Locale.Get("TLM_LINEAR_MAP_VIEW_MODE", x.ToString())).ToArray(), (int idx) =>
-               {
+            m_mapModeDropDown = UIHelperExtension.CloneBasicDropDownNoLabel([.. Enum.GetValues(typeof(MapMode)).Cast<MapMode>().Where(x => x >= 0).Select(x => Locale.Get("TLM_LINEAR_MAP_VIEW_MODE", x.ToString()))], idx =>
+            {
                    m_currentMode = (MapMode)idx;
                    RefreshVehicleButtons(GetLineID(out bool fromBuilding), fromBuilding);
                    MarkDirty();
@@ -395,19 +395,19 @@ namespace TransportLinesManager.WorldInfoPanels
                     // 4 switch cases for each of 4 unscaled display states
                     float weightingPrev, weightingNext;
                     var vehicle_flags = Singleton<VehicleManager>.instance.m_vehicles.m_buffer[vehicleId].m_flags;
-                    if((vehicle_flags & (Vehicle.Flags.Leaving)) != 0)
+                    if ((vehicle_flags & (Vehicle.Flags.Leaving)) != 0)
                     {
                         // vehicle stopped at a stop; current stop is "prev" because next stop is "next"
                         weightingPrev = 1;
                         weightingNext = 0;
                     }
-                    else if((vehicle_flags & (Vehicle.Flags.Arriving)) != 0)
+                    else if ((vehicle_flags & (Vehicle.Flags.Arriving)) != 0)
                     {
                         // vehicle departing from a stop
                         weightingPrev = 0.75f;
                         weightingNext = 0.25f;
                     }
-                    else if((vehicle_flags & (Vehicle.Flags.Stopped)) != 0)
+                    else if ((vehicle_flags & (Vehicle.Flags.Stopped)) != 0)
                     {
                         // vehicle arriving at the next stop
                         weightingPrev = 0.25f;
@@ -495,8 +495,6 @@ namespace TransportLinesManager.WorldInfoPanels
                 labelVehicle.suffix = $"\n<color #ff0000>{(expense / 100.0f).ToString(Settings.moneyFormat, LocaleManager.cultureInfo)}</color>";
             }
         }
-
-
 
         public void OnGotFocus() => m_cachedScrollPosition = m_scrollPanel.scrollPosition;
         private void OnGotFocusBind(UIComponent component, UIFocusEventParameter eventParam) => m_cachedScrollPosition = m_scrollPanel.scrollPosition;

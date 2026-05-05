@@ -26,7 +26,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
 
             foreach (var kv in ReflectionUtils.GetSubtypesRecursive(typeof(TLMShowConfigTab), GetType()))
             {
-                var tsd = (kv.GetConstructor(new Type[0]).Invoke(null) as TLMShowConfigTab).TSD;
+                var tsd = (kv.GetConstructor([]).Invoke(null) as TLMShowConfigTab).TSD;
 
 
                 GameObject tab = Instantiate(tabTemplate.gameObject);
@@ -52,7 +52,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
                     secSprite.isInteractive = false;
                     secSprite.disabledColor = Color.black;
                 }
-                strip.AddTab(name, tab, body, new Type[] { kv });
+                strip.AddTab(name, tab, body, [kv]);
             }
             strip.selectedIndex = -1;
             strip.selectedIndex = 0;

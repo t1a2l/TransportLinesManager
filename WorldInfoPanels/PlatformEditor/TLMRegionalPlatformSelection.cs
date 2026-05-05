@@ -125,8 +125,11 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
             {
                 m_title.eventCheckChanged -= OnToggleUseTlmSettings;
                 var building = WorldInfoPanel.GetCurrentInstanceID().Building;
-                var show = BuildingManager.instance.m_buildings.m_buffer[building].Info.m_buildingAI is TransportStationAI tsai && (tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportTrain || tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportBus);
-
+                var show = false;
+                if (building != 0)
+                {
+                    show = BuildingManager.instance.m_buildings.m_buffer[building].Info.m_buildingAI is TransportStationAI tsai && (tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportTrain || tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportBus);
+                }
                 UpdateNearPlatforms(show);
                 m_title.eventCheckChanged += OnToggleUseTlmSettings;
                 m_dirty = false;
@@ -159,8 +162,8 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
             if (b.Info.m_buildingAI is not TransportStationAI tsai)
             {
                 m_containerParent.isVisible = false;
-				return;
-			}
+                return;
+            }
             var availableOutsideTransportInfo = OutsideTransportInfo(data, nm);
 
             if (availableOutsideTransportInfo.Count == 0)
@@ -181,12 +184,12 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
             for (ushort i = 0; i < rowItems.Length; i++)
             {
                 var row = rowItems[i];
-                var trackInfo = nm.m_segments.m_buffer[nm.m_lanes.m_buffer[stops[i].laneId].m_segment].Info;
-                if (availableOutsideTransportInfo.Any(x => x.IsValidOutsideConnectionTrack(trackInfo)))
+                var netInfo = nm.m_segments.m_buffer[nm.m_lanes.m_buffer[stops[i].laneId].m_segment].Info;
+                if (availableOutsideTransportInfo.Any(x => x.IsValidOutsideConnectionNetwork(netInfo)))
                 {
                     row.isVisible = true;
                     var controller = row.GetComponentInChildren<TLMTableRowOutsideConnection>();
-                    controller.ResetData(buildingId, TransportSystemDefinition.FromNetInfo(trackInfo), i, outsideConnections);
+                    controller.ResetData(buildingId, TransportSystemDefinition.FromNetInfo(netInfo), i, outsideConnections);
                 }
                 else
                 {
@@ -197,12 +200,12 @@ namespace TransportLinesManager.WorldInfoPanels.PlatformEditor
 
         private List<TransportSystemDefinition> OutsideTransportInfo(BuildingTransportDataCache data, NetManager nm)
         {
-            return data.StopPoints.Select(x =>
+            return [.. data.StopPoints.Select(x =>
             {
                 ref NetSegment segment = ref nm.m_segments.m_buffer[nm.m_lanes.m_buffer[x.laneId].m_segment];
                 var info = segment.Info;
                 return TransportSystemDefinition.FromNetInfo(info);
-            }).Where(x => x != null && x?.GetTransportInfoIntercity() != null).GroupBy(x => x).Select(x => x.First()).ToList();
+            }).Where(x => x != null && x?.GetTransportInfoIntercity() != null).GroupBy(x => x).Select(x => x.First())];
         }
     }
 }

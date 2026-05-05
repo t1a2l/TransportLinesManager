@@ -9,7 +9,6 @@ using static TransportLinesManager.WorldInfoPanels.Tabs.TLMReportsTab;
 
 namespace TransportLinesManager.WorldInfoPanels.ReportTabs
 {
-
     internal abstract class BasicReportTab<L, D> : UICustomControl, ITLMReportChild where D : BasicReportData, new() where L : BaseReportLine<D>
     {
 

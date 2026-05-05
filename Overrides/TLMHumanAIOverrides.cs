@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using ColossalFramework;
@@ -16,8 +15,8 @@ namespace TransportLinesManager.Overrides
     [HarmonyPatch(typeof(HumanAI))]
 	public static class TLMHumanAIOverrides 
 	{
-        private static readonly MethodInfo m_doHumanAiEconomyManagement = typeof(TLMHumanAIOverrides).GetMethod("DoHumanAiEconomyManagement", Patcher.allFlags);
-        private static readonly MethodInfo m_economyManagerCallAdd = typeof(EconomyManager).GetMethod("AddResource", Patcher.allFlags, null, new Type[] { typeof(Resource), typeof(int), typeof(ItemClass) }, null);
+        private static readonly MethodInfo m_doHumanAIEconomyManagement = typeof(TLMHumanAIOverrides).GetMethod("DoHumanAIEconomyManagement", Patcher.allFlags);
+        private static readonly MethodInfo m_economyManagerCallAdd = typeof(EconomyManager).GetMethod("AddResource", Patcher.allFlags, null, [typeof(Resource), typeof(int), typeof(ItemClass)], null);
         private static readonly MethodInfo m_getTicketPriceForPrefix = typeof(TLMHumanAIOverrides).GetMethod("GetTicketPriceForVehicle", Patcher.allFlags);
         private static readonly MethodInfo m_getTicketPriceDefault = typeof(VehicleAI).GetMethod("GetTicketPrice", Patcher.allFlags);
 
@@ -32,10 +31,10 @@ namespace TransportLinesManager.Overrides
                 if (inst[i].opcode == OpCodes.Callvirt && inst[i].operand == m_economyManagerCallAdd)
                 {
                     inst[i] = new CodeInstruction(OpCodes.Ldloc_2);
-                    inst.InsertRange(i + 1, new List<CodeInstruction>(){
-                        new CodeInstruction(OpCodes.Ldarg_1),
-                        new CodeInstruction(OpCodes.Call, m_doHumanAiEconomyManagement)
-                    });
+                    inst.InsertRange(i + 1, [
+                        new(OpCodes.Ldarg_1),
+                        new(OpCodes.Call, m_doHumanAIEconomyManagement)
+                    ]);
                     break;
                 }
             }
@@ -63,9 +62,9 @@ namespace TransportLinesManager.Overrides
             return inst;
         }
 
-        private static int DoHumanAiEconomyManagement(EconomyManager instance, Resource resource, int amount, ItemClass itemClass, ushort vehicleId, ushort citizenId)
+        internal static int DoHumanAIEconomyManagement(EconomyManager instance, Resource resource, int amount, ItemClass itemClass, ushort vehicleId, ushort citizenId)
         {
-            LogUtils.DoLog($"DoHumanAiEconomyManagement : vehicleId {vehicleId}");
+            LogUtils.DoLog($"DoHumanAIEconomyManagement : vehicleId {vehicleId}");
             ushort lineId = VehicleManager.instance.m_vehicles.m_buffer[vehicleId].m_transportLine;
             ref Citizen citizen = ref CitizenManager.instance.m_citizens.m_buffer[citizenId];
             instance.AddResource(resource, amount, itemClass);
@@ -75,13 +74,13 @@ namespace TransportLinesManager.Overrides
                 TLMTransportLineStatusesManager.instance.AddToLine(lineId, amount, 0, ref citizen, citizenId);
                 TLMTransportLineStatusesManager.instance.AddToVehicle(vehicleId, amount, 0, ref citizen);
                 TLMTransportLineStatusesManager.instance.AddToStop(stopId, amount, ref citizen);
-                LogUtils.DoLog($"DoHumanAiEconomyManagement : line {lineId};amount = {amount}; citizen = {citizenId}");
+                LogUtils.DoLog($"DoHumanAIEconomyManagement : line {lineId};amount = {amount}; citizen = {citizenId}");
             }
 
             return 0;
         }
 
-        private static int GetTicketPriceForVehicle(VehicleAI ai, ushort vehicleID, ref Vehicle vehicleData)
+        internal static int GetTicketPriceForVehicle(VehicleAI ai, ushort vehicleID, ref Vehicle vehicleData)
         {
             var def = TransportSystemDefinition.From(vehicleData.Info);
 

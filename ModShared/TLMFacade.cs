@@ -145,17 +145,14 @@ namespace TransportLinesManager.ModShared
                 {
                     var info = VehicleManager.instance.m_vehicles.m_buffer[firstVehicle].Info;
 
-                    modelPrefix = (info.name.Contains(".") ? info.name.Split(new char[] { '.' }, 2)[1] : info.name).ToUpper().Substring(0, 3);
+                    modelPrefix = (info.name.Contains(".") ? info.name.Split(['.'], 2)[1] : info.name).ToUpper().Substring(0, 3);
                 }
                 return modelPrefix;
             }
 
             string GetVehicleInstanceString()
             {
-                if (vehicleString == null)
-                {
-                    vehicleString = vehicleId.ToString().PadLeft(5, '\0');
-                }
+                vehicleString ??= vehicleId.ToString().PadLeft(5, '\0');
                 return vehicleString;
             }
 
@@ -221,51 +218,42 @@ namespace TransportLinesManager.ModShared
 
             char GetLetter(char item)
             {
-                switch (item)
+                return item switch
                 {
-                    case 'D': return GetDepotPrefix()[0];
-                    case 'E': return GetDepotPrefix()[1];
-                    case 'F': return GetDepotPrefix()[2];
-
-                    case 'M': return GetModelPrefix()[0];
-                    case 'N': return GetModelPrefix()[1];
-                    case 'O': return GetModelPrefix()[2];
-
-                    case 'P': return GetLinePrefix()[0];
-                    case 'Q': return GetLinePrefix()[1];
-                    case 'R': return GetLinePrefix()[2];
-
-                    case 'J': return GetVehicleNthTrailer().Replace('\0', '0')[0];
-                    case 'K': return GetVehicleNthTrailer().Replace('\0', '0')[1];
-                    case 'L': return GetVehicleNthTrailer().Replace('\0', '0')[2];
-
-                    case 'S': return GetVehicleNthDepot().Replace('\0', '0')[0];
-                    case 'T': return GetVehicleNthDepot().Replace('\0', '0')[1];
-                    case 'U': return GetVehicleNthDepot().Replace('\0', '0')[2];
-
-                    case 'V': return GetVehicleInstanceString().Replace('\0', '0')[0];
-                    case 'W': return GetVehicleInstanceString().Replace('\0', '0')[1];
-                    case 'X': return GetVehicleInstanceString().Replace('\0', '0')[2];
-                    case 'Y': return GetVehicleInstanceString().Replace('\0', '0')[3];
-                    case 'Z': return GetVehicleInstanceString().Replace('\0', '0')[4];
-
-                    case 'j': return GetVehicleNthTrailer()[0];
-                    case 'k': return GetVehicleNthTrailer()[1];
-                    case 'l': return GetVehicleNthTrailer()[2];
-
-                    case 's': return GetVehicleNthDepot()[0];
-                    case 't': return GetVehicleNthDepot()[1];
-                    case 'u': return GetVehicleNthDepot()[2];
-
-                    case 'v': return GetVehicleInstanceString()[0];
-                    case 'w': return GetVehicleInstanceString()[1];
-                    case 'x': return GetVehicleInstanceString()[2];
-                    case 'y': return GetVehicleInstanceString()[3];
-                    case 'z':
-                        return GetVehicleInstanceString()[4];
-
-                    default: return item;
+                    'D' => GetDepotPrefix()[0],
+                    'E' => GetDepotPrefix()[1],
+                    'F' => GetDepotPrefix()[2],
+                    'M' => GetModelPrefix()[0],
+                    'N' => GetModelPrefix()[1],
+                    'O' => GetModelPrefix()[2],
+                    'P' => GetLinePrefix()[0],
+                    'Q' => GetLinePrefix()[1],
+                    'R' => GetLinePrefix()[2],
+                    'J' => GetVehicleNthTrailer().Replace('\0', '0')[0],
+                    'K' => GetVehicleNthTrailer().Replace('\0', '0')[1],
+                    'L' => GetVehicleNthTrailer().Replace('\0', '0')[2],
+                    'S' => GetVehicleNthDepot().Replace('\0', '0')[0],
+                    'T' => GetVehicleNthDepot().Replace('\0', '0')[1],
+                    'U' => GetVehicleNthDepot().Replace('\0', '0')[2],
+                    'V' => GetVehicleInstanceString().Replace('\0', '0')[0],
+                    'W' => GetVehicleInstanceString().Replace('\0', '0')[1],
+                    'X' => GetVehicleInstanceString().Replace('\0', '0')[2],
+                    'Y' => GetVehicleInstanceString().Replace('\0', '0')[3],
+                    'Z' => GetVehicleInstanceString().Replace('\0', '0')[4],
+                    'j' => GetVehicleNthTrailer()[0],
+                    'k' => GetVehicleNthTrailer()[1],
+                    'l' => GetVehicleNthTrailer()[2],
+                    's' => GetVehicleNthDepot()[0],
+                    't' => GetVehicleNthDepot()[1],
+                    'u' => GetVehicleNthDepot()[2],
+                    'v' => GetVehicleInstanceString()[0],
+                    'w' => GetVehicleInstanceString()[1],
+                    'x' => GetVehicleInstanceString()[2],
+                    'y' => GetVehicleInstanceString()[3],
+                    'z' => GetVehicleInstanceString()[4],
+                    _ => item,
                 };
+                ;
             }
 
             bool escapeNext = false;

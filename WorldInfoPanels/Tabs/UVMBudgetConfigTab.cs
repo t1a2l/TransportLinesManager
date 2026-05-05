@@ -39,8 +39,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_showAbsoluteCheckbox.isChecked = TLMTransportLineExtension.Instance.IsDisplayAbsoluteValues(lineID);
         }
 
-        internal override List<Color> ColorOrder { get; } = new List<Color>()
-        {
+        internal override List<Color> ColorOrder { get; } =
+        [
             Color.red,
             Color.Lerp(Color.red,Color.yellow,0.5f),
             Color.yellow,
@@ -51,7 +51,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             Color.Lerp(Color.blue,Color.magenta,0.5f),
             Color.magenta,
             Color.Lerp(Color.red,Color.magenta,0.5f),
-        };
+        ];
 
         public static bool IsAbsoluteValue() => Instance.m_showAbsoluteCheckbox.isChecked;
         protected override TimeableList<BudgetEntryXml> Config
@@ -60,7 +60,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             : null;
 
 
-        protected override BudgetEntryXml DefaultEntry() => new BudgetEntryXml()
+        protected override BudgetEntryXml DefaultEntry() => new()
         {
             HourOfDay = 0,
             Value = 100

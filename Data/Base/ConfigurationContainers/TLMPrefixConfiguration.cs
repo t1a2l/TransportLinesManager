@@ -13,9 +13,9 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
     public class TLMPrefixConfiguration : IAssetSelectorStorage, INameableStorage, IColorSelectableStorage, IBasicExtensionStorage
     {
         [XmlElement("Budget")]        
-        public TimeableList<BudgetEntryXml> BudgetEntries { get; set; } = new TimeableList<BudgetEntryXml>();
+        public TimeableList<BudgetEntryXml> BudgetEntries { get; set; } = [];
         [XmlElement("TicketPrices")]
-        public TimeableList<TicketPriceEntryXml> TicketPriceEntries { get; set; } = new TimeableList<TicketPriceEntryXml>();
+        public TimeableList<TicketPriceEntryXml> TicketPriceEntries { get; set; } = [];
         [XmlElement("AssetsList")]
         public SimpleXmlList<string> AssetList { get; set; } = new SimpleXmlList<string>();
         [XmlElement("AssetsTransportList")]
@@ -59,7 +59,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         }
 
         [XmlElement("DepotsAllowed")]
-        public SimpleXmlHashSet<ushort> DepotsAllowed { get; set; } = new SimpleXmlHashSet<ushort>();
+        public SimpleXmlHashSet<ushort> DepotsAllowed { get; set; } = [];
 
     }
 }

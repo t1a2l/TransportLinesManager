@@ -27,7 +27,7 @@ namespace TransportLinesManager.Overrides
         private static readonly MethodInfo m_targetVehicles = typeof(TransportLine).GetMethod("CalculateTargetVehicleCount", Patcher.allFlags);
         private static readonly MethodInfo m_setActive = typeof(TransportLine).GetMethod("SetActive", Patcher.allFlags);
         private static readonly MethodInfo m_newTargetVehicles = typeof(TransportLineOverrides).GetMethod("NewCalculateTargetVehicleCount", Patcher.allFlags);
-        private static readonly MethodInfo m_economyManagerCallFetch = typeof(EconomyManager).GetMethod("FetchResource", Patcher.allFlags, null, new Type[] { typeof(Resource), typeof(int), typeof(ItemClass) }, null);
+        private static readonly MethodInfo m_economyManagerCallFetch = typeof(EconomyManager).GetMethod("FetchResource", Patcher.allFlags, null, [typeof(Resource), typeof(int), typeof(ItemClass)], null);
         private static readonly MethodInfo m_doTransportLineEconomyManagement = typeof(TransportLineOverrides).GetMethod("DoTransportLineEconomyManagement", Patcher.allFlags);
         private static readonly MethodInfo m_getBudgetInt = typeof(TLMLineUtils).GetMethod("GetEffectiveBudgetInt", Patcher.allFlags);
 
@@ -70,19 +70,19 @@ namespace TransportLinesManager.Overrides
         {
             var inst = new List<CodeInstruction>(instructions);
 
-            inst.InsertRange(0, new List<CodeInstruction>
-                    {
-                        new CodeInstruction(OpCodes.Ldarg_0),
-                        new CodeInstruction(OpCodes.Ldarg_1),
-                        new CodeInstruction(OpCodes.Call, m_getBudgetInt),
-                        new CodeInstruction(OpCodes.Ldc_I4_0),
-                        new CodeInstruction(OpCodes.Cgt),
-                        new CodeInstruction(OpCodes.Ldarg_1),
-                        new CodeInstruction(OpCodes.Call, m_getBudgetInt),
-                        new CodeInstruction(OpCodes.Ldc_I4_0),
-                        new CodeInstruction(OpCodes.Cgt),
-                        new CodeInstruction(OpCodes.Call,m_setActive ),
-                    });
+            inst.InsertRange(0,
+            [
+                new(OpCodes.Ldarg_0),
+                new(OpCodes.Ldarg_1),
+                new(OpCodes.Call, m_getBudgetInt),
+                new(OpCodes.Ldc_I4_0),
+                new(OpCodes.Cgt),
+                new(OpCodes.Ldarg_1),
+                new(OpCodes.Call, m_getBudgetInt),
+                new(OpCodes.Ldc_I4_0),
+                new(OpCodes.Cgt),
+                new(OpCodes.Call,m_setActive ),
+            ]);
             for (int i = 0; i < inst.Count; i++)
             {
                 if (inst[i].opcode == OpCodes.Call && inst[i].operand == m_targetVehicles)
@@ -161,7 +161,9 @@ namespace TransportLinesManager.Overrides
         
         [HarmonyPatch(typeof(TransportLine), "AddVehicle")]
         [HarmonyPostfix]
+#pragma warning disable IDE0060 // Remove unused parameter
         public static void BusUnbuncher(ushort vehicleID, ref Vehicle data, bool findTargetStop)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             if (findTargetStop && (data.Info.GetAI() is BusAI || data.Info.GetAI() is TramAI || data.Info.GetAI() is TrolleybusAI) && data.m_transportLine > 0)
             {
@@ -193,7 +195,7 @@ namespace TransportLinesManager.Overrides
                 || (info.m_vehicleType == VehicleInfo.VehicleType.Tram && TLMBaseConfigXML.CurrentContextConfig.ExpressTramsEnabled)
                 || (info.m_vehicleType == VehicleInfo.VehicleType.Trolleybus && TLMBaseConfigXML.CurrentContextConfig.ExpressTrolleybusesEnabled);
             var currentStop = TransportLine.GetPrevStop(nextStop);
-            __result = validType && currentStop != __instance.m_stops && !TLMStopDataContainer.Instance.SafeGet(currentStop).IsTerminal ? true : CanLeaveStop(__instance, nextStop, waitTime);
+            __result = validType && currentStop != __instance.m_stops && !TLMStopDataContainer.Instance.SafeGet(currentStop).IsTerminal || CanLeaveStop(__instance, nextStop, waitTime);
             return false;
         }
 

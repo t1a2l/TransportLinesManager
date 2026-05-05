@@ -153,7 +153,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             bool showLocal = nearLines.Count > 0;
             if (showLocal)
             {
-                var localLines = TLMLineUtils.SortLines(nearLines.Select(x => Tuple.New(x, false)).ToList()).Values.ToArray();
+                var localLines = TLMLineUtils.SortLines([.. nearLines.Select(x => Tuple.New(x, false))]).Values.ToArray();
                 var itemsEntries = m_localLinesTemplateList.SetItemCount(localLines.Length);
                 for (int idx = 0; idx < localLines.Length; idx++)
                 {

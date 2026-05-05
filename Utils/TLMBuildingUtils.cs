@@ -7,9 +7,8 @@ namespace TransportLinesManager.Utils
 {
     public class TLMBuildingUtils
     {
-        public static string GetBuildingDetails(ushort buildingId, out ItemClass.Service serviceFound, out ItemClass.SubService subserviceFound, out string prefix, out NamingType namingType, ushort lineId = 0)
+        public static string GetBuildingDetails(ushort buildingId, out ItemClass.Service serviceFound, out ItemClass.SubService subserviceFound, out string prefix, out NamingType namingType)
         {
-
             BuildingManager bm = Singleton<BuildingManager>.instance;
             if (bm.m_buildings.m_buffer[buildingId].m_parentBuilding > 0)
             {
@@ -25,7 +24,7 @@ namespace TransportLinesManager.Utils
             {
                 var data = TLMBaseConfigXML.CurrentContextConfig.GetAutoNameData(serviceFound);
                 prefix = data?.NamingPrefix?.Trim();
-                namingType = NamingTypeExtensions.From(serviceFound, subserviceFound);
+                namingType = NamingTypeExtensions.From(serviceFound);
 
             }
             else

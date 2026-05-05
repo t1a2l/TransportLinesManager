@@ -19,10 +19,10 @@ namespace TransportLinesManager.OptionsMenu
 {
     internal abstract class TLMShowConfigTab : UICustomControl, ITLMConfigOptionsTab
     {
-        public UIPanel mainPanel { get; private set; }
+        public UIPanel MainPanel { get; private set; }
         public UIHelperExtension m_uiHelper;
 
-        public static TLMShowConfigTab instance { get; private set; }
+        public static TLMShowConfigTab Instance { get; private set; }
 
         internal abstract TransportSystemDefinition TSD { get; }
 
@@ -48,11 +48,11 @@ namespace TransportLinesManager.OptionsMenu
 
         private void Awake()
         {
-            instance = this;
-            mainPanel = GetComponent<UIPanel>();
-            mainPanel.autoLayout = true;
-            mainPanel.autoLayoutDirection = LayoutDirection.Vertical;
-            m_uiHelper = new UIHelperExtension(mainPanel);
+            Instance = this;
+            MainPanel = GetComponent<UIPanel>();
+            MainPanel.autoLayout = true;
+            MainPanel.autoLayoutDirection = LayoutDirection.Vertical;
+            m_uiHelper = new UIHelperExtension(MainPanel);
 
             m_uiHelper.AddLabel(string.Format(Locale.Get("TLM_CONFIGS_FOR"), TSD.GetTransportName()));
             UIPanel panel = m_uiHelper.Self.GetComponentInParent<UIPanel>();

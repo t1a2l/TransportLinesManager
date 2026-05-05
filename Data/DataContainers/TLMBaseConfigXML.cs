@@ -74,11 +74,13 @@ namespace TransportLinesManager.Data.DataContainers
         [XmlAttribute("autoName")]
         public bool UseAutoName { get; set; }
         [XmlAttribute("lineCodeInAutoname")]
+        public bool BusLinesUseSoftDespawn { get; set; } = false;
+        [XmlAttribute("BusLinesUseSoftDespawn")]
         public bool AddLineCodeInAutoname { get; set; }
 
         [Obsolete("XML Export only!", true)]
         public NonSequentialList<TLMTransportTypeConfigurationsXML> PublicTransportConfigurations { get => PublicTransportConfigurations_internal; set => PublicTransportConfigurations_internal = value; }
-        private NonSequentialList<TLMTransportTypeConfigurationsXML> PublicTransportConfigurations_internal { get; set; } = new NonSequentialList<TLMTransportTypeConfigurationsXML>();
+        private NonSequentialList<TLMTransportTypeConfigurationsXML> PublicTransportConfigurations_internal { get; set; } = [];
         public TLMTransportTypeConfigurationsXML GetTransportData(TransportSystemDefinition def)
         {
             if (!PublicTransportConfigurations_internal.TryGetValue(def.Id, out TLMTransportTypeConfigurationsXML result))
@@ -90,8 +92,8 @@ namespace TransportLinesManager.Data.DataContainers
 
 
         [Obsolete("XML Export only!", true)]
-        public NonSequentialList<TLMAutoNameConfigurationData<ItemClass.Service>> ServiceAutoName { get => ServiceAutoName_internal; set => ServiceAutoName_internal = value ?? new NonSequentialList<TLMAutoNameConfigurationData<ItemClass.Service>>(); }
-        private NonSequentialList<TLMAutoNameConfigurationData<ItemClass.Service>> ServiceAutoName_internal { get; set; } = new NonSequentialList<TLMAutoNameConfigurationData<ItemClass.Service>>();
+        public NonSequentialList<TLMAutoNameConfigurationData<ItemClass.Service>> ServiceAutoName { get => ServiceAutoName_internal; set => ServiceAutoName_internal = value ?? []; }
+        private NonSequentialList<TLMAutoNameConfigurationData<ItemClass.Service>> ServiceAutoName_internal { get; set; } = [];
         public TLMAutoNameConfigurationData<ItemClass.Service> GetAutoNameData(ItemClass.Service service)
         {
             if (!ServiceAutoName_internal.TryGetValue((long)service, out TLMAutoNameConfigurationData<ItemClass.Service> result))
@@ -102,8 +104,8 @@ namespace TransportLinesManager.Data.DataContainers
         }
 
         [Obsolete("XML Export only!", true)]
-        public NonSequentialList<TLMAutoNameConfigurationData<TLMSpecialNamingClass>> SpecialAutoName { get => SpecialAutoName_internal; set => SpecialAutoName_internal = value ?? new NonSequentialList<TLMAutoNameConfigurationData<TLMSpecialNamingClass>>(); }
-        private NonSequentialList<TLMAutoNameConfigurationData<TLMSpecialNamingClass>> SpecialAutoName_internal { get; set; } = new NonSequentialList<TLMAutoNameConfigurationData<TLMSpecialNamingClass>>();
+        public NonSequentialList<TLMAutoNameConfigurationData<TLMSpecialNamingClass>> SpecialAutoName { get => SpecialAutoName_internal; set => SpecialAutoName_internal = value ?? []; }
+        private NonSequentialList<TLMAutoNameConfigurationData<TLMSpecialNamingClass>> SpecialAutoName_internal { get; set; } = [];
         public TLMAutoNameConfigurationData<TLMSpecialNamingClass> GetAutoNameData(TLMSpecialNamingClass clazz)
         {
             if (!SpecialAutoName_internal.TryGetValue((long)clazz, out TLMAutoNameConfigurationData<TLMSpecialNamingClass> result))

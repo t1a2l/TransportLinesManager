@@ -32,7 +32,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private VehicleInfo m_lastInfo;
         private UITemplateList<UIPanel> m_checkboxTemplateList;
         private UITextField m_nameFilter;
-        private readonly Dictionary<TransportSystemDefinition, string> m_clipboard = new();
+        private readonly Dictionary<TransportSystemDefinition, string> m_clipboard = [];
 
         private UIButton m_copyButton;
         private UIButton m_pasteButton;
@@ -55,7 +55,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             MonoUtils.CreateUIElement(out m_nameFilter, MainPanel.transform);
             MonoUtils.UiTextFieldDefaults(m_nameFilter);
             MonoUtils.InitButtonFull(m_nameFilter, false, "OptionsDropboxListbox");
-            m_nameFilter.tooltipLocaleID = "TLM_ASSET_FILTERBY";
+            m_nameFilter.tooltip = Locale.Get("TLM_ASSET_FILTERBY");
             m_nameFilter.relativePosition = new Vector3(5, 50);
             m_nameFilter.height = 23;
             m_nameFilter.width = 170f;
@@ -126,6 +126,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_pasteButton.isVisible = true;
             UpdateAssetList(config);
         }
+
         private void ActionPaste()
         {
             if (!m_clipboard.ContainsKey(TransportSystem))
@@ -137,11 +138,12 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             config.SetAssetTransportListForLine(lineId, XmlUtils.DefaultXmlDeserialize<List<TransportAsset>>(m_clipboard[TransportSystem]));
             UpdateAssetList(config);
         }
+
         private void ActionDelete()
         {
             var lineId = GetLineID();
             IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
-            config.SetAssetTransportListForLine(lineId, new List<TransportAsset>());
+            config.SetAssetListForLine(lineId, []);
             UpdateAssetList(config);
         }
 
@@ -235,7 +237,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             var lineId = GetLineID();
             m_lastInfo = default;
             m_pasteButton.isVisible = m_clipboard.ContainsKey(TransportSystem);
-            var targetAssets = TransportSystem.GetTransportExtension().GetAllBasicAssetsForLine(lineId).Where(x => x.Value.Contains(m_nameFilter.text)).ToList();
+            var targetAssets = TransportSystem.GetTransportExtension().GetAllBasicAssetsForLine(lineId).Where(x => x.Value.ToLower().Contains(m_nameFilter.text.ToLower())).ToList();
             UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(targetAssets.Count);
             List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
             List<string> allowedAssets = config.GetAssetListForLine(lineId);
@@ -393,10 +395,13 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         }
 
         private void RedrawModel() => m_previewRenderer.RenderVehicle(m_lastInfo, m_lastColor == Color.clear ? Color.HSVToRGB(Math.Abs(m_previewRenderer.CameraRotation) / 360f, .5f, .5f) : m_lastColor, true);
+        
         public void OnEnable()
         { }
+
         public void OnDisable()
         { }
+
         public void OnGotFocus()
         { }
 

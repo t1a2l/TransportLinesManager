@@ -28,8 +28,11 @@
   </Target>
   <ItemGroup>
     <Compile Remove="Code\Icons\**" />
+    <Compile Remove="TLM2WE\**" />
     <EmbeddedResource Remove="Code\Icons\**" />
+    <EmbeddedResource Remove="TLM2WE\**" />
     <None Remove="Code\Icons\**" />
+    <None Remove="TLM2WE\**" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Commons\UI\i18n\*.properties" />
@@ -67,7 +70,10 @@
       <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
-  </ItemGroup>
+    <Reference Include="ValueTuple">
+      <HintPath>..\_managed\ValueTuple.dll</HintPath>
+    </Reference> 
+    </ItemGroup>
   <ItemGroup>
     <None Update="UI\Images\PreviewImage.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -45,7 +45,7 @@ namespace TransportLinesManager.Utils
 
         public static string GetStopName(ushort stopId)
         {
-            InstanceID id = new InstanceID
+            InstanceID id = new()
             {
                 NetNode = stopId
             };
@@ -85,7 +85,7 @@ namespace TransportLinesManager.Utils
             if (lineId == 0 && !fromBuilding)
             {
                 buildingID = stopId;
-                return GetBuildingNameForStation(lineId, out serviceFound, out subserviceFound, out prefix, stopId, out resultNamingType);
+                return GetBuildingNameForStation(out serviceFound, out subserviceFound, out prefix, stopId, out resultNamingType);
             }
             TransportSystemDefinition tsd = TransportSystemDefinition.FromLineId(lineId, fromBuilding);
             string savedName = GetStopName(stopId);
@@ -133,7 +133,7 @@ namespace TransportLinesManager.Utils
 
             if (buildingID > 0)
             {
-                return GetBuildingNameForStation(lineId, out serviceFound, out subserviceFound, out prefix, buildingID, out resultNamingType);
+                return GetBuildingNameForStation(out serviceFound, out subserviceFound, out prefix, buildingID, out resultNamingType);
             }
 
 
@@ -181,20 +181,20 @@ namespace TransportLinesManager.Utils
             }
         }
 
-        private static string GetBuildingNameForStation(ushort lineId, out Service serviceFound, out SubService subserviceFound, out string prefix, ushort buildingID, out NamingType resultNamingType)
+        private static string GetBuildingNameForStation(out Service serviceFound, out SubService subserviceFound, out string prefix, ushort buildingID, out NamingType resultNamingType)
         {
-            string name = TLMBuildingUtils.GetBuildingDetails(buildingID, out serviceFound, out subserviceFound, out prefix, out resultNamingType, lineId);
+            string name = TLMBuildingUtils.GetBuildingDetails(buildingID, out serviceFound, out subserviceFound, out prefix, out resultNamingType);
             if (resultNamingType == NamingType.NONE)
             {
-                resultNamingType = NamingTypeExtensions.From(serviceFound, subserviceFound);
+                resultNamingType = NamingTypeExtensions.From(serviceFound);
             }
             return name;
         }
 
-        public static Service[] GetUsableServiceInAutoName() => m_searchOrderStationNamingRule.OfType<Service>().ToArray();
+        public static Service[] GetUsableServiceInAutoName() => [.. m_searchOrderStationNamingRule.OfType<Service>()];
 
         //ORDEM DE BUSCA DE CONFIG
-        private static object[] m_searchOrderStationNamingRule = new object[] {
+        private static readonly object[] m_searchOrderStationNamingRule = [
             TransportSystemDefinition.PLANE,
             TransportSystemDefinition.SHIP,
             TransportSystemDefinition.BLIMP,
@@ -233,7 +233,7 @@ namespace TransportLinesManager.Utils
             TLMSpecialNamingClass.Industrial,
             TLMSpecialNamingClass.District,
             TLMSpecialNamingClass.Address,
-        };
+        ];
 
         public static string GetStationName(ushort stopId, ushort lineId, ItemClass.SubService ss, bool fromBuilding) => GetStationName(stopId, lineId, ss, out _, out _, out _, out _, out _, fromBuilding, excludeCargo: true);
         
@@ -290,6 +290,19 @@ namespace TransportLinesManager.Utils
                 }
             }
 
+            if(fromBuilding && nm.m_nodes.m_buffer[stopId].Info.m_class.m_subService == SubService.PublicTransportBus && nm.m_nodes.m_buffer[(int)stopId].Info.m_class.name == "Intercity Bus Line")
+            {
+                tempBuildingId = BuildingUtils.FindBuilding(position, 100f, ItemClass.Service.Road, ItemClass.SubService.None, null, Building.Flags.None, Building.Flags.None);
+                if (BuildingManager.instance.m_buildings.m_buffer[tempBuildingId].m_parentBuilding != 0)
+                {
+                    tempBuildingId = Building.FindParentBuilding(tempBuildingId);
+                }
+                if (BuildingUtils.IsBuildingValidForStation(true, bm, tempBuildingId))
+                {
+                    return tempBuildingId;
+                }
+            }
+
             tempBuildingId = BuildingUtils.FindBuilding(position, 100f, ItemClass.Service.PublicTransport, ItemClass.SubService.None, m_defaultAllowedVehicleTypes, Building.Flags.None, Building.Flags.None);
             if (BuildingManager.instance.m_buildings.m_buffer[tempBuildingId].m_parentBuilding != 0)
             {
@@ -315,7 +328,7 @@ namespace TransportLinesManager.Utils
 
         }
 
-        private static readonly TransferManager.TransferReason[] m_defaultAllowedVehicleTypes = {
+        private static readonly TransferManager.TransferReason[] m_defaultAllowedVehicleTypes = [
             TransferManager.TransferReason.Blimp ,
             TransferManager.TransferReason.CableCar ,
             TransferManager.TransferReason.Ferry ,
@@ -328,7 +341,7 @@ namespace TransportLinesManager.Utils
             TransferManager.TransferReason.TouristBus ,
             TransferManager.TransferReason.IntercityBus ,
             TransferManager.TransferReason.Bus
-        };
+        ];
 
         public static ushort GetStationBuilding(uint stopId, ItemClass.SubService ss, bool excludeCargo = false, bool restrictToTransportType = false)
         {
@@ -383,7 +396,7 @@ namespace TransportLinesManager.Utils
                     if (conf.UseInAutoName)
                     {
                         tempBuildingId = BuildingUtils.FindBuilding(nn.m_position, 100f, serv, subserv, null, Building.Flags.None, Building.Flags.None);
-                        if (tempBuildingId > 0 && (!(idx is TransportSystemDefinition) || IsBuildingValidForStation(excludeCargo, bm, tempBuildingId)))
+                        if (tempBuildingId > 0 && (idx is not TransportSystemDefinition || IsBuildingValidForStation(excludeCargo, bm, tempBuildingId)))
                         {
                             var parent = Building.FindParentBuilding(tempBuildingId);
                             return parent == 0 ? tempBuildingId : parent;

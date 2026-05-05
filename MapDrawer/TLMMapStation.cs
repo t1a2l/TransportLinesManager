@@ -12,22 +12,22 @@ namespace TransportLinesManager.MapDrawer
     {
 
         public string name;
-        public Dictionary<ushort, Vector3> stopsWithWorldPos = new Dictionary<ushort, Vector3>();
+        public Dictionary<ushort, Vector3> stopsWithWorldPos = [];
         public ushort stopId;
 
 
-        public List<ushort> LinesPassing { get; private set; } = new List<ushort>();
+        public List<ushort> LinesPassing { get; private set; } = [];
         public int Id { get; private set; }
-        private ItemClass.Service service;
-        private string districtName;
-        private ushort districtId;
+        private readonly ItemClass.Service service;
+        private readonly string districtName;
+        private readonly ushort districtId;
 
         public string ToJson() => $@"{{""name"":""{name}"",""linesPassingCount"":{ LinesPassing.Count},
-                ""stops"":{{{string.Join(",", stopsWithWorldPos.Select(x => $@"""{x.Key}"":[{x.Value.x},{x.Value.y},{x.Value.z}]").ToArray())}}},
-                ""stopId"":{stopId},""linesPassing"":[{string.Join(",", LinesPassing.Select(x => x.ToString()).ToArray())}],
+                ""stops"":{{{string.Join(",", [.. stopsWithWorldPos.Select(x => $@"""{x.Key}"":[{x.Value.x},{x.Value.y},{x.Value.z}]")])}}},
+                ""stopId"":{stopId},""linesPassing"":[{string.Join(",", [.. LinesPassing.Select(x => x.ToString())])}],
                 ""id"":{Id},""service"":""{service}"",""districtId"":{districtId},""districtName"":""{districtName}""}}";
 
-        public TLMMapStation(string n, Vector2 pos, Vector3 worldPos, Dictionary<ushort, Vector3> stops, int stationId, ItemClass.Service service, ushort stopId)
+        public TLMMapStation(string n, Vector3 worldPos, Dictionary<ushort, Vector3> stops, int stationId, ItemClass.Service service, ushort stopId)
         {
             name = n;
 

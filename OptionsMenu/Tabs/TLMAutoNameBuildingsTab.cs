@@ -11,8 +11,8 @@ namespace TransportLinesManager.OptionsMenu.Tabs
     internal class TLMAutoNameBuildingsTab : UICustomControl, ITLMConfigOptionsTab
     {
         private UIComponent parent;
-        private readonly Dictionary<ItemClass.Service, UITextField> m_textFields = new Dictionary<ItemClass.Service, UITextField>();
-        private readonly Dictionary<ItemClass.Service, UICheckBox> m_checks = new Dictionary<ItemClass.Service, UICheckBox>();
+        private readonly Dictionary<ItemClass.Service, UITextField> m_textFields = [];
+        private readonly Dictionary<ItemClass.Service, UICheckBox> m_checks = [];
 
         private void Awake()
         {

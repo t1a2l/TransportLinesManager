@@ -203,7 +203,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     m_colorField.selectedColor = Singleton<TransportManager>.instance.GetLineColor(lineID);
                     LineType lineType = UVMPublicTransportWorldInfoPanel.GetLineType(lineID, fromBuilding);
                     m_weeklyPassengersString = ((lineType != LineType.WalkingTour) ? "TRANSPORT_LINE_PASSENGERS" : "TRANSPORT_LINE_PASSENGERS_WALKINGTOUR");
-                    m_ageChart.tooltipLocaleID = ((lineType != LineType.WalkingTour) ? "PUBLICTRANSPORT_PASSENGERAGEGROUPS_TOOLTIP" : "PUBLICTRANSPORT_PASSENGERAGEGROUPS_TOOLTIP_WALKINGTOUR");
+                    m_ageChart.tooltip = (lineType != LineType.WalkingTour) ? Locale.Get("PUBLICTRANSPORT_PASSENGERAGEGROUPS_TOOLTIP") : Locale.Get("PUBLICTRANSPORT_PASSENGERAGEGROUPS_TOOLTIP_WALKINGTOUR");
                     m_tripSaved.isVisible = (lineType == LineType.Default);
                     m_pullValuePanel.isVisible = (lineType == LineType.WalkingTour);
                     m_lineLengthLabel.text = StringUtils.SafeFormat(Locale.Get("LINEINFOPANEL_LINELENGTH"), (Singleton<TransportManager>.instance.m_lines.m_buffer[lineID].m_totalLength / 1000f).ToString("F2", LocaleManager.cultureInfo));
@@ -288,19 +288,19 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     {
                         num3 = 100 - (percentageValue + percentageValue2 + percentageValue3 + percentageValue4);
                     }
-                    m_ageChart.SetValues(new int[]
-                    {
+                    m_ageChart.SetValues(
+                    [
                 percentageValue,
                 percentageValue2,
                 percentageValue3,
                 num3,
                 percentageValue4
-                    });
-                    m_passengers.text = LocaleFormatter.FormatGeneric(m_weeklyPassengersString, new object[]
-                    {
+                    ]);
+                    m_passengers.text = LocaleFormatter.FormatGeneric(m_weeklyPassengersString,
+                    [
                 averageCount2,
                 averageCount
-                    });
+                    ]);
                     int num5 = 0;
                     int num6 = 0;
                     if (averageCount2 + averageCount != 0)
@@ -316,10 +316,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                         num5 = (int)(((averageCount8 * 10000L) + (num6 >> 1)) / num6);
                         num5 = Mathf.Clamp(num5, 0, 100);
                     }
-                    m_tripSaved.text = LocaleFormatter.FormatGeneric("TRANSPORT_LINE_TRIPSAVED", new object[]
-                    {
+                    m_tripSaved.text = LocaleFormatter.FormatGeneric("TRANSPORT_LINE_TRIPSAVED",
+                    [
                 num5
-                    });
+                    ]);
                     if (m_pullValuePanel.isVisible)
                     {
                         m_pullValue.text = StringUtils.SafeFormat(Locale.Get("PUBTRANSWORLDINFOPANEL_PULLVALUE"), Singleton<TransportManager>.instance.m_lines.m_buffer[lineID].GetPullValue(lineID));

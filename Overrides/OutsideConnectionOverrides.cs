@@ -27,10 +27,10 @@ namespace TransportLinesManager.Overrides
                     && mi.Name == "GetRandomVehicleInfo")
                 {
                     inst.RemoveAt(i);
-                    inst.InsertRange(i, new List<CodeInstruction> {
-                        new CodeInstruction(OpCodes.Ldarg_2),
-                        new CodeInstruction(OpCodes.Call, GetRandomVehicle),
-                    });
+                    inst.InsertRange(i, [
+                        new(OpCodes.Ldarg_2),
+                        new(OpCodes.Call, GetRandomVehicle),
+                    ]);
                 }
             }
             LogUtils.PrintMethodIL(inst);

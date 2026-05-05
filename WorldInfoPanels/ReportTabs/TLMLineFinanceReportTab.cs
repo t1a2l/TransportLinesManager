@@ -5,7 +5,6 @@ using static TransportLinesManager.Data.Managers.TLMTransportLineStatusesManager
 
 namespace TransportLinesManager.WorldInfoPanels.ReportTabs
 {
-
     internal class TLMLineFinanceReportTab : BasicReportTab<TLMFinanceReportLine, IncomeExpenseReport>
     {
         protected override string TitleLocaleID { get; } = "TLM_FINANCIAL_REPORT";

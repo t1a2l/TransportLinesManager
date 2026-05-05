@@ -25,11 +25,13 @@ namespace TransportLinesManager.Palettes
             // to create lighter colours:
             // take a random integer between 0 & 128 (rather than between 0 and 255)
             // and then add 64 to make the colour lighter
-            byte[] colorBytes = new byte[3];
-            colorBytes[0] = (byte)(_random.Next(128) + 64);
-            colorBytes[1] = (byte)(_random.Next(128) + 64);
-            colorBytes[2] = (byte)(_random.Next(128) + 64);
-            Color32 color = new Color32
+            byte[] colorBytes =
+            [
+                (byte)(_random.Next(128) + 64),
+                (byte)(_random.Next(128) + 64),
+                (byte)(_random.Next(128) + 64),
+            ];
+            Color32 color = new()
             {
 
                 // make the color fully opaque

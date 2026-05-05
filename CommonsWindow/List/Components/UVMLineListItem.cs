@@ -15,10 +15,10 @@ namespace TransportLinesManager.CommonsWindow.List.Components
 {
     internal class UVMLineListItem : UICustomControl
     {
-        private static readonly Color32 BackgroundColor = new Color32(49, 52, 58, 255);
-        private static readonly Color32 BrokenBackgroundColor = new Color32(80, 26, 24, 255);
-        private static readonly Color32 Line0BackgroundColor = new Color32(88, 28, 124, 255);
-        private static readonly Color32 ForegroundColor = new Color32(185, 221, 254, 255);
+        private static readonly Color32 BackgroundColor = new(49, 52, 58, 255);
+        private static readonly Color32 BrokenBackgroundColor = new(80, 26, 24, 255);
+        private static readonly Color32 Line0BackgroundColor = new(88, 28, 124, 255);
+        private static readonly Color32 ForegroundColor = new(185, 221, 254, 255);
 
         private ushort m_lineID = ushort.MaxValue;
 
@@ -83,11 +83,11 @@ namespace TransportLinesManager.CommonsWindow.List.Components
                     m_linePassengers.isVisible = true;
                     m_linePassengers.text = (averageCount + averageCount2).ToString("N0");
 
-                    m_linePassengers.tooltip = LocaleFormatter.FormatGeneric("TRANSPORT_LINE_PASSENGERS", new object[]
-                    {
+                    m_linePassengers.tooltip = LocaleFormatter.FormatGeneric("TRANSPORT_LINE_PASSENGERS",
+                    [
                 averageCount,
                 averageCount2
-                    });
+                    ]);
                     TLMLineUtils.SetLineNumberCircleOnRef(LineID, false, m_lineNumberFormatted, 0.8f);
                     m_lineColor.atlas = m_linePassengers.atlas;
                     m_lineColor.normalFgSprite = TLMLineUtils.GetIconForLine(LineID, false);
@@ -294,6 +294,7 @@ namespace TransportLinesManager.CommonsWindow.List.Components
         public void Awake()
         {
             m_mouseIsOver = false;
+            var panel = GetComponent<UIPanel>();
             m_background = Find<UIPanel>("BG");
             m_lineName = Find<UILabel>("LineName");
             m_lineNameField = Find<UITextField>("LineNameField");
@@ -301,12 +302,11 @@ namespace TransportLinesManager.CommonsWindow.List.Components
             m_linePassengers = Find<UILabel>("LinePassengers");
             m_lineBalance = Find<UILabel>("LineExpenses");
             m_lineVehicles = Find<UILabel>("LineVehicles");
-            m_lineVehicles = Find<UILabel>("LineVehicles");
             var viewLine = Find<UIButton>("ViewLine");
             m_deleteLine = Find<UIButton>("DeleteLine");
             m_lineBudgetLabel = Find<UILabel>("LineBudget");
-            m_lineIsVisible = Find<UICheckBox>("LineVisibility");
-            m_lineColor = Find<UIColorField>("LineColor");
+            m_lineIsVisible = panel.GetComponentInChildren<UICheckBox>();
+            m_lineColor = panel.GetComponentInChildren<UIColorField>();
             m_lineNumberFormatted = m_lineColor.GetComponentInChildren<UIButton>();
             m_buttonAutoName = Find<UIButton>("AutoNameBtn");
             m_buttonAutoColor = Find<UIButton>("AutoColorBtn");
@@ -487,12 +487,12 @@ namespace TransportLinesManager.CommonsWindow.List.Components
 
             var m_lineIsVisible = m_uIHelper.AddCheckboxNoLabel("LineVisibility");
             ((UISprite)m_lineIsVisible.checkedBoxObject).spriteName = "LineVisibilityToggleOn";
-            ((UISprite)m_lineIsVisible.checkedBoxObject).tooltipLocaleID = "PUBLICTRANSPORT_HIDELINE";
+            ((UISprite)m_lineIsVisible.checkedBoxObject).tooltip = Locale.Get("PUBLICTRANSPORT_HIDELINE");
             ((UISprite)m_lineIsVisible.checkedBoxObject).isTooltipLocalized = true;
 
             ((UISprite)m_lineIsVisible.checkedBoxObject).size = new Vector2(24, 24);
             ((UISprite)m_lineIsVisible.components[0]).spriteName = "LineVisibilityToggleOff";
-            ((UISprite)m_lineIsVisible.components[0]).tooltipLocaleID = "PUBLICTRANSPORT_SHOWLINE";
+            ((UISprite)m_lineIsVisible.components[0]).tooltip = Locale.Get("PUBLICTRANSPORT_SHOWLINE");
             ((UISprite)m_lineIsVisible.components[0]).isTooltipLocalized = true;
             ((UISprite)m_lineIsVisible.components[0]).size = new Vector2(24, 24);
             m_lineIsVisible.relativePosition = new Vector3(20, 10);

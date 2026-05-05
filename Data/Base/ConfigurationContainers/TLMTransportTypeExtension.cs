@@ -29,9 +29,9 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         private TransportSystemDefinition Definition => TSD;
 
         [XmlElement("Configurations")]
-        public SimpleNonSequentialList<TLMPrefixConfiguration> Configurations { get; set; } = new SimpleNonSequentialList<TLMPrefixConfiguration>();
+        public SimpleNonSequentialList<TLMPrefixConfiguration> Configurations { get; set; } = [];
 
-        private SimpleXmlDictionary<string, TLMAssetConfiguration> AssetConfigurations { get; set; } = new SimpleXmlDictionary<string, TLMAssetConfiguration>();
+        private SimpleXmlDictionary<string, TLMAssetConfiguration> AssetConfigurations { get; set; } = [];
 
         [XmlElement("AssetConfigurations")]
         public SimpleXmlDictionary<string, TLMAssetConfiguration> AssetConfigurationsStore
@@ -156,7 +156,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
             SimulationManager.instance.StartCoroutine(TLMVehicleUtils.UpdateCapacityUnitsFromTSD());
         }
 
-        private static readonly Dictionary<string, int> m_defaultCapacities = new();
+        private static readonly Dictionary<string, int> m_defaultCapacities = [];
 
         public Dictionary<string, MutableTuple<float, int>> GetCapacityRelative(VehicleInfo info)
         {

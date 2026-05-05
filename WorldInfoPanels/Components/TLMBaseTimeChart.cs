@@ -6,13 +6,12 @@ using Commons.Utils;
 using Commons.Utils.UtilitiesClasses;
 using TransportLinesManager.Data.Base;
 using TransportLinesManager.Utils;
-using TransportLinesManager.WorldInfoPanels.Components;
 using TransportLinesManager.WorldInfoPanels.Tabs;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace TransportLinesManager.UI
+namespace TransportLinesManager.WorldInfoPanels.Components
 {
     public abstract class TLMBaseTimeChart<T, C, L, V> : MonoBehaviour
         where T : TLMBaseTimedConfigTab<T, C, L, V>
@@ -110,10 +109,10 @@ namespace TransportLinesManager.UI
         {
             if (steps.Count == 0)
             {
-                steps = new List<Tuple<int, Color, uint>>
-                {
+                steps =
+                [
                     Tuple.New(0,Color.gray,1u)
-                };
+                ];
             }
 
             steps.Sort((x, y) => x.First - y.First);
@@ -121,9 +120,9 @@ namespace TransportLinesManager.UI
             {
                 steps.Insert(0, Tuple.New(0, steps.Last().Second, steps.Last().Third));
             }
-            if (steps.Count != m_clock.sliceCount)
+            if (steps.Count != m_clock.SliceCount)
             {
-                while (m_clock.sliceCount > 0)
+                while (m_clock.SliceCount > 0)
                 {
                     m_clock.RemoveSlice(0);
                 }
@@ -135,16 +134,16 @@ namespace TransportLinesManager.UI
             }
             else
             {
-                for (int i = 0; i < m_clock.sliceCount; i++)
+                for (int i = 0; i < m_clock.SliceCount; i++)
                 {
                     var color = steps[i].Third == 0 ? Color.gray : steps[i].Second;
-                    m_clock.GetSlice(i).innerColor = color;
-                    m_clock.GetSlice(i).outterColor = color;
+                    m_clock.GetSlice(i).InnerColor = color;
+                    m_clock.GetSlice(i).OutterColor = color;
                 }
             }
 
             var targetValues = steps.Select(x => Mathf.Round(x.First * 100f / 24f)).ToList();
-            m_clock.SetValuesStarts(targetValues.ToArray());
+            m_clock.SetValuesStarts([.. targetValues]);
         }
 
         public void Awake()
@@ -156,7 +155,7 @@ namespace TransportLinesManager.UI
             panel.autoLayout = false;
             panel.useCenter = true;
             panel.wrapLayout = false;
-            panel.tooltipLocaleID = ClockTooltip;
+            panel.tooltip = Locale.Get(ClockTooltip);
 
             MonoUtils.CreateUIElement(out m_container, transform, "ClockContainer");
             m_container.relativePosition = new Vector3((panel.width / 2f) - 70, 0);
@@ -165,7 +164,7 @@ namespace TransportLinesManager.UI
             m_container.autoLayout = false;
             m_container.useCenter = true;
             m_container.wrapLayout = false;
-            m_container.tooltipLocaleID = ClockTooltip;
+            m_container.tooltip = Locale.Get(ClockTooltip);
 
             MonoUtils.CreateUIElement(out m_clock, m_container.transform, "Clock");
             m_clock.spriteName = "24hClock";

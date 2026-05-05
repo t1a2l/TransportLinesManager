@@ -1,7 +1,6 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Commons.Extensions;
 using Commons.Extensions.UI;
 using Commons.UI;
 using Commons.UI.SpriteNames;
@@ -111,7 +110,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
          {
              if (x == 1)
              {
-                 if (val == TLMAutoColorPaletteContainer.PALETTE_RANDOM || !(TLMAutoColorPaletteContainer.GetPalette(val) is null))
+                 if (val == TLMAutoColorPaletteContainer.PALETTE_RANDOM || TLMAutoColorPaletteContainer.GetPalette(val) is not null)
                  {
                      AddPalette(Locale.Get("TLM_ADDPALETTE_ERROR_PALETTEALREADYEXISTS"), val);
                  }
@@ -205,7 +204,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
                     colorField.gameObject.AddComponent<UIColorFieldExtension>();
                     colorField.objectUserData = true;
                 }
-                (colorField.triggerButton as UILabel).text = $"{i.ToString("0")}";
+                (colorField.triggerButton as UILabel).text = $"{i:0}";
                 (colorField.triggerButton as UILabel).textColor = ((Color)colors[i]).ContrastColor();
                 (colorField.triggerButton as UILabel).disabledTextColor = ((Color)colors[i]).ContrastColor();
                 colorField.selectedColor = colors[i];

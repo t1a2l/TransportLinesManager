@@ -16,7 +16,9 @@ namespace TransportLinesManager.Overrides
     {
         [HarmonyPatch(typeof(CityServiceWorldInfoPanel), "OnLinesOverviewClicked")]
         [HarmonyPrefix]
+#pragma warning disable IDE0060 // Remove unused parameter
         public static bool OnLinesOverviewClicked(CityServiceWorldInfoPanel __instance, ref InstanceID ___m_InstanceID)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             if (___m_InstanceID.Type != InstanceType.Building || ___m_InstanceID.Building == 0)
             {
@@ -40,7 +42,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(CityServiceWorldInfoPanel), "UpdateBindings")]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> TranspileUpdateBindingsCSWIP(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> TranspileUpdateBindingsCSWIP(IEnumerable<CodeInstruction> instructions)
         {
             var inst = new List<CodeInstruction>(instructions);
             MethodInfo CanAllowRegionalLines = typeof(CityServiceWorldInfoPanelOverrides).GetMethod("CanAllowVanillaRegionalLines", Patcher.allFlags);
@@ -55,10 +57,10 @@ namespace TransportLinesManager.Overrides
                 {
                     inst.RemoveAt(i + 1);
                     inst.RemoveAt(i + 1);
-                    inst.InsertRange(i + 1, new List<CodeInstruction> {
-                        new CodeInstruction(OpCodes.Ldloc_0),
-                        new CodeInstruction(OpCodes.Call, CanAllowRegionalLines),
-                    });
+                    inst.InsertRange(i + 1, [
+                        new(OpCodes.Ldloc_0),
+                        new(OpCodes.Call, CanAllowRegionalLines),
+                    ]);
                     break;
                 }
             }
