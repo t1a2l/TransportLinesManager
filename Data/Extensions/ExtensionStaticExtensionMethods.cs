@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TransportLinesManager.Data.DataContainers;
 using TransportLinesManager.WorldInfoPanels.Tabs;
+using System.Linq;
 
 namespace TransportLinesManager.Data.Extensions
 {
@@ -16,11 +17,11 @@ namespace TransportLinesManager.Data.Extensions
         #region Assets List
         public static List<TransportAsset> GetAssetTransportListForLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetTransportList;
 
-        public static void SetAssetTransportListForLine<T>(this T it, ushort lineId, List<TransportAsset> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetTransportList = new SimpleXmlList<TransportAsset>(list);
+        public static void SetAssetTransportListForLine<T>(this T it, ushort lineId, List<TransportAsset> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetTransportList = [.. list];
 
         public static List<string> GetAssetListForLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList;
 
-        public static void SetAssetListForLine<T>(this T it, ushort lineId, List<string> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList = new SimpleXmlList<string>(list);
+        public static void SetAssetListForLine<T>(this T it, ushort lineId, List<string> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList = [.. list];
 
         public static void AddAssetToLine<T>(this T it, ushort lineId, string assetId, string capacity, string weight) where T : IAssetSelectorExtension
         {
@@ -34,8 +35,8 @@ namespace TransportLinesManager.Data.Extensions
             {
                 name = assetId,
                 capacity = int.Parse(capacity),
-                count = new Dictionary<int, Count>(),
-                spawn_percent = new Dictionary<int, int>(),
+                count = [],
+                spawn_percent = []
             };
             for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
             {

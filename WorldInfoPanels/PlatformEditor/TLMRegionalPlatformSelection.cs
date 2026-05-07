@@ -5,7 +5,6 @@ using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Data.DataContainers;
 using System.Linq;
 using UnityEngine;
-using Epic.OnlineServices.Presence;
 using System.Collections.Generic;
 using TransportLinesManager.Cache.BuildingData;
 

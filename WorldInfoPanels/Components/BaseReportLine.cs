@@ -66,11 +66,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         protected abstract void AddColumns(ref float xAdvance);
 
-        private void ChangeSize(Vector2 y)
-        {
-            m_background?.size = y;
-        }
-
         protected float InitField(out UILabel label, string name, string tooltipLocale, float xAdvance, float columnWidth)
         {
             MonoUtils.CreateUIElement(out label, m_container.transform, name);
