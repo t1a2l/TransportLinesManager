@@ -32,6 +32,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_checkbox = Find<UICheckBox>("AssetCheckbox");
             m_capacityEditor = Find<UITextField>("Cap");
             m_weightEditor = Find<UITextField>("Weg");
+            var panel = GetComponent<UIPanel>();
+            m_checkbox = panel.GetComponentInChildren<UICheckBox>();
+            m_capacityEditor = panel.GetComponentInChildren<UITextField>();
             m_checkbox.eventCheckChanged += (x, y) =>
             {
                 if (m_isLoading)

@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using TransportLinesManager.Data.DataContainers;
 
 namespace TransportLinesManager.Utils
 {
@@ -134,7 +135,7 @@ namespace TransportLinesManager.Utils
                         }
                         foreach (KeyValuePair<ushort, VehicleInfo> item in vehiclesToRemove)
                         {
-                            if (item.Value.m_vehicleAI is BusAI)
+                            if (item.Value.m_vehicleAI is BusAI && !TLMBaseConfigXML.Instance.BusLinesUseSoftDespawn)
                             {
                                 var info = extension.GetAModel(lineId, "Add");
                                 VehicleUtils.ReplaceVehicleModel(item.Key, info);

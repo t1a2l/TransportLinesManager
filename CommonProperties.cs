@@ -12,8 +12,8 @@ namespace Commons
         public static string ModRootFolder => TLMController.FOLDER_PATH;
         public static string ModIcon => TransportLinesManagerMod.Instance.IconName;
         public static string ModDllRootFolder { get; } = TransportLinesManagerMod.RootFolder;
-        public static string[] AssetExtraFileNames { get; } = new string[0];
-        public static string[] AssetExtraDirectoryNames { get; } = new string[0];
+        public static string[] AssetExtraFileNames { get; } = [];
+        public static string[] AssetExtraDirectoryNames { get; } = [];
 
         public static string GitHubRepoPath { get; } = "t1a2l/TransportLinesManager"; 
 

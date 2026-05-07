@@ -31,8 +31,8 @@ namespace TransportLinesManager.UI
         }
         #endregion
 
-        private static FieldInfo tt_nextLineNum = typeof(TransportManager).GetField("m_lineNumber", Patcher.allFlags);
-        private static readonly SavedBool m_showLineCreationToolBox = new SavedBool("TLM_showLineToolbox", Settings.gameSettingsFile, true);
+        private static readonly FieldInfo tt_nextLineNum = typeof(TransportManager).GetField("m_lineNumber", Patcher.allFlags);
+        private static readonly SavedBool m_showLineCreationToolBox = new("TLM_showLineToolbox", Settings.gameSettingsFile, true);
 
         public TransportInfo.TransportType CurrentType => TransportTool.m_prefab?.m_transportType ?? TransportInfo.TransportType.Bus;
 
@@ -252,7 +252,7 @@ namespace TransportLinesManager.UI
             if (TLMPrefixesUtils.HasPrefix(TransportTool.m_prefab))
             {
                 linePrefixDropDown.isVisible = true;
-                linePrefixDropDown.items = TLMPrefixesUtils.GetPrefixesOptions(tsd, false).ToArray();
+                linePrefixDropDown.items = [.. TLMPrefixesUtils.GetPrefixesOptions(tsd, false)];
                 linePrefixDropDown.selectedIndex = GetCurrentPrefix();
                 lineNumberTxtBox.text = GetCurrentNumber().ToString();
                 lineNumberTxtBox.width = 90;

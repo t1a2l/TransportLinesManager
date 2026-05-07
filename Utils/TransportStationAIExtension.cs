@@ -7,7 +7,7 @@ namespace TransportLinesManager.Utils
 {
     public static class TransportStationAIExtension
     {
-        public static bool UseSecondaryTransportInfoForConnection(this TransportStationAI tsai) => !(tsai.m_secondaryTransportInfo is null) && tsai.m_secondaryTransportInfo.m_class.m_subService == tsai.m_transportLineInfo?.m_class.m_subService && tsai.m_secondaryTransportInfo.m_class.m_level == tsai.m_transportLineInfo.m_class.m_level;
+        public static bool UseSecondaryTransportInfoForConnection(this TransportStationAI tsai) => tsai.m_secondaryTransportInfo is not null && tsai.m_secondaryTransportInfo.m_class.m_subService == tsai.m_transportLineInfo?.m_class.m_subService && tsai.m_secondaryTransportInfo.m_class.m_level == tsai.m_transportLineInfo.m_class.m_level;
 
         public static bool CreateConnectionNode(this TransportSystemDefinition tsd, out ushort node, Vector3 position)
         {
@@ -86,6 +86,36 @@ namespace TransportLinesManager.Utils
             segment = 0;
             return false;
         }
+
+
+        public static ushort FindNearestConnection(ushort outsideConnection, Building.Flags incomingOutgoing)
+        {
+            ushort result = 0;
+            BuildingManager instance = Singleton<BuildingManager>.instance;
+            float num = float.PositiveInfinity;
+            Vector3 position = instance.m_buildings.m_buffer[outsideConnection].m_position;
+            FastList<ushort> outsideConnections = instance.GetOutsideConnections();
+            BuildingInfo info = instance.m_buildings.m_buffer[outsideConnection].Info;
+            foreach (ushort item in outsideConnections)
+            {
+                if ((instance.m_buildings.m_buffer[item].m_flags & incomingOutgoing) != incomingOutgoing)
+                {
+                    continue;
+                }
+                BuildingInfo info2 = instance.m_buildings.m_buffer[item].Info;
+                if (info != null && info2 != null && info.m_class.m_service == info2.m_class.m_service && item != outsideConnection)
+                {
+                    float sqrMagnitude = (instance.m_buildings.m_buffer[item].m_position - position).sqrMagnitude;
+                    if (sqrMagnitude < num)
+                    {
+                        num = sqrMagnitude;
+                        result = item;
+                    }
+                }
+            }
+            return result;
+        }
+
     }
 }
 

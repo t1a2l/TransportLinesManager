@@ -13,17 +13,17 @@ namespace TransportLinesManager.Cache.BuildingData
 {
     public class BuildingTransportDataCache
     {
-        internal NonSequentialList<InnerBuildingLine> RegionalLines { get; } = new NonSequentialList<InnerBuildingLine>();
+        internal NonSequentialList<InnerBuildingLine> RegionalLines { get; } = [];
         private ushort BuildingId { get; }
         public int RegionalLinesCount => RegionalLines.Count;
         public StopPointDescriptorLanes[] StopPoints { get; private set; }
 
         public TLMBuildingsConfiguration BuildingData => TLMBuildingDataContainer.Instance.SafeGet(BuildingId);
 
-        public BuildingTransportDataCache(ushort buildingId, ref Building b, TransportStationAI tsai)
+        public BuildingTransportDataCache(ushort buildingId, ref Building b)
         {
             BuildingId = buildingId;
-            RemapLines(buildingId, ref b, tsai);
+            RemapLines(buildingId, ref b);
             StopPoints = MapStopPoints();
         }
 
@@ -31,10 +31,10 @@ namespace TransportLinesManager.Cache.BuildingData
         {
             RegionalLines.Clear();
             ref Building b = ref BuildingManager.instance.m_buildings.m_buffer[BuildingId];
-            RemapLines(BuildingId, ref b, b.Info.m_buildingAI as TransportStationAI);
+            RemapLines(BuildingId, ref b);
         }
 
-        private void RemapLines(ushort buildingId, ref Building b, TransportStationAI tsai)
+        private void RemapLines(ushort buildingId, ref Building b)
         {
             MapBuildingLines(buildingId, buildingId);
             var nextSubBuildingId = b.m_subBuilding;
@@ -101,32 +101,29 @@ namespace TransportLinesManager.Cache.BuildingData
 
                 if (thisBuilding != buildingIdKey)
                 {
-                    var x = thisBuilding;
-                    thisBuilding = otherNodeBuilding;
-                    otherNodeBuilding = x;
-
-                    x = nextNodeId;
-                    nextNodeId = otherNode;
-                    otherNode = x;
+                    (otherNodeBuilding, thisBuilding) = (thisBuilding, otherNodeBuilding);
+                    (otherNode, nextNodeId) = (nextNodeId, otherNode);
                 }
 
                 ref Building outsideConnectionBuilding = ref BuildingManager.instance.m_buildings.m_buffer[otherNodeBuilding];
-                var tsd = TransportSystemDefinition.FromOutsideConnection(outsideConnectionBuilding.Info.GetSubService(), outsideConnectionBuilding.Info.GetClassLevel(), VehicleInfo.VehicleType.None);
-                if(tsd is null) // Unsupported regional line type
+                var tsd = TransportSystemDefinition.FromOutsideConnection(outsideConnectionBuilding.Info.GetService(), outsideConnectionBuilding.Info.GetSubService(), outsideConnectionBuilding.Info.GetClassLevel(), VehicleInfo.VehicleType.None);
+                if(tsd is null || thisBuilding == 0 || otherNodeBuilding == 0) // Unsupported regional line type
                 {
                     nextNodeId = node.m_nextBuildingNode;
                     continue;
                 }
-                InnerBuildingLine transportLine =
-                    new InnerBuildingLine
-                    {
-                        Info = tsd.GetTransportInfoIntercity(),
-                        SrcStop = otherNode,
-                        DstStop = nextNodeId,
-                        SrcBuildingId = otherNodeBuilding,
-                        DstBuildingId = thisBuilding
-                    };
-                RegionalLines[transportLine.SrcStop] = transportLine;
+                InnerBuildingLine transportLine = new()
+                {
+                    Info = tsd.GetTransportInfoIntercity(),
+                    SrcStop = otherNode,
+                    DstStop = nextNodeId,
+                    SrcBuildingId = otherNodeBuilding,
+                    DstBuildingId = thisBuilding
+                };
+                if(transportLine.CountStops() > 1 && transportLine.CountStops() < 32768)
+                {
+                    RegionalLines[transportLine.SrcStop] = transportLine;
+                }
                 nextNodeId = node.m_nextBuildingNode;
             } while (nextNodeId != 0);
         }
@@ -198,24 +195,24 @@ namespace TransportLinesManager.Cache.BuildingData
             }
             if (!isSubBuilding)
             {
-            var subBuildingId = b.m_subBuilding;
-            var subbuildingIndex = 0;
-            while (subBuildingId > 0)
-            {
-                    StopPointDescriptorLanes[] subPlats = MapStopPoints(subBuildingId, thresold, true);
-                if (subPlats != null)
+                var subBuildingId = b.m_subBuilding;
+                var subbuildingIndex = 0;
+                while (subBuildingId > 0)
                 {
-                    result.AddRange(subPlats.Select(x =>
+                        StopPointDescriptorLanes[] subPlats = MapStopPoints(subBuildingId, thresold, true);
+                    if (subPlats != null)
                     {
-                        x.subbuildingId = (sbyte)subbuildingIndex;
-                        return x;
-                    }));
+                        result.AddRange(subPlats.Select(x =>
+                        {
+                            x.subbuildingId = (sbyte)subbuildingIndex;
+                            return x;
+                        }));
+                    }
+                    subBuildingId = BuildingManager.instance.m_buildings.m_buffer[subBuildingId].m_subBuilding;
+                    subbuildingIndex++;
                 }
-                subBuildingId = BuildingManager.instance.m_buildings.m_buffer[subBuildingId].m_subBuilding;
-                subbuildingIndex++;
             }
-            }
-            result = result.OrderByDescending(x => x.subbuildingId).GroupBy(x => x.platformLaneId).Select(x => x.First()).ToList();
+            result = [.. result.OrderByDescending(x => x.subbuildingId).GroupBy(x => x.platformLaneId).Select(x => x.First())];
             result.Sort((x, y) =>
             {
                 int priorityX = StopSearchUtils.VehicleToPriority(x.vehicleType);
@@ -240,7 +237,7 @@ namespace TransportLinesManager.Cache.BuildingData
                 return -centerX.x.CompareTo(centerY.x);
             });
 
-            return result.ToArray();
+            return [.. result];
         }
         private static bool MapLane(uint laneId, int laneIdx, ref NetSegment segment, Vector3 directionPath, NetInfo.Lane refLane, out StopPointDescriptorLanes result)
         {
@@ -250,11 +247,10 @@ namespace TransportLinesManager.Cache.BuildingData
                 return false;
             }
             var laneType = NetInfo.LaneType.Vehicle;
-            if(refLane.m_stopType == VehicleInfo.VehicleType.Car)
+            if (refLane.m_stopType == VehicleInfo.VehicleType.Car)
             {
                 laneType = NetInfo.LaneType.TransportVehicle;
             }
-
             segment.GetLeftAndRightLanes(segment.m_startNode, laneType, refLane.m_stopType, VehicleInfo.VehicleCategory.All, laneIdx, false, out int leftIdx, out int rightIdx, out uint leftLane, out uint rightLane);
             ref NetLane nl = ref NetManager.instance.m_lanes.m_buffer[laneId];
             if (leftIdx >= 0 && rightIdx >= 0)

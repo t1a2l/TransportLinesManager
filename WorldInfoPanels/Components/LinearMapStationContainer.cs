@@ -11,7 +11,6 @@ using TransportLinesManager.Overrides;
 using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.NearLines;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using static TransportLinesManager.WorldInfoPanels.UVMPublicTransportWorldInfoPanel.UVMPublicTransportWorldInfoPanelObject;
 
@@ -108,8 +107,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             bg = GetComponent<UIPanel>();
             connectionPanel = bg.Find<UIPanel>("ConnectionPanel");
             stopNameField = bg.Find<UITextField>("StopNameField");
+            uibutton = bg.GetComponentInChildren<UIButton>();
             uilabel = bg.Find<UILabel>("PassengerCount");
-            uibutton = bg.Find<UIButton>("StopButton");
             dist = bg.Find<UILabel>("Distance");
             TLMLineItemButtonControl.EnsureTemplate();
             connections = new UITemplateList<UIButton>(connectionPanel, TLMLineItemButtonControl.LINE_ITEM_TEMPLATE);
@@ -148,7 +147,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                     var newVal = TLMStopDataContainer.Instance.SafeGet(m_stopId).IsTerminal;
                     TLMStopDataContainer.Instance.SafeGet(m_stopId).IsTerminal = !newVal;
                     NetProperties properties = NetManager.instance.m_properties;
-                    if (!(properties is null) && !(properties.m_drawSound is null))
+                    if (properties is not null && properties.m_drawSound is not null)
                     {
                         AudioManager.instance.DefaultGroup.AddPlayer(0, properties.m_drawSound, 1f);
                     }
@@ -173,11 +172,11 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             dist.text = distance;
             UpdateConnectionPanel();
             UpdateTerminalStatus();
-            uibutton.tooltipLocaleID = m_fromBuilding || !TransportSystemDefinition.FromLineId(m_lineId, m_fromBuilding).CanHaveTerminals()
+            uibutton.tooltip = m_fromBuilding || !TransportSystemDefinition.FromLineId(m_lineId, m_fromBuilding).CanHaveTerminals()
                 ? ""
                 : m_stopId == TransportManager.instance.m_lines.m_buffer[m_lineId].m_stops
-                    ? "TLM_FIRSTSTOPALWAYSTERMINAL"
-                    : "TLM_RIGHTCLICKSETTERMINAL";
+                    ? Locale.Get("TLM_FIRSTSTOPALWAYSTERMINAL")
+                    : Locale.Get("TLM_RIGHTCLICKSETTERMINAL");
         }
 
 
@@ -263,7 +262,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             var targBuilding = TLMStationUtils.GetStationBuilding(m_stopId, m_lineId, m_fromBuilding);
             var lines = BuildingManager.instance.m_buildings.m_buffer[targBuilding].Info.m_buildingAI is TransportStationAI tsai && (tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportTrain || tsai.m_transportLineInfo?.m_class.m_subService == ItemClass.SubService.PublicTransportBus) ? TransportLinesManagerMod.Controller.BuildingLines.SafeGet(targBuilding) : null;
 
-            var buildingLines = lines is null ? new List<long>() : lines.RegionalLines.Keys.ToList();
+            var buildingLines = lines is null ? new List<long>() : [.. lines.RegionalLines.Keys];
             if (m_fromBuilding)
             {
                 buildingLines.Remove(m_lineId);

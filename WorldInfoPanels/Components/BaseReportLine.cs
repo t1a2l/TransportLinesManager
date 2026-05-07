@@ -9,7 +9,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 {
     internal abstract class BaseReportLine<T> : MonoBehaviour where T : TLMTransportLineStatusesManager.BasicReportData
     {
-        private static readonly Color32 BackgroundColor = new Color32(49, 52, 58, 255);
+        private static readonly Color32 BackgroundColor = new(49, 52, 58, 255);
         private UIPanel m_container;
         private UILabel m_dateTime;
 
@@ -54,7 +54,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             MonoUtils.LimitWidthAndBox(m_dateTime);
             xAdvance += m_dateTime.minimumSize.x;
             AddColumns(ref xAdvance);
-
         }
 
         private void ChangeSize(Vector2 y)
@@ -67,6 +66,11 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         protected abstract void AddColumns(ref float xAdvance);
 
+        private void ChangeSize(Vector2 y)
+        {
+            m_background?.size = y;
+        }
+
         protected float InitField(out UILabel label, string name, string tooltipLocale, float xAdvance, float columnWidth)
         {
             MonoUtils.CreateUIElement(out label, m_container.transform, name);
@@ -78,7 +82,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             label.verticalAlignment = UIVerticalAlignment.Middle;
             label.padding = new RectOffset(3, 3, 5, 3);
             label.isTooltipLocalized = true;
-            label.tooltipLocaleID = tooltipLocale;
+            label.tooltip = Locale.Get(tooltipLocale);
             MonoUtils.LimitWidthAndBox(label, columnWidth);
             return columnWidth;
         }
@@ -116,7 +120,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         }
         protected abstract void AsTitleInternal();
 
-        public string FloatToHour(float time) => $"{((int)time).ToString("00")}:{((int)(time % 1 * 60)).ToString("00")}";
+        public string FloatToHour(float time) => $"{(int)time:00}:{(int)(time % 1 * 60):00}";
 
     }
 

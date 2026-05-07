@@ -20,14 +20,14 @@ namespace TransportLinesManager.Overrides
             var inst = new List<CodeInstruction>(instructions);
             Label label = il.DefineLabel();
             inst[2].labels.Add(label);
-            inst.InsertRange(2, new List<CodeInstruction>
-            {
-                new CodeInstruction(OpCodes.Call, CheckEnabled),
-                new CodeInstruction(OpCodes.Brfalse, label),
-                new CodeInstruction(OpCodes.Ldarg_0),
-                new CodeInstruction(OpCodes.Call,OverrideStart),
-                new CodeInstruction(OpCodes.Ret ),
-            });
+            inst.InsertRange(2,
+            [
+                new(OpCodes.Call, CheckEnabled),
+                new(OpCodes.Brfalse, label),
+                new(OpCodes.Ldarg_0),
+                new(OpCodes.Call,OverrideStart),
+                new(OpCodes.Ret ),
+            ]);
             LogUtils.PrintMethodIL(inst);
             return inst;
         }
@@ -38,11 +38,11 @@ namespace TransportLinesManager.Overrides
         {
             var UpdateBindings = typeof(UVMPublicTransportWorldInfoPanel).GetMethod("UpdateBindings", Patcher.allFlags);
             var inst = new List<CodeInstruction>(instructions);
-            inst.InsertRange(2, new List<CodeInstruction>
-            {
-                new CodeInstruction(OpCodes.Call, UpdateBindings),
-                new CodeInstruction(OpCodes.Ret),
-            });
+            inst.InsertRange(2,
+            [
+                new(OpCodes.Call, UpdateBindings),
+                new(OpCodes.Ret),
+            ]);
             return inst;
         }
 
@@ -66,7 +66,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(PublicTransportWorldInfoPanel), "OnEnable")]
         [HarmonyPrefix]
-        public static bool OnEnable(PublicTransportWorldInfoPanel __instance)
+        public static bool OnEnable()
         {
 			UVMPublicTransportWorldInfoPanel.OnEnableOverride();
             return false;
@@ -74,7 +74,7 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(PublicTransportWorldInfoPanel), "OnDisable")]
         [HarmonyPrefix]
-        public static bool OnDisable(PublicTransportWorldInfoPanel __instance, ref InstanceID ___m_InstanceID)
+        public static bool OnDisable()
         {
             UVMPublicTransportWorldInfoPanel.OnDisableOverride();
             return false;

@@ -2,7 +2,6 @@
 using Commons.Extensions;
 using Commons.Utils;
 using TransportLinesManager.Utils;
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -15,7 +14,7 @@ namespace TransportLinesManager.Overrides
         private static readonly FieldInfo m_budgetField = typeof(TransportLine).GetField("m_budget", Patcher.allFlags);
         private static readonly MethodInfo m_getBudgetInt = typeof(TLMLineUtils).GetMethod("GetEffectiveBudgetInt", Patcher.allFlags);
 
-		[HarmonyPatch(typeof(TransportLineAI), "SimulationStep", new Type[] { typeof(ushort), typeof(NetNode) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Ref })]
+		[HarmonyPatch(typeof(TransportLineAI), "SimulationStep", [typeof(ushort), typeof(NetNode)], [ArgumentType.Normal, ArgumentType.Ref])]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> TranspileSimulationStepAI(IEnumerable<CodeInstruction> instructions)
         {

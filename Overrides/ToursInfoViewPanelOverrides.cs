@@ -11,44 +11,20 @@ namespace TransportLinesManager.Overrides
         [HarmonyPrefix]
         public static bool OpenDetailPanel(int idx)
         {
-            TransportSystemDefinition def;
-            switch (idx)
+            TransportSystemDefinition def = idx switch
             {
-                case 0:
-                    def = TransportSystemDefinition.BUS;
-                    break;
-                case 1:
-                    def = TransportSystemDefinition.TROLLEY;
-                    break;
-                case 2:
-                    def = TransportSystemDefinition.TRAM;
-                    break;
-                case 3:
-                    def = TransportSystemDefinition.METRO;
-                    break;
-                case 4:
-                    def = TransportSystemDefinition.TRAIN;
-                    break;
-                case 5:
-                    def = TransportSystemDefinition.FERRY;
-                    break;
-                case 6:
-                    def = TransportSystemDefinition.BLIMP;
-                    break;
-                case 7:
-                    def = TransportSystemDefinition.MONORAIL;
-                    break;
-                case 9:
-                    def = TransportSystemDefinition.TOUR_PED;
-                    break;
-                case 10:
-                    def = TransportSystemDefinition.TOUR_BUS;
-                    break;
-                default:
-                    def = TransportSystemDefinition.BUS;
-                    break;
-            }
-
+                0 => TransportSystemDefinition.BUS,
+                1 => TransportSystemDefinition.TROLLEY,
+                2 => TransportSystemDefinition.TRAM,
+                3 => TransportSystemDefinition.METRO,
+                4 => TransportSystemDefinition.TRAIN,
+                5 => TransportSystemDefinition.FERRY,
+                6 => TransportSystemDefinition.BLIMP,
+                7 => TransportSystemDefinition.MONORAIL,
+                9 => TransportSystemDefinition.TOUR_PED,
+                10 => TransportSystemDefinition.TOUR_BUS,
+                _ => TransportSystemDefinition.BUS,
+            };
             TLMPanel.Instance?.OpenAt(def);
             return false;
         }

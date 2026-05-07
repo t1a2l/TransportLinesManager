@@ -5,7 +5,6 @@ using static TransportLinesManager.Data.Managers.TLMTransportLineStatusesManager
 
 namespace TransportLinesManager.WorldInfoPanels.ReportTabs
 {
-
     internal class TLMLinePassengerGenderReportTab : BasicReportTab<TLMPassengerGenderReportLine, GenderPassengerReport>
     {
         protected override string TitleLocaleID { get; } = "TLM_PASSENGERS_GENDER_LINE_REPORT";

@@ -170,7 +170,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 float angle = (start + end) / 2f;
                 updateInfo[i].Fourth.ZOrder = updateInfo[i].First;
             }
-            m_clockChart.SetValues(updateInfo.Select(x => Tuple.New(x.Second, x.Third, x.Fourth.Entry.Value)).ToList());
+            m_clockChart.SetValues([.. updateInfo.Select(x => Tuple.New(x.Second, x.Third, x.Fourth.Entry.Value))]);
         }
 
         private void RemoveTime(V entry)

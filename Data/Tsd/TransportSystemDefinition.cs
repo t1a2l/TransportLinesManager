@@ -12,6 +12,7 @@ using System.Linq;
 using UnityEngine;
 using static TransferManager;
 using TransportLinesManager.Data.DataContainers;
+using ICities;
 
 namespace TransportLinesManager.Data.Tsd
 {
@@ -42,7 +43,7 @@ namespace TransportLinesManager.Data.Tsd
             [0] = FISHING,
         };
 
-        private static readonly Dictionary<TransportSystemDefinition, TransportInfoContainer> m_infoList = new Dictionary<TransportSystemDefinition, TransportInfoContainer>();
+        private static readonly Dictionary<TransportSystemDefinition, TransportInfoContainer> m_infoList = [];
 
         public class TransportInfoContainer
         {
@@ -107,7 +108,7 @@ namespace TransportLinesManager.Data.Tsd
                     IEnumerable<TransportSystemDefinition> missing = registeredTsd.Values.Where(x => !m_infoList.ContainsKey(x));
                     if (missing.Count() > 0 && CommonProperties.DebugMode)
                     {
-                        LogUtils.DoLog($"Some TSDs can't find their infos: [{string.Join(", ", missing.Select(x => x.ToString()).ToArray())}]\nIgnore if you don't have all DLCs installed");
+                        LogUtils.DoLog($"Some TSDs can't find their infos: [{string.Join(", ", [.. missing.Select(x => x.ToString())])}]\nIgnore if you don't have all DLCs installed");
                     }
                     LogUtils.DoLog("TSD end loading infos");
                 }
@@ -203,34 +204,26 @@ namespace TransportLinesManager.Data.Tsd
         public bool HasVehicles() => VehicleType != VehicleInfo.VehicleType.None;
         public bool IsPrefixable()
         {
-            switch (TransportType)
+            return TransportType switch
             {
-                case TransportInfo.TransportType.HotAirBalloon:
-                case TransportInfo.TransportType.Taxi:
-                case TransportInfo.TransportType.CableCar:
-                case TransportInfo.TransportType.Pedestrian:
-                case TransportInfo.TransportType.EvacuationBus:
-                case TransportInfo.TransportType.Fishing:
-                    return false;
-                default:
-                    return true;
-            }
+                TransportInfo.TransportType.HotAirBalloon or TransportInfo.TransportType.Taxi or TransportInfo.TransportType.CableCar or TransportInfo.TransportType.Pedestrian or TransportInfo.TransportType.EvacuationBus or TransportInfo.TransportType.Fishing => false,
+                _ => true,
+            };
         }
 
         public string GetTransportTypeIcon()
         {
-            switch (TransportType)
+            return TransportType switch
             {
-                case TransportInfo.TransportType.EvacuationBus: return "SubBarFireDepartmentDisaster";
-                case TransportInfo.TransportType.Pedestrian: return "SubBarPublicTransportWalkingTours";
-                case TransportInfo.TransportType.TouristBus: return "SubBarPublicTransportTours";
-                case TransportInfo.TransportType.HotAirBalloon: return "IconBalloonTours";
-                case TransportInfo.TransportType.Post: return "SubBarPublicTransportPost";
-                case TransportInfo.TransportType.CableCar: return PublicTransportWorldInfoPanel.GetVehicleTypeIcon(TransportInfo.TransportType.CableCar);
-                case TransportInfo.TransportType.Airplane:
-                    return VehicleType == VehicleInfo.VehicleType.Helicopter
-                        ? "IconPolicyHelicopterPriority"
-                        : PublicTransportWorldInfoPanel.GetVehicleTypeIcon(TransportType);
+                TransportInfo.TransportType.EvacuationBus => "SubBarFireDepartmentDisaster",
+                TransportInfo.TransportType.Pedestrian => "SubBarPublicTransportWalkingTours",
+                TransportInfo.TransportType.TouristBus => "SubBarPublicTransportTours",
+                TransportInfo.TransportType.HotAirBalloon => "IconBalloonTours",
+                TransportInfo.TransportType.Post => "SubBarPublicTransportPost",
+                TransportInfo.TransportType.CableCar => PublicTransportWorldInfoPanel.GetVehicleTypeIcon(TransportInfo.TransportType.CableCar),
+                TransportInfo.TransportType.Airplane => VehicleType == VehicleInfo.VehicleType.Helicopter
+                                        ? "IconPolicyHelicopterPriority"
+                                        : PublicTransportWorldInfoPanel.GetVehicleTypeIcon(TransportType),
                 //case TransportInfo.TransportType.Ship:
                 //case TransportInfo.TransportType.Bus:
                 //case TransportInfo.TransportType.Metro:
@@ -238,8 +231,9 @@ namespace TransportLinesManager.Data.Tsd
                 //case TransportInfo.TransportType.Taxi:
                 //case TransportInfo.TransportType.Tram:
                 //case TransportInfo.TransportType.Monorail:
-                default: return PublicTransportWorldInfoPanel.GetVehicleTypeIcon(TransportType);
+                _ => PublicTransportWorldInfoPanel.GetVehicleTypeIcon(TransportType),
             };
+            ;
         }
 
         public bool IsFromSystem(VehicleInfo info)
@@ -251,6 +245,11 @@ namespace TransportLinesManager.Data.Tsd
             if(info.m_class.m_subService == SubService && (info.m_vehicleType == VehicleType || info.m_class.m_level == LevelAdditional))
 			{
                 TransportInfo transportInfo = VehicleUtils.GetTransportInfoField(info.m_vehicleAI)?.GetValue(info.m_vehicleAI) as TransportInfo;
+                // ignore cargo helicopters
+                if(transportInfo.m_vehicleType == VehicleInfo.VehicleType.Helicopter && info.m_class.m_level == ItemClass.Level.Level5)
+                {
+                    return false;
+                }
                 var fieldInfo = VehicleUtils.GetVehicleCapacityField(info.m_vehicleAI);
                 if(transportInfo.m_transportType == TransportType && fieldInfo != null)
 				{
@@ -357,7 +356,7 @@ namespace TransportLinesManager.Data.Tsd
             {
                 return default;
             }
-            if(info.name == "Bus Station Stop")
+            if (info.name == "Bus Station Stop")
             {
                 TransportSystemDefinition result = registeredTsd.Values.FirstOrDefault(x =>
                 x.TransportType.ToString() == info.m_publicTransportCategory.ToString() // Bus
@@ -373,7 +372,6 @@ namespace TransportLinesManager.Data.Tsd
                 && (x.Level == info.GetClassLevel() || x.LevelAdditional == info.GetClassLevel() || x.LevelIntercity == info.GetClassLevel()));
                 return result;
             }
-            
         }
 
         public static TransportSystemDefinition FromIntercity(TransportInfo info)
@@ -418,32 +416,24 @@ namespace TransportLinesManager.Data.Tsd
             }
         }
 
-        public bool IsIntercityBusConnection(BuildingInfo connectionInfo)
-            => connectionInfo.m_class.m_service == ItemClass.Service.Road && this == BUS && connectionInfo.m_class.m_subService == ItemClass.SubService.None;
-        
-        public bool IsIntercityBusConnectionTrack(NetInfo trackInfo)
-            => trackInfo.m_class.m_service == ItemClass.Service.Road && this == BUS && trackInfo.m_class.m_subService == ItemClass.SubService.None;
-        
         public bool IsValidOutsideConnection(ushort outsideConnectionBuildingId)
-            => BuildingManager.instance.m_buildings.m_buffer[outsideConnectionBuildingId].Info is BuildingInfo outsideConn
-            && outsideConn.m_buildingAI is OutsideConnectionAI
-         && (
-             FromOutsideConnection(outsideConn.m_class.m_subService, outsideConn.m_class.m_level, VehicleInfo.VehicleType.None) == this
-             || IsIntercityBusConnection(outsideConn));
-        
-        public bool IsValidOutsideConnectionTrack(NetInfo netInfo) =>
-              FromOutsideConnection(netInfo.m_class.m_subService, netInfo.m_class.m_level, VehicleInfo.VehicleType.None) == this
-              || IsIntercityBusConnectionTrack(netInfo);
-
-        internal static TransportSystemDefinition FromOutsideConnection(ItemClass.SubService subService, ItemClass.Level level, VehicleInfo.VehicleType type)
         {
-            if(subService == ItemClass.SubService.PublicTransportTrain) // train connection
+            return BuildingManager.instance.m_buildings.m_buffer[outsideConnectionBuildingId].Info is BuildingInfo outsideConn
+            && outsideConn.m_buildingAI is OutsideConnectionAI
+            && FromOutsideConnection(outsideConn.m_class.m_service, outsideConn.m_class.m_subService, outsideConn.m_class.m_level, VehicleInfo.VehicleType.None) == this;
+        }
+
+        public bool IsValidOutsideConnectionNetwork(NetInfo netInfo) => FromOutsideConnection(netInfo.m_class.m_service, netInfo.m_class.m_subService, netInfo.m_class.m_level, VehicleInfo.VehicleType.None) == this;
+
+        internal static TransportSystemDefinition FromOutsideConnection(ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, VehicleInfo.VehicleType type)
+        {
+            if (subService == ItemClass.SubService.PublicTransportTrain) // tracks outside connection
             {
                 return registeredTsd.Where(x => x.Value.LevelIntercity == level && x.Value.SubService == subService && (type == VehicleInfo.VehicleType.None || x.Value.VehicleType == type)).FirstOrDefault().Value;
             }
-            else if(subService == ItemClass.SubService.None && level == ItemClass.Level.Level5 && type == VehicleInfo.VehicleType.None) // road connection
+            if (service == ItemClass.Service.Road && subService == ItemClass.SubService.None) // road outside connection
             {
-                return registeredTsd.Where(x => x.Value.LevelIntercity == ItemClass.Level.Level3 && x.Value.SubService == ItemClass.SubService.PublicTransportBus && x.Value.VehicleType == VehicleInfo.VehicleType.Car).FirstOrDefault().Value;
+                return registeredTsd.Where(x => x.Value.LevelIntercity == ItemClass.Level.Level3 && x.Value.SubService == ItemClass.SubService.PublicTransportBus && (type == VehicleInfo.VehicleType.None || x.Value.VehicleType == type)).FirstOrDefault().Value;
             }
             return null;
         }
@@ -451,7 +441,6 @@ namespace TransportLinesManager.Data.Tsd
         public static TransportSystemDefinition From(TransportInfo.TransportType TransportType, ItemClass.SubService SubService, VehicleInfo.VehicleType VehicleType, ItemClass.Level Level)
         {
             var targetMask = GetTsdIndex(TransportType, SubService, VehicleType, Level, null, null);
-            //LogUtils.DoLog($"Index ({TransportType},{SubService},{VehicleType},{Level}) == {targetMask.ToString("X8")}\n{Environment.StackTrace}");
             return FromIndex(targetMask);
         }
 
@@ -460,7 +449,7 @@ namespace TransportLinesManager.Data.Tsd
             var result = registeredTsd.Where(x => (x.Key & 0xFFFF00) == (idx & 0xFFFF00) && (x.Key & 0xf8 & idx) > 0).FirstOrDefault().Value;
             if (result is null)
             {
-                LogUtils.DoErrorLog($"Invalid Index! Searching for: {idx.ToString("X8")}");
+                LogUtils.DoErrorLog($"Invalid Index! Searching for: {idx:X8}");
             }
 
             return result;
@@ -499,7 +488,7 @@ namespace TransportLinesManager.Data.Tsd
             int settedCost = GetConfig()?.DefaultCostPerPassenger ?? 0;
             return settedCost == 0 ? GetDefaultPassengerCapacityCostLocal() : settedCost / 100f;
         }
-        public float GetDefaultPassengerCapacityCostLocal() => TransportInfoDict.TryGetValue(this, out TransportInfoContainer info) && !(info.Local is null) ? info.Local.m_maintenanceCostPerVehicle / (float)DefaultCapacity : -1;
+        public float GetDefaultPassengerCapacityCostLocal() => TransportInfoDict.TryGetValue(this, out TransportInfoContainer info) && info.Local is not null ? info.Local.m_maintenanceCostPerVehicle / (float)DefaultCapacity : -1;
 
         public LineIconSpriteNames GetBgIcon()
         {

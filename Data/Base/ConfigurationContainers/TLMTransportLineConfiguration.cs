@@ -31,15 +31,15 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         [XmlAttribute("displayAbsoluteValues")]
         public bool DisplayAbsoluteValues { get; set; } = false;
         [XmlElement("Budget")]
-        public TimeableList<BudgetEntryXml> BudgetEntries { get; set; } = new TimeableList<BudgetEntryXml>();
+        public TimeableList<BudgetEntryXml> BudgetEntries { get; set; } = [];
         [XmlElement("AssetsList")]
         public SimpleXmlList<string> AssetList { get; set; } = new SimpleXmlList<string>();
         [XmlElement("AssetsTransportList")]
         public SimpleXmlList<TransportAsset> AssetTransportList { get; set; } = new SimpleXmlList<TransportAsset>();
         [XmlElement("TicketPrices")]
-        public TimeableList<TicketPriceEntryXml> TicketPriceEntries { get; set; } = new TimeableList<TicketPriceEntryXml>();
+        public TimeableList<TicketPriceEntryXml> TicketPriceEntries { get; set; } = [];
         [XmlElement("DepotsAllowed")]
-        public SimpleXmlHashSet<ushort> DepotsAllowed { get; set; } = new SimpleXmlHashSet<ushort>();
+        public SimpleXmlHashSet<ushort> DepotsAllowed { get; set; } = [];
 
         [XmlAttribute("isZeroed")]
         public bool IsZeroed { get; set; }

@@ -11,7 +11,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         private UILabel m_hgh;
         private UILabel m_total;
 
-
         protected override void SetDataInternal(WealthPassengerReport data)
         {
             m_low.text = data.Low.ToString();

@@ -402,7 +402,7 @@ namespace TransportLinesManager.Utils
                 return false;
             }
 
-            subservicesAllowed ??= new ItemClass.SubService[] { ItemClass.SubService.PublicTransportTrain, ItemClass.SubService.PublicTransportMetro };
+            subservicesAllowed ??= [ItemClass.SubService.PublicTransportTrain, ItemClass.SubService.PublicTransportMetro];
             int num = Mathf.Max((int)(((pos.x - maxDistance) / 64f) + 135f), 0);
             int num2 = Mathf.Max((int)(((pos.z - maxDistance) / 64f) + 135f), 0);
             int num3 = Mathf.Min((int)(((pos.x + maxDistance) / 64f) + 135f), 269);
@@ -513,12 +513,12 @@ namespace TransportLinesManager.Utils
                 return;
             }
             text = GetLineStringId(lineID, regionalLine).Trim();
-            string[] textParts = text.Split(new char[] { '\n' });
+            string[] textParts = text.Split(['\n']);
             int lenght = textParts.Max(x => x.Length);
             if (lenght >= 9 && textParts.Length == 1)
             {
                 text = text.Replace("·", "\n").Replace(".", "\n").Replace("-", "\n").Replace("/", "\n").Replace(" ", "\n");
-                textParts = text.Split(new char[] { '\n' });
+                textParts = text.Split(['\n']);
                 lenght = textParts.Max(x => x.Length);
             }
             if (lenght >= 8)
@@ -589,7 +589,7 @@ namespace TransportLinesManager.Utils
 
 
         private static int colorChangeCooldown = 0;
-        private static readonly Dictionary<ushort, Color> colorChangeTarget = new();
+        private static readonly Dictionary<ushort, Color> colorChangeTarget = [];
         internal static void SetLineColor(MonoBehaviour parent, ushort lineId, Color color) => parent.StartCoroutine(ChangeColorCoroutine(parent, lineId, color));
 
         private static IEnumerator ChangeColorCoroutine(MonoBehaviour comp, ushort id, Color newColor)
@@ -631,13 +631,13 @@ namespace TransportLinesManager.Utils
 
         public static AsyncTask<bool> SetLineName(ushort lineIdx, string name) => Singleton<SimulationManager>.instance.AddAction(TransportManager.instance.SetLineName(lineIdx, name));
 
-        private static readonly TransportInfo.TransportType[] m_roadTransportTypes = new TransportInfo.TransportType[] { TransportInfo.TransportType.Bus, TransportInfo.TransportType.Tram, TransportInfo.TransportType.Trolleybus };
+        private static readonly TransportInfo.TransportType[] m_roadTransportTypes = [TransportInfo.TransportType.Bus, TransportInfo.TransportType.Tram, TransportInfo.TransportType.Trolleybus];
         internal static bool IsRoadLine(ushort lineId, bool regional) => regional
             ? NetManager.instance.m_nodes.m_buffer[lineId].Info.m_netAI is TransportLineAI { m_vehicleType: VehicleInfo.VehicleType.Car }
             : m_roadTransportTypes.Contains(TransportManager.instance.m_lines.m_buffer[lineId].Info.m_transportType);
         public static string CalculateAutoName(ushort lineIdx, bool regionalLine, out List<DestinationPoco> stationDestinations)
         {
-            stationDestinations = new List<DestinationPoco>();
+            stationDestinations = [];
 
             ushort startStop;
             ushort nextStop;
@@ -685,10 +685,10 @@ namespace TransportLinesManager.Utils
             var hasAnyTerminals = allowTerminals && stations.Where(x => x.Fourth).Count() > 1;
             if (hasAnyTerminals)
             {
-                stations = stations.Select((x) => x.Fourth ? Tuple.New(NamingType.TERMINAL, x.Second, x.Third, x.Fourth) : x).ToList();
-                stationDestinations = stations.Where(x => x.Fourth).Select(x => new DestinationPoco { stopId = x.Third, stopName = x.Second }).ToList();
+                stations = [.. stations.Select((x) => x.Fourth ? Tuple.New(NamingType.TERMINAL, x.Second, x.Third, x.Fourth) : x)];
+                stationDestinations = [.. stations.Where(x => x.Fourth).Select(x => new DestinationPoco { stopId = x.Third, stopName = x.Second })];
             }
-            LogUtils.DoLog($"stations => [{string.Join(" ; ", stations.Select(x => $"{x.First}|{x.Second}").ToArray())}]");
+            LogUtils.DoLog($"stations => [{string.Join(" ; ", [.. stations.Select(x => $"{x.First}|{x.Second}")])}]");
             string startStationStr, endStationStr;
             if (stations.Count % 2 == 0 && stations.Count > 2)
             {
@@ -828,17 +828,17 @@ namespace TransportLinesManager.Utils
 
 
 
-        internal static readonly NamingMode[] m_numberedNamingTypes = new NamingMode[]
-        {
+        internal static readonly NamingMode[] m_numberedNamingTypes =
+        [
         NamingMode. LatinLowerNumber ,
         NamingMode. LatinUpperNumber ,
         NamingMode. GreekLowerNumber,
         NamingMode. GreekUpperNumber,
         NamingMode. CyrillicLowerNumber,
         NamingMode. CyrillicUpperUpper
-        };
+        ];
 
-        public static readonly TransferManager.TransferReason[] defaultAllowedVehicleTypes = {
+        public static readonly TransferManager.TransferReason[] defaultAllowedVehicleTypes = [
             TransferManager.TransferReason.Blimp ,
             TransferManager.TransferReason.CableCar ,
             TransferManager.TransferReason.Ferry ,
@@ -849,7 +849,7 @@ namespace TransportLinesManager.Utils
             TransferManager.TransferReason.PassengerShip ,
             TransferManager.TransferReason.Tram ,
             TransferManager.TransferReason.Bus
-        };
+        ];
     }
 
 }

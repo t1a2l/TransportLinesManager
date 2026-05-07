@@ -11,8 +11,8 @@ namespace TransportLinesManager.MapDrawer
         public Dictionary<ushort, TLMMapTransportLine> transportLines;
         public List<TLMMapStation> stations;
         public string ToJson() => $@"{{
-            ""transportLines"":{{{string.Join(",\n", transportLines.Select(x => $"\"{x.Key}\":{x.Value.ToJson()}").ToArray())}}},
-            ""stations"":[{string.Join(",\n", stations.Select((x, i) => x.ToJson()).ToArray())}]
+            ""transportLines"":{{{string.Join(",\n", [.. transportLines.Select(x => $"\"{x.Key}\":{x.Value.ToJson()}")])}}},
+            ""stations"":[{string.Join(",\n", [.. stations.Select((x, i) => x.ToJson())])}]
         }}";
     }
 

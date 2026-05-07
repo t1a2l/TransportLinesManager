@@ -12,7 +12,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
     {
         private UIPanel m_bg;
         private UITabstrip m_reportTabstrip;
-        private Dictionary<string, ITLMReportChild> m_childControls = new Dictionary<string, ITLMReportChild>();
+        private readonly Dictionary<string, ITLMReportChild> m_childControls = [];
         private bool m_showDayTime = false;
         private bool m_dirty = false;
 

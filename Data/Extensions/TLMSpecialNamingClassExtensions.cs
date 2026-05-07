@@ -12,21 +12,15 @@ namespace TransportLinesManager.Data.Extensions
 
         public static NamingType ToNamingType(this TLMSpecialNamingClass clazz)
         {
-            switch (clazz)
+            return clazz switch
             {
-                case TLMSpecialNamingClass.Campus:
-                    return NamingType.CAMPUS;
-                case TLMSpecialNamingClass.Industrial:
-                    return NamingType.INDUSTRY_AREA;
-                case TLMSpecialNamingClass.ParkArea:
-                    return NamingType.PARKAREA;
-                case TLMSpecialNamingClass.District:
-                    return NamingType.DISTRICT;
-                case TLMSpecialNamingClass.Address:
-                    return NamingType.ADDRESS;
-                default:
-                    return 0;
-            }
+                TLMSpecialNamingClass.Campus => NamingType.CAMPUS,
+                TLMSpecialNamingClass.Industrial => NamingType.INDUSTRY_AREA,
+                TLMSpecialNamingClass.ParkArea => NamingType.PARKAREA,
+                TLMSpecialNamingClass.District => NamingType.DISTRICT,
+                TLMSpecialNamingClass.Address => NamingType.ADDRESS,
+                _ => 0,
+            };
         }
 
         public static string GetLocalizedName(this TLMSpecialNamingClass clazz) => Locale.Get("TLM_SPECIALNAMINGCLASS", clazz.ToString());

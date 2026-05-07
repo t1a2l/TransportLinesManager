@@ -26,8 +26,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             return 0;
         }
 
-        internal override List<Color> ColorOrder { get; } = new List<Color>()
-        {
+        internal override List<Color> ColorOrder { get; } =
+        [
             Color.Lerp(Color.red,Color.magenta,0.5f),
             Color.magenta,
             Color.Lerp(Color.blue,Color.magenta,0.5f),
@@ -38,7 +38,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             Color.yellow,
             Color.Lerp(Color.red,Color.yellow,0.5f),
             Color.red,
-        };
+        ];
 
         protected override TimeableList<TicketPriceEntryXml> Config
             => UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && !fromBuilding

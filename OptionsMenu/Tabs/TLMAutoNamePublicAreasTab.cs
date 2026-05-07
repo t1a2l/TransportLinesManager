@@ -1,6 +1,5 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Commons.Extensions;
 using Commons.Extensions.UI;
 using TransportLinesManager.Data.Base.Enums;
 using TransportLinesManager.Data.DataContainers;
@@ -15,8 +14,8 @@ namespace TransportLinesManager.OptionsMenu.Tabs
     internal class TLMAutoNamePublicAreasTab : UICustomControl, ITLMConfigOptionsTab
     {
         private UIComponent parent;
-        private readonly Dictionary<TLMSpecialNamingClass, UITextField> m_textFields = new Dictionary<TLMSpecialNamingClass, UITextField>();
-        private readonly Dictionary<TLMSpecialNamingClass, UICheckBox> m_checks = new Dictionary<TLMSpecialNamingClass, UICheckBox>();
+        private readonly Dictionary<TLMSpecialNamingClass, UITextField> m_textFields = [];
+        private readonly Dictionary<TLMSpecialNamingClass, UICheckBox> m_checks = [];
 
         private void Awake()
         {

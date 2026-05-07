@@ -25,7 +25,7 @@ namespace TransportLinesManager.Utils
 
         public static bool HasPrefix(ref TransportLine t) => HasPrefix(TransportSystemDefinition.GetDefinitionForLine(ref t));
 
-        public static bool HasPrefix(ushort idx) => idx == 0 ? true : HasPrefix(TransportSystemDefinition.GetDefinitionForLine(idx, false));
+        public static bool HasPrefix(ushort idx) => idx == 0 || HasPrefix(TransportSystemDefinition.GetDefinitionForLine(idx, false));
 
         public static bool HasPrefix(TransportInfo t) => HasPrefix(TransportSystemDefinition.FromLocal(t));
 
@@ -77,7 +77,7 @@ namespace TransportLinesManager.Utils
                 pal.Add(config.Palette);
             }
             Color c;
-            c = TLMAutoColorPaletteContainer.GetColor(num, pal.Where(x => !x.IsNullOrWhiteSpace()).ToArray(), randomOnOverflow, avoidRandom);
+            c = TLMAutoColorPaletteContainer.GetColor(num, [.. pal.Where(x => !x.IsNullOrWhiteSpace())], randomOnOverflow, avoidRandom);
             if (c == Color.clear && !allowClear)
             {
                 c = tsdRef.Color;
@@ -121,7 +121,7 @@ namespace TransportLinesManager.Utils
             }
             if (prefixNamingMode == NamingMode.None)
             {
-                return saida.ToArray();
+                return [.. saida];
             }
             switch (prefixNamingMode)
             {
@@ -174,7 +174,7 @@ namespace TransportLinesManager.Utils
             {
                 saida.RemoveAt(0);
             }
-            return saida.ToArray();
+            return [.. saida];
         }
 
         internal static string[] SimpleOptionsArrayForNamingType(NamingMode prefixNamingMode)
@@ -182,7 +182,7 @@ namespace TransportLinesManager.Utils
             var saida = new List<string>(new string[1]);
             if (prefixNamingMode == NamingMode.None)
             {
-                return saida.ToArray();
+                return [.. saida];
             }
             switch (prefixNamingMode)
             {
@@ -231,7 +231,7 @@ namespace TransportLinesManager.Utils
             {
                 saida.AddRange(NumberArrays.numeros);
             }
-            return saida.ToArray();
+            return [.. saida];
         }
 
         private static void AddToArrayWithName(string[] input, List<string> saida, TransportSystemDefinition tsd, bool addPrefixName)
@@ -269,7 +269,7 @@ namespace TransportLinesManager.Utils
             var saida = new List<string>();
             if (addDefaults)
             {
-                saida.AddRange(new string[] { Locale.Get("TLM_ALL"), Locale.Get("TLM_UNPREFIXED") });
+                saida.AddRange([Locale.Get("TLM_ALL"), Locale.Get("TLM_UNPREFIXED")]);
             }
             else
             {

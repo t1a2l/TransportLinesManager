@@ -21,7 +21,7 @@ namespace TransportLinesManager
         public override string Description => "Allows to customize and manage your public transport systems.";
         public override bool UseGroup9 => false;
 
-        protected override Dictionary<ulong, string> IncompatibleModList { get; } = new Dictionary<ulong, string>();
+        protected override Dictionary<ulong, string> IncompatibleModList { get; } = [];
 
         public TransportLinesManagerMod() : base()
         {
@@ -30,10 +30,10 @@ namespace TransportLinesManager
             " With the introduction of the Express Buses system, now the vehicles are emptied in the next terminal stop before get to the depot.";
         }
 
-        protected override List<string> IncompatibleDllModList { get; } = new List<string>()
-        {
+        protected override List<string> IncompatibleDllModList { get; } =
+        [
             "ImprovedPublicTransport2"
-        };
+        ];
 
 
         public override void TopSettingsUI(UIHelperExtension helper) => TLMConfigOptions.instance.GenerateOptionsMenu(helper);
@@ -81,10 +81,10 @@ namespace TransportLinesManager
         }
 
 
-        private static readonly SavedBool m_savedShowNearLinesInCityServicesWorldInfoPanel = new SavedBool("TLM_showNearLinesInCityServicesWorldInfoPanel", Settings.gameSettingsFile, true, true);
-        private static readonly SavedBool m_savedShowNearLinesInZonedBuildingWorldInfoPanel = new SavedBool("TLM_showNearLinesInZonedBuildingWorldInfoPanel", Settings.gameSettingsFile, false, true);
-        private static readonly SavedBool m_savedUseGameClockAsReferenceIfNoDayNightCycle = new SavedBool("TLM_useGameClockAsReferenceIfNoDayNightCycle", Settings.gameSettingsFile, false, true);
-        private static readonly SavedBool m_showDistanceInLinearMap = new SavedBool("TLM_showDistanceInLinearMap", Settings.gameSettingsFile, true, true);
+        private static readonly SavedBool m_savedShowNearLinesInCityServicesWorldInfoPanel = new("TLM_showNearLinesInCityServicesWorldInfoPanel", Settings.gameSettingsFile, true, true);
+        private static readonly SavedBool m_savedShowNearLinesInZonedBuildingWorldInfoPanel = new("TLM_showNearLinesInZonedBuildingWorldInfoPanel", Settings.gameSettingsFile, false, true);
+        private static readonly SavedBool m_savedUseGameClockAsReferenceIfNoDayNightCycle = new("TLM_useGameClockAsReferenceIfNoDayNightCycle", Settings.gameSettingsFile, false, true);
+        private static readonly SavedBool m_showDistanceInLinearMap = new("TLM_showDistanceInLinearMap", Settings.gameSettingsFile, true, true);
 
         public static bool ShowNearLinesPlop
         {
