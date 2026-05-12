@@ -27,6 +27,9 @@ namespace TransportLinesManager.Data.Extensions
         {
             List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
             IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+            bool isCustomConfig = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId);
+            bool isAbsolute = isCustomConfig && UVMBudgetConfigTab.IsAbsoluteValue();
+
             if (list.Any(item => item.name == assetId))
             {
                 return;
@@ -53,7 +56,7 @@ namespace TransportLinesManager.Data.Extensions
             {
                 index = 0;
             }
-            if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
+            if (isAbsolute)
             {
                 var totalCount = 0;
                 for (int i = 0; i < list.Count; i++)
@@ -82,6 +85,7 @@ namespace TransportLinesManager.Data.Extensions
         {
             List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
             IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+            int newIndex = currentConfig.BudgetEntries.Count - 1;
             for (int i = 0; i < list.Count; i++)
             {
                 var count = new Count
@@ -89,33 +93,39 @@ namespace TransportLinesManager.Data.Extensions
                     totalCount = 0,
                     usedCount = 0
                 };
-                list[i].count.Add(currentConfig.BudgetEntries.Count - 1, count);
-                list[i].spawn_percent.Add(currentConfig.BudgetEntries.Count - 1, 100);
+                list[i].count[newIndex] = count;
+                list[i].spawn_percent[newIndex] = 100;
             }
             SetAssetTransportListForLine(it, lineId, list);
         }
 
-        public static void RemoveBudgetEntry<T, V>(this T it, ushort lineId, V entry) where T : IAssetSelectorExtension where V : UintValueHourEntryXml<V>
+        public static void RemoveBudgetEntryByIndex<T>(this T it, ushort lineId, int indexToRemove)  where T : IAssetSelectorExtension
         {
             List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
-            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
-            var index = 0;
-            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
-            {
-                if (currentConfig.BudgetEntries[i].HourOfDay.Value == entry.HourOfDay)
-                {
-                    index = i;
-                    break;
-                }
-            }
             for (int i = 0; i < list.Count; i++)
             {
-                list[i].count.Remove(index);
-                list[i].spawn_percent.Remove(index);
+                // Remove the specific index
+                list[i].count.Remove(indexToRemove);
+                list[i].spawn_percent.Remove(indexToRemove);
+
+                var newCount = new Dictionary<int, Count>();
+                var newPercent = new Dictionary<int, int>();
+                foreach (var kvp in list[i].count)
+                {
+                    newCount[kvp.Key > indexToRemove ? kvp.Key - 1 : kvp.Key] = kvp.Value;
+                } 
+                foreach (var kvp in list[i].spawn_percent)
+                { 
+                    newPercent[kvp.Key > indexToRemove ? kvp.Key - 1 : kvp.Key] = kvp.Value; 
+                }
+                var item = list[i];
+                item.count = newCount;
+                item.spawn_percent = newPercent;
+                list[i] = item;
+                it.SetAssetTransportListForLine(lineId, list);
             }
             SetAssetTransportListForLine(it, lineId, list);
         }
-
 
         public static void RemoveAssetFromLine<T>(this T it, ushort lineId, string assetId) where T : IAssetSelectorExtension
         {
