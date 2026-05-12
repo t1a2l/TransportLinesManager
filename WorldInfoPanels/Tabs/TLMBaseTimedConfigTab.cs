@@ -175,16 +175,27 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void RemoveTime(V entry)
         {
-            if (Config != default)
+            if (Config == default) return;
+            int entryIndex = -1;
+            for (int i = 0; i < Config.Count; i++)
             {
-                Config.RemoveAtHour(entry.HourOfDay ?? -1);
-                m_isDirty = true;
-                if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
+                if (Config[i].HourOfDay == entry.HourOfDay)
                 {
-                    IBasicExtension extension = lineId > 0 && !fromBuilding ? TLMLineUtils.GetEffectiveExtensionForLine(lineId) : UVMPublicTransportWorldInfoPanel.GetCurrentTSD().GetTransportExtension();
-                    extension.RemoveBudgetEntry(lineId, entry);
+                    entryIndex = i;
+                    break;
                 }
             }
+            if (entryIndex < 0) return;
+
+            if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
+            {
+                IBasicExtension extension = lineId > 0 && !fromBuilding ? TLMLineUtils.GetEffectiveExtensionForLine(lineId) : UVMPublicTransportWorldInfoPanel.GetCurrentTSD().GetTransportExtension();
+                // FIX: pass index directly, remove assets BEFORE removing from Config
+                extension.RemoveBudgetEntryByIndex(lineId, entryIndex);
+            }
+            Config.RemoveAtHour(entry.HourOfDay ?? -1); // remove AFTER assets are fixed
+            m_isDirty = true;
+            UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
         }
         private void SetTime(V idx, int val)
         {
@@ -204,12 +215,14 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private void AddEntry()
         {
             Config.Add(DefaultEntry());
-            RebuildList();
+            if (Config.Count >= 24) return;
             if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
             {
                 IBasicExtension extension = lineId > 0 && !fromBuilding ? TLMLineUtils.GetEffectiveExtensionForLine(lineId) : UVMPublicTransportWorldInfoPanel.GetCurrentTSD().GetTransportExtension();
                 extension.AddDefaultToNewBudgetEntry(lineId);
             }
+            RebuildList();
+            UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
         }
 
 
