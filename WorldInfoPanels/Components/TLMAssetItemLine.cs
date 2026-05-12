@@ -89,7 +89,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 }
                 else
                 {
-                    m_weightEditor.text = asset.spawn_percent.ContainsKey(index) ? asset.spawn_percent[index].ToString() : "0";
+                    m_weightEditor.text = asset.spawn_percent.ContainsKey(index) ? asset.spawn_percent[index].ToString() : "100";
                 }
             }
             else
@@ -195,8 +195,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                             int remaining = maxVehicles - otherTotal;
                             if (value > remaining)
                             {
-                                // FIX #9: clamp to remaining instead of silently zeroing
-                                value = Mathf.Max(0, remaining);
+                                value = Mathf.Clamp(value, 0, remaining);
                             }
 
                             var item_count = asset.count.ContainsKey(index) ? asset.count[index] : new Count();
@@ -205,11 +204,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                         }
                         else
                         {
-                            value = Mathf.Max(0, value);
-                            if (!asset.spawn_percent.ContainsKey(index))
-                            {
-                                asset.spawn_percent[index] = 0;
-                            }
+                            value = Mathf.Clamp(value, 0, 100);
                             asset.spawn_percent[index] = value;
                         }
                         allowedTransportAssets[asset_index] = asset;
