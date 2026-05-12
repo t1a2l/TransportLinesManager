@@ -1,10 +1,11 @@
+using System;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Commons.Extensions.UI;
 using Commons.UI.SpriteNames;
 using Commons.Utils;
 using TransportLinesManager.Data.Base;
-using System;
+using TransportLinesManager.Utils;
 using UnityEngine;
 
 namespace TransportLinesManager.WorldInfoPanels.Components
@@ -257,8 +258,32 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                     }
                     else
                     {
-                        m_timeInput.color = Color.white;
-                        OnTimeChanged?.Invoke(Entry, time);
+                        bool isDuplicate = false;
+                        if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && !fromBuilding)
+                        {
+                            var config = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+                            foreach (var entry in config.BudgetEntries)
+                            {
+                                // skip checking against self
+                                if (entry.HourOfDay == Entry.HourOfDay) continue;
+                                if (entry.HourOfDay == time)
+                                {
+                                    isDuplicate = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (isDuplicate)
+                        {
+                            m_timeInput.color = Color.red;
+                        }
+                        else
+                        {
+                            m_timeInput.color = Color.white;
+                            m_timeInput.tooltip = string.Empty;
+                            OnTimeChanged?.Invoke(Entry, time);
+                        }
                     }
                 }
             }
