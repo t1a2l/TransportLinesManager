@@ -17,9 +17,9 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         [XmlElement("TicketPrices")]
         public TimeableList<TicketPriceEntryXml> TicketPriceEntries { get; set; } = [];
         [XmlElement("AssetsList")]
-        public SimpleXmlList<string> AssetList { get; set; } = new SimpleXmlList<string>();
+        public SimpleXmlList<string> AssetList { get; set; } = [];
         [XmlElement("AssetsTransportList")]
-        public SimpleXmlList<TransportAsset> AssetTransportList { get; set; } = new SimpleXmlList<TransportAsset>();
+        public SimpleXmlList<TransportAsset> AssetTransportList { get; set; } = [];
         [XmlAttribute("name")]
         public string Name { get; set; }
         [XmlAttribute("useColorForModel")]
