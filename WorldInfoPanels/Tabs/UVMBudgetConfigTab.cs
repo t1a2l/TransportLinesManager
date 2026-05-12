@@ -7,6 +7,7 @@ using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.Components;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
@@ -60,11 +61,18 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             : null;
 
 
-        protected override BudgetEntryXml DefaultEntry() => new()
+        protected override BudgetEntryXml DefaultEntry()
         {
-            HourOfDay = 0,
-            Value = 100
-        };
+            // find first hour not already used
+            var usedHours = new HashSet<int>(Config.Select(x => x.HourOfDay ?? -1));
+            int availableHour = Enumerable.Range(0, 24).FirstOrDefault(h => !usedHours.Contains(h));
+
+            return new()
+            {
+                HourOfDay = availableHour >= 0 ? availableHour : 0,
+                Value = 100
+            };
+        }
         public override string GetTemplateName() => UVMBudgetEditorLine.BUDGET_LINE_TEMPLATE;
         public override void EnsureTemplate() => UVMBudgetEditorLine.EnsureTemplate();
     }
