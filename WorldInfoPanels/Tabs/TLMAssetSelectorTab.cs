@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Commons.Extensions.UI;
+using TransportLinesManager.Data.DataContainers;
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
@@ -38,8 +39,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private UIButton m_pasteButton;
         private UIButton m_eraseButton;
 
-        private static UIDropDown m_timeBudgetSelect;
+        private UILabel m_capacityColumnHeader;
+        private UILabel m_weightColumnHeader;
+        private UILabel m_vehicleCountLabel;
 
+        private static UIDropDown m_timeBudgetSelect;
 
         private TransportSystemDefinition TransportSystem => UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
         internal static ushort GetLineID()
@@ -56,7 +60,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             MonoUtils.UiTextFieldDefaults(m_nameFilter);
             MonoUtils.InitButtonFull(m_nameFilter, false, "OptionsDropboxListbox");
             m_nameFilter.tooltip = Locale.Get("TLM_ASSET_FILTERBY");
-            m_nameFilter.relativePosition = new Vector3(5, 50);
+            m_nameFilter.relativePosition = new Vector3(5f, 50f);
             m_nameFilter.height = 23;
             m_nameFilter.width = 170f;
             m_nameFilter.eventKeyUp += (x, y) => UpdateAssetList(TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem));
@@ -64,9 +68,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_nameFilter.eventTextCancelled += (x, y) => UpdateAssetList(TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem));
             m_nameFilter.horizontalAlignment = UIHorizontalAlignment.Left;
             m_nameFilter.padding = new RectOffset(2, 2, 4, 2);
-            m_timeBudgetSelect = UIHelperExtension.CloneBasicDropDownNoLabel(new string[0], ChangeBudgetTime, MainPanel);
+            m_timeBudgetSelect = UIHelperExtension.CloneBasicDropDownNoLabel([], ChangeBudgetTime, MainPanel);
             m_timeBudgetSelect.tooltipLocaleID = "TLM_TIME_PERCENT_LABEL";
-            m_timeBudgetSelect.relativePosition = new Vector3(280, 45);
+            m_timeBudgetSelect.relativePosition = new Vector3(MainPanel.width - 100f, 25f);
             m_timeBudgetSelect.height = 30f;
             m_timeBudgetSelect.width = 90f;
             m_timeBudgetSelect.horizontalAlignment = UIHorizontalAlignment.Left;
@@ -80,6 +84,33 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             CreateButtons();
 
             CreateTemplateList();
+
+            MonoUtils.CreateUIElement(out m_capacityColumnHeader, MainPanel.transform);
+            m_capacityColumnHeader.autoSize = false;
+            m_capacityColumnHeader.width = 50f;
+            m_capacityColumnHeader.height = 20f;
+            m_capacityColumnHeader.relativePosition = new Vector3(MainPanel.width - 145f, 60f);
+            m_capacityColumnHeader.textScale = 0.65f;
+            m_capacityColumnHeader.textAlignment = UIHorizontalAlignment.Center;
+            m_capacityColumnHeader.localeID = "TLM_ASSET_CAPACITY_FIELD_HEADER";
+
+            MonoUtils.CreateUIElement(out m_weightColumnHeader, MainPanel.transform);
+            m_weightColumnHeader.autoSize = false;
+            m_weightColumnHeader.width = 50f;
+            m_weightColumnHeader.height = 20f;
+            m_weightColumnHeader.relativePosition = new Vector3(MainPanel.width - 95f, 60f);
+            m_weightColumnHeader.textScale = 0.65f;
+            m_weightColumnHeader.textAlignment = UIHorizontalAlignment.Center;
+            // text set dynamically in UpdateModeIndicator()
+
+            MonoUtils.CreateUIElement(out m_vehicleCountLabel, MainPanel.transform);
+            m_vehicleCountLabel.autoSize = false;
+            m_vehicleCountLabel.width = 140f;
+            m_vehicleCountLabel.height = 20f;
+            m_vehicleCountLabel.relativePosition = new Vector3(180f, 48f);
+            m_vehicleCountLabel.textScale = 0.65f;
+            m_vehicleCountLabel.textAlignment = UIHorizontalAlignment.Left;
+            m_vehicleCountLabel.isVisible = false;
         }
 
         private void TimeBudgetSelect_eventSelectedIndexChanged(UIComponent component, int value)
@@ -112,9 +143,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_eraseButton.tooltip = Locale.Get("TLM_DELETE_CURRENT_LIST");
 
             removeUndesired.relativePosition = new Vector3(MainPanel.width - 50, 0f);
-            m_copyButton.relativePosition = new Vector3(MainPanel.width - 50f, 25);
-            m_pasteButton.relativePosition = new Vector3(MainPanel.width - 25f, 25);
-            m_eraseButton.relativePosition = new Vector3(MainPanel.width - 25f, 0);
+            m_copyButton.relativePosition = new Vector3(MainPanel.width - 75f, 0f);
+            m_pasteButton.relativePosition = new Vector3(MainPanel.width - 100f, 0f);
+            m_eraseButton.relativePosition = new Vector3(MainPanel.width - 25f, 0f);
+            // MainPanel.width - 380f
         }
 
         private void ActionCopy()
@@ -249,7 +281,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     var item = InitTransportItem(asset, currentConfig);
                     allowedTransportAssets.Add(item);
                 }
-                config.SetAssetListForLine(lineId, new List<string>());
+                config.SetAssetListForLine(lineId, []);
                 config.SetAssetTransportListForLine(lineId, allowedTransportAssets);
             }
             string[] budgetArr = new string[currentConfig.BudgetEntries.Count];
@@ -267,6 +299,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
             m_timeBudgetSelect.items = budgetArr;
             m_timeBudgetSelect.selectedIndex = 0;
+            UpdateModeIndicator(lineId, 0);
 
             if (TransportLinesManagerMod.DebugMode)
             {
@@ -277,7 +310,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     arr[i] = asset.name;
                     i++;
                 }
-                LogUtils.DoLog($"selectedAssets Size = {allowedTransportAssets?.Count} ({string.Join(",", arr ?? new string[0])}) {config?.GetType()}");
+                LogUtils.DoLog($"selectedAssets Size = {allowedTransportAssets?.Count} ({string.Join(",", arr ?? [])}) {config?.GetType()}");
 
             }
             for (int i = 0; i < assetsCheck.Length; i++)
@@ -304,8 +337,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 name = assetName,
                 capacity = VehicleUtils.GetCapacity(PrefabCollection<VehicleInfo>.FindLoaded(assetName)),
-                count = new Dictionary<int, Count>(),
-                spawn_percent = new Dictionary<int, int>()
+                count = [],
+                spawn_percent = []
             };
             for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
             {
@@ -326,8 +359,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 return;
             }
-            m_timeBudgetSelect.selectedIndex = idxSel;
+            m_timeBudgetSelect.selectedIndex = idxSel; 
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding);
+            UpdateModeIndicator(lineId, idxSel);
             if (!fromBuilding)
             {
                 var targetAssets = TransportSystem.GetTransportExtension().GetAllBasicAssetsForLine(lineId).Where(x => x.Value.Contains(m_nameFilter.text)).ToList();
@@ -386,6 +420,32 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     RedrawModel();
 
                 }
+            }
+        }
+
+        private void UpdateModeIndicator(ushort lineId, int budgetIndex)
+        {
+            bool isCustom = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId);
+            bool isAbsolute = isCustom && UVMBudgetConfigTab.IsAbsoluteValue();
+
+            if (isAbsolute)
+            {
+                m_weightColumnHeader.text = Locale.Get("TLM_ASSET_COUNT_HEADER"); // e.g. "Count"
+                IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+                if (budgetIndex >= 0 && budgetIndex < currentConfig.BudgetEntries.Count)
+                {
+                    float budgetPercent = currentConfig.BudgetEntries[budgetIndex].Value / 100f;
+                    float lineLength = TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength;
+                    TransportInfo info = TransportManager.instance.m_lines.m_buffer[lineId].Info;
+                    int maxVehicles = TLMLineUtils.ProjectTargetVehicleCount(info, lineLength, budgetPercent);
+                    m_vehicleCountLabel.text = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES"), maxVehicles);
+                    m_vehicleCountLabel.isVisible = true;
+                }
+            }
+            else
+            {
+                m_weightColumnHeader.text = Locale.Get("TLM_ASSET_PERCENT_HEADER"); // e.g. "%"
+                m_vehicleCountLabel.isVisible = false;
             }
         }
 

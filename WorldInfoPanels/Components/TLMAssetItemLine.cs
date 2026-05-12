@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using ColossalFramework;
 using TransportLinesManager.WorldInfoPanels.Tabs;
 using System.Linq;
-using Commons.Utils.UtilitiesClasses;
 
 namespace TransportLinesManager.WorldInfoPanels.Components
 {
@@ -29,12 +28,12 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         public void Awake()
         {
-            m_checkbox = Find<UICheckBox>("AssetCheckbox");
-            m_capacityEditor = Find<UITextField>("Cap");
-            m_weightEditor = Find<UITextField>("Weg");
             var panel = GetComponent<UIPanel>();
             m_checkbox = panel.GetComponentInChildren<UICheckBox>();
-            m_capacityEditor = panel.GetComponentInChildren<UITextField>();
+
+            m_capacityEditor = panel.Find<UITextField>("Cap");
+            m_weightEditor = panel.Find<UITextField>("Weg");
+
             m_checkbox.eventCheckChanged += (x, y) =>
             {
                 if (m_isLoading)
@@ -76,23 +75,45 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             var info = PrefabCollection<VehicleInfo>.FindLoaded(m_currentAsset);
             var tsd = TransportSystemDefinition.From(info);
             UpdateMaintenanceCost(info, tsd);
-            if(isAllowed)
+
+            bool isCustomConfig = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId);
+            bool isAbsolute = isCustomConfig && UVMBudgetConfigTab.IsAbsoluteValue();
+
+            if (isAllowed)
             {
-                m_capacityEditor.text = asset.capacity.ToString() != "" ? asset.capacity.ToString() : VehicleUtils.GetCapacity(PrefabCollection<VehicleInfo>.FindLoaded(asset.name)).ToString("0");
-                if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
+                m_weightEditor.isInteractive = true;
+                m_weightEditor.opacity = 1f;
+                if (isAbsolute)
                 {
-                    m_weightEditor.text = asset.count[index].ToString();
+                    m_weightEditor.text = asset.count.ContainsKey(index) ? asset.count[index].totalCount.ToString() : "0";
                 }
                 else
                 {
-                    m_weightEditor.text = asset.spawn_percent[index].ToString();
+                    m_weightEditor.text = asset.spawn_percent.ContainsKey(index) ? asset.spawn_percent[index].ToString() : "0";
                 }
             }
             else
             {
-                m_capacityEditor.text = VehicleUtils.GetCapacity(PrefabCollection<VehicleInfo>.FindLoaded(asset.name)).ToString("0");
+                m_weightEditor.isInteractive = false;
+                m_weightEditor.opacity = 0.3f;
                 m_weightEditor.text = "0";
             }
+
+            m_capacityEditor.text = asset.capacity != 0 ? asset.capacity.ToString() : VehicleUtils.GetCapacity(info).ToString("0");
+
+            if (isAbsolute)
+            {
+                m_weightEditor.tooltip = Locale.Get("TLM_ASSET_COUNT_FIELD_DESCRIPTION");
+            }
+            else if (isCustomConfig)
+            {
+                m_weightEditor.tooltip = Locale.Get("TLM_ASSET_WEIGHT_FIELD_DESCRIPTION");
+            }
+            else
+            {
+                m_weightEditor.tooltip = Locale.Get("TLM_ASSET_WEIGHT_FIELD_DESCRIPTION");
+            }
+
             m_isLoading = false;
         }
 
@@ -152,24 +173,43 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                         {
                             index = 0;
                         }
-                        if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
+
+                        bool isAbsolute = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId) && UVMBudgetConfigTab.IsAbsoluteValue();
+
+                        if (isAbsolute)
                         {
-                            var totalCount = 0;
+                            float budgetPercent = currentConfig.BudgetEntries[index].Value / 100f;
+                            float lineLength = TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength;
+                            TransportInfo transportInfo = TransportManager.instance.m_lines.m_buffer[lineId].Info;
+                            int maxVehicles = TLMLineUtils.ProjectTargetVehicleCount(transportInfo, lineLength, budgetPercent);
+
+                            int otherTotal = 0;
                             for (int i = 0; i < allowedTransportAssets.Count; i++)
                             {
-                                totalCount += allowedTransportAssets[i].count[index].totalCount;
+                                if (allowedTransportAssets[i].name != m_currentAsset)
+                                {
+                                    otherTotal += allowedTransportAssets[i].count.ContainsKey(index) ? allowedTransportAssets[i].count[index].totalCount : 0;
+                                }
                             }
-                            // check if the new total is more then allowed if so make it zero
-                            if (totalCount + value > currentConfig.BudgetEntries[index].Value)
+
+                            int remaining = maxVehicles - otherTotal;
+                            if (value > remaining)
                             {
-                                value = 0;
+                                // FIX #9: clamp to remaining instead of silently zeroing
+                                value = Mathf.Max(0, remaining);
                             }
-                            var item_count = asset.count[index];
+
+                            var item_count = asset.count.ContainsKey(index) ? asset.count[index] : new Count();
                             item_count.totalCount = value;
                             asset.count[index] = item_count;
                         }
                         else
                         {
+                            value = Mathf.Max(0, value);
+                            if (!asset.spawn_percent.ContainsKey(index))
+                            {
+                                asset.spawn_percent[index] = 0;
+                            }
                             asset.spawn_percent[index] = value;
                         }
                         allowedTransportAssets[asset_index] = asset;
