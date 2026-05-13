@@ -22,6 +22,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
     {
         private UILabel m_title;
         private Color m_lastColor = Color.clear;
+        private bool m_isDirty = false;
+
         public void Awake() => CreateWindow();
 
         public UIPanel MainPanel { get; private set; }
@@ -46,11 +48,14 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private static UIDropDown m_timeBudgetSelect;
 
         private TransportSystemDefinition TransportSystem => UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
+
         internal static ushort GetLineID()
         {
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding);
             return !fromBuilding ? lineId : (ushort)0;
         }
+
+        public void MarkDirty() => m_isDirty = true;
 
         private void CreateWindow()
         {
@@ -274,6 +279,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
             List<string> allowedAssets = config.GetAssetListForLine(lineId);
             IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+            if (lineId > 0 && currentConfig.BudgetEntries.Count == 0)
+            {
+                TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineId); // triggers lazy init
+                currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId); // re-fetch
+            }
             if (allowedAssets.Count > 0)
             {
                 foreach (var asset in allowedAssets)
@@ -342,13 +352,18 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             };
             for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
             {
-                var item_count = new Count
+                var item_count = new CountEntry
                 {
-                    totalCount = 0,
-                    usedCount = 0
+                    TotalCount = 0,
+                    UsedCount = 0
                 };
-                item.count.Add(i, item_count);
-                item.spawn_percent.Add(i, 100);
+                item.count.Add(i.ToString(), item_count);
+
+                var item_spawn = new SpawnPercentEntry
+                {
+                    Value = 100
+                };
+                item.spawn_percent.Add(i.ToString(), item_spawn);
             }
             return item;
         }
@@ -406,6 +421,13 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public void UpdateBindings()
         {
+            if (m_isDirty)
+            {
+                m_isDirty = false;
+                IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
+                UpdateAssetList(config);
+            }
+
             if (GetComponentInParent<UIComponent>().isVisible)
             {
                 if (m_lastInfo is null)
