@@ -54,6 +54,13 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                     {
                         extension.RemoveAssetFromLine(fromBuilding ? (ushort)0 : lineId, m_currentAsset);
                     }
+
+                    List<TransportAsset> allowedTransportAssets = extension.GetAssetTransportListForLine(fromBuilding ? (ushort)0 : lineId);
+                    var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
+                    if (index == -1) index = 0;
+                    bool isAllowed = allowedTransportAssets.Any(item => item.name == m_currentAsset);
+                    TransportAsset asset = isAllowed ? allowedTransportAssets.Find(item => item.name == m_currentAsset) : new TransportAsset { name = m_currentAsset };
+                    SetAsset(asset, isAllowed, fromBuilding ? (ushort)0 : lineId, index);
                 }
             };
             MonoUtils.LimitWidthAndBox(m_checkbox.label, 225, out UIPanel container);
@@ -85,11 +92,11 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 m_weightEditor.opacity = 1f;
                 if (isAbsolute)
                 {
-                    m_weightEditor.text = asset.count.ContainsKey(index) ? asset.count[index].totalCount.ToString() : "0";
+                    m_weightEditor.text = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()].TotalCount.ToString() : "0";
                 }
                 else
                 {
-                    m_weightEditor.text = asset.spawn_percent.ContainsKey(index) ? asset.spawn_percent[index].ToString() : "100";
+                    m_weightEditor.text = asset.spawn_percent.ContainsKey(index.ToString()) ? asset.spawn_percent[index.ToString()].Value.ToString() : "100";
                 }
             }
             else
@@ -188,7 +195,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                             {
                                 if (allowedTransportAssets[i].name != m_currentAsset)
                                 {
-                                    otherTotal += allowedTransportAssets[i].count.ContainsKey(index) ? allowedTransportAssets[i].count[index].totalCount : 0;
+                                    otherTotal += allowedTransportAssets[i].count.ContainsKey(index.ToString()) ? allowedTransportAssets[i].count[index.ToString()].TotalCount : 0;
                                 }
                             }
 
@@ -198,14 +205,14 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                                 value = Mathf.Clamp(value, 0, remaining);
                             }
 
-                            var item_count = asset.count.ContainsKey(index) ? asset.count[index] : new Count();
-                            item_count.totalCount = value;
-                            asset.count[index] = item_count;
+                            var item_count = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()] : new CountEntry();
+                            item_count.TotalCount = value;
+                            asset.count[index.ToString()] = item_count;
                         }
                         else
                         {
                             value = Mathf.Clamp(value, 0, 100);
-                            asset.spawn_percent[index] = value;
+                            asset.spawn_percent[index.ToString()] = new SpawnPercentEntry { Value = value };
                         }
                         allowedTransportAssets[asset_index] = asset;
                         config.SetAssetTransportListForLine(lineId, allowedTransportAssets);
