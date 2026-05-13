@@ -309,16 +309,16 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 index = 0;
             }
             var asset_index = assetTransportList.FindIndex(item => item.name == selectedModel);
-            var asset_count = assetTransportList[asset_index].count[index];
+            var asset_count = assetTransportList[asset_index].count[index.ToString()];
             if(status == "Add")
             {
-                asset_count.usedCount++;
+                asset_count.UsedCount++;
             }
             else if (status == "Remove")
             {
-                asset_count.usedCount--;
+                asset_count.UsedCount--;
             }
-            assetTransportList[asset_index].count[index] = asset_count;
+            assetTransportList[asset_index].count[index.ToString()] = asset_count;
             ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
         }
 

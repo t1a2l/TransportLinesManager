@@ -1,23 +1,35 @@
-﻿using System.Collections.Generic;
+﻿using System.Xml.Serialization;
+using Commons.Utils.UtilitiesClasses;
 
 namespace TransportLinesManager.Utils
 {
 	public struct TransportAsset
 	{
-		public string name;
+        [XmlAttribute("name")]
+        public string name;
 
-		public Dictionary<int, int> spawn_percent;
+        [XmlAttribute("capacity")]
+        public int capacity;
 
-		public Dictionary<int, Count> count;
+        [XmlElement("SpawnPercent")]
+        public SimpleXmlDictionary<string, SpawnPercentEntry> spawn_percent;
 
-		public int capacity;
-
+        [XmlElement("Count")]
+        public SimpleXmlDictionary<string, CountEntry> count;
 	}
 
-    public struct Count
-	{
-        public int totalCount;
+    public class SpawnPercentEntry
+    {
+        [XmlAttribute("value")]
+        public int Value { get; set; }
+    }
 
-        public int usedCount;
-	}
+    public class CountEntry
+    {
+        [XmlAttribute("total")]
+        public int TotalCount { get; set; }
+
+        [XmlAttribute("used")]
+        public int UsedCount { get; set; }
+    }
 }

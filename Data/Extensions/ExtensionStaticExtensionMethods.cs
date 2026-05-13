@@ -43,13 +43,18 @@ namespace TransportLinesManager.Data.Extensions
             };
             for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
             {
-                var count = new Count
+                var count = new CountEntry
                 {
-                    totalCount = 0,
-                    usedCount = 0
+                    TotalCount = 0,
+                    UsedCount = 0
                 };
-                item.count.Add(i, count);
-                item.spawn_percent.Add(i, 100);
+                item.count.Add(i.ToString(), count);
+
+                var spawnPercent = new SpawnPercentEntry
+                {
+                    Value = 100
+                };
+                item.spawn_percent.Add(i.ToString(), spawnPercent);
             }
             var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
             if (index == -1)
@@ -61,7 +66,7 @@ namespace TransportLinesManager.Data.Extensions
                 var totalCount = 0;
                 for (int i = 0; i < list.Count; i++)
                 {
-                    totalCount += list[i].count[index].totalCount;
+                    totalCount += list[i].count[index.ToString()].TotalCount;
                 }
                 var newCount = int.Parse(weight);
                 // check if the new total is more then allowed if so make it zero
@@ -69,13 +74,14 @@ namespace TransportLinesManager.Data.Extensions
                 {
                     newCount = 0;
                 }
-                var item_count = item.count[index];
-                item_count.totalCount = newCount;
-                item.count[index] = item_count;
+                var item_count = item.count[index.ToString()];
+                item_count.TotalCount = newCount;
+                item.count[index.ToString()] = item_count;
             }
             else
             {
-                item.spawn_percent[index] = int.Parse(weight);
+                int parsedWeight = int.Parse(weight);
+                item.spawn_percent[index.ToString()].Value = parsedWeight > 0 ? parsedWeight : 100;
             }
             list.Add(item);
             SetAssetTransportListForLine(it, lineId, list);
@@ -88,13 +94,18 @@ namespace TransportLinesManager.Data.Extensions
             int newIndex = currentConfig.BudgetEntries.Count - 1;
             for (int i = 0; i < list.Count; i++)
             {
-                var count = new Count
+                var count = new CountEntry
                 {
-                    totalCount = 0,
-                    usedCount = 0
+                    TotalCount = 0,
+                    UsedCount = 0
                 };
-                list[i].count[newIndex] = count;
-                list[i].spawn_percent[newIndex] = 100;
+                list[i].count[newIndex.ToString()] = count;
+
+                var spawnPercent = new SpawnPercentEntry
+                {
+                    Value = 100
+                };
+                list[i].spawn_percent[newIndex.ToString()] = spawnPercent;
             }
             SetAssetTransportListForLine(it, lineId, list);
         }
@@ -105,18 +116,18 @@ namespace TransportLinesManager.Data.Extensions
             for (int i = 0; i < list.Count; i++)
             {
                 // Remove the specific index
-                list[i].count.Remove(indexToRemove);
-                list[i].spawn_percent.Remove(indexToRemove);
+                list[i].count.Remove(indexToRemove.ToString());
+                list[i].spawn_percent.Remove(indexToRemove.ToString());
 
-                var newCount = new Dictionary<int, Count>();
-                var newPercent = new Dictionary<int, int>();
+                var newCount = new SimpleXmlDictionary<string, CountEntry>();
+                var newPercent = new SimpleXmlDictionary<string, SpawnPercentEntry>();
                 foreach (var kvp in list[i].count)
                 {
-                    newCount[kvp.Key > indexToRemove ? kvp.Key - 1 : kvp.Key] = kvp.Value;
+                    newCount[kvp.Key.CompareTo(indexToRemove.ToString()) > 0 ? (int.Parse(kvp.Key) - 1).ToString() : kvp.Key] = kvp.Value;
                 } 
                 foreach (var kvp in list[i].spawn_percent)
                 { 
-                    newPercent[kvp.Key > indexToRemove ? kvp.Key - 1 : kvp.Key] = kvp.Value; 
+                    newPercent[kvp.Key.CompareTo(indexToRemove.ToString()) > 0 ? (int.Parse(kvp.Key) - 1).ToString() : kvp.Key] = kvp.Value; 
                 }
                 var item = list[i];
                 item.count = newCount;
