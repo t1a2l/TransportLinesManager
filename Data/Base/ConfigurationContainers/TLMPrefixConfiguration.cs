@@ -14,31 +14,37 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
     {
         [XmlElement("Budget")]        
         public TimeableList<BudgetEntryXml> BudgetEntries { get; set; } = [];
+
         [XmlElement("TicketPrices")]
         public TimeableList<TicketPriceEntryXml> TicketPriceEntries { get; set; } = [];
+
         [XmlElement("AssetsList")]
         public SimpleXmlList<string> AssetList { get; set; } = [];
+
         [XmlElement("AssetsTransportList")]
         public SimpleXmlList<TransportAsset> AssetTransportList { get; set; } = [];
+
         [XmlAttribute("name")]
         public string Name { get; set; }
+
         [XmlAttribute("useColorForModel")]
         public bool UseColorForModel { get; set; }
 
         [XmlIgnore]
         public Color Color { get => m_cachedColor; set => m_cachedColor = value; }
+
         [XmlIgnore]
         private Color m_cachedColor;
+
         [XmlAttribute("color")]
         public string PropColorStr { get => m_cachedColor == default ? null : ColorExtensions.ToRGB(Color); set => m_cachedColor = value.IsNullOrWhiteSpace() ? default : (Color) ColorExtensions.FromRGB(value); }
-
 
         [XmlAttribute("customPalette")]
         public string CustomPalette { get; set; }
 
-
         [XmlIgnore]
         public LineIconSpriteNames CustomIcon { get; set; } = LineIconSpriteNames.NULL;
+
         [XmlAttribute("customFormat")]
         public string CustomFormatStr
         {
@@ -60,6 +66,5 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
 
         [XmlElement("DepotsAllowed")]
         public SimpleXmlHashSet<ushort> DepotsAllowed { get; set; } = [];
-
     }
 }

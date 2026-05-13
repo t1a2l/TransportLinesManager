@@ -19,25 +19,30 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 if (!value && isCustom)
                 {
                     DisplayAbsoluteValues = false;
-                    BudgetEntries = new TimeableList<BudgetEntryXml>();
-                    AssetList = new SimpleXmlList<string>();
-                    AssetTransportList = new SimpleXmlList<TransportAsset>();
-                    TicketPriceEntries = new TimeableList<TicketPriceEntryXml>();
-                    DepotsAllowed = new SimpleXmlHashSet<ushort>();
+                    BudgetEntries = [];
+                    AssetList = [];
+                    AssetTransportList = [];
+                    TicketPriceEntries = [];
+                    DepotsAllowed = [];
                 }
                 isCustom = value;
             }
         }
         [XmlAttribute("displayAbsoluteValues")]
         public bool DisplayAbsoluteValues { get; set; } = false;
+
         [XmlElement("Budget")]
         public TimeableList<BudgetEntryXml> BudgetEntries { get; set; } = [];
+
         [XmlElement("AssetsList")]
-        public SimpleXmlList<string> AssetList { get; set; } = new SimpleXmlList<string>();
+        public SimpleXmlList<string> AssetList { get; set; } = [];
+
         [XmlElement("AssetsTransportList")]
-        public SimpleXmlList<TransportAsset> AssetTransportList { get; set; } = new SimpleXmlList<TransportAsset>();
+        public SimpleXmlList<TransportAsset> AssetTransportList { get; set; } = [];
+
         [XmlElement("TicketPrices")]
         public TimeableList<TicketPriceEntryXml> TicketPriceEntries { get; set; } = [];
+
         [XmlElement("DepotsAllowed")]
         public SimpleXmlHashSet<ushort> DepotsAllowed { get; set; } = [];
 
