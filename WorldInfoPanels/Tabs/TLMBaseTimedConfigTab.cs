@@ -131,7 +131,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void RecountRows()
         {
-
             var rulesCount = Config.Count;
             var newRows = m_timeRows.SetItemCount(rulesCount);
             for (int i = 0; i < rulesCount; i++)
@@ -140,7 +139,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 controller.SetSliderParams(GetColorForNumber(i), GetMaxSliderValue());
                 controller.Entry = Config[i];
                 controller.OnTimeChanged = SetTime;
-                controller.OnDie = RemoveTime;
+                controller.OnDie = rulesCount > 1 ? RemoveTime : null;
                 controller.OnBudgetChanged = SetValue;
             }
             ReorderLines();
@@ -195,7 +194,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
             Config.RemoveAtHour(entry.HourOfDay ?? -1); // remove AFTER assets are fixed
             m_isDirty = true;
-            UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
+            UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(UVMBudgetConfigTab));
         }
         private void SetTime(V idx, int val)
         {
@@ -222,7 +221,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 extension.AddDefaultToNewBudgetEntry(lineId);
             }
             RebuildList();
-            UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
+            UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(UVMBudgetConfigTab));
         }
 
 

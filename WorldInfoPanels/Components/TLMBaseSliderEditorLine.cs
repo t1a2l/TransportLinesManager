@@ -37,7 +37,23 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 FillData();
             }
         }
-        public Action<V> OnDie;
+
+        private Action<V> m_onDie;
+
+        public Action<V> OnDie
+        {
+            get => m_onDie;
+            set
+            {
+                m_onDie = value;
+                if (m_die != null)
+                {
+                    m_die.isVisible = value != null;
+                    m_die.isInteractive = value != null;
+                }
+            }
+        }
+
         public Action<V, int> OnTimeChanged;
         public Action<V, float> OnBudgetChanged;
         private V m_entry;
@@ -90,7 +106,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 SetValue(val);
             };
             m_die = Find<UIButton>("Delete");
-            m_die.eventClick += (component, eventParam) => OnDie?.Invoke(Entry);
+            m_die.eventClick += (component, eventParam) => m_onDie?.Invoke(Entry);
             MonoUtils.LimitWidthAndBox(m_value, 60, out UIPanel container, true);
 
             container.AttachUIComponent(m_valueField.gameObject);
