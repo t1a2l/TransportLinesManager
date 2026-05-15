@@ -24,7 +24,7 @@ namespace TransportLinesManager.Utils
             {
                 var data = TLMBaseConfigXML.CurrentContextConfig.GetAutoNameData(serviceFound);
                 prefix = data?.NamingPrefix?.Trim();
-                namingType = NamingTypeExtensions.From(serviceFound);
+                namingType = NamingTypeExtensions.From(serviceFound, subserviceFound);
 
             }
             else

@@ -28,7 +28,7 @@ namespace TransportLinesManager.Utils
                 NamingType.FIREDEPARTMENT => 0x0000000b,
                 NamingType.EDUCATION => 0x0000000c,
                 NamingType.DISASTER => 0x0000000d,
-                NamingType.GARBAGE => 0x0000000f,
+                NamingType.UTILITY => 0x0000000f,
                 NamingType.PARKAREA => 0x00000010,
                 NamingType.DISTRICT => 0x00000010,
                 NamingType.INDUSTRY_AREA => 0x00000010,
@@ -38,6 +38,10 @@ namespace TransportLinesManager.Utils
                 NamingType.TROLLEY => 0x00000006,
                 NamingType.HELICOPTER => 0x00000001,
                 NamingType.TERMINAL => -0x00000020,
+                NamingType.BANK => 0x0000000b,
+                NamingType.SERVICE_POINT => 0x0000000f,
+                NamingType.HOTEL => 0x0000000e,
+                NamingType.RACE => 0x00000005,
                 _ => 0x7FFFFFFF,
             };
         }
@@ -57,7 +61,7 @@ namespace TransportLinesManager.Utils
                     : tsd == TransportSystemDefinition.TOUR_BUS ? NamingType.TOUR_BUS
                     : NamingType.NONE;
 
-        public static NamingType From(ItemClass.Service service)
+        public static NamingType From(ItemClass.Service service, ItemClass.SubService subService)
         {
             switch (service)
             {
@@ -66,13 +70,14 @@ namespace TransportLinesManager.Utils
                 case ItemClass.Service.Fishing:
                 case ItemClass.Service.Beautification: return NamingType.BEAUTIFICATION;
                 case ItemClass.Service.HealthCare: return NamingType.HEALTHCARE;
-                case ItemClass.Service.PoliceDepartment: return NamingType.POLICEDEPARTMENT;
+                case ItemClass.Service.PoliceDepartment when subService != ItemClass.SubService.PoliceDepartmentBank: return NamingType.POLICEDEPARTMENT;
+                case ItemClass.Service.PoliceDepartment when subService == ItemClass.SubService.PoliceDepartmentBank: return NamingType.BANK;
                 case ItemClass.Service.FireDepartment: return NamingType.FIREDEPARTMENT;
                 case ItemClass.Service.Education: return NamingType.EDUCATION;
                 case ItemClass.Service.Disaster: return NamingType.DISASTER;
                 case ItemClass.Service.Water:
                 case ItemClass.Service.Electricity:
-                case ItemClass.Service.Garbage: return NamingType.GARBAGE;
+                case ItemClass.Service.Garbage: return NamingType.UTILITY;
                 case ItemClass.Service.VarsitySports:
                 case ItemClass.Service.PlayerEducation:
                 case ItemClass.Service.Museums: return NamingType.CAMPUS;
@@ -81,6 +86,9 @@ namespace TransportLinesManager.Utils
                 case ItemClass.Service.Residential:
                 case ItemClass.Service.Industrial:
                 case ItemClass.Service.Commercial: return NamingType.RICO;
+                case ItemClass.Service.ServicePoint: return NamingType.SERVICE_POINT;
+                case ItemClass.Service.Hotel: return NamingType.HOTEL;
+                case ItemClass.Service.Race: return NamingType.RACE;
                 default:
                     LogUtils.DoErrorLog($"UNREGISTRED NAMING TYPE:{service}");
                     return NamingType.NONE;

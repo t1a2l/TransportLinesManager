@@ -186,7 +186,7 @@ namespace TransportLinesManager.Utils
             string name = TLMBuildingUtils.GetBuildingDetails(buildingID, out serviceFound, out subserviceFound, out prefix, out resultNamingType);
             if (resultNamingType == NamingType.NONE)
             {
-                resultNamingType = NamingTypeExtensions.From(serviceFound);
+                resultNamingType = NamingTypeExtensions.From(serviceFound, subserviceFound);
             }
             return name;
         }

@@ -21,7 +21,7 @@
         FIREDEPARTMENT,
         EDUCATION,
         DISASTER,
-        GARBAGE,
+        UTILITY,
         CAMPUS,
         PARKAREA,
         INDUSTRY_AREA,
@@ -30,7 +30,11 @@
         RICO,
         TROLLEY,
         HELICOPTER,
-        TERMINAL
+        TERMINAL,
+        BANK,
+        SERVICE_POINT,
+        HOTEL,
+        RACE
     }
 
 }
