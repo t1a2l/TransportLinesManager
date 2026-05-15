@@ -65,27 +65,17 @@ namespace TransportLinesManager.ModShared
         public event Action<ushort> EventLineDestinationsChanged;
         public event Action<ushort> EventRegionalLineParameterChanged;
 
-        [Obsolete("Use version with regional line flag", true)]
-        public static string GetFullStationName(ushort stopId, ushort lineId, ItemClass.SubService subService) =>
-             GetFullStationName(stopId, lineId, false, subService);
         public ushort GetVehicleLine(ushort vehicleId, out bool regional) => TLMVehicleUtils.GetVehicleLine(vehicleId, out regional);
         public static string GetFullStationName(ushort stopId, ushort lineId, bool regional, ItemClass.SubService subService) =>
             stopId == 0 ? ""
                 : TLMLineUtils.IsRoadLine(lineId, regional) ? TLMStationUtils.GetFullStationName(stopId, lineId, subService, regional)
                 : TLMStationUtils.GetStationName(stopId, lineId, subService, regional);
 
-        [Obsolete("Use version with regional line flag", true)]
-        public static Tuple<string, Color, string> GetIconStringParameters(ushort lineID) => TLMLineUtils.GetIconStringParameters(lineID, false);
         public static int GetStopLine(ushort stopId, out bool isBuilding) => TLMLineUtils.GetStopLine(stopId, out isBuilding);
         public static string GetLineName(ushort lineId, bool regional) => TLMLineUtils.GetLineName(lineId, regional);
         public static Tuple<string, Color, string> GetIconStringParameters(ushort lineID, bool regionalLine) => TLMLineUtils.GetIconStringParameters(lineID, regionalLine);
-        [Obsolete("Use version with regional line flag", true)]
-        public static ushort GetStationBuilding(ushort stopId, ushort lineId) => TLMStationUtils.GetStationBuilding(stopId, lineId, false);
         public static Color GetLineColor(ushort lineId, bool regional) => TLMLineUtils.GetLineColor(lineId, regional);
         public static ushort GetStationBuilding(ushort stopId, ushort lineId, bool regional) => TLMStationUtils.GetStationBuilding(stopId, lineId, regional);
-
-        [Obsolete("Use version with regional line flag", true)]
-        public static string GetLineSortString(ushort lineId, ref TransportLine transportLine) => TLMLineUtils.GetLineSortString(lineId, false);
         public static string GetLineSortString(ushort lineId, bool regional) => TLMLineUtils.GetLineSortString(lineId, regional);
 
         public string GetVehicleIdentifier(ushort vehicleId)
@@ -275,33 +265,12 @@ namespace TransportLinesManager.ModShared
             }
             return result.Replace("\0", "").Trim();
         }
-        [Obsolete("Deprecated in TLM14, use the alternative signature with destination list.", true)]
-        public static void CalculateAutoName(ushort lineId, out ushort startStation, out ushort endStation, out string startStationStr, out string endStationStr)
-        {
-            TLMLineUtils.CalculateAutoName(lineId, false, out List<DestinationPoco> destinations);
-            if (destinations.Count > 0)
-            {
-                startStation = destinations.First().stopId;
-                endStation = destinations.Last().stopId;
-                startStationStr = destinations.First().stopName;
-                endStationStr = destinations.Last().stopName;
-            }
-            else
-            {
-                startStation = endStation = 0;
-                startStationStr = endStationStr = null;
-            }
 
-        }
-        [Obsolete("Deprecated in TLM14, use the alternative signature with regional parameter.", true)]
-        public static void CalculateAutoName(ushort lineId, out List<DestinationPoco> destinations)
-            => TLMLineUtils.CalculateAutoName(lineId, false, out destinations);
         public static void CalculateAutoName(ushort lineId, bool regional, out List<DestinationPoco> destinations)
             => TLMLineUtils.CalculateAutoName(lineId, regional, out destinations);
 
-        [Obsolete("Use version with boolean indicator for regional lines", true)]
-        public static string GetLineStringId(ushort lineId) => TLMLineUtils.GetLineStringId(lineId, false);
         public static string GetLineStringId(ushort lineId, bool regionalLine) => TLMLineUtils.GetLineStringId(lineId, regionalLine);
+
         public static bool GetRegionalLineParameters(ushort buildingStopId, out string Identifier, out string formatBg, out Color color)
         {
             if (TransportLinesManagerMod.Controller.BuildingLines[buildingStopId] is InnerBuildingLine ibl && ibl.LineDataObject is OutsideConnectionLineInfo ocli)
