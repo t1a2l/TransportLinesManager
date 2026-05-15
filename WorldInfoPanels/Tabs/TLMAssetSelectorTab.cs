@@ -248,6 +248,12 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 MainPanel.isVisible = false;
                 return;
             }
+
+            UVMPublicTransportWorldInfoPanel.GetLineID(out _, out bool fromBuilding);
+            m_timeBudgetSelect.isVisible = !fromBuilding;
+            m_weightColumnHeader.isVisible = !fromBuilding;
+            m_vehicleCountLabel.isVisible = !fromBuilding;
+
             LogUtils.DoLog("tsd = {0}", tsd);
             IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
 
@@ -294,22 +300,27 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 config.SetAssetListForLine(lineId, []);
                 config.SetAssetTransportListForLine(lineId, allowedTransportAssets);
             }
-            string[] budgetArr = new string[currentConfig.BudgetEntries.Count];
-            int index = 0;
-            int[] temp = new int[currentConfig.BudgetEntries.Count];
-            foreach (var item in currentConfig.BudgetEntries)
+
+            UVMPublicTransportWorldInfoPanel.GetLineID(out _, out bool fromBuilding);
+            if (!fromBuilding)
             {
-                temp[index] = (int)item.HourOfDay;
-                index++;
+                string[] budgetArr = new string[currentConfig.BudgetEntries.Count];
+                int index = 0;
+                int[] temp = new int[currentConfig.BudgetEntries.Count];
+                foreach (var item in currentConfig.BudgetEntries)
+                {
+                    temp[index] = (int)item.HourOfDay;
+                    index++;
+                }
+                Array.Sort(temp);
+                for (int i = 0; i < temp.Length; i++)
+                {
+                    budgetArr[i] = temp[i].ToString();
+                }
+                m_timeBudgetSelect.items = budgetArr;
+                m_timeBudgetSelect.selectedIndex = 0;
+                UpdateModeIndicator(lineId, 0);
             }
-            Array.Sort(temp);
-            for (int i = 0; i < temp.Length; i++)
-            {
-                budgetArr[i] = temp[i].ToString();
-            }
-            m_timeBudgetSelect.items = budgetArr;
-            m_timeBudgetSelect.selectedIndex = 0;
-            UpdateModeIndicator(lineId, 0);
 
             if (TransportLinesManagerMod.DebugMode)
             {

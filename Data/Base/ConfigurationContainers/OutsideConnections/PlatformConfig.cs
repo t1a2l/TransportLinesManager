@@ -142,6 +142,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnect
                     }
                     instance.m_nodes.m_buffer[result.m_nodeStation].m_flags |= NetNode.Flags.Fixed;
                     instance.m_nodes.m_buffer[result.m_nodeStation].m_lane = PlatformLaneId;
+                    instance.m_nodes.m_buffer[result.m_nodeStation].m_maxWaitTime = 0;
                     instance.UpdateNode(result.m_nodeStation);
                     instance.m_nodes.m_buffer[result.m_nodeStation].m_nextBuildingNode = stationBuilding.m_netNode;
                     stationBuilding.m_netNode = result.m_nodeStation;
@@ -154,6 +155,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnect
                     {
                         instance.m_nodes.m_buffer[result.m_nodeOutsideConnection].m_flags |= NetNode.Flags.Disabled;
                     }
+                    instance.m_nodes.m_buffer[result.m_nodeOutsideConnection].m_maxWaitTime = 0;
                     instance.UpdateNode(result.m_nodeOutsideConnection);
                     instance.m_nodes.m_buffer[result.m_nodeOutsideConnection].m_nextBuildingNode = stationBuilding.m_netNode;
                     stationBuilding.m_netNode = result.m_nodeOutsideConnection;
@@ -181,6 +183,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnect
                         {
                             instance.m_nodes.m_buffer[result.m_nodeVirtual].m_flags |= NetNode.Flags.Disabled;
                         }
+                        instance.m_nodes.m_buffer[result.m_nodeVirtual].m_maxWaitTime = 0;
                         instance.UpdateNode(result.m_nodeVirtual);
                         instance.m_nodes.m_buffer[result.m_nodeVirtual].m_nextBuildingNode = stationBuilding.m_netNode;
                         stationBuilding.m_netNode = result.m_nodeVirtual;

@@ -34,6 +34,7 @@ namespace TransportLinesManager.Data.Extensions
             {
                 return;
             }
+
             var item = new TransportAsset
             {
                 name = assetId,
@@ -41,47 +42,52 @@ namespace TransportLinesManager.Data.Extensions
                 count = [],
                 spawn_percent = []
             };
-            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
-            {
-                var count = new CountEntry
-                {
-                    TotalCount = 0,
-                    UsedCount = 0
-                };
-                item.count.Add(i.ToString(), count);
 
-                var spawnPercent = new SpawnPercentEntry
+            bool isIntercity = lineId == 0;
+            if (!isIntercity)
+            {    
+                for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
                 {
-                    Value = 100
-                };
-                item.spawn_percent.Add(i.ToString(), spawnPercent);
-            }
-            var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
-            if (index == -1)
-            {
-                index = 0;
-            }
-            if (isAbsolute)
-            {
-                var totalCount = 0;
-                for (int i = 0; i < list.Count; i++)
-                {
-                    totalCount += list[i].count[index.ToString()].TotalCount;
+                    var count = new CountEntry
+                    {
+                        TotalCount = 0,
+                        UsedCount = 0
+                    };
+                    item.count.Add(i.ToString(), count);
+
+                    var spawnPercent = new SpawnPercentEntry
+                    {
+                        Value = 100
+                    };
+                    item.spawn_percent.Add(i.ToString(), spawnPercent);
                 }
-                var newCount = int.Parse(weight);
-                // check if the new total is more then allowed if so make it zero
-                if(totalCount + newCount > currentConfig.BudgetEntries[index].Value)
+                var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
+                if (index == -1)
                 {
-                    newCount = 0;
+                    index = 0;
                 }
-                var item_count = item.count[index.ToString()];
-                item_count.TotalCount = newCount;
-                item.count[index.ToString()] = item_count;
-            }
-            else
-            {
-                int parsedWeight = int.Parse(weight);
-                item.spawn_percent[index.ToString()].Value = parsedWeight > 0 ? parsedWeight : 100;
+                if (isAbsolute)
+                {
+                    var totalCount = 0;
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        totalCount += list[i].count[index.ToString()].TotalCount;
+                    }
+                    var newCount = int.Parse(weight);
+                    // check if the new total is more then allowed if so make it zero
+                    if (totalCount + newCount > currentConfig.BudgetEntries[index].Value)
+                    {
+                        newCount = 0;
+                    }
+                    var item_count = item.count[index.ToString()];
+                    item_count.TotalCount = newCount;
+                    item.count[index.ToString()] = item_count;
+                }
+                else
+                {
+                    int parsedWeight = int.Parse(weight);
+                    item.spawn_percent[index.ToString()].Value = parsedWeight > 0 ? parsedWeight : 100;
+                }
             }
             list.Add(item);
             SetAssetTransportListForLine(it, lineId, list);

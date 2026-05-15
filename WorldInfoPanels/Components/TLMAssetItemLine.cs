@@ -83,7 +83,10 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             var tsd = TransportSystemDefinition.From(info);
             UpdateMaintenanceCost(info, tsd);
 
-            bool isCustomConfig = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId);
+            bool isIntercity = lineId == 0;
+            m_weightEditor.isVisible = !isIntercity;
+
+            bool isCustomConfig = !isIntercity && TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId);
             bool isAbsolute = isCustomConfig && UVMBudgetConfigTab.IsAbsoluteValue();
 
             if (isAllowed)
