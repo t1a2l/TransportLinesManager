@@ -283,6 +283,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
             }
             return m_basicAssetsList;
         }
+
         public VehicleInfo GetAModel(ushort lineID, string status)
         {
             VehicleInfo info = null;
@@ -292,13 +293,17 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 info = VehicleUtils.GetModelByPercentageOrCount(assetList, lineID, out string modelName, status);
                 if (info == null)
                 {
+                    if (string.IsNullOrEmpty(modelName))
+                    {
+                        LogUtils.DoErrorLog($"GetAModel: GetModelByPercentageOrCount returned null model name for line {lineId} — breaking to avoid infinite loop");
+                        break;
+                    }
                     ExtensionStaticExtensionMethods.RemoveAssetFromLine(this, lineID, modelName);
                     assetList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
                 }
             }
             return info;
         }
-
 
         public void EditVehicleUsedCount(ushort lineID, string selectedModel, string status)
         {

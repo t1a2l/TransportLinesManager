@@ -146,6 +146,7 @@ namespace TransportLinesManager.Data.Extensions
 
         public static void RemoveAssetFromLine<T>(this T it, ushort lineId, string assetId) where T : IAssetSelectorExtension
         {
+            if (string.IsNullOrEmpty(assetId)) return; // guard against null loop
             List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
             if (!list.Any(item => item.name == assetId))
             {

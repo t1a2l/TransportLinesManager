@@ -78,6 +78,11 @@ namespace TransportLinesManager.Data.DataContainers
                 info = VehicleUtils.GetModelByPercentageOrCount(assetTransportList, lineId, out string modelName, status);
                 if (info == null)
                 {
+                    if (string.IsNullOrEmpty(modelName))
+                    {
+                        LogUtils.DoErrorLog($"GetAModel: GetModelByPercentageOrCount returned null model name for line {lineId} — breaking to avoid infinite loop");
+                        break;
+                    }
                     ExtensionStaticExtensionMethods.RemoveAssetFromLine(this, lineId, modelName);
                     assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineId);
                 }
