@@ -295,7 +295,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 {
                     if (string.IsNullOrEmpty(modelName))
                     {
-                        LogUtils.DoErrorLog($"GetAModel: GetModelByPercentageOrCount returned null model name for line {lineId} — breaking to avoid infinite loop");
+                        LogUtils.DoErrorLog($"GetAModel: GetModelByPercentageOrCount returned null model name for line {lineID} — breaking to avoid infinite loop");
                         break;
                     }
                     ExtensionStaticExtensionMethods.RemoveAssetFromLine(this, lineID, modelName);
