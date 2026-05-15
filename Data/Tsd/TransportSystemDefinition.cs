@@ -343,7 +343,13 @@ namespace TransportLinesManager.Data.Tsd
             && x.VehicleType == info.m_vehicleType
             && x.TransportType == info.m_transportType
             && (x.Level == info.GetClassLevel() || x.LevelAdditional == info.GetClassLevel()));
-            if (result == default)
+
+            // Don't log error if this is an intercity asset — FromIntercity will handle it
+            if (result == default && !registeredTsd.Values.Any(x =>
+                x.SubService == info.m_class.m_subService
+                && x.VehicleType == info.m_vehicleType
+                && x.TransportType == info.m_transportType
+                && x.LevelIntercity == info.GetClassLevel()))
             {
                 LogUtils.DoErrorLog($"Local TSD NOT FOUND FOR TRANSPORT INFO: info.m_class.m_subService={info.m_class.m_subService}, info.m_vehicleType={info.m_vehicleType}, info.m_transportType={info.m_transportType}, info.classLevel = {info.GetClassLevel()}");
             }

@@ -361,7 +361,13 @@ namespace TransportLinesManager.WorldInfoPanels
             return false;
         }
 
-        internal static TransportSystemDefinition GetCurrentTSD() => GetLineID(out ushort lineId, out bool fromBuilding) && (lineId > 0 || fromBuilding) ? TransportSystemDefinition.FromLineId(lineId, fromBuilding) : TransportSystemDefinition.FromIndex(m_obj.CurrentInstanceID.Index);
+        internal static TransportSystemDefinition GetCurrentTSD()  
+        {
+            if (!GetLineID(out ushort lineId, out bool fromBuilding) && (lineId > 0 || fromBuilding)) return null;
+            if (lineId > 0 || fromBuilding) return TransportSystemDefinition.FromLineId(lineId, fromBuilding);
+            if (m_obj.CurrentInstanceID.Type == (InstanceType)TLMInstanceType.TransportSystemDefinition) return TransportSystemDefinition.FromIndex(m_obj.CurrentInstanceID.Index);
+            return null;
+        }
 
         internal static void ForceReload() => OnSetTarget();
 
