@@ -8,6 +8,7 @@ using TransportLinesManager.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.Collections;
 
 namespace TransportLinesManager.Cache.BuildingData
 {
@@ -129,6 +130,7 @@ namespace TransportLinesManager.Cache.BuildingData
         }
 
         private StopPointDescriptorLanes[] MapStopPoints() => MapStopPoints(BuildingId, 1f);
+
         private StopPointDescriptorLanes[] MapStopPoints(ushort buildingId, float thresold, bool isSubBuilding = false)
         {
             var result = new List<StopPointDescriptorLanes>();
@@ -297,6 +299,7 @@ namespace TransportLinesManager.Cache.BuildingData
             }
             return false;
         }
+
         internal void GetPlatformData(ushort platformIdx, out PlatformConfig dataObj)
         {
             var targetLaneIdx = StopPoints[platformIdx];
@@ -306,16 +309,24 @@ namespace TransportLinesManager.Cache.BuildingData
                 dataObj.VehicleLaneId = targetLaneIdx.laneId;
             }
         }
+
         public void AddRegionalLine(ushort platformId, ushort outsideConnectionId, string name, Color clr)
         {
             GetPlatformData(platformId, out PlatformConfig dataObj);
             dataObj.AddDestination(BuildingId, outsideConnectionId, name, clr);
-            RemapLines();
+            TransportLinesManagerMod.Controller.StartCoroutine(RemapLinesNextFrame());
         }
+
         public void RemoveRegionalLine(ushort platformId, ushort outsideConnectionId)
         {
             GetPlatformData(platformId, out PlatformConfig dataObj);
             dataObj.RemoveDestination(BuildingId, outsideConnectionId);
+            RemapLines();
+        }
+
+        private IEnumerator RemapLinesNextFrame()
+        {
+            yield return null; // wait one simulation frame
             RemapLines();
         }
 
