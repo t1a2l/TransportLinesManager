@@ -395,28 +395,29 @@ namespace TransportLinesManager.WorldInfoPanels
                     // 4 switch cases for each of 4 unscaled display states
                     float weightingPrev, weightingNext;
                     var vehicle_flags = Singleton<VehicleManager>.instance.m_vehicles.m_buffer[vehicleId].m_flags;
-                    if ((vehicle_flags & (Vehicle.Flags.Leaving)) != 0)
+                    if ((vehicle_flags & (Vehicle.Flags.Stopped)) != 0)
                     {
-                        // vehicle stopped at a stop; current stop is "prev" because next stop is "next"
+                        // vehicle is at a stop with doors open — sits exactly on prevStop
                         weightingPrev = 1;
                         weightingNext = 0;
                     }
-                    else if ((vehicle_flags & (Vehicle.Flags.Arriving)) != 0)
+                    else if ((vehicle_flags & (Vehicle.Flags.Leaving)) != 0)
                     {
-                        // vehicle departing from a stop
+                        // vehicle just departed, still close to the stop it left
                         weightingPrev = 0.75f;
                         weightingNext = 0.25f;
                     }
-                    else if ((vehicle_flags & (Vehicle.Flags.Stopped)) != 0)
+                    else if ((vehicle_flags & (Vehicle.Flags.Arriving)) != 0)
                     {
-                        // vehicle arriving at the next stop
+                        // vehicle approaching next stop, almost there
                         weightingPrev = 0.25f;
                         weightingNext = 0.75f;
                     }
                     else
                     {
-                        // vehicle in progress to next stop
-                        weightingPrev = weightingNext = 0.5f;
+                        // vehicle in transit, midway between stops
+                        weightingPrev = 0.5f;
+                        weightingNext = 0.5f;
                     }
                     // apply the basic relative position first
                     relativePosition.y = prevStationIdx * weightingPrev + nextStationIdx * weightingNext;
