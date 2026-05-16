@@ -1,14 +1,15 @@
-﻿using ColossalFramework;
-using HarmonyLib;
+﻿using System;
+using System.Reflection;
+using ColossalFramework;
 using Commons.Extensions;
 using Commons.Utils;
-using TransportLinesManager.Data.Tsd;
+using HarmonyLib;
 using TransportLinesManager.Data.DataContainers;
 using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Data.Managers;
+using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Interfaces;
 using TransportLinesManager.Utils;
-using System;
-using System.Reflection;
 using UnityEngine;
 
 namespace TransportLinesManager.Overrides
@@ -136,6 +137,23 @@ namespace TransportLinesManager.Overrides
             }
             return true;
 
+        }
+
+        [HarmonyPatch(typeof(VehicleAI), "GetMaintenanceCost")]
+        [HarmonyPostfix]
+        public static void PostfixGetMaintenanceCost(ushort vehicleID, ref Vehicle vehicleData, ref int __result)
+        {
+            if (__result <= 0 || vehicleData.m_transportLine == 0)
+            {
+                return;
+            }
+
+            // The game calls GetMaintenanceCost once per simulation frame for each active vehicle.
+            // __result is in game currency units (same scale as ticket prices).
+            // We record it on both the vehicle and its line for accurate per-vehicle breakdown.
+            ushort lineId = vehicleData.m_transportLine;
+            TLMTransportLineStatusesManager.instance.AddExpenseToVehicle(vehicleID, __result);
+            TLMTransportLineStatusesManager.instance.AddExpenseToLine(lineId, __result);
         }
 
         private static bool CheckDespawn(ushort vehicleID, ref Vehicle vehicleData, bool isEmpty = false)
