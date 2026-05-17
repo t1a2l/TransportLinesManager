@@ -74,16 +74,6 @@ namespace TransportLinesManager.Data.Managers
         
         public void AddToStop(ushort stopId, long income, ref Citizen citizenData) => IncrementInArray(stopId, ref m_stopDataLong, ref m_stopDataInt, (int)StopDataLong.INCOME, null, (int)StopDataSmallInt.TOTAL_PASSENGERS, (int)StopDataSmallInt.TOURIST_PASSENGERS, (int)StopDataSmallInt.STUDENT_PASSENGERS, income, 0, ref citizenData);
 
-        public void AddExpenseToLine(ushort lineId, long expense)
-        {
-            m_linesDataLong[(lineId * CYCLES_HISTORY_ARRAY_SIZE) + CYCLES_CURRENT_DATA_IDX][(int)LineDataLong.EXPENSE] += expense;
-        }
-
-        public void AddExpenseToVehicle(ushort vehicleId, long expense)
-        {
-            m_vehiclesDataLong[(vehicleId * CYCLES_HISTORY_ARRAY_SIZE) + CYCLES_CURRENT_DATA_IDX][(int)VehicleDataLong.EXPENSE] += expense;
-        }
-
         private void IncrementInArray(ushort id, ref long[][] arrayRef, ref int[][] arrayRefInt, int incomeIdx, int? expenseIdx, int totalPassIdx, int tourPassIdx, int studPassIdx, long income, long expense, ref Citizen citizenData)
         {
             arrayRef[(id * CYCLES_HISTORY_ARRAY_SIZE) + CYCLES_CURRENT_DATA_IDX][incomeIdx] += income;
