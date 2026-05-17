@@ -6,7 +6,6 @@ using Commons.Utils;
 using Commons.Utils.UtilitiesClasses;
 using TransportLinesManager.Data.Base;
 using TransportLinesManager.Data.Tsd;
-using TransportLinesManager.UI;
 using TransportLinesManager.WorldInfoPanels.Components;
 using System;
 using System.Collections.Generic;
@@ -204,9 +203,44 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void SetValue(V idx, float val)
         {
-            if (idx.Value != (uint)val)
+            uint oldVal = idx.Value;
+            if (oldVal != (uint)val)
             {
                 idx.Value = (uint)val;
+
+                // Hook: if in count mode, reconcile counts for this budget index
+                if (UVMBudgetConfigTab.IsAbsoluteValue()
+                    && UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding)
+                    && !fromBuilding && lineId > 0)
+                {
+                    int budgetIndex = -1;
+                    for (int i = 0; i < Config.Count; i++)
+                    {
+                        if (Config[i] == idx)
+                        {
+                            budgetIndex = i;
+                            break;
+                        }
+                    }
+                    if (budgetIndex == -1) return; // safety guard
+                    IBasicExtension ext = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
+                    List<TransportAsset> assets = ext.GetAssetTransportListForLine(lineId);
+
+                    int projected = TLMLineUtils.ProjectTargetVehicleCount(
+                        TransportManager.instance.m_lines.m_buffer[lineId].Info,
+                        TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength,
+                        idx.Value / 100f);
+
+                    int oldProjected = TLMLineUtils.ProjectTargetVehicleCount(
+                        TransportManager.instance.m_lines.m_buffer[lineId].Info,
+                        TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength,
+                        oldVal / 100f);
+
+                    TLMCountModeUtils.OnBudgetChangedInCountMode(lineId, ext, budgetIndex, projected, oldProjected);
+                    ext.SetAssetTransportListForLine(lineId, assets); // persist
+                    UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
+                }
+
                 ReorderLines();
             }
         }

@@ -211,6 +211,17 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                             var item_count = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()] : new CountEntry();
                             item_count.TotalCount = value;
                             asset.count[index.ToString()] = item_count;
+
+                            allowedTransportAssets[asset_index] = asset; // update list first so ReconcileOverAssigned sees new value
+                            int newBudget = TLMCountModeUtils.ReconcileOverAssigned(allowedTransportAssets, index.ToString(), maxVehicles);
+                            if (newBudget > maxVehicles)
+                            {
+                                m_weightEditor.tooltip = string.Format(Locale.Get("TLM_BUDGET_RAISED_TO_MATCH"), newBudget);
+                            }
+                            else
+                            {
+                                m_weightEditor.tooltip = Locale.Get("TLM_ASSET_COUNT_FIELD_DESCRIPTION");
+                            }
                         }
                         else
                         {

@@ -8,6 +8,8 @@ using TransportLinesManager.WorldInfoPanels.Components;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using TransportLinesManager.Interfaces;
+using TransportLinesManager.Data.Extensions;
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
@@ -15,21 +17,43 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
     public class UVMBudgetConfigTab : TLMBaseTimedConfigTab<UVMBudgetConfigTab, UVMBudgetTimeChart, UVMBudgetEditorLine, BudgetEntryXml>
     {
         private UICheckBox m_showAbsoluteCheckbox;
+
         public override string GetTitleLocale() => "TLM_PER_HOUR_BUDGET_TITLE";
+
         public override string GetValueColumnLocale() => "TLM_BUDGET";
+
         public override float GetMaxSliderValue() => 500;
+
         public override void ExtraAwake()
         {
-            m_showAbsoluteCheckbox = m_uiHelper.AddCheckboxLocale("TLM_SHOW_ABSOLUTE_VALUE", false, (x) =>
+            m_showAbsoluteCheckbox = m_uiHelper.AddCheckboxLocale("TLM_SHOW_ABSOLUTE_VALUE", false, (isAbsolute) =>
             {
-                if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
+                if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && !fromBuilding)
                 {
-                    if (!fromBuilding)
+                    TLMTransportLineExtension.Instance.SetDisplayAbsoluteValues(lineId, isAbsolute);
+
+                    IBasicExtension ext = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
+                    List<TransportAsset> assets = ext.GetAssetTransportListForLine(lineId);
+                    IBasicExtensionStorage cfg = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+
+                    for (int i = 0; i < cfg.BudgetEntries.Count; i++)
                     {
-                        TLMTransportLineExtension.Instance.SetDisplayAbsoluteValues(lineId, x);
-                        RebuildList();
+                        string key = i.ToString();
+                        float pct = cfg.BudgetEntries[i].Value / 100f;
+                        int budget = TLMLineUtils.ProjectTargetVehicleCount(
+                            TransportManager.instance.m_lines.m_buffer[lineId].Info,
+                            TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength, pct);
+
+                        if (isAbsolute) // percent → count
+                            TLMCountModeUtils.ConvertPercentToCount(assets, key, budget);
+                        else            // count → percent
+                            TLMCountModeUtils.ConvertCountToPercent(assets, key, budget);
                     }
-                }              
+
+                    ext.SetAssetTransportListForLine(lineId, assets);
+                    RebuildList();
+                    UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
+                }
             });
             MonoUtils.LimitWidthAndBox(m_showAbsoluteCheckbox.label, m_uiHelper.Self.width - 40f);
         }
@@ -55,11 +79,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         ];
 
         public static bool IsAbsoluteValue() => Instance.m_showAbsoluteCheckbox.isChecked;
+
         protected override TimeableList<BudgetEntryXml> Config
             => UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && !fromBuilding
             ? TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries
             : null;
-
 
         protected override BudgetEntryXml DefaultEntry()
         {
@@ -73,7 +97,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 Value = 100
             };
         }
+
         public override string GetTemplateName() => UVMBudgetEditorLine.BUDGET_LINE_TEMPLATE;
+
         public override void EnsureTemplate() => UVMBudgetEditorLine.EnsureTemplate();
     }
 }

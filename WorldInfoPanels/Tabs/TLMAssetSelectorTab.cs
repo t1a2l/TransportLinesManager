@@ -471,7 +471,20 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     float lineLength = TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength;
                     TransportInfo info = TransportManager.instance.m_lines.m_buffer[lineId].Info;
                     int maxVehicles = TLMLineUtils.ProjectTargetVehicleCount(info, lineLength, budgetPercent);
-                    m_vehicleCountLabel.text = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES"), maxVehicles);
+                    IBasicExtension ext = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
+                    List<TransportAsset> assets = ext.GetAssetTransportListForLine(lineId);
+                    int unassigned = TLMCountModeUtils.GetUnassignedCount(assets, budgetIndex.ToString(), maxVehicles);
+
+                    bool allZero = assets.Count > 0 && assets.All(a => !a.count.TryGetValue(budgetIndex.ToString(), out var ce) || ce.TotalCount == 0);
+
+                    if (unassigned > 0)
+                        m_vehicleCountLabel.text = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES_WITH_UNASSIGNED"), maxVehicles, unassigned);
+                    // e.g. "Max: 7 (2 unassigned)"
+                    else if (allZero && maxVehicles > 0)
+                        m_vehicleCountLabel.tooltip = Locale.Get("TLM_NO_VEHICLES_ASSIGNED_WARNING");
+                    // "No vehicles assigned for this time period"
+                    else
+                        m_vehicleCountLabel.text = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES"), maxVehicles);
                     m_vehicleCountLabel.isVisible = true;
                 }
             }
