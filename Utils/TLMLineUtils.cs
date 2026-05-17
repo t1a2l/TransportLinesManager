@@ -23,6 +23,33 @@ namespace TransportLinesManager.Utils
 {
     internal class TLMLineUtils
     {
+        public static readonly NamingMode[] m_numberedNamingTypes =
+        [
+            NamingMode. LatinLowerNumber ,
+            NamingMode. LatinUpperNumber ,
+            NamingMode. GreekLowerNumber,
+            NamingMode. GreekUpperNumber,
+            NamingMode. CyrillicLowerNumber,
+            NamingMode. CyrillicUpperUpper
+        ];
+
+        public static readonly TransferManager.TransferReason[] defaultAllowedVehicleTypes = [
+            TransferManager.TransferReason.Blimp ,
+            TransferManager.TransferReason.CableCar ,
+            TransferManager.TransferReason.Ferry ,
+            TransferManager.TransferReason.MetroTrain ,
+            TransferManager.TransferReason.Monorail ,
+            TransferManager.TransferReason.PassengerTrain ,
+            TransferManager.TransferReason.PassengerPlane ,
+            TransferManager.TransferReason.PassengerShip ,
+            TransferManager.TransferReason.Tram ,
+            TransferManager.TransferReason.Bus
+        ];
+
+        private static int colorChangeCooldown = 0;
+
+        private static readonly Dictionary<ushort, Color> colorChangeTarget = [];
+
         public static void GetQuantityPassengerWaiting(ushort currentStop, out int residents, out int tourists, out int timeTilBored)
         {
             var residentsIn = 0;
@@ -46,7 +73,6 @@ namespace TransportLinesManager.Utils
             tourists = touristsIn;
             timeTilBored = timeTilBoredIn;
         }
-
 
         public static void DoWithEachPassengerWaiting(ushort currentStop, Action<ushort> actionToDo)
         {
@@ -97,7 +123,7 @@ namespace TransportLinesManager.Utils
             }
         }
 
-        internal static string GetLineName(ushort lineId, bool regional)
+        public static string GetLineName(ushort lineId, bool regional)
         {
             if (!regional)
             {
@@ -113,7 +139,8 @@ namespace TransportLinesManager.Utils
                 return string.Format(Locale.Get("TLM_OUTSIDECONNECTION_TARGETCITYTEMPLATE"), TLMStationUtils.GetStationName(lineObj.DstStop, lineId, lineObj.Info.m_class.m_subService, true));
             }
         }
-        internal static int GetStopLine(ushort stopId, out bool isBuilding)
+
+        public static int GetStopLine(ushort stopId, out bool isBuilding)
         {
             var lineId = NetManager.instance.m_nodes.m_buffer[stopId].m_transportLine;
             if (lineId > 0)
@@ -137,6 +164,7 @@ namespace TransportLinesManager.Utils
                 return 0;
             }
         }
+        
         public static float GetEffectiveBudget(ushort transportLine) => GetEffectiveBudgetInt(transportLine) / 100f;
 
         public static int GetEffectiveBudgetInt(ushort transportLine)
@@ -159,36 +187,6 @@ namespace TransportLinesManager.Utils
             return result;
         }
 
-        private static IEnumerator MakePassengersBored(ushort transportLine, uint simulationFrameStart)
-        {
-            int citizensCount = 0;
-            do
-            {
-                do
-                {
-                    yield return 0;
-                } while (SimulationManager.instance.m_referenceFrameIndex - simulationFrameStart < 5);
-                if (!TLMTransportLineExtension.Instance.SafeGet(transportLine).IsZeroed)
-                {
-                    yield break;
-                }
-                ushort stop = Singleton<TransportManager>.instance.m_lines.m_buffer[transportLine].m_stops;
-                citizensCount = 0;
-                do
-                {
-                    var citizensToBored = new List<ushort>();
-                    DoWithEachPassengerWaiting(stop, (citizenId) => citizensToBored.Add(citizenId));
-                    foreach (var citizenId in citizensToBored)
-                    {
-                        CitizenManager.instance.m_instances.m_buffer[citizenId].m_waitCounter = byte.MaxValue;
-                    }
-                    citizensCount += citizensToBored.Count;
-                    stop = TransportLine.GetNextStop(stop);
-                } while (stop != Singleton<TransportManager>.instance.m_lines.m_buffer[transportLine].m_stops);
-                simulationFrameStart = SimulationManager.instance.m_referenceFrameIndex;
-            } while (citizensCount > 0 || !TLMTransportLineExtension.Instance.SafeGet(transportLine).IsZeroed);
-        }
-
         public static IBasicExtensionStorage GetEffectiveConfigForLine(ushort lineId)
         {
             if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
@@ -201,6 +199,7 @@ namespace TransportLinesManager.Utils
                 return (tsd.GetTransportExtension() as ISafeGettable<TLMPrefixConfiguration>).SafeGet(TLMPrefixesUtils.GetPrefix(lineId));
             }
         }
+        
         public static IBasicExtension GetEffectiveExtensionForLine(ushort lineId, TransportSystemDefinition tsd = null)
         {
             if (lineId == 0 && tsd is null)
@@ -228,6 +227,7 @@ namespace TransportLinesManager.Utils
             return Tuple.New(Mathf.Lerp(currentBudget.First.First.Value, currentBudget.Second.First.Value, currentBudget.Third) / 100f, currentBudget.First.Second, currentBudget.Second.Second, currentBudget.Third, currentConfig is TLMTransportLineConfiguration);
 
         }
+        
         public static string GetLineStringId(ushort lineIdx, bool fromBuilding)
         {
             if (fromBuilding)
@@ -255,7 +255,6 @@ namespace TransportLinesManager.Utils
         }
 
         public static void GetLineNamingParameters(ushort lineIdx, bool regional, out NamingMode prefix, out Separator s, out NamingMode suffix, out NamingMode nonPrefix, out bool zeros, out bool invertPrefixSuffix) => GetLineNamingParameters(lineIdx, regional, out prefix, out s, out suffix, out nonPrefix, out zeros, out invertPrefixSuffix, out _);
-
 
         public static TransportSystemDefinition GetLineNamingParameters(ushort lineIdx, bool regional, out NamingMode prefix, out Separator s, out NamingMode suffix, out NamingMode nonPrefix, out bool zeros, out bool invertPrefixSuffix, out string icon)
         {
@@ -311,6 +310,7 @@ namespace TransportLinesManager.Utils
             }
             return false;
         }
+        
         public static void GetNamingRulesFromTSD(out NamingMode prefix, out Separator s, out NamingMode suffix, out NamingMode nonPrefix, out bool zeros, out bool invertPrefixSuffix, TransportSystemDefinition tsd)
 
         {
@@ -393,7 +393,6 @@ namespace TransportLinesManager.Utils
             }
             return noneFound;
         }
-
 
         public static bool GetNearStopPoints(Vector3 pos, float maxDistance, ref Dictionary<ushort, Vector3> stopsFound, ItemClass.SubService[] subservicesAllowed = null, int maxDepht = 4, int depth = 0)
         {
@@ -489,8 +488,6 @@ namespace TransportLinesManager.Utils
             return transportTypeLetter + GetLineStringId(s, regional);
         }
 
-
-
         public static void SetLineNumberCircleOnRef(ushort lineID, bool regionalLine, UITextComponent reference, float ratio = 1f)
         {
             GetLineNumberCircleOnRefParams(lineID, regionalLine, ratio, out string text, out Color textColor, out float textScale, out Vector3 relativePosition);
@@ -501,59 +498,6 @@ namespace TransportLinesManager.Utils
             reference.useOutline = true;
             reference.outlineColor = Color.black;
         }
-
-        private static void GetLineNumberCircleOnRefParams(ushort lineID, bool regionalLine, float ratio, out string text, out Color textColor, out float textScale, out Vector3 relativePosition)
-        {
-            if (lineID == 0)
-            {
-                text = "";
-                textColor = default;
-                textScale = 0;
-                relativePosition = default;
-                return;
-            }
-            text = GetLineStringId(lineID, regionalLine).Trim();
-            string[] textParts = text.Split(['\n']);
-            int lenght = textParts.Max(x => x.Length);
-            if (lenght >= 9 && textParts.Length == 1)
-            {
-                text = text.Replace("·", "\n").Replace(".", "\n").Replace("-", "\n").Replace("/", "\n").Replace(" ", "\n");
-                textParts = text.Split(['\n']);
-                lenght = textParts.Max(x => x.Length);
-            }
-            if (lenght >= 8)
-            {
-                textScale = 0.4f * ratio;
-                relativePosition = new Vector3(0f, 0.125f);
-            }
-            else if (lenght >= 6)
-            {
-                textScale = 0.666f * ratio;
-                relativePosition = new Vector3(0f, 0.5f);
-            }
-            else if (lenght >= 4)
-            {
-                textScale = 1f * ratio;
-                relativePosition = new Vector3(0f, 1f);
-            }
-            else if (lenght == 3 || textParts.Length > 1)
-            {
-                textScale = 1.25f * ratio;
-                relativePosition = new Vector3(0f, 1.5f);
-            }
-            else if (lenght == 2)
-            {
-                textScale = 1.75f * ratio;
-                relativePosition = new Vector3(-0.5f, 0.5f);
-            }
-            else
-            {
-                textScale = 2.3f * ratio;
-                relativePosition = new Vector3(-0.5f, 0f);
-            }
-            textColor = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineID) ? Color.yellow : Color.white;
-        }
-
 
         public static string[] GetAllStopsFromLine(ushort lineID, bool fromBuilding)
         {
@@ -587,10 +531,7 @@ namespace TransportLinesManager.Utils
             return null;
         }
 
-
-        private static int colorChangeCooldown = 0;
-        private static readonly Dictionary<ushort, Color> colorChangeTarget = [];
-        internal static void SetLineColor(MonoBehaviour parent, ushort lineId, Color color) => parent.StartCoroutine(ChangeColorCoroutine(parent, lineId, color));
+        public static void SetLineColor(MonoBehaviour parent, ushort lineId, Color color) => parent.StartCoroutine(ChangeColorCoroutine(parent, lineId, color));
 
         private static IEnumerator ChangeColorCoroutine(MonoBehaviour comp, ushort id, Color newColor)
         {
@@ -632,9 +573,11 @@ namespace TransportLinesManager.Utils
         public static AsyncTask<bool> SetLineName(ushort lineIdx, string name) => Singleton<SimulationManager>.instance.AddAction(TransportManager.instance.SetLineName(lineIdx, name));
 
         private static readonly TransportInfo.TransportType[] m_roadTransportTypes = [TransportInfo.TransportType.Bus, TransportInfo.TransportType.Tram, TransportInfo.TransportType.Trolleybus];
-        internal static bool IsRoadLine(ushort lineId, bool regional) => regional
+
+        public static bool IsRoadLine(ushort lineId, bool regional) => regional
             ? NetManager.instance.m_nodes.m_buffer[lineId].Info.m_netAI is TransportLineAI { m_vehicleType: VehicleInfo.VehicleType.Car }
             : m_roadTransportTypes.Contains(TransportManager.instance.m_lines.m_buffer[lineId].Info.m_transportType);
+
         public static string CalculateAutoName(ushort lineIdx, bool regionalLine, out List<DestinationPoco> stationDestinations)
         {
             stationDestinations = [];
@@ -794,10 +737,11 @@ namespace TransportLinesManager.Utils
         public static Tuple<string, Color, string> GetIconStringParameters(ushort lineId, bool regionalLine) => Tuple.New(GetIconForLine(lineId, regionalLine), GetLineColor(lineId, regionalLine), GetLineStringId(lineId, regionalLine));
 
         public static int ProjectTargetVehicleCount(TransportInfo info, float lineLength, float budget) => Mathf.CeilToInt(budget * lineLength / info.m_defaultVehicleDistance);
+        
         public static float CalculateBudgetForEachVehicle(TransportInfo info, float lineLength) => info.m_defaultVehicleDistance / lineLength;
 
-
         public static Tuple<TicketPriceEntryXml, int> GetTicketPriceForLine(TransportSystemDefinition tsd, ushort lineId) => GetTicketPriceForLine(tsd, lineId, ReferenceTimer);
+
         public static Tuple<TicketPriceEntryXml, int> GetTicketPriceForLine(TransportSystemDefinition tsd, ushort lineId, float hour)
         {
             Tuple<TicketPriceEntryXml, int> ticketPriceDefault = null;
@@ -824,32 +768,88 @@ namespace TransportLinesManager.Utils
 
             return ticketPriceDefault;
         }
+ 
+        private static IEnumerator MakePassengersBored(ushort transportLine, uint simulationFrameStart)
+        {
+            int citizensCount = 0;
+            do
+            {
+                do
+                {
+                    yield return 0;
+                } while (SimulationManager.instance.m_referenceFrameIndex - simulationFrameStart < 5);
+                if (!TLMTransportLineExtension.Instance.SafeGet(transportLine).IsZeroed)
+                {
+                    yield break;
+                }
+                ushort stop = Singleton<TransportManager>.instance.m_lines.m_buffer[transportLine].m_stops;
+                citizensCount = 0;
+                do
+                {
+                    var citizensToBored = new List<ushort>();
+                    DoWithEachPassengerWaiting(stop, (citizenId) => citizensToBored.Add(citizenId));
+                    foreach (var citizenId in citizensToBored)
+                    {
+                        CitizenManager.instance.m_instances.m_buffer[citizenId].m_waitCounter = byte.MaxValue;
+                    }
+                    citizensCount += citizensToBored.Count;
+                    stop = TransportLine.GetNextStop(stop);
+                } while (stop != Singleton<TransportManager>.instance.m_lines.m_buffer[transportLine].m_stops);
+                simulationFrameStart = SimulationManager.instance.m_referenceFrameIndex;
+            } while (citizensCount > 0 || !TLMTransportLineExtension.Instance.SafeGet(transportLine).IsZeroed);
+        }
 
-
-
-
-        internal static readonly NamingMode[] m_numberedNamingTypes =
-        [
-        NamingMode. LatinLowerNumber ,
-        NamingMode. LatinUpperNumber ,
-        NamingMode. GreekLowerNumber,
-        NamingMode. GreekUpperNumber,
-        NamingMode. CyrillicLowerNumber,
-        NamingMode. CyrillicUpperUpper
-        ];
-
-        public static readonly TransferManager.TransferReason[] defaultAllowedVehicleTypes = [
-            TransferManager.TransferReason.Blimp ,
-            TransferManager.TransferReason.CableCar ,
-            TransferManager.TransferReason.Ferry ,
-            TransferManager.TransferReason.MetroTrain ,
-            TransferManager.TransferReason.Monorail ,
-            TransferManager.TransferReason.PassengerTrain ,
-            TransferManager.TransferReason.PassengerPlane ,
-            TransferManager.TransferReason.PassengerShip ,
-            TransferManager.TransferReason.Tram ,
-            TransferManager.TransferReason.Bus
-        ];
+        private static void GetLineNumberCircleOnRefParams(ushort lineID, bool regionalLine, float ratio, out string text, out Color textColor, out float textScale, out Vector3 relativePosition)
+        {
+            if (lineID == 0)
+            {
+                text = "";
+                textColor = default;
+                textScale = 0;
+                relativePosition = default;
+                return;
+            }
+            text = GetLineStringId(lineID, regionalLine).Trim();
+            string[] textParts = text.Split(['\n']);
+            int lenght = textParts.Max(x => x.Length);
+            if (lenght >= 9 && textParts.Length == 1)
+            {
+                text = text.Replace("·", "\n").Replace(".", "\n").Replace("-", "\n").Replace("/", "\n").Replace(" ", "\n");
+                textParts = text.Split(['\n']);
+                lenght = textParts.Max(x => x.Length);
+            }
+            if (lenght >= 8)
+            {
+                textScale = 0.4f * ratio;
+                relativePosition = new Vector3(0f, 0.125f);
+            }
+            else if (lenght >= 6)
+            {
+                textScale = 0.666f * ratio;
+                relativePosition = new Vector3(0f, 0.5f);
+            }
+            else if (lenght >= 4)
+            {
+                textScale = 1f * ratio;
+                relativePosition = new Vector3(0f, 1f);
+            }
+            else if (lenght == 3 || textParts.Length > 1)
+            {
+                textScale = 1.25f * ratio;
+                relativePosition = new Vector3(0f, 1.5f);
+            }
+            else if (lenght == 2)
+            {
+                textScale = 1.75f * ratio;
+                relativePosition = new Vector3(-0.5f, 0.5f);
+            }
+            else
+            {
+                textScale = 2.3f * ratio;
+                relativePosition = new Vector3(-0.5f, 0f);
+            }
+            textColor = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineID) ? Color.yellow : Color.white;
+        }
     }
 
 }
