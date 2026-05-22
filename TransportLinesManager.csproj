@@ -64,7 +64,7 @@
     </Reference>
     <Reference Include="UnifiedUILib">
       <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\workshop\content\255710\2966990700\UnifiedUILib.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\UnityEngine.dll</HintPath>
@@ -72,6 +72,7 @@
     </Reference>
     <Reference Include="ValueTuple">
       <HintPath>..\_managed\ValueTuple.dll</HintPath>
+      <Private>False</Private>
     </Reference> 
     </ItemGroup>
   <ItemGroup>
