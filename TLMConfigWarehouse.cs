@@ -19,6 +19,7 @@ namespace TransportLinesManager
     {
 
         protected override string ID { get; } = "TLM_ConfigWarehouse";
+
         [XmlIgnore]
         public static readonly ConfigIndex[] PALETTES_INDEXES = [
           SHIP_PALETTE_MAIN,
@@ -32,8 +33,10 @@ namespace TransportLinesManager
           TOUR_PED_CONFIG_PALETTE_MAIN,
           TROLLEY_CONFIG_PALETTE_MAIN,
           HELICOPTER_CONFIG_PALETTE_MAIN
-       ];
+        ];
+
         protected bool unsafeMode = false;
+
         public TLMConfigWarehouse() { }
 
         public override void SetBool(ConfigIndex idx, bool? newVal)
@@ -511,7 +514,6 @@ namespace TransportLinesManager
             };
         }
 
-
         public static readonly ConfigIndex[] configurableTicketTransportCategories = [
             TRAIN_CONFIG      ,
             TRAM_CONFIG       ,
@@ -526,7 +528,7 @@ namespace TransportLinesManager
             TOUR_BUS_CONFIG   ,
             TROLLEY_CONFIG       ,
             HELICOPTER_CONFIG       ,
-       ];
+        ];
 
         public static readonly ConfigIndex[] configurableAutoNameTransportCategories = [
            PLANE_CONFIG,
@@ -542,7 +544,8 @@ namespace TransportLinesManager
            TOUR_PED_CONFIG,
            TROLLEY_CONFIG,
            HELICOPTER_CONFIG,
-       ];
+        ];
+
         public static readonly ConfigIndex[] configurableAutoNameCategories = [
            MONUMENT_SERVICE_CONFIG,
            BEAUTIFICATION_SERVICE_CONFIG,
@@ -556,14 +559,16 @@ namespace TransportLinesManager
            PLAYER_EDUCATION_SERVICE_CONFIG,
            VARSITY_SPORTS_SERVICE_CONFIG,
            MUSEUMS_SERVICE_CONFIG,
-       ];
+        ];
+
         public static readonly ConfigIndex[] extraAutoNameCategories = [
-           PARKAREA_NAME_CONFIG       ,
-           CAMPUS_AREA_NAME_CONFIG       ,
-           INDUSTRIAL_AREA_NAME_CONFIG       ,
-           DISTRICT_NAME_CONFIG       ,
+           PARKAREA_NAME_CONFIG,
+           CAMPUS_AREA_NAME_CONFIG,
+           INDUSTRIAL_AREA_NAME_CONFIG,
+           DISTRICT_NAME_CONFIG,
            ADDRESS_NAME_CONFIG
-       ];
+        ];
+
         public static readonly ConfigIndex[] defaultTrueBoolProperties = [
             MONUMENT_USE_FOR_AUTO_NAMING_REF,
             BEAUTIFICATION_USE_FOR_AUTO_NAMING_REF,
@@ -575,56 +580,57 @@ namespace TransportLinesManager
             PARKAREA_USE_FOR_AUTO_NAMING_REF,
             DISTRICT_USE_FOR_AUTO_NAMING_REF,
             ADD_LINE_NUMBER_IN_AUTONAME,
-            TRAIN_SHOW_IN_LINEAR_MAP ,
-            METRO_SHOW_IN_LINEAR_MAP ,
-            BUS_SHOW_IN_LINEAR_MAP ,
-            MONORAIL_SHOW_IN_LINEAR_MAP ,
-            CABLE_CAR_SHOW_IN_LINEAR_MAP ,
-            PLANE_SHOW_IN_LINEAR_MAP ,
-            SHIP_SHOW_IN_LINEAR_MAP ,
-            TOUR_PED_CONFIG_SHOW_IN_LINEAR_MAP ,
-            TOUR_BUS_CONFIG_SHOW_IN_LINEAR_MAP ,
-            HELICOPTER_CONFIG_SHOW_IN_LINEAR_MAP ,
-            TROLLEY_CONFIG_SHOW_IN_LINEAR_MAP ,
-       ];
+            TRAIN_SHOW_IN_LINEAR_MAP,
+            METRO_SHOW_IN_LINEAR_MAP,
+            BUS_SHOW_IN_LINEAR_MAP,
+            MONORAIL_SHOW_IN_LINEAR_MAP,
+            CABLE_CAR_SHOW_IN_LINEAR_MAP,
+            PLANE_SHOW_IN_LINEAR_MAP,
+            SHIP_SHOW_IN_LINEAR_MAP,
+            TOUR_PED_CONFIG_SHOW_IN_LINEAR_MAP,
+            TOUR_BUS_CONFIG_SHOW_IN_LINEAR_MAP,
+            HELICOPTER_CONFIG_SHOW_IN_LINEAR_MAP,
+            TROLLEY_CONFIG_SHOW_IN_LINEAR_MAP
+        ];
+
         public static readonly ConfigIndex[] namingOrder =
         [
-           PLANE_CONFIG ,
-           SHIP_CONFIG  ,
-           TRAIN_CONFIG ,
-           HELICOPTER_CONFIG  ,
-           BLIMP_CONFIG  ,
-           FERRY_CONFIG  ,
-           MONORAIL_CONFIG ,
-           METRO_CONFIG ,
-           CABLE_CAR_CONFIG ,
-           TRAM_CONFIG ,
-           TROLLEY_CONFIG ,
-           BUS_CONFIG   ,
-           TAXI_CONFIG  ,
-           NATURAL_SERVICE_CONFIG   ,
-           VARSITY_SPORTS_SERVICE_CONFIG   ,
-           MUSEUMS_SERVICE_CONFIG   ,
-           PLAYER_EDUCATION_SERVICE_CONFIG   ,
-           PLAYER_INDUSTRY_SERVICE_CONFIG  ,
-           BEAUTIFICATION_SERVICE_CONFIG    ,
-           MONUMENT_SERVICE_CONFIG  ,
-           HEALTHCARE_SERVICE_CONFIG    ,
-           EDUCATION_SERVICE_CONFIG ,
-           DISASTER_SERVICE_CONFIG    ,
-           POLICEDEPARTMENT_SERVICE_CONFIG  ,
-           FIREDEPARTMENT_SERVICE_CONFIG    ,
-           GARBAGE_SERVICE_CONFIG   ,
-           WATER_SERVICE_CONFIG ,
-           ELECTRICITY_SERVICE_CONFIG   ,
-           ROAD_SERVICE_CONFIG  ,
-           OFFICE_SERVICE_CONFIG    ,
-           TOURISM_SERVICE_CONFIG   ,
-           CITIZEN_SERVICE_CONFIG   ,
-           INDUSTRIAL_SERVICE_CONFIG    ,
-           COMMERCIAL_SERVICE_CONFIG    ,
-           RESIDENTIAL_SERVICE_CONFIG   ,
-       ];
+           PLANE_CONFIG,
+           SHIP_CONFIG ,
+           TRAIN_CONFIG,
+           HELICOPTER_CONFIG,
+           BLIMP_CONFIG,
+           FERRY_CONFIG,
+           MONORAIL_CONFIG,
+           METRO_CONFIG,
+           CABLE_CAR_CONFIG,
+           TRAM_CONFIG,
+           TROLLEY_CONFIG,
+           BUS_CONFIG,
+           TAXI_CONFIG,
+           NATURAL_SERVICE_CONFIG,
+           VARSITY_SPORTS_SERVICE_CONFIG,
+           MUSEUMS_SERVICE_CONFIG,
+           PLAYER_EDUCATION_SERVICE_CONFIG,
+           PLAYER_INDUSTRY_SERVICE_CONFIG,
+           BEAUTIFICATION_SERVICE_CONFIG,
+           MONUMENT_SERVICE_CONFIG,
+           HEALTHCARE_SERVICE_CONFIG,
+           EDUCATION_SERVICE_CONFIG,
+           DISASTER_SERVICE_CONFIG,
+           POLICEDEPARTMENT_SERVICE_CONFIG,
+           FIREDEPARTMENT_SERVICE_CONFIG,
+           GARBAGE_SERVICE_CONFIG,
+           WATER_SERVICE_CONFIG,
+           ELECTRICITY_SERVICE_CONFIG,
+           ROAD_SERVICE_CONFIG,
+           OFFICE_SERVICE_CONFIG,
+           TOURISM_SERVICE_CONFIG,
+           CITIZEN_SERVICE_CONFIG,
+           INDUSTRIAL_SERVICE_CONFIG,
+           COMMERCIAL_SERVICE_CONFIG,
+           RESIDENTIAL_SERVICE_CONFIG
+        ];
 
         public static TLMSpecialNamingClass ToSpecial(ConfigIndex idx)
         {
@@ -702,7 +708,6 @@ namespace TransportLinesManager
             ADD_LINE_NUMBER_IN_AUTONAME = GLOBAL_CONFIG | 0x9 | TYPE_BOOL,
             MAX_VEHICLES_SPECIFIC_CONFIG = GLOBAL_CONFIG | 0x23 | TYPE_INT,
 
-
             TRAIN_CONFIG = TransportInfo.TransportType.Train << 16,
             TRAM_CONFIG = TransportInfo.TransportType.Tram << 16,
             METRO_CONFIG = TransportInfo.TransportType.Metro << 16,
@@ -720,8 +725,6 @@ namespace TransportLinesManager
             FERRY_CONFIG = (TransportInfo.TransportType.Ship << 16) | 0x800000,
             TROLLEY_CONFIG = TransportInfo.TransportType.Trolleybus << 16,
             HELICOPTER_CONFIG = TransportInfo.TransportType.Helicopter << 16,
-
-
 
             RESIDENTIAL_SERVICE_CONFIG = ItemClass.Service.Residential,
             COMMERCIAL_SERVICE_CONFIG = ItemClass.Service.Commercial,
@@ -752,8 +755,6 @@ namespace TransportLinesManager
             PARKAREA_NAME_CONFIG = 0xfd,
             DISTRICT_NAME_CONFIG = 0xfe,
             ADDRESS_NAME_CONFIG = 0xff,
-
-
 
             PREFIX = 0x1 | TYPE_INT,
             SEPARATOR = 0x2 | TYPE_INT,
@@ -928,7 +929,6 @@ namespace TransportLinesManager
             TROLLEY_CONFIG_SHOW_IN_LINEAR_MAP = TROLLEY_CONFIG | SHOW_IN_LINEAR_MAP,
             HELICOPTER_CONFIG_SHOW_IN_LINEAR_MAP = HELICOPTER_CONFIG | SHOW_IN_LINEAR_MAP,
 
-
             TRAIN_DEFAULT_TICKET_PRICE = TRAIN_CONFIG | DEFAULT_TICKET_PRICE,
             TRAM_DEFAULT_TICKET_PRICE = TRAM_CONFIG | DEFAULT_TICKET_PRICE,
             METRO_DEFAULT_TICKET_PRICE = METRO_CONFIG | DEFAULT_TICKET_PRICE,
@@ -1012,13 +1012,11 @@ namespace TransportLinesManager
             MUSEUMS_USE_FOR_AUTO_NAMING_REF = MUSEUMS_SERVICE_CONFIG | USE_FOR_AUTO_NAMING_REF,
             VARSITY_SPORTS_USE_FOR_AUTO_NAMING_REF = VARSITY_SPORTS_SERVICE_CONFIG | USE_FOR_AUTO_NAMING_REF,
 
-
             CAMPUS_AREA_USE_FOR_AUTO_NAMING_REF = CAMPUS_AREA_NAME_CONFIG | USE_FOR_AUTO_NAMING_REF,
             INDUSTRIAL_AREA_USE_FOR_AUTO_NAMING_REF = INDUSTRIAL_AREA_NAME_CONFIG | USE_FOR_AUTO_NAMING_REF,
             PARKAREA_USE_FOR_AUTO_NAMING_REF = PARKAREA_NAME_CONFIG | USE_FOR_AUTO_NAMING_REF,
             DISTRICT_USE_FOR_AUTO_NAMING_REF = DISTRICT_NAME_CONFIG | USE_FOR_AUTO_NAMING_REF,
             ADDRESS_USE_FOR_AUTO_NAMING_REF = ADDRESS_NAME_CONFIG | USE_FOR_AUTO_NAMING_REF,
-
 
             TRAIN_USE_FOR_AUTO_NAMING_REF = TRAIN_CONFIG | PUBLICTRANSPORT_USE_FOR_AUTO_NAMING_REF,
             TRAM_USE_FOR_AUTO_NAMING_REF = TRAM_CONFIG | PUBLICTRANSPORT_USE_FOR_AUTO_NAMING_REF,
@@ -1085,8 +1083,6 @@ namespace TransportLinesManager
             TROLLEY_CONFIG_AUTO_NAMING_REF_TEXT = TROLLEY_CONFIG | PUBLICTRANSPORT_AUTO_NAMING_REF_TEXT,
             HELICOPTER_CONFIG_AUTO_NAMING_REF_TEXT = HELICOPTER_CONFIG | PUBLICTRANSPORT_AUTO_NAMING_REF_TEXT,
 
-
-
             TRAIN_VEHICLE_NUMBER_FORMAT_LOCAL = TRAIN_CONFIG | VEHICLE_NUMBER_FORMAT_LOCAL,
             TRAM_VEHICLE_NUMBER_FORMAT_LOCAL = TRAM_CONFIG | VEHICLE_NUMBER_FORMAT_LOCAL,
             METRO_VEHICLE_NUMBER_FORMAT_LOCAL = METRO_CONFIG | VEHICLE_NUMBER_FORMAT_LOCAL,
@@ -1101,9 +1097,6 @@ namespace TransportLinesManager
             TOUR_BUS_CONFIG_VEHICLE_NUMBER_FORMAT_LOCAL = TOUR_BUS_CONFIG | VEHICLE_NUMBER_FORMAT_LOCAL,
             TROLLEY_CONFIG_VEHICLE_NUMBER_FORMAT_LOCAL = TROLLEY_CONFIG | VEHICLE_NUMBER_FORMAT_LOCAL,
             HELICOPTER_CONFIG_VEHICLE_NUMBER_FORMAT_LOCAL = HELICOPTER_CONFIG | VEHICLE_NUMBER_FORMAT_LOCAL,
-
-
-
 
             TRAIN_VEHICLE_NUMBER_FORMAT_FOREIGN = TRAIN_CONFIG | VEHICLE_NUMBER_FORMAT_FOREIGN,
             TRAM_VEHICLE_NUMBER_FORMAT_FOREIGN = TRAM_CONFIG | VEHICLE_NUMBER_FORMAT_FOREIGN,

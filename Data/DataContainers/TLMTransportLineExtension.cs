@@ -19,7 +19,9 @@ namespace TransportLinesManager.Data.DataContainers
     {
         [XmlElement("Configurations")]
         public SimpleNonSequentialList<TLMTransportLineConfiguration> Configurations { get; set; } = [];
+
         internal void SafeCleanEntry(ushort lineID) => Configurations[lineID] = new TLMTransportLineConfiguration();
+        
         public TLMTransportLineConfiguration SafeGet(uint lineId)
         {
             if (!Configurations.ContainsKey(lineId))
@@ -28,15 +30,20 @@ namespace TransportLinesManager.Data.DataContainers
             }
             return Configurations[lineId];
         }
+
         IAssetSelectorStorage ISafeGettable<IAssetSelectorStorage>.SafeGet(uint index) => SafeGet(index);
+
         IBudgetStorage ISafeGettable<IBudgetStorage>.SafeGet(uint index) => SafeGet(index);
+
         ITicketPriceStorage ISafeGettable<ITicketPriceStorage>.SafeGet(uint index) => SafeGet(index);
+
         IDepotSelectionStorage ISafeGettable<IDepotSelectionStorage>.SafeGet(uint index) => SafeGet(index);
+
         IBasicExtensionStorage ISafeGettable<IBasicExtensionStorage>.SafeGet(uint index) => SafeGet(index);
 
         public override string SaveId => $"TLM_TLMTransportLineExtension";
 
-        private readonly Dictionary<TransportSystemDefinition, List<TransportAsset>> m_basicAssetsList = new();
+        private readonly Dictionary<TransportSystemDefinition, List<TransportAsset>> m_basicAssetsList = [];
 
         public void SetUseCustomConfig(ushort lineId, bool value)
         {
@@ -47,7 +54,9 @@ namespace TransportLinesManager.Data.DataContainers
         public bool IsUsingCustomConfig(ushort lineId) => SafeGet(lineId).IsCustom;
 
         public void SetDisplayAbsoluteValues(ushort lineId, bool value) => SafeGet(lineId).DisplayAbsoluteValues = value;
+
         public bool IsDisplayAbsoluteValues(ushort lineId) => SafeGet(lineId).DisplayAbsoluteValues;
+
         #region Asset List
         public List<TransportAsset> GetBasicAssetListForLine(ushort lineId)
         {
@@ -58,7 +67,9 @@ namespace TransportLinesManager.Data.DataContainers
             }
             return m_basicAssetsList[tsd];
         }
+
         public Dictionary<TransportAsset, string> GetSelectedBasicAssetsForLine(ushort lineId) => this.GetAssetTransportListForLine(lineId).Where(x => PrefabCollection<VehicleInfo>.FindLoaded(x.name) != null).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
+        
         public Dictionary<TransportAsset, string> GetAllBasicAssetsForLine(ushort lineId)
         {
             var tsd = TransportSystemDefinition.FromLineId(lineId, false);
@@ -69,6 +80,7 @@ namespace TransportLinesManager.Data.DataContainers
 
             return m_basicAssetsList[tsd].ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
         }
+       
         public VehicleInfo GetAModel(ushort lineId, string status)
         {
             VehicleInfo info = null;
@@ -166,12 +178,10 @@ namespace TransportLinesManager.Data.DataContainers
 
         }
         #endregion
+
         #region Depot
         public uint LineToIndex(ushort lineId) => lineId > 0 ? lineId : throw new System.Exception("Line 0 cannot have specific configuration!");
-
-
         #endregion
-
 
     }
 }
