@@ -16,6 +16,7 @@ using TransportLinesManager.WorldInfoPanels.NearLines;
 using TransportLinesManager.WorldInfoPanels.PlatformEditor;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -119,6 +120,7 @@ namespace TransportLinesManager
 
             TLMTransportTypeDataContainer.Instance.RefreshCapacities();
 
+            MigrateOldVehicleCountData();
             StartCoroutine(VehicleUtils.UpdateCapacityUnits());
             InitWipSidePanels();
 
@@ -209,8 +211,8 @@ namespace TransportLinesManager
 
         }
 
-
         public void OpenTLMPanel() => TransportLinesManagerMod.Instance.OpenPanelAtModTab();
+
         public void CloseTLMPanel() => TransportLinesManagerMod.Instance.ClosePanel();
 
         public IEnumerator RenameCoroutine(ushort id, string newName)
@@ -236,28 +238,101 @@ namespace TransportLinesManager
         }
 
         internal static readonly Color[] COLOR_ORDER =
-             [
-                Color.red,
-                Color.Lerp(Color.red, Color.yellow,0.5f),
-                Color.yellow,
-                Color.green,
-                Color.cyan,
-                Color.blue,
-                Color.Lerp(Color.blue, Color.magenta,0.5f),
-                Color.magenta,
-                Color.white,
-                Color.black,
-                Color.Lerp( Color.red,                                    Color.black,0.5f),
-                Color.Lerp( Color.Lerp(Color.red, Color.yellow,0.5f),     Color.black,0.5f),
-                Color.Lerp( Color.yellow,                                 Color.black,0.5f),
-                Color.Lerp( Color.green,                                  Color.black,0.5f),
-                Color.Lerp( Color.cyan,                                   Color.black,0.5f),
-                Color.Lerp( Color.blue,                                   Color.black,0.5f),
-                Color.Lerp( Color.Lerp(Color.blue, Color.magenta,0.5f),   Color.black,0.5f),
-                Color.Lerp( Color.magenta,                                Color.black,0.5f),
-                Color.Lerp( Color.white,                                  Color.black,0.25f),
-                Color.Lerp( Color.white,                                  Color.black,0.75f)
-             ];
+        [
+            Color.red,
+            Color.Lerp(Color.red, Color.yellow,0.5f),
+            Color.yellow,
+            Color.green,
+            Color.cyan,
+            Color.blue,
+            Color.Lerp(Color.blue, Color.magenta,0.5f),
+            Color.magenta,
+            Color.white,
+            Color.black,
+            Color.Lerp( Color.red, Color.black,0.5f),
+            Color.Lerp( Color.Lerp(Color.red, Color.yellow,0.5f), Color.black,0.5f),
+            Color.Lerp( Color.yellow, Color.black,0.5f),
+            Color.Lerp( Color.green, Color.black,0.5f),
+            Color.Lerp( Color.cyan, Color.black,0.5f),
+            Color.Lerp( Color.blue, Color.black,0.5f),
+            Color.Lerp( Color.Lerp(Color.blue, Color.magenta,0.5f), Color.black,0.5f),
+            Color.Lerp( Color.magenta, Color.black,0.5f),
+            Color.Lerp( Color.white, Color.black,0.25f),
+            Color.Lerp( Color.white, Color.black,0.75f)
+        ];
+
+        private static void MigrateOldVehicleCountData()
+        {
+            var ext = TLMTransportLineExtension.Instance;
+            var vm = VehicleManager.instance;
+            var tm = TransportManager.instance;
+
+            foreach (var kvp in ext.Configurations)
+            {
+                ushort lineId = (ushort)kvp.Key;
+                var config = kvp.Value;
+
+                if (config.AssetTransportList == null || config.AssetTransportList.Count == 0)
+                    continue;
+
+                // Detect old format: assets with no count/spawn_percent dictionaries
+                bool isOldFormat = config.AssetTransportList.Any(a => a.count == null || a.count.Count == 0);
+                if (!isOldFormat) continue;
+
+                int budgetCount = config.BudgetEntries?.Count > 0 ? config.BudgetEntries.Count : 1;
+                bool isCountBased = config.DisplayAbsoluteValues;
+
+                // For count-based: count actual vehicles on the line per asset name
+                Dictionary<string, int> vehicleCountPerAsset = null;
+                if (isCountBased)
+                {
+                    vehicleCountPerAsset = [];
+                    ref TransportLine tl = ref tm.m_lines.m_buffer[lineId];
+                    int vehicleCount = tl.CountVehicles(lineId);
+                    for (int v = 0; v < vehicleCount; v++)
+                    {
+                        ushort vehicleId = tl.GetVehicle(v);
+                        if (vehicleId == 0) continue;
+                        string assetName = vm.m_vehicles.m_buffer[vehicleId].Info.name;
+                        vehicleCountPerAsset.TryGetValue(assetName, out int current);
+                        vehicleCountPerAsset[assetName] = current + 1;
+                    }
+                }
+
+                for (int i = 0; i < config.AssetTransportList.Count; i++)
+                {
+                    var asset = config.AssetTransportList[i];
+                    asset.count ??= [];
+                    asset.spawn_percent ??= [];
+
+                    for (int idx = 0; idx < budgetCount; idx++)
+                    {
+                        string key = idx.ToString();
+
+                        if (!asset.spawn_percent.ContainsKey(key))
+                            asset.spawn_percent[key] = new SpawnPercentEntry { Value = 100 };
+
+                        if (!asset.count.ContainsKey(key))
+                        {
+                            int usedCount = 0;
+                            int totalCount = 0;
+                            if (isCountBased && vehicleCountPerAsset != null)
+                            {
+                                vehicleCountPerAsset.TryGetValue(asset.name, out usedCount);
+                                totalCount = usedCount; // best guess: assign what's deployed
+                            }
+                            asset.count[key] = new CountEntry
+                            {
+                                TotalCount = totalCount,
+                                UsedCount = usedCount
+                            };
+                        }
+                    }
+
+                    config.AssetTransportList[i] = asset; // struct re-assign
+                }
+            }
+        }
     }
 
 }
