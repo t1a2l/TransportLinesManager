@@ -72,6 +72,10 @@ namespace TransportLinesManager.WorldInfoPanels.ReportTabs
             {
                 List<D> report = GetReportData(lineId);
                 var totalizer = new D();
+
+                while (report.Count < 17)
+                    report.Insert(0, new D());
+
                 for (int i = 0; i < m_reportLines.Length; i++)
                 {
                     m_reportLines[i].SetData(report[16 - i], showDayTime, TLMController.IsRealTimeEnabled);
