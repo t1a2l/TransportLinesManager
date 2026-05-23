@@ -216,11 +216,11 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                             int newBudget = TLMCountModeUtils.ReconcileOverAssigned(allowedTransportAssets, index.ToString(), maxVehicles);
                             if (newBudget > maxVehicles)
                             {
-                                m_weightEditor.tooltip = string.Format(Locale.Get("TLM_BUDGET_RAISED_TO_MATCH"), newBudget);
+                                m_weightEditor.tooltip = string.Format(Locale.Get("TLM_BUDGET_RAISED_TO_MATCH_TOOLTIP"), newBudget);
                             }
                             else
                             {
-                                m_weightEditor.tooltip = Locale.Get("TLM_ASSET_COUNT_FIELD_DESCRIPTION");
+                                m_weightEditor.tooltip = Locale.Get("TLM_ASSET_COUNT_FIELD_TOOLTIP");
                             }
                         }
                         else

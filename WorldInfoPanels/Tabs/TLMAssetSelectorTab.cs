@@ -476,15 +476,30 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     int unassigned = TLMCountModeUtils.GetUnassignedCount(assets, budgetIndex.ToString(), maxVehicles);
 
                     bool allZero = assets.Count > 0 && assets.All(a => !a.count.TryGetValue(budgetIndex.ToString(), out var ce) || ce.TotalCount == 0);
+                    string text = "";
+                    string tooltip = "";
+                    Color32 color = new(255, 255, 255, 255); // white
 
                     if (unassigned > 0)
-                        m_vehicleCountLabel.text = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES_WITH_UNASSIGNED"), maxVehicles, unassigned);
+                    {
+                        text = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES"), maxVehicles, unassigned);
+                        tooltip = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES_TOOLTIP"), maxVehicles, unassigned);
+                    }
                     // e.g. "Max: 7 (2 unassigned)"
                     else if (allZero && maxVehicles > 0)
-                        m_vehicleCountLabel.tooltip = Locale.Get("TLM_NO_VEHICLES_ASSIGNED_WARNING");
-                    // "No vehicles assigned for this time period"
+                    {
+                        text = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES_WITH_UNASSIGNED"), maxVehicles, unassigned);
+                        tooltip = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES_WITH_UNASSIGNED_TOOLTIP"), maxVehicles, unassigned);
+                    }
                     else
-                        m_vehicleCountLabel.text = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES"), maxVehicles);
+                    {
+                        text = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES_WITH_UNASSIGNED"), maxVehicles, unassigned);
+                        tooltip = string.Format(Locale.Get("TLM_NO_VEHICLES_ASSIGNED_WARNING_TOOLTIP"), maxVehicles, unassigned);
+                        color = new Color32(255, 200, 0, 255); // yellow
+                    }
+                    m_vehicleCountLabel.text = text;
+                    m_vehicleCountLabel.tooltip = tooltip;
+                    m_vehicleCountLabel.color = color;
                     m_vehicleCountLabel.isVisible = true;
                 }
             }
