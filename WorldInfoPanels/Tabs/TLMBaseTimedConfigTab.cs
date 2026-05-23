@@ -237,7 +237,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                         oldVal / 100f);
 
                     TLMCountModeUtils.OnBudgetChangedInCountMode(lineId, ext, budgetIndex, projected, oldProjected);
-                    ext.SetAssetTransportListForLine(lineId, assets); // persist
                     UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
                 }
 
