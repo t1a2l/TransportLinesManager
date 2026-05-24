@@ -480,22 +480,24 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     string tooltip = "";
                     Color32 color = new(255, 255, 255, 255); // white
 
+                    // e.g. "Max: 7 (2 unassigned)" - this is a warning state that not all vehicles are assigned, even though there is a budget
                     if (unassigned > 0)
-                    {
-                        text = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES"), maxVehicles, unassigned);
-                        tooltip = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES_TOOLTIP"), maxVehicles, unassigned);
-                    }
-                    // e.g. "Max: 7 (2 unassigned)"
-                    else if (allZero && maxVehicles > 0)
                     {
                         text = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES_WITH_UNASSIGNED"), maxVehicles, unassigned);
                         tooltip = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES_WITH_UNASSIGNED_TOOLTIP"), maxVehicles, unassigned);
                     }
-                    else
+                    // e.g. ⚠ - none assigned, No assets assigned for this time slot
+                    else if (allZero && maxVehicles > 0)
                     {
-                        text = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES_WITH_UNASSIGNED"), maxVehicles, unassigned);
+                        text = string.Format(Locale.Get("TLM_NO_VEHICLES_ASSIGNED_WARNING"), maxVehicles, unassigned);
                         tooltip = string.Format(Locale.Get("TLM_NO_VEHICLES_ASSIGNED_WARNING_TOOLTIP"), maxVehicles, unassigned);
                         color = new Color32(255, 200, 0, 255); // yellow
+                    }
+                    // e.g. "7" - everything is assigned, so no warnings
+                    else
+                    {
+                        text = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES"), maxVehicles, unassigned);
+                        tooltip = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES_TOOLTIP"), maxVehicles, unassigned);
                     }
                     m_vehicleCountLabel.text = text;
                     m_vehicleCountLabel.tooltip = tooltip;
