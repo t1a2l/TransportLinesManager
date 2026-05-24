@@ -43,8 +43,7 @@ namespace TransportLinesManager.Data.Extensions
                 spawn_percent = []
             };
 
-            bool isIntercity = lineId == 0;
-            if (!isIntercity)
+            if (lineId != 0)
             {    
                 for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
                 {
