@@ -87,7 +87,11 @@ namespace TransportLinesManager.Data.DataContainers
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineId);
             while (info == null && assetTransportList.Count > 0)
             {
-                info = VehicleUtils.GetModelByPercentageOrCount(assetTransportList, lineId, out string modelName);
+                string modelName = null;
+                if (lineId != 0)
+                {
+                    info = VehicleUtils.GetModelByPercentageOrCount(assetTransportList, lineId, out modelName);
+                }
                 if (info == null)
                 {
                     if (string.IsNullOrEmpty(modelName))
