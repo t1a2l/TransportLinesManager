@@ -486,7 +486,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                         text = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES_WITH_UNASSIGNED"), maxVehicles, unassigned);
                         tooltip = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES_WITH_UNASSIGNED_TOOLTIP"), maxVehicles, unassigned);
                     }
-                    // e.g. ⚠ - none assigned, No assets assigned for this time slot
+                    // e.g. "⚠" - none assigned, No assets assigned for this time slot
                     else if (allZero && maxVehicles > 0)
                     {
                         text = string.Format(Locale.Get("TLM_NO_VEHICLES_ASSIGNED_WARNING"), maxVehicles, unassigned);
