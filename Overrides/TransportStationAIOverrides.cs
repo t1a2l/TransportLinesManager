@@ -171,7 +171,7 @@ namespace TransportLinesManager.Overrides
             var tsd = TransportSystemDefinition.FromOutsideConnection(service, subService, level, type);
             if (tsd is not null)
             {
-                VehicleInfo randomVehicleInfo = tsd.GetTransportExtension().GetAModel(0, "Add");
+                VehicleInfo randomVehicleInfo = tsd.GetTransportExtension().GetAModel(0);
                 if (randomVehicleInfo != null)
                 {
                     tsd.GetTransportExtension().EditVehicleUsedCount(0, randomVehicleInfo.name, "Add");

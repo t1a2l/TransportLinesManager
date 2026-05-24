@@ -81,13 +81,13 @@ namespace TransportLinesManager.Data.DataContainers
             return m_basicAssetsList[tsd].ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
         }
        
-        public VehicleInfo GetAModel(ushort lineId, string status)
+        public VehicleInfo GetAModel(ushort lineId)
         {
             VehicleInfo info = null;
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineId);
             while (info == null && assetTransportList.Count > 0)
             {
-                info = VehicleUtils.GetModelByPercentageOrCount(assetTransportList, lineId, out string modelName, status);
+                info = VehicleUtils.GetModelByPercentageOrCount(assetTransportList, lineId, out string modelName);
                 if (info == null)
                 {
                     if (string.IsNullOrEmpty(modelName))

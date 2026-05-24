@@ -137,7 +137,7 @@ namespace TransportLinesManager.Utils
                         {
                             if (item.Value.m_vehicleAI is BusAI && !TLMBaseConfigXML.Instance.BusLinesUseSoftDespawn)
                             {
-                                var info = extension.GetAModel(lineId, "Add");
+                                var info = extension.GetAModel(lineId);
                                 VehicleUtils.ReplaceVehicleModel(item.Key, info);
                                 extension.EditVehicleUsedCount(lineId, info.name, "Add");
                             }

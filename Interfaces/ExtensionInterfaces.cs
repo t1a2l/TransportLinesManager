@@ -42,7 +42,7 @@ namespace TransportLinesManager.Interfaces
     {
         Dictionary<TransportAsset, string> GetAllBasicAssetsForLine(ushort lineId);
         List<TransportAsset> GetBasicAssetListForLine(ushort lineId);
-        VehicleInfo GetAModel(ushort lineId, string status);
+        VehicleInfo GetAModel(ushort lineId);
         void EditVehicleUsedCount(ushort lineID, string selectedModel, string status);
     }
 

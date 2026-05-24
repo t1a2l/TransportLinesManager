@@ -80,7 +80,7 @@ namespace TransportLinesManager.Overrides
         private static VehicleInfo DoModelDraw(ushort lineId)
         {
             Interfaces.IBasicExtension extension = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
-            VehicleInfo randomInfo = extension.GetAModel(lineId, "Add");
+            VehicleInfo randomInfo = extension.GetAModel(lineId);
             if(randomInfo != null)
             {
                 extension.EditVehicleUsedCount(lineId, randomInfo.name, "Add");

@@ -148,7 +148,7 @@ namespace TransportLinesManager.Overrides
                 IBasicExtension extension = TLMLineUtils.GetEffectiveExtensionForLine(vehicleData.m_transportLine);
                 if (currentVehicleCount > targetVehicleCount)
                 {
-                    var info = extension.GetAModel(vehicleData.m_transportLine, "Remove");
+                    var info = extension.GetAModel(vehicleData.m_transportLine);
                     if(vehicleData.Info == info)
                     {
                         extension.EditVehicleUsedCount(vehicleData.m_transportLine, info.name, "Remove");

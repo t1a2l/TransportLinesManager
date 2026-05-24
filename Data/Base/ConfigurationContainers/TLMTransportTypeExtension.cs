@@ -284,13 +284,13 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
             return m_basicAssetsList;
         }
 
-        public VehicleInfo GetAModel(ushort lineID, string status)
+        public VehicleInfo GetAModel(ushort lineID)
         {
             VehicleInfo info = null;
             List<TransportAsset> assetList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
             while (info == null && assetList.Count > 0)
             {
-                info = VehicleUtils.GetModelByPercentageOrCount(assetList, lineID, out string modelName, status);
+                info = VehicleUtils.GetModelByPercentageOrCount(assetList, lineID, out string modelName);
                 if (info == null)
                 {
                     if (string.IsNullOrEmpty(modelName))
