@@ -480,7 +480,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     string tooltip = "";
                     Color32 color = new(255, 255, 255, 255); // white
 
-                    // e.g. "Max: 7 (2 unassigned)" - this is a warning state that not all vehicles are assigned, even though there is a budget
+                    // e.g. "7 (2)" - this is a warning state that not all vehicles are assigned, even though there is a budget
                     if (unassigned > 0)
                     {
                         text = string.Format(Locale.Get("TLM_ASSET_MAX_VEHICLES_WITH_UNASSIGNED"), maxVehicles, unassigned);
