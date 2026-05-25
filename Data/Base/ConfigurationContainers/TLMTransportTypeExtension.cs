@@ -317,6 +317,10 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
 
         public void EditVehicleUsedCount(ushort lineID, string selectedModel, string status)
         {
+            if (lineID == 0)
+            {
+                return;
+            }
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
             var budgetData = TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineID);
             int index = budgetData.Second;
@@ -337,7 +341,6 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
             assetTransportList[asset_index].count[index.ToString()] = asset_count;
             ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
         }
-
 
         private void LoadBasicAssets()
         {

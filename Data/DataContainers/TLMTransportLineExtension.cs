@@ -114,7 +114,10 @@ namespace TransportLinesManager.Data.DataContainers
 
         public void EditVehicleUsedCount(ushort lineID, string selectedModel, string status)
         {
-            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineID);
+            if (lineID == 0)
+            {
+                return;
+            }
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
             var budgetData = TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineID);
             int index = budgetData.Second;

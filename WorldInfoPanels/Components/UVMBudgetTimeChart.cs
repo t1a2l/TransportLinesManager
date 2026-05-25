@@ -91,7 +91,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         public override void OnUpdate()
         {
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineID, out bool fromBuilding);
-            if (!fromBuilding)
+            if (!fromBuilding && lineID != 0)
             {
                 Tuple<float, int, int, float> value = TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineID);
                 m_effectiveSprite.color = UVMBudgetConfigTab.Instance.ColorOrder[value.Second % UVMBudgetConfigTab.Instance.ColorOrder.Count];
