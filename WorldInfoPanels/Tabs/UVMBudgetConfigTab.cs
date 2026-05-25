@@ -18,6 +18,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
     {
         private UICheckBox m_showAbsoluteCheckbox;
 
+        private bool m_isLoading;
+
         public override string GetTitleLocale() => "TLM_PER_HOUR_BUDGET_TITLE";
 
         public override string GetValueColumnLocale() => "TLM_BUDGET";
@@ -44,10 +46,16 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                             TransportManager.instance.m_lines.m_buffer[lineId].Info,
                             TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength, pct);
 
+                        if (m_isLoading) return;
+
                         if (isAbsolute) // percent → count
-                            TLMCountModeUtils.ConvertPercentToCount(assets, key, budget);
-                        else            // count → percent
-                            TLMCountModeUtils.ConvertCountToPercent(assets, key, budget);
+                        {
+                            TLMCountModeUtils.ConvertPercentToCount(assets, key, budget); 
+                        }
+                        else // count → percent
+                        { 
+                            TLMCountModeUtils.ConvertCountToPercent(assets, key, budget); 
+                        }
                     }
 
                     ext.SetAssetTransportListForLine(lineId, assets);
@@ -60,8 +68,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public override void ExtraOnSetTarget(ushort lineID)
         {
+            m_isLoading = true;  // prevent eventCheckChanged from firing
             m_showAbsoluteCheckbox.isVisible = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineID);
             m_showAbsoluteCheckbox.isChecked = TLMTransportLineExtension.Instance.IsDisplayAbsoluteValues(lineID);
+            m_isLoading = false;
         }
 
         internal override List<Color> ColorOrder { get; } =
