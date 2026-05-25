@@ -92,6 +92,12 @@ namespace TransportLinesManager.Data.DataContainers
                 {
                     info = VehicleUtils.GetModelByPercentageOrCount(assetTransportList, lineId, out modelName);
                 }
+                else
+                {
+                    // Regional lines (lineId == 0) use the basic randomizer
+                    var simpleStringList = assetTransportList.Select(a => a.name).ToList();
+                    info = VehicleUtils.GetRandomModel(simpleStringList, out modelName);
+                }
                 if (info == null)
                 {
                     if (string.IsNullOrEmpty(modelName))
@@ -110,12 +116,13 @@ namespace TransportLinesManager.Data.DataContainers
         {
             IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineID);
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
-            var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
+            var budgetData = TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineID);
+            int index = budgetData.Second;
             if (index == -1)
             {
                 index = 0;
             }
-            var asset_index = assetTransportList.FindIndex(item => item.name == selectedModel);
+            var asset_index = assetTransportList.FindIndex(item => item.name == selectedModel); 
             var asset_count = assetTransportList[asset_index].count[index.ToString()];
             if (status == "Add")
             {

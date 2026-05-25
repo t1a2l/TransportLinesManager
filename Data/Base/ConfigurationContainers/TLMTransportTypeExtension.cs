@@ -294,7 +294,13 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 if (lineID != 0)
                 {
                     info = VehicleUtils.GetModelByPercentageOrCount(assetList, lineID, out modelName);
-                } 
+                }
+                else
+                {
+                    // Regional lines (lineId == 0) use the basic randomizer
+                    var simpleStringList = assetList.Select(a => a.name).ToList();
+                    info = VehicleUtils.GetRandomModel(simpleStringList, out modelName);
+                }
                 if (info == null)
                 {
                     if (string.IsNullOrEmpty(modelName))
@@ -312,7 +318,8 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         public void EditVehicleUsedCount(ushort lineID, string selectedModel, string status)
         {
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
-            var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
+            var budgetData = TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineID);
+            int index = budgetData.Second;
             if (index == -1)
             {
                 index = 0;
