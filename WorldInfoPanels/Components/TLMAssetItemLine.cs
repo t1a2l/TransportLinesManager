@@ -175,8 +175,11 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                     if (allowedTransportAssets.Any(item => item.name == m_currentAsset))
                     {
                         IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
-
                         var asset_index = allowedTransportAssets.FindIndex(item => item.name == m_currentAsset);
+                        if (asset_index == -1)
+                        {
+                            return;
+                        }
                         var asset = allowedTransportAssets[asset_index];
                         var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
                         if (index == -1)

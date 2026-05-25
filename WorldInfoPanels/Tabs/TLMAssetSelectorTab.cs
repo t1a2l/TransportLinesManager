@@ -306,9 +306,14 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 string[] budgetArr = new string[currentConfig.BudgetEntries.Count];
                 int index = 0;
-                int[] temp = new int[currentConfig.BudgetEntries.Count];
+                int length = currentConfig.BudgetEntries.Count;
+                int[] temp = new int[length];
                 foreach (var item in currentConfig.BudgetEntries)
                 {
+                    if(index >= length)
+                    {
+                        break;
+                    }
                     temp[index] = (int)item.HourOfDay;
                     index++;
                 }
@@ -324,10 +329,15 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             if (TransportLinesManagerMod.DebugMode)
             {
-                var arr = new string[allowedTransportAssets.Count];
+                var length = allowedTransportAssets.Count;
+                var arr = new string[length];
                 var i = 0;
                 foreach (var asset in allowedTransportAssets)
                 {
+                    if(i >= length)
+                    {
+                        break;
+                    }
                     arr[i] = asset.name;
                     i++;
                 }

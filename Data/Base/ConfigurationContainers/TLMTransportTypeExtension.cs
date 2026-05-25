@@ -329,6 +329,11 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 index = 0;
             }
             var asset_index = assetTransportList.FindIndex(item => item.name == selectedModel);
+            if (asset_index == -1)
+            {
+                LogUtils.DoErrorLog($"EditVehicleUsedCount: Could not find asset {selectedModel} in line {lineID} asset list — breaking to avoid infinite loop");
+                return;
+            }
             var asset_count = assetTransportList[asset_index].count[index.ToString()];
             if(status == "Add")
             {
