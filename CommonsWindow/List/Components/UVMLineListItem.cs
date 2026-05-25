@@ -20,7 +20,7 @@ namespace TransportLinesManager.CommonsWindow.List.Components
         private static readonly Color32 Line0BackgroundColor = new(88, 28, 124, 255);
         private static readonly Color32 ForegroundColor = new(185, 221, 254, 255);
 
-        private ushort m_lineID = ushort.MaxValue;
+        private readonly ushort m_lineID = ushort.MaxValue;
 
         private UICheckBox m_lineIsVisible;
 
@@ -64,29 +64,29 @@ namespace TransportLinesManager.CommonsWindow.List.Components
 
         private void SetLineID(ushort id)
         {
-            m_lineID = id >= TransportManager.MAX_LINE_COUNT ? throw new System.Exception($"INVALID LINE IDX: {id}") : id;
+            LineID = id >= TransportManager.MAX_LINE_COUNT ? throw new System.Exception($"INVALID LINE IDX: {id}") : id;
             m_lastUpdate = 0;
         }
 
         public void RefreshData(bool updateColors, bool updateVisibility)
         {
-            if (m_lineID < Singleton<TransportManager>.instance.m_lines.m_buffer.Length)
+            if (LineID < Singleton<TransportManager>.instance.m_lines.m_buffer.Length)
             {
-                if (m_lineID > 0)
+                if (LineID > 0)
                 {
-                    m_lineName.text = Singleton<TransportManager>.instance.GetLineName(m_lineID);
-                    LineNumber = Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].m_lineNumber;
+                    m_lineName.text = Singleton<TransportManager>.instance.GetLineName(LineID);
+                    LineNumber = Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_lineNumber;
 
 
-                    int averageCount = (int)Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].m_passengers.m_residentPassengers.m_averageCount;
-                    int averageCount2 = (int)Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].m_passengers.m_touristPassengers.m_averageCount;
+                    int averageCount = (int)Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_passengers.m_residentPassengers.m_averageCount;
+                    int averageCount2 = (int)Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_passengers.m_touristPassengers.m_averageCount;
                     m_linePassengers.isVisible = true;
                     m_linePassengers.text = (averageCount + averageCount2).ToString("N0");
 
                     m_linePassengers.tooltip = LocaleFormatter.FormatGeneric("TRANSPORT_LINE_PASSENGERS",
                     [
-                averageCount,
-                averageCount2
+                        averageCount,
+                        averageCount2
                     ]);
                     TLMLineUtils.SetLineNumberCircleOnRef(LineID, false, m_lineNumberFormatted, 0.8f);
                     m_lineColor.atlas = m_linePassengers.atlas;
@@ -99,18 +99,18 @@ namespace TransportLinesManager.CommonsWindow.List.Components
 
                     PassengerCountsInt = averageCount + averageCount2;
 
-                    SetBackgroundColor(((Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].m_flags & TransportLine.Flags.Complete) == TransportLine.Flags.None));
+                    SetBackgroundColor(((Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags & TransportLine.Flags.Complete) == TransportLine.Flags.None));
 
                     m_lineIsVisible.isVisible = true;
-                    var tsd = TransportSystemDefinition.FromLineId(m_lineID, false);
+                    var tsd = TransportSystemDefinition.FromLineId(LineID, false);
                     if (updateColors)
                     {
-                        m_lineColor.selectedColor = Singleton<TransportManager>.instance.GetLineColor(m_lineID);
+                        m_lineColor.selectedColor = Singleton<TransportManager>.instance.GetLineColor(LineID);
                     }
                     if (updateVisibility)
                     {
                         m_isUpdatingVisibility = true;
-                        m_lineIsVisible.isChecked = ((Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].m_flags & TransportLine.Flags.Hidden) == TransportLine.Flags.None);
+                        m_lineIsVisible.isChecked = ((Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags & TransportLine.Flags.Hidden) == TransportLine.Flags.None);
                         m_isUpdatingVisibility = false;
                     }
 
@@ -118,14 +118,14 @@ namespace TransportLinesManager.CommonsWindow.List.Components
                     if (tsd.HasVehicles())
                     {
                         m_lineVehicles.isVisible = true;
-                        TransportInfo info = Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].Info;
+                        TransportInfo info = Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].Info;
                         float overallBudget = Singleton<EconomyManager>.instance.GetBudget(info.m_class) / 100f;
 
 
                         string vehTooltip = string.Format("{0} {1}", m_lineVehicles.text, Locale.Get("PUBLICTRANSPORT_VEHICLES"));
                         m_lineVehicles.tooltip = vehTooltip;
-                        m_lineStops.text = Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].CountStops(m_lineID).ToString("N0");
-                        m_lineVehicles.text = Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].CountVehicles(m_lineID).ToString("N0");
+                        m_lineStops.text = Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].CountStops(LineID).ToString("N0");
+                        m_lineVehicles.text = Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].CountVehicles(LineID).ToString("N0");
 
                         TLMTransportLineStatusesManager.instance.GetLastWeekIncomeAndExpensesForLine(LineID, out long income, out long expense);
                         long balance = (income - expense);
@@ -133,10 +133,12 @@ namespace TransportLinesManager.CommonsWindow.List.Components
                         m_lineBalance.textColor = balance >= 0 ? ColorExtensions.FromRGB("00c000") : ColorExtensions.FromRGB("c00000");
                         m_lineBalance.isVisible = true;
 
-                        m_lineBudgetLabel.text = string.Format("{0:0%}", TLMLineUtils.GetEffectiveBudget(LineID));
+                        var effectiveLineBudget = TLMLineUtils.GetEffectiveBudget(LineID);
+
+                        m_lineBudgetLabel.text = string.Format("{0:0%}", effectiveLineBudget);
                         m_lineBudgetLabel.tooltip = string.Format(Locale.Get("TLM_LINE_BUDGET_EXPLAIN_2"),
-                            Locale.Get("TRANSPORT_LINE", Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].Info.m_transportType.ToString()),
-                            overallBudget, Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_budget / 100f, TLMLineUtils.GetEffectiveBudget(LineID));
+                            Locale.Get("TRANSPORT_LINE", Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].Info.m_transportType.ToString()),
+                            overallBudget, Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_budget / 100f, effectiveLineBudget);
                         m_lineBudgetLabel.isVisible = true;
 
                     }
@@ -189,7 +191,7 @@ namespace TransportLinesManager.CommonsWindow.List.Components
                 RefreshData(m_lastUpdate == 0, m_lastUpdate == 0);
                 m_lastUpdate = SimulationManager.instance.m_referenceFrameIndex;
             }
-            else if (m_lineID > 0 && m_lineID < Singleton<TransportManager>.instance.m_lines.m_buffer.Length && ((Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].m_flags & TransportLine.Flags.Complete) == TransportLine.Flags.None))
+            else if (LineID > 0 && LineID < Singleton<TransportManager>.instance.m_lines.m_buffer.Length && ((Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags & TransportLine.Flags.Complete) == TransportLine.Flags.None))
             {
                 SetBackgroundColor(true);
             }
@@ -212,38 +214,38 @@ namespace TransportLinesManager.CommonsWindow.List.Components
 
         public void ChangeLineVisibility(bool r)
         {
-            if (m_lineID < Singleton<TransportManager>.instance.m_lines.m_buffer.Length && m_lineID != 0 && !m_isUpdatingVisibility)
+            if (LineID < Singleton<TransportManager>.instance.m_lines.m_buffer.Length && LineID != 0 && !m_isUpdatingVisibility)
             {
                 Singleton<SimulationManager>.instance.AddAction(() =>
                 {
                     if (r)
                     {
-                        Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].m_flags &= ~TransportLine.Flags.Hidden;
+                        Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags &= ~TransportLine.Flags.Hidden;
                     }
                     else
                     {
-                        Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].m_flags |= TransportLine.Flags.Hidden;
+                        Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags |= TransportLine.Flags.Hidden;
                     }
                 });
             }
         }
 
-        public void DoAutoColor() => TLMController.AutoColor(m_lineID);
+        public void DoAutoColor() => TLMController.AutoColor(LineID);
 
-        public void DoAutoName() => TLMLineUtils.SetLineName(m_lineID, TLMLineUtils.CalculateAutoName(m_lineID, false, out _));
+        public void DoAutoName() => TLMLineUtils.SetLineName(LineID, TLMLineUtils.CalculateAutoName(LineID, false, out _));
 
         private void OnMouseEnter(UIComponent comp, UIMouseEventParameter param)
         {
             if (!m_mouseIsOver)
             {
                 m_mouseIsOver = true;
-                if (m_lineID != 0)
+                if (LineID != 0)
                 {
                     Singleton<SimulationManager>.instance.AddAction(delegate
                     {
-                        if ((Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].m_flags & TransportLine.Flags.Created) != TransportLine.Flags.None)
+                        if ((Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags & TransportLine.Flags.Created) != TransportLine.Flags.None)
                         {
-                            Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].m_flags |= TransportLine.Flags.Highlighted;
+                            Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags |= TransportLine.Flags.Highlighted;
                         }
                     });
                 }
@@ -255,13 +257,13 @@ namespace TransportLinesManager.CommonsWindow.List.Components
             if (m_mouseIsOver)
             {
                 m_mouseIsOver = false;
-                if (m_lineID != 0)
+                if (LineID != 0)
                 {
                     Singleton<SimulationManager>.instance.AddAction(delegate
                     {
-                        if ((Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].m_flags & TransportLine.Flags.Created) != TransportLine.Flags.None)
+                        if ((Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags & TransportLine.Flags.Created) != TransportLine.Flags.None)
                         {
-                            Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].m_flags &= ~TransportLine.Flags.Highlighted;
+                            Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags &= ~TransportLine.Flags.Highlighted;
                         }
                     });
                 }
@@ -283,13 +285,13 @@ namespace TransportLinesManager.CommonsWindow.List.Components
 
         private void OnLineChanged(ushort id)
         {
-            if (id == m_lineID)
+            if (id == LineID)
             {
                 RefreshData(true, true);
             }
         }
 
-        private void OnColorChanged(UIComponent x, Color color) => TLMLineUtils.SetLineColor(this, m_lineID, color);
+        private void OnColorChanged(UIComponent x, Color color) => TLMLineUtils.SetLineColor(this, LineID, color);
 
         public void Awake()
         {
@@ -316,11 +318,11 @@ namespace TransportLinesManager.CommonsWindow.List.Components
 
             viewLine.eventClick += delegate (UIComponent c, UIMouseEventParameter r)
              {
-                 if (m_lineID != 0)
+                 if (LineID != 0)
                  {
-                     Vector3 position = Singleton<NetManager>.instance.m_nodes.m_buffer[Singleton<TransportManager>.instance.m_lines.m_buffer[m_lineID].m_stops].m_position;
+                     Vector3 position = Singleton<NetManager>.instance.m_nodes.m_buffer[Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_stops].m_position;
                      InstanceID iid = InstanceID.Empty;
-                     iid.TransportLine = m_lineID;
+                     iid.TransportLine = LineID;
                      WorldInfoPanel.Show<PublicTransportWorldInfoPanel>(position, iid);
                  }
                  else
@@ -334,7 +336,7 @@ namespace TransportLinesManager.CommonsWindow.List.Components
 
             m_deleteLine.eventClick += delegate (UIComponent c, UIMouseEventParameter r)
             {
-                if (m_lineID != 0)
+                if (LineID != 0)
                 {
                     ConfirmPanel.ShowModal("CONFIRM_LINEDELETE", delegate (UIComponent comp, int ret)
                     {
@@ -342,7 +344,7 @@ namespace TransportLinesManager.CommonsWindow.List.Components
                         {
                             Singleton<SimulationManager>.instance.AddAction(delegate
                             {
-                                Singleton<TransportManager>.instance.ReleaseLine(m_lineID);
+                                Singleton<TransportManager>.instance.ReleaseLine(LineID);
 
                             });
                         }
