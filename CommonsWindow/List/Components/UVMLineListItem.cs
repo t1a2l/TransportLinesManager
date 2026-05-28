@@ -20,7 +20,7 @@ namespace TransportLinesManager.CommonsWindow.List.Components
         private static readonly Color32 Line0BackgroundColor = new(88, 28, 124, 255);
         private static readonly Color32 ForegroundColor = new(185, 221, 254, 255);
 
-        private readonly ushort m_lineID = ushort.MaxValue;
+        private ushort m_lineID = ushort.MaxValue;
 
         private UICheckBox m_lineIsVisible;
 
@@ -64,7 +64,7 @@ namespace TransportLinesManager.CommonsWindow.List.Components
 
         private void SetLineID(ushort id)
         {
-            LineID = id >= TransportManager.MAX_LINE_COUNT ? throw new System.Exception($"INVALID LINE IDX: {id}") : id;
+            m_lineID = id >= TransportManager.MAX_LINE_COUNT ? throw new System.Exception($"INVALID LINE IDX: {id}") : id;
             m_lastUpdate = 0;
         }
 
