@@ -7,6 +7,7 @@ using TransportLinesManager.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System;
 
 namespace TransportLinesManager.WorldInfoPanels.NearLines
 {
@@ -16,11 +17,11 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
         private UIPanel m_localContainer;
         private UILabel m_title;
         private UIPanel m_listContainer;
-        private UITemplateList<UIButton> m_localLinesTemplateList;
+        private UITemplateList<TLMNearLineRowControl> m_localLinesTemplateList;
         private UIPanel m_regionalContainer;
         private UILabel m_regTitle;
         private UIPanel m_regListContainer;
-        private UITemplateList<UIButton> m_regionalLinesTemplateList;
+        private UITemplateList<TLMNearLineRowControl> m_regionalLinesTemplateList;
         private ushort lastBuildingSelected = 0;
 
         private bool m_dirty = true;
@@ -37,8 +38,6 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
         {
             m_containerParent = GetComponent<UIPanel>();
             m_containerParent.backgroundSprite = "GenericPanelDark";
-
-
             m_containerParent.autoFitChildrenVertically = true;
             m_containerParent.autoLayout = true;
             m_containerParent.autoLayoutDirection = LayoutDirection.Vertical;
@@ -50,16 +49,16 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_containerParent.padding.top = 5;
             m_containerParent.padding.bottom = 5;
 
-
             MonoUtils.CreateUIElement(out m_localContainer, m_containerParent.transform);
             m_localContainer.width = m_containerParent.width;
             m_localContainer.autoFitChildrenVertically = true;
             m_localContainer.autoLayout = true;
+            m_localContainer.relativePosition = Vector3.zero;
             m_localContainer.autoLayoutDirection = LayoutDirection.Vertical;
             m_localContainer.autoLayoutPadding = new RectOffset(2, 2, 2, 2);
             m_localContainer.padding = new RectOffset(2, 2, 2, 2);
             m_localContainer.autoLayoutStart = LayoutStart.TopLeft;
-            m_localContainer.name = "TLMLinesNearRegional";
+            m_localContainer.name = "TLMLinesNearLocal";
 
             MonoUtils.CreateUIElement(out m_title, m_localContainer.transform);
             m_title.autoSize = false;
@@ -73,20 +72,21 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_listContainer.width = m_localContainer.width;
             m_listContainer.autoFitChildrenVertically = true;
             m_listContainer.autoLayout = true;
-            m_listContainer.autoLayoutDirection = LayoutDirection.Horizontal;
+            m_listContainer.autoLayoutDirection = LayoutDirection.Vertical;
             m_listContainer.autoLayoutPadding = new RectOffset(2, 2, 2, 2);
             m_listContainer.padding = new RectOffset(2, 2, 2, 2);
             m_listContainer.autoLayoutStart = LayoutStart.TopLeft;
-            m_listContainer.wrapLayout = true;
+            m_listContainer.wrapLayout = false;
             m_listContainer.name = "TLMLinesNearList";
             TLMLineItemButtonControl.EnsureTemplate();
-            m_localLinesTemplateList = new UITemplateList<UIButton>(m_listContainer, TLMLineItemButtonControl.LINE_ITEM_TEMPLATE);
-
+            TLMNearLineRowControl.EnsureTemplate();
+            m_localLinesTemplateList = new UITemplateList<TLMNearLineRowControl>(m_listContainer, TLMNearLineRowControl.ROW_TEMPLATE);
 
             MonoUtils.CreateUIElement(out m_regionalContainer, m_containerParent.transform);
             m_regionalContainer.width = m_containerParent.width;
             m_regionalContainer.autoFitChildrenVertically = true;
             m_regionalContainer.autoLayout = true;
+            m_regionalContainer.relativePosition = Vector3.zero;
             m_regionalContainer.autoLayoutDirection = LayoutDirection.Vertical;
             m_regionalContainer.autoLayoutPadding = new RectOffset(2, 2, 2, 2);
             m_regionalContainer.padding = new RectOffset(2, 2, 2, 2);
@@ -101,18 +101,17 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_regTitle.useOutline = true;
             m_regTitle.height = 18;
 
-
             MonoUtils.CreateUIElement(out m_regListContainer, m_regionalContainer.transform);
             m_regListContainer.width = m_regionalContainer.width;
             m_regListContainer.autoFitChildrenVertically = true;
             m_regListContainer.autoLayout = true;
-            m_regListContainer.autoLayoutDirection = LayoutDirection.Horizontal;
+            m_regListContainer.autoLayoutDirection = LayoutDirection.Vertical;
             m_regListContainer.autoLayoutPadding = new RectOffset(2, 2, 2, 2);
             m_regListContainer.padding = new RectOffset(2, 2, 2, 2);
             m_regListContainer.autoLayoutStart = LayoutStart.TopLeft;
-            m_regListContainer.wrapLayout = true;
+            m_regListContainer.wrapLayout = false;
             m_regListContainer.name = "TLMLinesNearListRegional";
-            m_regionalLinesTemplateList = new UITemplateList<UIButton>(m_regListContainer, TLMLineItemButtonControl.LINE_ITEM_TEMPLATE);
+            m_regionalLinesTemplateList = new UITemplateList<TLMNearLineRowControl>(m_regListContainer, TLMNearLineRowControl.ROW_TEMPLATE);
         }
         internal void EventWIPChanged(bool isGrow)
         {
@@ -136,7 +135,9 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             {
                 return;
             }
+
             ushort buildingId = WorldInfoPanel.GetCurrentInstanceID().Building;
+
             if (lastBuildingSelected == buildingId && !force)
             {
                 return;
@@ -145,10 +146,12 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             {
                 lastBuildingSelected = buildingId;
             }
+
             ref Building b = ref Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingId];
 
             var nearLines = new List<ushort>();
             Vector3 sidewalk = b.CalculateSidewalkPosition();
+            bool hasStationWaitData = TryGetStationLineWaitData(buildingId, out var waitingByLine);
             TLMLineUtils.GetNearLines(sidewalk, 120f, ref nearLines);
             bool showLocal = nearLines.Count > 0;
             if (showLocal)
@@ -158,9 +161,14 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
                 for (int idx = 0; idx < localLines.Length; idx++)
                 {
                     ushort lineId = localLines[idx].First;
-                    var itemControl = itemsEntries[idx].GetComponent<TLMLineItemButtonControl>();
-                    itemControl.ResetData(false, lineId, sidewalk);
+                    string lineName = GetShortLineName(false, lineId);
+                    int waiting = hasStationWaitData && waitingByLine.TryGetValue(lineId, out int count) ? count : -1;
+                    itemsEntries[idx].ResetData(false, lineId, sidewalk, lineName, waiting);
                 }
+            }
+            else
+            {
+                m_localLinesTemplateList.SetItemCount(0);
             }
 
             var showRegional = false;
@@ -173,15 +181,202 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
                     var itemsEntries = m_regionalLinesTemplateList.SetItemCount(regionalLines.Length);
                     for (ushort idx = 0; idx < regionalLines.Length; idx++)
                     {
-                        var itemControl = itemsEntries[idx].GetComponent<TLMLineItemButtonControl>();
-                        itemControl.ResetData(true, (ushort)regionalLines[idx], sidewalk);
+                        ushort lineId = (ushort)regionalLines[idx];
+                        string lineName = GetShortLineName(true, lineId);
+                        int waiting = hasStationWaitData && waitingByLine.TryGetValue(lineId, out int count) ? count : -1;
+                        itemsEntries[idx].ResetData(true, lineId, sidewalk, lineName, waiting);
                     }
                 }
+            }
+            else
+            {
+                m_regionalLinesTemplateList.SetItemCount(0);
             }
 
             m_localContainer.isVisible = showLocal;
             m_regionalContainer.isVisible = showRegional;
             m_containerParent.isVisible = showLocal || showRegional;
+        }
+
+        private static string GetShortLineName(bool fromBuilding, ushort lineId)
+        {
+            string name = fromBuilding ? TLMLineUtils.GetLineStringId(lineId, true) : TransportManager.instance.GetLineName(lineId);
+
+            if (name.IsNullOrWhiteSpace())
+            {
+                name = TLMLineUtils.GetLineStringId(lineId, fromBuilding);
+            }
+
+            const int maxLength = 24;
+            return name != null && name.Length > maxLength ? name.Substring(0, maxLength - 1) + "…" : name ?? "";
+        }
+
+        private static bool TryGetStationLineWaitData(ushort buildingId, out Dictionary<ushort, int> waitingByLine)
+        {
+            waitingByLine = [];
+
+            ushort[] stopNodes = GetStationStops(buildingId); // your IPT-style adapted helper
+            if (stopNodes == null || stopNodes.Length == 0)
+            {
+                return false;
+            }
+
+            var nm = NetManager.instance;
+
+            for (int i = 0; i < stopNodes.Length; i++)
+            {
+                ushort nodeId = stopNodes[i];
+                if (nodeId == 0 || nodeId >= nm.m_nodes.m_buffer.Length)
+                {
+                    continue;
+                }
+
+                ref NetNode node = ref nm.m_nodes.m_buffer[nodeId];
+                ushort lineId = node.m_transportLine;
+                if (lineId == 0)
+                {
+                    continue;
+                }
+
+                int waiting = QueryStopWaiting(nodeId, out _, out _); // implement this separately
+                if (waitingByLine.TryGetValue(lineId, out int current))
+                {
+                    waitingByLine[lineId] = current + waiting;
+                }
+                else
+                {
+                    waitingByLine[lineId] = waiting;
+                }
+            }
+
+            return waitingByLine.Count > 0;
+        }
+
+        private static ushort[] GetStationStops(ushort buildingID)
+        {
+            List<ushort> stationStops = [];
+            NetManager instance = Singleton<NetManager>.instance;
+            ushort num1 = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].m_netNode;
+            int num2 = 0;
+            while (num1 != 0)
+            {
+                if (instance.m_nodes.m_buffer[num1].Info.m_class.m_layer != ItemClass.Layer.PublicTransport)
+                {
+                    for (int index = 0; index < 8; ++index)
+                    {
+                        ushort segment = instance.m_nodes.m_buffer[num1].GetSegment(index);
+                        if (segment != 0 && instance.m_segments.m_buffer[segment].m_startNode == num1)
+                            CalculateLanes(instance.m_segments.m_buffer[segment].m_lanes, ref stationStops);
+                    }
+                }
+                num1 = instance.m_nodes.m_buffer[num1].m_nextBuildingNode;
+                if (++num2 > 32768)
+                {
+                    CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid list detected!\n" + System.Environment.StackTrace);
+                    break;
+                }
+            }
+            return [.. stationStops];
+        }
+
+        private static void CalculateLanes(uint firstLane, ref List<ushort> stationStops)
+        {
+            NetManager instance = Singleton<NetManager>.instance;
+            uint num1 = firstLane;
+            int num2 = 0;
+            while ((int)num1 != 0)
+            {
+                ushort nodes = instance.m_lanes.m_buffer[(int)(uint)(UIntPtr)num1].m_nodes;
+                if (nodes != 0)
+                    CalculateLaneNodes(nodes, ref stationStops);
+                num1 = instance.m_lanes.m_buffer[(int)(uint)(UIntPtr)num1].m_nextLane;
+                if (++num2 > 262144)
+                {
+                    CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid list detected!\n" + System.Environment.StackTrace);
+                    break;
+                }
+            }
+        }
+
+        private static void CalculateLaneNodes(ushort firstNode, ref List<ushort> stationStops)
+        {
+            NetManager instance = Singleton<NetManager>.instance;
+            ushort num1 = firstNode;
+            int num2 = 0;
+            while ((int)num1 != 0)
+            {
+                if ((int)instance.m_nodes.m_buffer[(int)num1].m_transportLine != 0)
+                    stationStops.Add(num1);
+                num1 = instance.m_nodes.m_buffer[(int)num1].m_nextLaneNode;
+                if (++num2 > 32768)
+                {
+                    CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid list detected!\n" + System.Environment.StackTrace);
+                    break;
+                }
+            }
+        }
+  
+        private static int QueryStopWaiting(ushort currentStop, out ushort nextStop, out byte max)
+        {
+            nextStop = TransportLine.GetNextStop(currentStop);
+            max = 0;
+
+            if (currentStop == 0 || nextStop == 0)
+            {
+                return 0;
+            }
+
+            var cm = Singleton<CitizenManager>.instance;
+            var nm = Singleton<NetManager>.instance;
+
+            if (currentStop >= nm.m_nodes.m_buffer.Length || nextStop >= nm.m_nodes.m_buffer.Length)
+            {
+                return 0;
+            }
+
+            Vector3 position1 = nm.m_nodes.m_buffer[currentStop].m_position;
+            Vector3 position2 = nm.m_nodes.m_buffer[nextStop].m_position;
+
+            int minX = Mathf.Max((int)((position1.x - 64f) / 8f + 1080f), 0);
+            int minZ = Mathf.Max((int)((position1.z - 64f) / 8f + 1080f), 0);
+            int maxX = Mathf.Min((int)((position1.x + 64f) / 8f + 1080f), 2159);
+            int maxZ = Mathf.Min((int)((position1.z + 64f) / 8f + 1080f), 2159);
+
+            int count = 0;
+
+            for (int gridZ = minZ; gridZ <= maxZ; ++gridZ)
+            {
+                for (int gridX = minX; gridX <= maxX; ++gridX)
+                {
+                    ushort instanceId = cm.m_citizenGrid[gridZ * 2160 + gridX];
+                    int guard = 0;
+
+                    while (instanceId != 0)
+                    {
+                        ref CitizenInstance citizenInstance = ref cm.m_instances.m_buffer[instanceId];
+                        ushort nextGridInstance = (ushort)citizenInstance.m_nextGridInstance;
+
+                        if ((citizenInstance.m_flags & CitizenInstance.Flags.WaitingTransport) != 0 &&
+                            Vector3.SqrMagnitude((Vector3)citizenInstance.m_targetPos - position1) < 4096f &&
+                            citizenInstance.Info != null &&
+                            citizenInstance.Info.m_citizenAI.TransportArriveAtSource(instanceId, ref citizenInstance, position1, position2))
+                        {
+                            max = Math.Max(max, citizenInstance.m_waitCounter);
+                            count++;
+                        }
+
+                        instanceId = nextGridInstance;
+
+                        if (++guard > 65536)
+                        {
+                            CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid citizen grid list detected!\n" + System.Environment.StackTrace);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return count;
         }
     }
 }
