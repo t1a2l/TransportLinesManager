@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using System.Collections;
+using KianCommons;
 
 namespace TransportLinesManager.Cache.BuildingData
 {
@@ -135,23 +136,41 @@ namespace TransportLinesManager.Cache.BuildingData
         {
             var result = new List<StopPointDescriptorLanes>();
 
-            var buildingNoodeIds = new List<ushort>();
+            if (buildingId == 0 || buildingId >= BuildingManager.instance.m_buildings.m_buffer.Length)
+            {
+                Debug.Log($"MapStopPoints: invalid buildingId={buildingId}");
+                return [];
+            }
 
             ref Building b = ref BuildingManager.instance.m_buildings.m_buffer[buildingId];
 
-            var nextNodeId = b.m_netNode;
+            var buildingNodeIds = new List<ushort>();
             var nm = NetManager.instance;
-            while (nextNodeId > 0)
+
+            // Collect building net nodes
+            var nextNodeId = b.m_netNode;
+            while (nextNodeId != 0 && nextNodeId < nm.m_nodes.m_buffer.Length)
             {
-                buildingNoodeIds.Add(nextNodeId);
+                buildingNodeIds.Add(nextNodeId);
                 nextNodeId = nm.m_nodes.m_buffer[nextNodeId].m_nextBuildingNode;
+            }
+
+            if (buildingNodeIds.Count == 0)
+            {
+                Debug.Log($"MapStopPoints: buildingId={buildingId} has no net nodes");
+                return [];
             }
 
             var mappedSegments = new List<ushort>();
 
-            for (int i = 0; i < buildingNoodeIds.Count; i++)
+            foreach (var nodeId in buildingNodeIds)
             {
-                var nodeId = buildingNoodeIds[i];
+                if (nodeId == 0 || nodeId >= nm.m_nodes.m_buffer.Length)
+                {
+                    Debug.Log($"MapStopPoints: invalid nodeId={nodeId} for buildingId={buildingId}");
+                    continue;
+                }
+
                 ref NetNode node = ref nm.m_nodes.m_buffer[nodeId];
 
                 for (int j = 0; j < 8; j++)
@@ -162,14 +181,44 @@ namespace TransportLinesManager.Cache.BuildingData
                     {
                         break;
                     }
+
+                    if (segmentId >= nm.m_segments.m_buffer.Length)
+                    {
+                        Debug.Log($"MapStopPoints: invalid segmentId={segmentId} for nodeId={nodeId}");
+                        continue;
+                    }
+
                     ref NetSegment segment = ref nm.m_segments.m_buffer[segmentId];
+
+                    if (!segment.IsValid())
+                    {
+                        Debug.Log($"MapStopPoints: segmentInfo invalid for segmentId={segmentId}");
+                        continue;
+                    }
+
                     var otherNodeId = segment.GetOtherNode(nodeId);
-                    if (buildingNoodeIds.Contains(otherNodeId) && !mappedSegments.Contains(segmentId) && (segment.m_flags & NetSegment.Flags.Untouchable) != 0)
+
+                    if (otherNodeId == 0 || otherNodeId >= nm.m_nodes.m_buffer.Length)
+                    {
+                        Debug.Log($"MapStopPoints: invalid otherNodeId={otherNodeId} for segmentId={segmentId}");
+                        continue;
+                    }
+
+                    var isUntouchable = (segment.m_flags & NetSegment.Flags.Untouchable) != 0;
+
+                    if (buildingNodeIds.Contains(otherNodeId) && !mappedSegments.Contains(segmentId) && isUntouchable)
                     {
                         mappedSegments.Add(segmentId);
+
                         var segmentInfo = segment.Info;
                         var srcNodeId = segment.m_startNode;
                         var dstNodeId = segment.m_endNode;
+
+                        if (srcNodeId == 0 || srcNodeId >= nm.m_nodes.m_buffer.Length || dstNodeId == 0 || dstNodeId >= nm.m_nodes.m_buffer.Length)
+                        {
+                            Debug.Log($"MapStopPoints: invalid srcNodeId={srcNodeId} or dstNodeId={dstNodeId} for segmentId={segmentId}");
+                            continue;
+                        }
 
                         ref NetNode srcNode = ref nm.m_nodes.m_buffer[srcNodeId];
                         ref NetNode dstNode = ref nm.m_nodes.m_buffer[dstNodeId];
@@ -177,19 +226,44 @@ namespace TransportLinesManager.Cache.BuildingData
                         Vector3 srcNodePos = srcNode.m_position;
                         Vector3 dstNodePos = dstNode.m_position;
 
-
                         srcNodePos.z *= -1;
                         dstNodePos.z *= -1;
+
                         Vector3 directionPath = Quaternion.AngleAxis(90, Vector3.up) * (dstNodePos - srcNodePos).normalized;
+
+                        // Guard against missing lane info array
+                        if (segmentInfo.m_lanes == null || segmentInfo.m_lanes.Length == 0)
+                        {
+                            Debug.Log($"MapStopPoints: segmentInfo.m_lanes null/empty for segmentId={segmentId}");
+                            continue;
+                        }
+
                         var nextLaneId = segment.m_lanes;
                         int k = 0;
+
                         while (nextLaneId != 0)
                         {
+                            if (nextLaneId >= nm.m_lanes.m_buffer.Length)
+                            {
+                                Debug.Log($"MapStopPoints: invalid nextLaneId={nextLaneId} for segmentId={segmentId}");
+                                break;
+                            }
+
+                            // Guard: k must be within segmentInfo.m_lanes length
+                            if (k >= segmentInfo.m_lanes.Length)
+                            {
+                                Debug.Log($"MapStopPoints: k={k} >= segmentInfo.m_lanes.Length={segmentInfo.m_lanes.Length} for segmentId={segmentId}, stopping lane loop");
+                                break;
+                            }
+
+                            ref NetLane lane = ref nm.m_lanes.m_buffer[nextLaneId];
+
                             if (MapLane(nextLaneId, k, ref segment, directionPath, segment.Info.m_lanes[k], out StopPointDescriptorLanes mappingResult))
                             {
                                 result.Add(mappingResult);
                             }
-                            nextLaneId = nm.m_lanes.m_buffer[nextLaneId].m_nextLane;
+
+                            nextLaneId = lane.m_nextLane;
                             k++;
                         }
                     }
@@ -198,34 +272,49 @@ namespace TransportLinesManager.Cache.BuildingData
             if (!isSubBuilding)
             {
                 var subBuildingId = b.m_subBuilding;
-                var subbuildingIndex = 0;
-                while (subBuildingId > 0)
+                var subBuildingIndex = 0;
+
+                while (subBuildingId != 0)
                 {
-                        StopPointDescriptorLanes[] subPlats = MapStopPoints(subBuildingId, thresold, true);
-                    if (subPlats != null)
+                    if (subBuildingId >= BuildingManager.instance.m_buildings.m_buffer.Length)
                     {
-                        result.AddRange(subPlats.Select(x =>
-                        {
-                            x.subbuildingId = (sbyte)subbuildingIndex;
-                            return x;
-                        }));
+                        Debug.Log($"MapStopPoints: invalid subBuildingId={subBuildingId} for buildingId={buildingId}");
+                        break;
                     }
+
+                    StopPointDescriptorLanes[] subPlats = MapStopPoints(subBuildingId, thresold, true);
+
+                    if (subPlats != null && subPlats.Length > 0)
+                    {
+                        for (int i = 0; i < subPlats.Length; i++)
+                        {
+                            var x = subPlats[i];
+                            x.subBuildingId = (sbyte)subBuildingIndex;
+                            result.Add(x);
+                        }
+                    }
+
                     subBuildingId = BuildingManager.instance.m_buildings.m_buffer[subBuildingId].m_subBuilding;
-                    subbuildingIndex++;
+                    subBuildingIndex++;
                 }
             }
-            result = [.. result.OrderByDescending(x => x.subbuildingId).GroupBy(x => x.platformLaneId).Select(x => x.First())];
+
+            // Deduplicate by platformLaneId and keep highest priority subbuilding
+            result = [.. result.OrderByDescending(x => x.subBuildingId).GroupBy(x => x.platformLaneId).Select(x => x.First())];
+
             result.Sort((x, y) =>
             {
                 int priorityX = StopSearchUtils.VehicleToPriority(x.vehicleType);
                 int priorityY = StopSearchUtils.VehicleToPriority(y.vehicleType);
+
                 if (priorityX != priorityY)
                 {
                     return priorityX.CompareTo(priorityY);
                 }
 
-                Vector3 centerX = (x.platformLine.Position(0.5f));
-                Vector3 centerY = (y.platformLine.Position(0.5f));
+                Vector3 centerX = x.platformLine.Position(0.5f);
+                Vector3 centerY = y.platformLine.Position(0.5f);
+
                 if (Mathf.Abs(centerX.y - centerY.y) >= thresold)
                 {
                     return -centerX.y.CompareTo(centerY.y);
@@ -241,6 +330,7 @@ namespace TransportLinesManager.Cache.BuildingData
 
             return [.. result];
         }
+
         private static bool MapLane(uint laneId, int laneIdx, ref NetSegment segment, Vector3 directionPath, NetInfo.Lane refLane, out StopPointDescriptorLanes result)
         {
             result = default;
@@ -276,7 +366,7 @@ namespace TransportLinesManager.Cache.BuildingData
                     vehicleType = refLane.m_stopType,
                     laneId = leftLane,
                     platformLaneId = laneId,
-                    subbuildingId = -1,
+                    subBuildingId = -1,
                     directionPath = directionPath * ((segment.m_flags & NetSegment.Flags.Invert) != 0 == (refLane.m_finalDirection == NetInfo.Direction.AvoidForward || refLane.m_finalDirection == NetInfo.Direction.Backward) ? 1 : -1)
                 };
                 return true;
@@ -291,7 +381,7 @@ namespace TransportLinesManager.Cache.BuildingData
                     vehicleType = refLane.m_stopType,
                     laneId = rightLane,
                     platformLaneId = laneId,
-                    subbuildingId = -1,
+                    subBuildingId = -1,
                     directionPath = directionPath * ((segment.m_flags & NetSegment.Flags.Invert) != 0 == (refLane.m_finalDirection == NetInfo.Direction.AvoidForward || refLane.m_finalDirection == NetInfo.Direction.Backward) ? 1 : -1)
                 };
                 return true;
