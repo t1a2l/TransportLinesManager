@@ -1,4 +1,5 @@
-﻿using ColossalFramework.UI;
+﻿using System.Linq;
+using ColossalFramework.UI;
 using Commons.Utils;
 using TransportLinesManager.Utils;
 using UnityEngine;
@@ -71,15 +72,18 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             UITemplateUtils.GetTemplateDict()[ROW_TEMPLATE] = panel;
         }
 
-        public void Awake()
+        public void Start()
         {
             m_root = GetComponent<UIPanel>();
-            m_badgeHost = Find<UIButton>("LineBadge");
-            m_badge = m_badgeHost.GetComponent<TLMLineItemButtonControl>();
+            m_badgeHost = GetComponentsInChildren<UIButton>(true).FirstOrDefault(x => x.name == "LineBadge");
             m_name = Find<UILabel>("LineName");
             m_waiting = Find<UILabel>("Waiting");
 
-            m_badge?.useGUILayout = false;
+            m_badge = m_badgeHost.GetComponent<TLMLineItemButtonControl>();
+            if (m_badge == null)
+            {
+                m_badge = m_badgeHost.gameObject.AddComponent<TLMLineItemButtonControl>();
+            }
 
             m_root.eventClick += OnRowClick;
             m_name.eventClick += OnAnyClick;
