@@ -19,6 +19,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
         private bool m_fromBuilding;
         private ushort m_lineId;
         private Vector3 m_position;
+        private bool m_initialized;
 
         public static void EnsureTemplate()
         {
@@ -72,27 +73,61 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             UITemplateUtils.GetTemplateDict()[ROW_TEMPLATE] = panel;
         }
 
-        public void Start()
-        {
-            m_root = GetComponent<UIPanel>();
-            m_badgeHost = GetComponentsInChildren<UIButton>(true).FirstOrDefault(x => x.name == "LineBadge");
-            m_name = Find<UILabel>("LineName");
-            m_waiting = Find<UILabel>("Waiting");
 
-            m_badge = m_badgeHost.GetComponent<TLMLineItemButtonControl>();
-            if (m_badge == null)
+        private bool EnsureReferences()
+        {
+            if (m_initialized)
             {
-                m_badge = m_badgeHost.gameObject.AddComponent<TLMLineItemButtonControl>();
+                return true;
             }
 
-            m_root.eventClick += OnRowClick;
-            m_name.eventClick += OnAnyClick;
-            m_waiting.eventClick += OnAnyClick;
-            m_badgeHost.eventClick += OnAnyClick;
+            m_root = GetComponent<UIPanel>();
+            m_badgeHost = GetComponentsInChildren<UIButton>(true).FirstOrDefault(x => x.name == "LineBadge");
+            m_name = GetComponentsInChildren<UILabel>(true).FirstOrDefault(x => x.name == "LineName");
+            m_waiting = GetComponentsInChildren<UILabel>(true).FirstOrDefault(x => x.name == "Waiting");
+
+            if (m_badgeHost != null)
+            {
+                m_badge = m_badgeHost.GetComponent<TLMLineItemButtonControl>();
+                if (m_badge == null)
+                {
+                    m_badge = m_badgeHost.gameObject.AddComponent<TLMLineItemButtonControl>();
+                }
+            }
+
+            if (m_root != null)
+            {
+                m_root.eventClick -= OnRowClick;
+                m_root.eventClick += OnRowClick;
+            }
+            if (m_name != null)
+            {
+                m_name.eventClick -= OnAnyClick;
+                m_name.eventClick += OnAnyClick;
+            }
+            if (m_waiting != null)
+            {
+                m_waiting.eventClick -= OnAnyClick;
+                m_waiting.eventClick += OnAnyClick;
+            }
+            if (m_badgeHost != null)
+            {
+                m_badgeHost.eventClick -= OnAnyClick;
+                m_badgeHost.eventClick += OnAnyClick;
+            }
+
+            m_initialized = m_root != null && m_badgeHost != null && m_badge != null && m_name != null && m_waiting != null;
+            return m_initialized;
         }
 
         public void ResetData(bool fromBuilding, ushort lineId, Vector3 position, string lineName, int waiting)
         {
+            if (!EnsureReferences())
+            {
+                Debug.LogError($"TLMNearLineRowControl not initialized: obj={gameObject.name}");
+                return;
+            }
+
             m_fromBuilding = fromBuilding;
             m_lineId = lineId;
             m_position = position;

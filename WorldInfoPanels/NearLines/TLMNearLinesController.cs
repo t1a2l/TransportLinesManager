@@ -121,15 +121,33 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
 
         private void Update()
         {
-            if (m_dirty && component.parent.isVisible)
+            if (!m_dirty)
             {
-                UpdateNearLines(m_mayShow, true);
-                m_dirty = false;
+                return;
             }
+
+            if (component?.parent == null || !component.parent.isVisible)
+            {
+                return;
+            }
+
+            var current = WorldInfoPanel.GetCurrentInstanceID();
+            if (current.Building == 0 && current.Type != (InstanceType)TLMInstanceType.BuildingLines)
+            {
+                return;
+            }
+
+            UpdateNearLines(m_mayShow, true);
+            m_dirty = false;
         }
 
         private void UpdateNearLines(bool show, bool force = false)
         {
+            if (m_containerParent == null || m_localLinesTemplateList == null || m_regionalLinesTemplateList == null)
+            {
+                return;
+            }
+
             m_containerParent.isVisible = show;
             if (!show)
             {
@@ -137,6 +155,16 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             }
 
             ushort buildingId = WorldInfoPanel.GetCurrentInstanceID().Building;
+
+            if (buildingId == 0)
+            {
+                m_localLinesTemplateList.SetItemCount(0);
+                m_regionalLinesTemplateList.SetItemCount(0);
+                m_localContainer.isVisible = false;
+                m_regionalContainer.isVisible = false;
+                m_containerParent.isVisible = false;
+                return;
+            }
 
             if (lastBuildingSelected == buildingId && !force)
             {
