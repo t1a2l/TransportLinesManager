@@ -157,7 +157,6 @@ namespace TransportLinesManager.Cache.BuildingData
 
             if (buildingNodeIds.Count == 0)
             {
-                Debug.Log($"MapStopPoints: buildingId={buildingId} has no net nodes");
                 return [];
             }
 
