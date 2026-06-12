@@ -9,11 +9,10 @@ namespace TransportLinesManager.Overrides
     [HarmonyPatch(typeof(BusAI))]
     public class BusAIOverrides
     {
-        [HarmonyPatch(typeof(BusAI), "GetColor", [typeof(ushort), typeof(Vehicle), typeof(InfoManager.InfoMode), typeof(InfoManager.SubInfoMode)], [ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Normal, ArgumentType.Normal])]
+        [HarmonyPatch(typeof(BusAI), "GetColor")]
         [HarmonyPrefix]
-#pragma warning disable IDE0060 // Remove unused parameter
+
         public static bool GetColor(ushort vehicleID, ref Vehicle data, InfoManager.InfoMode infoMode, InfoManager.SubInfoMode subInfoMode, ref Color __result)
-#pragma warning restore IDE0060 // Remove unused parameter
         {
             if (data.m_leadingVehicle == 0 
                 && infoMode == InfoManager.InfoMode.None 
