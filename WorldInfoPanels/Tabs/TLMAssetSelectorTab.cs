@@ -45,6 +45,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private UILabel m_weightColumnHeader;
         private UILabel m_vehicleCountLabel;
 
+        private UISprite m_timeBudgetSelectLabelSprite;
         private static UIDropDown m_timeBudgetSelect;
 
         private TransportSystemDefinition TransportSystem => UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
@@ -73,6 +74,13 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_nameFilter.eventTextCancelled += (x, y) => UpdateAssetList(TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem));
             m_nameFilter.horizontalAlignment = UIHorizontalAlignment.Left;
             m_nameFilter.padding = new RectOffset(2, 2, 4, 2);
+
+            MonoUtils.CreateUIElement(out m_timeBudgetSelectLabelSprite, MainPanel.transform);
+            m_timeBudgetSelectLabelSprite.spriteName = "InfoPanelIconCurrency";
+            m_timeBudgetSelectLabelSprite.size = new Vector2(40, 40);
+            m_timeBudgetSelectLabelSprite.relativePosition = new Vector3(MainPanel.width - 140f, 20f);
+            m_timeBudgetSelectLabelSprite.tooltipLocaleID = "TLM_START_HOUR";
+
             m_timeBudgetSelect = UIHelperExtension.CloneBasicDropDownNoLabel([], ChangeBudgetTime, MainPanel);
             m_timeBudgetSelect.tooltipLocaleID = "TLM_TIME_PERCENT_LABEL";
             m_timeBudgetSelect.relativePosition = new Vector3(MainPanel.width - 100f, 25f);
