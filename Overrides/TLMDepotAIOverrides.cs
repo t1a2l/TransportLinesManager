@@ -58,7 +58,7 @@ namespace TransportLinesManager.Overrides
 
 
                 LogUtils.DoLog("randomVehicleInfo");
-                VehicleInfo randomVehicleInfo = DoModelDraw(offer.TransportLine) ?? Singleton<VehicleManager>.instance.GetRandomVehicleInfo(ref Singleton<SimulationManager>.instance.m_randomizer, m_info.m_class.m_service, m_info.m_class.m_subService, m_info.m_class.m_level);
+                VehicleInfo randomVehicleInfo = DoModelDraw(offer.TransportLine);
                 if (randomVehicleInfo != null)
                 {
                     LogUtils.DoLog("randomVehicleInfo != null");
@@ -70,6 +70,11 @@ namespace TransportLinesManager.Overrides
                         randomVehicleInfo.m_vehicleAI.SetSource(vehicleID, ref vehicles.m_buffer[vehicleID], buildingID);
                         randomVehicleInfo.m_vehicleAI.StartTransfer(vehicleID, ref vehicles.m_buffer[vehicleID], reason, offer);
                     }
+                    return false;
+                }
+                else
+                {
+                    LogUtils.DoErrorLog("DoModelDraw returned null for line {0}", offer.TransportLine);
                     return false;
                 }
             }
