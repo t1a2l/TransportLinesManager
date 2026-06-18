@@ -57,7 +57,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
                     List<TransportAsset> allowedTransportAssets = extension.GetAssetTransportListForLine(fromBuilding ? (ushort)0 : lineId);
                     var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
-                    if (index == -1) index = 0;
+                    if (index == -1) index = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
                     bool isAllowed = allowedTransportAssets.Any(item => item.name == m_currentAsset);
                     TransportAsset asset = isAllowed ? allowedTransportAssets.Find(item => item.name == m_currentAsset) : new TransportAsset { name = m_currentAsset };
                     SetAsset(asset, isAllowed, fromBuilding ? (ushort)0 : lineId, index);
@@ -184,7 +184,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                         var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
                         if (index == -1)
                         {
-                            index = 0;
+                            index = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
                         }
 
                         bool isAbsolute = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId) && UVMBudgetConfigTab.IsAbsoluteValue();
