@@ -15,14 +15,12 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
-using TransportLinesManager.WorldInfoPanels.Tabs;
 
 namespace TransportLinesManager.Data.Base.ConfigurationContainers
 {
     [XmlRoot("TransportTypeExtension")]
     public class TLMTransportTypeConfigurations : TsdIdentifiable, ITLMTransportTypeExtension
     {
-
         private List<TransportAsset> m_basicAssetsList;
         private List<TransportAsset> m_basicAssetsListIntercity;
 
@@ -317,34 +315,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
 
         public void EditVehicleUsedCount(ushort lineID, string selectedModel, string status)
         {
-            if (lineID == 0)
-            {
-                return;
-            }
-            List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
-            var budgetData = TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineID);
-            int index = budgetData.Second;
-            if (index == -1)
-            {
-                index = 0;
-            }
-            var asset_index = assetTransportList.FindIndex(item => item.name == selectedModel);
-            if (asset_index == -1)
-            {
-                LogUtils.DoErrorLog($"EditVehicleUsedCount: Could not find asset {selectedModel} in line {lineID} asset list — breaking to avoid infinite loop");
-                return;
-            }
-            var asset_count = assetTransportList[asset_index].count[index.ToString()];
-            if(status == "Add")
-            {
-                asset_count.UsedCount++;
-            }
-            else if (status == "Remove")
-            {
-                asset_count.UsedCount--;
-            }
-            assetTransportList[asset_index].count[index.ToString()] = asset_count;
-            ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
+            return;
         }
 
         private void LoadBasicAssets()
