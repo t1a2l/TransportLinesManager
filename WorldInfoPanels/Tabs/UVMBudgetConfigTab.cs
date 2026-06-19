@@ -60,7 +60,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
                     ext.SetAssetTransportListForLine(lineId, assets);
                     RebuildList();
-                    UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
+                    TLMAssetSelectorTab.MarkDirty();
                 }
             });
             MonoUtils.LimitWidthAndBox(m_showAbsoluteCheckbox.label, m_uiHelper.Self.width - 40f);

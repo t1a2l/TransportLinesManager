@@ -57,7 +57,11 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
                     List<TransportAsset> allowedTransportAssets = extension.GetAssetTransportListForLine(fromBuilding ? (ushort)0 : lineId);
                     var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
-                    if (index == -1) index = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                    if (index == -1)
+                    {
+                        var hourIndex = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                        index = hourIndex != -1 ? hourIndex : 0;
+                    }
                     bool isAllowed = allowedTransportAssets.Any(item => item.name == m_currentAsset);
                     TransportAsset asset = isAllowed ? allowedTransportAssets.Find(item => item.name == m_currentAsset) : new TransportAsset { name = m_currentAsset };
                     SetAsset(asset, isAllowed, fromBuilding ? (ushort)0 : lineId, index);
@@ -152,7 +156,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                         tsd.GetTransportExtension().SetVehicleCapacity(m_currentAsset, value);
                         m_capacityEditor.text = VehicleUtils.GetCapacity(info).ToString("0");
                         UpdateMaintenanceCost(info, tsd);
-                        UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
+                        TLMAssetSelectorTab.MarkDirty();
                     }
                 }
             }
@@ -184,7 +188,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                         var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
                         if (index == -1)
                         {
-                            index = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                            var hourIndex = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                            index = hourIndex != -1 ? hourIndex : 0;
                         }
 
                         bool isAbsolute = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId) && UVMBudgetConfigTab.IsAbsoluteValue();
@@ -235,7 +240,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                         config.SetAssetTransportListForLine(lineId, allowedTransportAssets);
                         m_weightEditor.text = value.ToString("0");
                         UpdateMaintenanceCost(info, tsd);
-                        UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
+                        TLMAssetSelectorTab.MarkDirty();
                     }
                 }
             }

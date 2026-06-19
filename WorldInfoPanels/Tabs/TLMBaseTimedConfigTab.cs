@@ -194,11 +194,13 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             Config.RemoveAtHour(entry.HourOfDay ?? -1); // remove AFTER assets are fixed
             m_isDirty = true;
             UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(UVMBudgetConfigTab));
+            TLMAssetSelectorTab.MarkDirty();
         }
         private void SetTime(V idx, int val)
         {
             idx.HourOfDay = val;
             ReorderLines();
+            TLMAssetSelectorTab.MarkDirty();
         }
 
         private void SetValue(V idx, float val)
@@ -224,7 +226,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     }
                     if (budgetIndex == -1) return; // safety guard
                     IBasicExtension ext = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
-                    List<TransportAsset> assets = ext.GetAssetTransportListForLine(lineId);
 
                     int projected = TLMLineUtils.ProjectTargetVehicleCount(
                         TransportManager.instance.m_lines.m_buffer[lineId].Info,
@@ -237,10 +238,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                         oldVal / 100f);
 
                     TLMCountModeUtils.OnBudgetChangedInCountMode(lineId, ext, budgetIndex, projected, oldProjected);
-                    UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMAssetSelectorTab));
                 }
 
                 ReorderLines();
+                TLMAssetSelectorTab.MarkDirty();
             }
         }
 
@@ -255,6 +256,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
             RebuildList();
             UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(UVMBudgetConfigTab));
+            TLMAssetSelectorTab.MarkDirty();
         }
 
 

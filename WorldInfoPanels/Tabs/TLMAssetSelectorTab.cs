@@ -22,7 +22,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
     {
         private UILabel m_title;
         private Color m_lastColor = Color.clear;
-        private bool m_isDirty = false;
+        private static bool m_isDirty = false;
 
         public void Awake() => CreateWindow();
 
@@ -56,7 +56,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             return !fromBuilding ? lineId : (ushort)0;
         }
 
-        public void MarkDirty() => m_isDirty = true;
+        public static void MarkDirty() => m_isDirty = true;
 
         private void CreateWindow()
         {
@@ -331,7 +331,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     budgetArr[i] = temp[i].ToString();
                 }
                 m_timeBudgetSelect.items = budgetArr;
-                m_timeBudgetSelect.selectedIndex = 0;
+                var hourIndex = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                m_timeBudgetSelect.selectedIndex = hourIndex != -1 ? hourIndex : 0;
                 UpdateModeIndicator(lineId, 0);
             }
 

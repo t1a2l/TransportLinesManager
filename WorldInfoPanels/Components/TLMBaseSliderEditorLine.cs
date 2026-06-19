@@ -6,6 +6,7 @@ using Commons.UI.SpriteNames;
 using Commons.Utils;
 using TransportLinesManager.Data.Base;
 using TransportLinesManager.Utils;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 using UnityEngine;
 
 namespace TransportLinesManager.WorldInfoPanels.Components
@@ -250,6 +251,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
             OnBudgetChanged?.Invoke(Entry, val);
             FillData();
+            TLMAssetSelectorTab.MarkDirty();
         }
 
         private bool alreadyCalling = false;

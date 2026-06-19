@@ -63,7 +63,8 @@ namespace TransportLinesManager.Data.Extensions
                 var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
                 if (index == -1)
                 {
-                    index = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                    var hourIndex = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                    index = hourIndex != -1 ? hourIndex : 0;
                 }
                 if (isAbsolute)
                 {
