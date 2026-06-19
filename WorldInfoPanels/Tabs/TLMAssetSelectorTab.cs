@@ -163,6 +163,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             m_copyButton.Hide();
             m_pasteButton.Hide();
+            m_eraseButton.Hide();
         }
 
         private void ActionCopy()
