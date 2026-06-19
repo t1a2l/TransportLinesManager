@@ -165,7 +165,34 @@ namespace TransportLinesManager.Data.DataContainers
             ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
         }
 
-        public void RebuildUsedCountForCurrentSlot(ushort lineID, int slotIndex)
+        private int GetCurrentExactBudgetSlot(ushort lineID)
+        {
+            if (lineID == 0)
+            {
+                return 0;
+            }
+
+            var exactBudget = TLMLineUtils.GetEffectiveConfigForLine(lineID).BudgetEntries.GetAtHourExact(SimulationManager.instance.m_currentGameTime.Hour);
+
+            int index = exactBudget.Second;
+            return index < 0 ? 0 : index;
+        }
+
+        private void EnsureUsedCountSlotSynchronized(ushort lineID, int currentSlot)
+        {
+            if (lineID == 0)
+            {
+                return;
+            }
+
+            if (!m_lastUsedCountSlotByLine.TryGetValue(lineID, out int lastSlot) || lastSlot != currentSlot)
+            {
+                RebuildUsedCountForCurrentSlot(lineID, currentSlot);
+                m_lastUsedCountSlotByLine[lineID] = currentSlot;
+            }
+        }
+
+        private void RebuildUsedCountForCurrentSlot(ushort lineID, int slotIndex)
         {
             if (lineID == 0 || slotIndex < 0)
             {
@@ -232,33 +259,6 @@ namespace TransportLinesManager.Data.DataContainers
             }
 
             ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
-        }
-
-        private int GetCurrentExactBudgetSlot(ushort lineID)
-        {
-            if (lineID == 0)
-            {
-                return 0;
-            }
-
-            var exactBudget = TLMLineUtils.GetEffectiveConfigForLine(lineID).BudgetEntries.GetAtHourExact(SimulationManager.instance.m_currentGameTime.Hour);
-
-            int index = exactBudget.Second;
-            return index < 0 ? 0 : index;
-        }
-
-        private void EnsureUsedCountSlotSynchronized(ushort lineID, int currentSlot)
-        {
-            if (lineID == 0)
-            {
-                return;
-            }
-
-            if (!m_lastUsedCountSlotByLine.TryGetValue(lineID, out int lastSlot) || lastSlot != currentSlot)
-            {
-                RebuildUsedCountForCurrentSlot(lineID, currentSlot);
-                m_lastUsedCountSlotByLine[lineID] = currentSlot;
-            }
         }
 
         #endregion
