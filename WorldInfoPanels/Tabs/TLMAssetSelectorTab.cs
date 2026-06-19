@@ -160,6 +160,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_pasteButton.relativePosition = new Vector3(MainPanel.width - 100f, 0f);
             m_eraseButton.relativePosition = new Vector3(MainPanel.width - 25f, 0f);
             // MainPanel.width - 380f
+
+            m_copyButton.Hide();
+            m_pasteButton.Hide();
         }
 
         private void ActionCopy()
