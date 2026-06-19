@@ -172,7 +172,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
             var dataClipboard = XmlUtils.DefaultXmlSerialize(config.GetAssetListForLine(lineId).ToList());
             m_clipboard[TransportSystem] = dataClipboard;
-            m_pasteButton.isVisible = true;
+            // m_pasteButton.isVisible = true;
             UpdateAssetList(config);
         }
 
@@ -291,7 +291,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             var lineId = GetLineID();
             m_lastInfo = default;
-            m_pasteButton.isVisible = m_clipboard.ContainsKey(TransportSystem);
+            // m_pasteButton.isVisible = m_clipboard.ContainsKey(TransportSystem);
             var targetAssets = TransportSystem.GetTransportExtension().GetAllBasicAssetsForLine(lineId).Where(x => x.Value.ToLower().Contains(m_nameFilter.text.ToLower())).ToList();
             UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(targetAssets.Count);
             List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
