@@ -11,7 +11,6 @@ using TransportLinesManager.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
-using TransportLinesManager.WorldInfoPanels.Tabs;
 
 namespace TransportLinesManager.Data.DataContainers
 {
@@ -20,7 +19,11 @@ namespace TransportLinesManager.Data.DataContainers
         [XmlElement("Configurations")]
         public SimpleNonSequentialList<TLMTransportLineConfiguration> Configurations { get; set; } = [];
 
-        internal void SafeCleanEntry(ushort lineID) => Configurations[lineID] = new TLMTransportLineConfiguration();
+        internal void SafeCleanEntry(ushort lineID)
+        {
+            Configurations[lineID] = new TLMTransportLineConfiguration();
+            m_lastUsedCountSlotByLine.Remove(lineID);
+        }
         
         public TLMTransportLineConfiguration SafeGet(uint lineId)
         {
@@ -44,6 +47,8 @@ namespace TransportLinesManager.Data.DataContainers
         public override string SaveId => $"TLM_TLMTransportLineExtension";
 
         private readonly Dictionary<TransportSystemDefinition, List<TransportAsset>> m_basicAssetsList = [];
+
+        private readonly Dictionary<ushort, int> m_lastUsedCountSlotByLine = [];
 
         public void SetUseCustomConfig(ushort lineId, bool value)
         {
@@ -118,30 +123,142 @@ namespace TransportLinesManager.Data.DataContainers
             {
                 return;
             }
+
+            int index = GetCurrentExactBudgetSlot(lineID);
+            EnsureUsedCountSlotSynchronized(lineID, index);
+
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
-            var budgetData = TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineID);
-            int index = budgetData.Second;
-            if (index == -1)
+            int assetindex = assetTransportList.FindIndex(item => item.name == selectedModel);
+            if (assetindex == -1)
             {
-                index = 0;
-            }
-            var asset_index = assetTransportList.FindIndex(item => item.name == selectedModel);
-            if (asset_index == -1)
-            {
-                LogUtils.DoErrorLog($"EditVehicleUsedCount: Could not find asset {selectedModel} in line {lineID} asset list — breaking to avoid infinite loop");
+                LogUtils.DoErrorLog($"EditVehicleUsedCount: Could not find asset {selectedModel} in line {lineID} asset list");
                 return;
             }
-            var asset_count = assetTransportList[asset_index].count[index.ToString()];
+
+            string key = index.ToString();
+            TransportAsset asset = assetTransportList[assetindex];
+
+            asset.count ??= [];
+
+            if (!asset.count.ContainsKey(key))
+            {
+                asset.count[key] = new CountEntry
+                {
+                    TotalCount = 0,
+                    UsedCount = 0
+                };
+            }
+
+            CountEntry assetcount = asset.count[key];
+
             if (status == "Add")
             {
-                asset_count.UsedCount++;
+                assetcount.UsedCount++;
             }
-            else if (status == "Remove")
+            else if (status == "Remove" && assetcount.UsedCount > 0)
             {
-                asset_count.UsedCount--;
+                assetcount.UsedCount--;
             }
-            assetTransportList[asset_index].count[index.ToString()] = asset_count;
+
+            asset.count[key] = assetcount;
+            assetTransportList[assetindex] = asset;
             ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
+        }
+
+        public void RebuildUsedCountForCurrentSlot(ushort lineID, int slotIndex)
+        {
+            if (lineID == 0 || slotIndex < 0)
+            {
+                return;
+            }
+
+            List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
+            if (assetTransportList == null || assetTransportList.Count == 0)
+            {
+                return;
+            }
+
+            var tm = TransportManager.instance;
+            var vm = VehicleManager.instance;
+            ref TransportLine tl = ref tm.m_lines.m_buffer[lineID];
+
+            Dictionary<string, int> vehicleCountPerAsset = [];
+            int vehicleCount = tl.CountVehicles(lineID);
+
+            for (int v = 0; v < vehicleCount; v++)
+            {
+                ushort vehicleId = tl.GetVehicle(v);
+                if (vehicleId == 0)
+                {
+                    continue;
+                }
+
+                VehicleInfo info = vm.m_vehicles.m_buffer[vehicleId].Info;
+                if (info == null || string.IsNullOrEmpty(info.name))
+                {
+                    continue;
+                }
+
+                if (!vehicleCountPerAsset.ContainsKey(info.name))
+                {
+                    vehicleCountPerAsset[info.name] = 0;
+                }
+
+                vehicleCountPerAsset[info.name]++;
+            }
+
+            string key = slotIndex.ToString();
+
+            for (int i = 0; i < assetTransportList.Count; i++)
+            {
+                TransportAsset asset = assetTransportList[i];
+
+                asset.count ??= [];
+
+                if (!asset.count.ContainsKey(key))
+                {
+                    asset.count[key] = new CountEntry
+                    {
+                        TotalCount = 0,
+                        UsedCount = 0
+                    };
+                }
+
+                CountEntry entry = asset.count[key];
+                entry.UsedCount = vehicleCountPerAsset.TryGetValue(asset.name, out int used) ? used : 0;
+                asset.count[key] = entry;
+
+                assetTransportList[i] = asset;
+            }
+
+            ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
+        }
+
+        private int GetCurrentExactBudgetSlot(ushort lineID)
+        {
+            if (lineID == 0)
+            {
+                return 0;
+            }
+
+            var exactBudget = TLMLineUtils.GetEffectiveConfigForLine(lineID).BudgetEntries.GetAtHourExact(SimulationManager.instance.m_currentGameTime.Hour);
+
+            int index = exactBudget.Second;
+            return index < 0 ? 0 : index;
+        }
+
+        private void EnsureUsedCountSlotSynchronized(ushort lineID, int currentSlot)
+        {
+            if (lineID == 0)
+            {
+                return;
+            }
+
+            if (!m_lastUsedCountSlotByLine.TryGetValue(lineID, out int lastSlot) || lastSlot != currentSlot)
+            {
+                RebuildUsedCountForCurrentSlot(lineID, currentSlot);
+                m_lastUsedCountSlotByLine[lineID] = currentSlot;
+            }
         }
 
         #endregion
