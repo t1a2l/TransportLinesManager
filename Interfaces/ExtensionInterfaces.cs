@@ -14,6 +14,7 @@ namespace TransportLinesManager.Interfaces
     public interface IBudgetableExtension : ISafeGettable<IBudgetStorage>, ILineNumberToIndexable
     {
     }
+
     public interface IBudgetStorage
     {
         TimeableList<BudgetEntryXml> BudgetEntries { get; set; }
@@ -41,24 +42,30 @@ namespace TransportLinesManager.Interfaces
     public interface IAssetSelectorExtension : ISafeGettable<IAssetSelectorStorage>, ILineNumberToIndexable
     {
         Dictionary<TransportAsset, string> GetAllBasicAssetsForLine(ushort lineId);
+
         List<TransportAsset> GetBasicAssetListForLine(ushort lineId);
+
         VehicleInfo GetAModel(ushort lineId);
+
         void EditVehicleUsedCount(ushort lineID, string selectedModel, string status);
     }
 
     public interface IAssetSelectorStorage
     {
         SimpleXmlList<TransportAsset> AssetTransportList { get; set; }
+
         SimpleXmlList<string> AssetList { get; set; }
     }
 
     public interface IColorSelectableExtension : ISafeGettable<IColorSelectableStorage>, ILineNumberToIndexable
     {
     }
+
     public interface IColorSelectableStorage
     {
         Color Color { get; set; }
     }
+
     public interface ISafeGettable<T>
     {
         T SafeGet(uint index);
@@ -76,7 +83,9 @@ namespace TransportLinesManager.Interfaces
     public interface IBasicExtension : IAssetSelectorExtension, IBudgetableExtension, ITicketPriceExtension, IDepotSelectableExtension, ISafeGettable<IBasicExtensionStorage>
     {
     }
+
     public interface IBasicExtensionStorage : IAssetSelectorStorage, IBudgetStorage, ITicketPriceStorage, IDepotSelectionStorage
-    { }
+    { 
+    }
 
 }
