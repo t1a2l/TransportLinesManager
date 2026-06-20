@@ -338,6 +338,16 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             UVMPublicTransportWorldInfoPanel.GetLineID(out _, out bool fromBuilding);
             if (!fromBuilding)
             {
+                BudgetEntryXml previouslySelectedEntry = null;
+                if (lineId > 0 && m_timeBudgetSelect != null)
+                {
+                    int oldUiIndex = m_timeBudgetSelect.selectedIndex;
+                    if (oldUiIndex >= 0 && oldUiIndex < m_budgetEntriesInUiOrder.Count)
+                    {
+                        previouslySelectedEntry = m_budgetEntriesInUiOrder[oldUiIndex];
+                    }
+                }
+
                 m_budgetEntriesInUiOrder.Clear();
 
                 var entriesInUiOrder = currentConfig.BudgetEntries.Cast<BudgetEntryXml>().OrderBy(x => x.HourOfDay).ToList();
@@ -345,18 +355,31 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 m_budgetEntriesInUiOrder.AddRange(entriesInUiOrder);
                 m_timeBudgetSelect.items = [.. entriesInUiOrder.Select(x => x.HourOfDay.ToString())];
 
-                var currentExact = currentConfig.BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer);
-                int backingIndex = currentExact.Second;
-                int selectedUiIndex = 0;
+                int selectedUiIndex = -1;
 
-                if (backingIndex >= 0 && currentExact.First is BudgetEntryXml currentEntry)
+                if (previouslySelectedEntry != null)
                 {
-                    selectedUiIndex = m_budgetEntriesInUiOrder.FindIndex(x => ReferenceEquals(x, currentEntry));
-                    if (selectedUiIndex < 0) selectedUiIndex = 0;
+                    selectedUiIndex = m_budgetEntriesInUiOrder.FindIndex(x => ReferenceEquals(x, previouslySelectedEntry));
+                }
+
+                if (selectedUiIndex < 0)
+                {
+                    var currentExact = currentConfig.BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer);
+                    int backingIndex = currentExact.Second;
+
+                    if (backingIndex >= 0 && currentExact.First is BudgetEntryXml currentEntry)
+                    {
+                        selectedUiIndex = m_budgetEntriesInUiOrder.FindIndex(x => ReferenceEquals(x, currentEntry));
+                    }
+                }
+
+                if (selectedUiIndex < 0)
+                {
+                    selectedUiIndex = 0;
                 }
 
                 m_timeBudgetSelect.selectedIndex = selectedUiIndex;
-                UpdateModeIndicator(lineId, backingIndex);
+                UpdateModeIndicator(lineId, GetBudgetSelectedIndex());
             }
 
             if (TransportLinesManagerMod.DebugMode)
