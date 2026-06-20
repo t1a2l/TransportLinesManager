@@ -23,6 +23,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         private UICheckBox m_checkbox;
         private UITextField m_capacityEditor;
         private UITextField m_weightEditor;
+        private UILabel m_usedCount;
         private string m_currentAsset;
         public Action OnMouseEnter;
 
@@ -33,6 +34,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
             m_capacityEditor = panel.Find<UITextField>("Cap");
             m_weightEditor = panel.Find<UITextField>("Weg");
+            m_usedCount = panel.Find<UILabel>("UsedCount");
 
             m_checkbox.eventCheckChanged += (x, y) =>
             {
@@ -71,6 +73,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             container.relativePosition = new Vector3(container.relativePosition.x, 0);
             m_capacityEditor.eventTextSubmitted += CapacityEditor_eventTextSubmitted;
             m_weightEditor.eventTextSubmitted += WeightEditor_eventTextSubmitted;
+            m_usedCount.text = "0";
 
             m_checkbox.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
             m_capacityEditor.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
@@ -86,6 +89,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             var info = PrefabCollection<VehicleInfo>.FindLoaded(m_currentAsset);
             var tsd = TransportSystemDefinition.From(info);
             UpdateMaintenanceCost(info, tsd);
+
+            m_usedCount.text = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()].UsedCount.ToString() : "-";
+            m_usedCount.tooltip = Locale.Get("TLM_ASSET_USED_LABEL_DESCRIPTION");
 
             bool isIntercity = lineId == 0;
             m_weightEditor.isVisible = !isIntercity;
@@ -289,6 +295,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             wegEditField.numericalOnly = true;
             wegEditField.maxLength = 5;
             wegEditField.padding = new RectOffset(2, 2, 9, 2);
+
+            MonoUtils.CreateUIElement(out UILabel usedCountField, panel.transform, "UsedCount", new Vector4(0, 0, 50, 32));
+            usedCountField.padding = new RectOffset(2, 2, 9, 2);
 
             go.AddComponent<TLMAssetItemLine>();
             TLMUiTemplateUtils.GetTemplateDict()[TEMPLATE_NAME] = panel;

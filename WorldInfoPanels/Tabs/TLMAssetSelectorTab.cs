@@ -58,6 +58,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private UILabel m_capacityColumnHeader;
         private UILabel m_weightColumnHeader;
+        private UILabel m_usedCountColumnHeader;
+
         private UILabel m_vehicleCountLabel;
 
         private UISprite m_timeBudgetSelectLabelSprite;
@@ -65,7 +67,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private TransportSystemDefinition TransportSystem => UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
 
-        private static List<BudgetEntryXml> m_budgetEntriesInUiOrder = [];
+        private static readonly List<BudgetEntryXml> m_budgetEntriesInUiOrder = [];
 
         internal static ushort GetLineID()
         {
@@ -137,6 +139,14 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_weightColumnHeader.textScale = 0.65f;
             m_weightColumnHeader.textAlignment = UIHorizontalAlignment.Center;
             // text set dynamically in UpdateModeIndicator()
+
+            MonoUtils.CreateUIElement(out m_usedCountColumnHeader, MainPanel.transform);
+            m_usedCountColumnHeader.autoSize = false;
+            m_usedCountColumnHeader.width = 50f;
+            m_usedCountColumnHeader.height = 20f;
+            m_usedCountColumnHeader.relativePosition = new Vector3(MainPanel.width - 25f, 60f);
+            m_usedCountColumnHeader.textScale = 0.65f;
+            m_usedCountColumnHeader.textAlignment = UIHorizontalAlignment.Center;
 
             MonoUtils.CreateUIElement(out m_vehicleCountLabel, MainPanel.transform);
             m_vehicleCountLabel.autoSize = false;
@@ -288,6 +298,20 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_weightColumnHeader.isVisible = !fromBuilding;
             m_vehicleCountLabel.isVisible = !fromBuilding;
 
+            bool isCustom = TLMTransportLineExtension.Instance.IsUsingCustomConfig(GetLineID());
+            bool isAbsolute = isCustom && UVMBudgetConfigTab.IsAbsoluteValue();
+
+            if(isAbsolute)
+            {
+                m_usedCountColumnHeader.isVisible = true;
+                m_vehicleCountLabel.isVisible = true;
+            }
+            else
+            {
+                m_usedCountColumnHeader.isVisible = false;
+                m_vehicleCountLabel.isVisible = false;
+            }
+
             LogUtils.DoLog("tsd = {0}", tsd);
             IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
 
@@ -399,6 +423,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 LogUtils.DoLog($"selectedAssets Size = {allowedTransportAssets?.Count} ({string.Join(",", arr ?? [])}) {config?.GetType()}");
 
             }
+
+            int selectedBudgetIndex = GetBudgetSelectedIndex();
+
             for (int i = 0; i < assetsCheck.Length; i++)
             {
                 var asset = targetAssets[i].Key;
@@ -408,7 +435,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 {
                     asset = allowedTransportAssets.Find(item => item.name == asset.name);
                 }
-                int selectedBudgetIndex = GetBudgetSelectedIndex();
+
                 controller.SetAsset(asset, isAllowed, lineId, selectedBudgetIndex);
                 controller.OnMouseEnter = () =>
                 {
@@ -531,6 +558,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             if (isAbsolute)
             {
                 m_weightColumnHeader.text = Locale.Get("TLM_ASSET_COUNT_HEADER"); // e.g. "Count"
+                m_usedCountColumnHeader.text = Locale.Get("TLM_ASSET_USED_HEADER");
+                m_usedCountColumnHeader.isVisible = true;
                 IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
                 if (budgetIndex >= 0 && budgetIndex < currentConfig.BudgetEntries.Count)
                 {
@@ -576,6 +605,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 m_weightColumnHeader.text = Locale.Get("TLM_ASSET_PERCENT_HEADER"); // e.g. "%"
                 m_vehicleCountLabel.isVisible = false;
+                m_usedCountColumnHeader.isVisible = false;
             }
         }
 
