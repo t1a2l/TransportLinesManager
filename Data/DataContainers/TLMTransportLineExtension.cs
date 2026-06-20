@@ -117,6 +117,11 @@ namespace TransportLinesManager.Data.DataContainers
             return info;
         }
 
+        public int GetCurrentUsedCountSlot(ushort lineId)
+        {
+            return GetCurrentExactBudgetSlot(lineId);
+        }
+
         public void EditVehicleUsedCount(ushort lineID, string selectedModel, string status)
         {
             if (lineID == 0)

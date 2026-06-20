@@ -103,8 +103,22 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 if (isAbsolute)
                 {
                     m_weightEditor.text = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()].TotalCount.ToString() : "0";
-                    m_usedCount.text = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()].UsedCount.ToString() : "-";
-                    m_usedCount.tooltip = Locale.Get("TLM_ASSET_USED_LABEL_DESCRIPTION");
+                    m_usedCount.isVisible = true;
+
+                    string key = index.ToString();
+                    bool isActiveSlot = index == TLMTransportLineExtension.Instance.GetCurrentUsedCountSlot(lineId);
+                    if(isActiveSlot)
+                    {
+                        m_usedCount.opacity = 1f;
+                        m_usedCount.text = asset.count.ContainsKey(key) ? asset.count[key].UsedCount.ToString() : "0";
+                        m_usedCount.tooltip = Locale.Get("TLM_ASSET_USED_LABEL_DESCRIPTION");
+                    }
+                    else
+                    {
+                        m_usedCount.opacity = 0.3f;
+                        m_usedCount.text = "-";
+                        m_usedCount.tooltip = null;
+                    }
                 }
                 else
                 {
@@ -116,8 +130,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 m_weightEditor.isInteractive = false;
                 m_weightEditor.opacity = 0.3f;
                 m_weightEditor.text = "0";
-                m_usedCount.opacity = 0.3f;
-                m_usedCount.text = "-";
+                m_usedCount.isVisible = false;
             }
 
             m_capacityEditor.text = asset.capacity != 0 ? asset.capacity.ToString() : VehicleUtils.GetCapacity(info).ToString("0");
