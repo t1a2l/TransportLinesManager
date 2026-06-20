@@ -15,6 +15,7 @@ using System.Linq;
 using UnityEngine;
 using Commons.Extensions.UI;
 using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Data.Base;
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
@@ -24,7 +25,21 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private Color m_lastColor = Color.clear;
         private static bool m_isDirty = false;
 
-        public void Awake() => CreateWindow();
+        internal static TLMAssetSelectorTab Instance { get; private set; }
+
+        public void Awake()
+        {
+            Instance = this;
+            CreateWindow();
+        }
+
+        public void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
+            }
+        }
 
         public UIPanel MainPanel { get; private set; }
 
@@ -50,10 +65,17 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private TransportSystemDefinition TransportSystem => UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
 
+        private static List<BudgetEntryXml> m_budgetEntriesInUiOrder = [];
+
         internal static ushort GetLineID()
         {
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding);
             return !fromBuilding ? lineId : (ushort)0;
+        }
+
+        internal static void RefreshIndicatorForBudgetIndex(ushort lineId, int budgetIndex)
+        {
+            Instance?.UpdateModeIndicator(lineId, budgetIndex);
         }
 
         public static void MarkDirty() => m_isDirty = true;
@@ -316,28 +338,25 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             UVMPublicTransportWorldInfoPanel.GetLineID(out _, out bool fromBuilding);
             if (!fromBuilding)
             {
-                string[] budgetArr = new string[currentConfig.BudgetEntries.Count];
-                int index = 0;
-                int length = currentConfig.BudgetEntries.Count;
-                int[] temp = new int[length];
-                foreach (var item in currentConfig.BudgetEntries)
+                m_budgetEntriesInUiOrder.Clear();
+
+                var entriesInUiOrder = currentConfig.BudgetEntries.Cast<BudgetEntryXml>().OrderBy(x => x.HourOfDay).ToList();
+
+                m_budgetEntriesInUiOrder.AddRange(entriesInUiOrder);
+                m_timeBudgetSelect.items = [.. entriesInUiOrder.Select(x => x.HourOfDay.ToString())];
+
+                var currentExact = currentConfig.BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer);
+                int backingIndex = currentExact.Second;
+                int selectedUiIndex = 0;
+
+                if (backingIndex >= 0 && currentExact.First is BudgetEntryXml currentEntry)
                 {
-                    if(index >= length)
-                    {
-                        break;
-                    }
-                    temp[index] = (int)item.HourOfDay;
-                    index++;
+                    selectedUiIndex = m_budgetEntriesInUiOrder.FindIndex(x => ReferenceEquals(x, currentEntry));
+                    if (selectedUiIndex < 0) selectedUiIndex = 0;
                 }
-                Array.Sort(temp);
-                for (int i = 0; i < temp.Length; i++)
-                {
-                    budgetArr[i] = temp[i].ToString();
-                }
-                m_timeBudgetSelect.items = budgetArr;
-                var hourIndex = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
-                m_timeBudgetSelect.selectedIndex = hourIndex != -1 ? hourIndex : 0;
-                UpdateModeIndicator(lineId, hourIndex);
+
+                m_timeBudgetSelect.selectedIndex = selectedUiIndex;
+                UpdateModeIndicator(lineId, backingIndex);
             }
 
             if (TransportLinesManagerMod.DebugMode)
@@ -366,7 +385,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 {
                     asset = allowedTransportAssets.Find(item => item.name == asset.name);
                 }
-                controller.SetAsset(asset, isAllowed, lineId, m_timeBudgetSelect.selectedIndex);
+                int selectedBudgetIndex = GetBudgetSelectedIndex();
+                controller.SetAsset(asset, isAllowed, lineId, selectedBudgetIndex);
                 controller.OnMouseEnter = () =>
                 {
                     m_lastInfo = PrefabCollection<VehicleInfo>.FindLoaded(asset.name);
@@ -537,7 +557,31 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public static int GetBudgetSelectedIndex()
         {
-            return m_timeBudgetSelect.selectedIndex;
+            if (!UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) || fromBuilding || lineId == 0)
+            {
+                return 0;
+            }
+
+            int uiIndex = m_timeBudgetSelect.selectedIndex;
+            if (uiIndex < 0 || uiIndex >= m_budgetEntriesInUiOrder.Count)
+            {
+                return 0;
+            }
+
+            return GetBudgetEntryBackingIndex(lineId, m_budgetEntriesInUiOrder[uiIndex]);
+        }
+
+        public static int GetBudgetEntryBackingIndex(ushort lineId, BudgetEntryXml target)
+        {
+            var cfg = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+            for (int i = 0; i < cfg.BudgetEntries.Count; i++)
+            {
+                if (ReferenceEquals(cfg.BudgetEntries[i], target))
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         private void RedrawModel() => m_previewRenderer.RenderVehicle(m_lastInfo, m_lastColor == Color.clear ? Color.HSVToRGB(Math.Abs(m_previewRenderer.CameraRotation) / 360f, .5f, .5f) : m_lastColor, true);

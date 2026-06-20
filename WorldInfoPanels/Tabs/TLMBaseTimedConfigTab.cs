@@ -215,15 +215,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     && UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding)
                     && !fromBuilding && lineId > 0)
                 {
-                    int budgetIndex = -1;
-                    for (int i = 0; i < Config.Count; i++)
-                    {
-                        if (Config[i] == idx)
-                        {
-                            budgetIndex = i;
-                            break;
-                        }
-                    }
+                    if (idx is not BudgetEntryXml budgetEntry) return;
+                    int budgetIndex = TLMAssetSelectorTab.GetBudgetEntryBackingIndex(lineId, budgetEntry);
                     if (budgetIndex == -1) return; // safety guard
                     IBasicExtension ext = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
 
@@ -238,6 +231,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                         oldVal / 100f);
 
                     TLMCountModeUtils.OnBudgetChangedInCountMode(lineId, ext, budgetIndex, projected, oldProjected);
+                    TLMAssetSelectorTab.RefreshIndicatorForBudgetIndex(lineId, budgetIndex);
                 }
 
                 ReorderLines();
