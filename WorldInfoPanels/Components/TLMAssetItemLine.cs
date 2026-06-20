@@ -90,9 +90,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             var tsd = TransportSystemDefinition.From(info);
             UpdateMaintenanceCost(info, tsd);
 
-            m_usedCount.text = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()].UsedCount.ToString() : "-";
-            m_usedCount.tooltip = Locale.Get("TLM_ASSET_USED_LABEL_DESCRIPTION");
-
             bool isIntercity = lineId == 0;
             m_weightEditor.isVisible = !isIntercity;
 
@@ -106,6 +103,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 if (isAbsolute)
                 {
                     m_weightEditor.text = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()].TotalCount.ToString() : "0";
+                    m_usedCount.text = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()].UsedCount.ToString() : "0";
+                    m_usedCount.tooltip = Locale.Get("TLM_ASSET_USED_LABEL_DESCRIPTION");
                 }
                 else
                 {
@@ -117,6 +116,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 m_weightEditor.isInteractive = false;
                 m_weightEditor.opacity = 0.3f;
                 m_weightEditor.text = "0";
+                m_usedCount.opacity = 0.3f;
+                m_usedCount.text = "0";
             }
 
             m_capacityEditor.text = asset.capacity != 0 ? asset.capacity.ToString() : VehicleUtils.GetCapacity(info).ToString("0");
