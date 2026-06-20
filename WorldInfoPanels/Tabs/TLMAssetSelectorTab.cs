@@ -337,7 +337,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 m_timeBudgetSelect.items = budgetArr;
                 var hourIndex = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
                 m_timeBudgetSelect.selectedIndex = hourIndex != -1 ? hourIndex : 0;
-                UpdateModeIndicator(lineId, 0);
+                UpdateModeIndicator(lineId, hourIndex);
             }
 
             if (TransportLinesManagerMod.DebugMode)
