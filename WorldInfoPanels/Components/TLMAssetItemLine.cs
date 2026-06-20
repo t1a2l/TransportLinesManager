@@ -103,7 +103,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 if (isAbsolute)
                 {
                     m_weightEditor.text = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()].TotalCount.ToString() : "0";
-                    m_usedCount.text = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()].UsedCount.ToString() : "0";
+                    m_usedCount.text = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()].UsedCount.ToString() : "-";
                     m_usedCount.tooltip = Locale.Get("TLM_ASSET_USED_LABEL_DESCRIPTION");
                 }
                 else
@@ -117,7 +117,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 m_weightEditor.opacity = 0.3f;
                 m_weightEditor.text = "0";
                 m_usedCount.opacity = 0.3f;
-                m_usedCount.text = "0";
+                m_usedCount.text = "-";
             }
 
             m_capacityEditor.text = asset.capacity != 0 ? asset.capacity.ToString() : VehicleUtils.GetCapacity(info).ToString("0");
@@ -271,7 +271,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             UICheckBox uiCheckbox = UIHelperExtension.AddCheckbox(panel, "AAAAAA", false);
             uiCheckbox.name = "AssetCheckbox";
             uiCheckbox.height = 32;
-            uiCheckbox.width = 225f;
+            uiCheckbox.width = 220f;
             uiCheckbox.label.processMarkup = true;
             uiCheckbox.label.textScale = 0.8f;
             uiCheckbox.label.verticalAlignment = UIVerticalAlignment.Middle;
@@ -297,8 +297,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             wegEditField.maxLength = 5;
             wegEditField.padding = new RectOffset(2, 2, 9, 2);
 
-            MonoUtils.CreateUIElement(out UILabel usedCountField, panel.transform, "UsedCount", new Vector4(0, 0, 50, 32));
+            MonoUtils.CreateUIElement(out UILabel usedCountField, panel.transform, "UsedCount", new Vector4(0, 0, 30, 32));
             usedCountField.padding = new RectOffset(2, 2, 9, 2);
+            usedCountField.textAlignment = UIHorizontalAlignment.Center;
 
             go.AddComponent<TLMAssetItemLine>();
             TLMUiTemplateUtils.GetTemplateDict()[TEMPLATE_NAME] = panel;

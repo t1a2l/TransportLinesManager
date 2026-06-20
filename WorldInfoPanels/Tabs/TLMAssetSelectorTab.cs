@@ -126,7 +126,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_capacityColumnHeader.autoSize = false;
             m_capacityColumnHeader.width = 50f;
             m_capacityColumnHeader.height = 20f;
-            m_capacityColumnHeader.relativePosition = new Vector3(MainPanel.width - 145f, 60f);
+            m_capacityColumnHeader.relativePosition = new Vector3(MainPanel.width - 148f, 60f);
             m_capacityColumnHeader.textScale = 0.65f;
             m_capacityColumnHeader.textAlignment = UIHorizontalAlignment.Center;
             m_capacityColumnHeader.localeID = "TLM_ASSET_CAPACITY_FIELD_HEADER";
@@ -135,7 +135,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_weightColumnHeader.autoSize = false;
             m_weightColumnHeader.width = 50f;
             m_weightColumnHeader.height = 20f;
-            m_weightColumnHeader.relativePosition = new Vector3(MainPanel.width - 95f, 60f);
+            m_weightColumnHeader.relativePosition = new Vector3(MainPanel.width - 98f, 60f);
             m_weightColumnHeader.textScale = 0.65f;
             m_weightColumnHeader.textAlignment = UIHorizontalAlignment.Center;
             // text set dynamically in UpdateModeIndicator()
@@ -144,17 +144,17 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_usedCountColumnHeader.autoSize = false;
             m_usedCountColumnHeader.width = 50f;
             m_usedCountColumnHeader.height = 20f;
-            m_usedCountColumnHeader.relativePosition = new Vector3(MainPanel.width - 25f, 60f);
+            m_usedCountColumnHeader.relativePosition = new Vector3(MainPanel.width - 57f, 60f);
             m_usedCountColumnHeader.textScale = 0.65f;
             m_usedCountColumnHeader.textAlignment = UIHorizontalAlignment.Center;
 
             MonoUtils.CreateUIElement(out m_vehicleCountLabel, MainPanel.transform);
             m_vehicleCountLabel.autoSize = false;
-            m_vehicleCountLabel.width = 140f;
+            m_vehicleCountLabel.width = 40f;
             m_vehicleCountLabel.height = 20f;
-            m_vehicleCountLabel.relativePosition = new Vector3(180f, 48f);
-            m_vehicleCountLabel.textScale = 0.65f;
-            m_vehicleCountLabel.textAlignment = UIHorizontalAlignment.Left;
+            m_vehicleCountLabel.relativePosition = new Vector3(190f, 60f);
+            m_vehicleCountLabel.textScale = 0.7f;
+            m_vehicleCountLabel.textAlignment = UIHorizontalAlignment.Center;
             m_vehicleCountLabel.isVisible = false;
         }
 
