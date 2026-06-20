@@ -430,7 +430,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
             m_timeBudgetSelect.selectedIndex = idxSel; 
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding);
-            UpdateModeIndicator(lineId, idxSel);
+            int selectedBudgetIndex = GetBudgetSelectedIndex();
+            UpdateModeIndicator(lineId, selectedBudgetIndex);
             if (!fromBuilding)
             {
                 var targetAssets = TransportSystem.GetTransportExtension().GetAllBasicAssetsForLine(lineId).Where(x => x.Value.Contains(m_nameFilter.text)).ToList();
@@ -446,7 +447,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     {
                         asset = allowedTransportAssets.Find(item => item.name == asset.name);
                     }
-                    controller.SetAsset(asset, isAllowed, lineId, m_timeBudgetSelect.selectedIndex);
+                    controller.SetAsset(asset, isAllowed, lineId, selectedBudgetIndex);
                     controller.OnMouseEnter = () =>
                     {
                         m_lastInfo = PrefabCollection<VehicleInfo>.FindLoaded(asset.name);
