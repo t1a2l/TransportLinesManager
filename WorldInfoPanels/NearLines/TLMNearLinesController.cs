@@ -41,6 +41,9 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
 
         public void Awake()
         {
+            TLMLineItemButtonControl.EnsureTemplate();
+            TLMNearLineRowControl.EnsureTemplate();
+
             m_containerParent = GetComponent<UIPanel>();
             m_containerParent.backgroundSprite = "GenericPanelDark";
             m_containerParent.autoFitChildrenVertically = true;
@@ -110,9 +113,9 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_localListScrollbar.name = "TLMLinesNearLocalListScrollbar";
 
             MonoUtils.CreateUIElement(out UISlicedSprite localScrollBg, m_localListScrollbar.transform);
-            localScrollBg.relativePosition = Vector2.zero;
+            localScrollBg.relativePosition = new Vector2(-2f, 0f);
             localScrollBg.autoSize = true;
-            localScrollBg.size = m_localListScrollbar.size;
+            localScrollBg.size = new Vector2(m_localListScrollbar.width + 2f, m_localListScrollbar.height); ;
             localScrollBg.fillDirection = UIFillDirection.Vertical;
             localScrollBg.spriteName = "ScrollbarTrack";
             m_localListScrollbar.trackObject = localScrollBg;
@@ -190,9 +193,9 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_regListScrollbar.name = "TLMLinesNearRegionalListScrollbar";
 
             MonoUtils.CreateUIElement(out UISlicedSprite regScrollBg, m_regListScrollbar.transform);
-            regScrollBg.relativePosition = Vector2.zero;
+            regScrollBg.relativePosition = new Vector2(-2f, 0f);
             regScrollBg.autoSize = true;
-            regScrollBg.size = m_regListScrollbar.size;
+            regScrollBg.size = new Vector2(m_regListScrollbar.width + 2f, m_regListScrollbar.height);
             regScrollBg.fillDirection = UIFillDirection.Vertical;
             regScrollBg.spriteName = "ScrollbarTrack";
             m_regListScrollbar.trackObject = regScrollBg;
@@ -213,9 +216,6 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             };
 
             m_regionalLinesTemplateList = new UITemplateList<TLMNearLineRowControl>(m_regListContainer, TLMNearLineRowControl.ROW_TEMPLATE);
-
-            TLMLineItemButtonControl.EnsureTemplate();
-            TLMNearLineRowControl.EnsureTemplate();
         }
         internal void EventWIPChanged(bool isGrow)
         {
