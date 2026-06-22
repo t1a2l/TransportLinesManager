@@ -16,17 +16,22 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
         private UIPanel m_containerParent;
         private UIPanel m_localContainer;
         private UILabel m_title;
-        private UIPanel m_listContainer;
+        private UIScrollablePanel m_localListContainer;
+        private UIScrollbar m_localListScrollbar;
         private UITemplateList<TLMNearLineRowControl> m_localLinesTemplateList;
         private UIPanel m_regionalContainer;
         private UILabel m_regTitle;
-        private UIPanel m_regListContainer;
+        private UIScrollablePanel m_regListContainer;
+        private UIScrollbar m_regListScrollbar;
         private UITemplateList<TLMNearLineRowControl> m_regionalLinesTemplateList;
         private ushort lastBuildingSelected = 0;
 
         private bool m_dirty = true;
         private bool m_mayShow = true;
 
+        private const float LIST_WIDTH = 285f;
+        private const float LIST_HEIGHT = 176f;
+        private const float SCROLLBAR_WIDTH = 10f;
 
         internal static TLMNearLinesController InitPanelNearLinesOnWorldInfoPanel(UIComponent parent)
         {
@@ -68,19 +73,69 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_title.useOutline = true;
             m_title.height = 18;
 
-            MonoUtils.CreateUIElement(out m_listContainer, m_localContainer.transform);
-            m_listContainer.width = m_localContainer.width;
-            m_listContainer.autoFitChildrenVertically = true;
-            m_listContainer.autoLayout = true;
-            m_listContainer.autoLayoutDirection = LayoutDirection.Vertical;
-            m_listContainer.autoLayoutPadding = new RectOffset(2, 2, 2, 2);
-            m_listContainer.padding = new RectOffset(2, 2, 2, 2);
-            m_listContainer.autoLayoutStart = LayoutStart.TopLeft;
-            m_listContainer.wrapLayout = false;
-            m_listContainer.name = "TLMLinesNearList";
+            MonoUtils.CreateUIElement(out UIPanel localListRow, m_localContainer.transform);
+            localListRow.width = m_localContainer.width;
+            localListRow.height = (int)LIST_HEIGHT;
+            localListRow.autoLayout = true;
+            localListRow.autoLayoutDirection = LayoutDirection.Horizontal;
+            localListRow.autoLayoutPadding = new RectOffset(0, 0, 0, 0);
+            localListRow.padding = new RectOffset(0, 0, 0, 0);
+            localListRow.wrapLayout = false;
+            localListRow.name = "TLMLinesNearLocalListRow";
+
+            MonoUtils.CreateUIElement(out m_localListContainer, localListRow.transform);
+            m_localListContainer.width = LIST_WIDTH;
+            m_localListContainer.height = LIST_HEIGHT;
+            m_localListContainer.clipChildren = true;
+            m_localListContainer.autoLayout = true;
+            m_localListContainer.autoLayoutDirection = LayoutDirection.Vertical;
+            m_localListContainer.autoLayoutPadding = new RectOffset(2, 2, 2, 2);
+            m_localListContainer.autoLayoutStart = LayoutStart.TopLeft;
+            m_localListContainer.wrapLayout = false;
+            m_localListContainer.name = "TLMLinesNearLocalList";
+            m_localListContainer.scrollWheelAmount = 42;
+
+            MonoUtils.CreateUIElement(out UIPanel localScrollbarHost, localListRow.transform);
+            localScrollbarHost.width = SCROLLBAR_WIDTH;
+            localScrollbarHost.height = LIST_HEIGHT;
+            localScrollbarHost.name = "TLMLinesNearLocalListScrollbarHost";
+
+            MonoUtils.CreateUIElement(out m_localListScrollbar, localScrollbarHost.transform);
+            m_localListScrollbar.width = SCROLLBAR_WIDTH;
+            m_localListScrollbar.height = LIST_HEIGHT;
+            m_localListScrollbar.orientation = UIOrientation.Vertical;
+            m_localListScrollbar.minValue = 0f;
+            m_localListScrollbar.value = 0f;
+            m_localListScrollbar.relativePosition = new Vector3(-2f, 0f);
+            m_localListScrollbar.incrementAmount = 42f;
+            m_localListScrollbar.name = "TLMLinesNearLocalListScrollbar";
+
+            MonoUtils.CreateUIElement(out UISlicedSprite localScrollBg, m_localListScrollbar.transform);
+            localScrollBg.relativePosition = Vector2.zero;
+            localScrollBg.autoSize = true;
+            localScrollBg.size = m_localListScrollbar.size;
+            localScrollBg.fillDirection = UIFillDirection.Vertical;
+            localScrollBg.spriteName = "LocalScrollbarTrack";
+            m_localListScrollbar.trackObject = localScrollBg;
+
+            MonoUtils.CreateUIElement(out UISlicedSprite localScrollThumb, localScrollBg.transform);
+            localScrollThumb.relativePosition = Vector2.zero;
+            localScrollThumb.fillDirection = UIFillDirection.Vertical;
+            localScrollThumb.autoSize = true;
+            localScrollThumb.width = localScrollBg.width - 4f;
+            localScrollThumb.spriteName = "LocalScrollbarThumb";
+            m_localListScrollbar.thumbObject = localScrollThumb;
+
+            m_localListContainer.verticalScrollbar = m_localListScrollbar;
+            m_localListContainer.eventMouseWheel += (c, p) =>
+            {
+                m_localListContainer.scrollPosition = new Vector2(0f, m_localListContainer.scrollPosition.y + Mathf.Sign(p.wheelDelta) * -m_localListScrollbar.incrementAmount);
+                p.Use();
+            };
+
             TLMLineItemButtonControl.EnsureTemplate();
             TLMNearLineRowControl.EnsureTemplate();
-            m_localLinesTemplateList = new UITemplateList<TLMNearLineRowControl>(m_listContainer, TLMNearLineRowControl.ROW_TEMPLATE);
+            m_localLinesTemplateList = new UITemplateList<TLMNearLineRowControl>(m_localListContainer, TLMNearLineRowControl.ROW_TEMPLATE);
 
             MonoUtils.CreateUIElement(out m_regionalContainer, m_containerParent.transform);
             m_regionalContainer.width = m_containerParent.width;
@@ -101,17 +156,63 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_regTitle.useOutline = true;
             m_regTitle.height = 18;
 
-            MonoUtils.CreateUIElement(out m_regListContainer, m_regionalContainer.transform);
+            MonoUtils.CreateUIElement(out UIPanel regListRow, m_regionalContainer.transform);
+            regListRow.width = m_regionalContainer.width;
+            regListRow.height = (int)LIST_HEIGHT;
+            regListRow.autoLayout = true;
+            regListRow.autoLayoutDirection = LayoutDirection.Horizontal;
+            regListRow.autoLayoutPadding = new RectOffset(0, 0, 0, 0);
+            regListRow.padding = new RectOffset(0, 0, 0, 0);
+            regListRow.wrapLayout = false;
+            regListRow.name = "TLMLinesNearRegionalListRow";
+
+            MonoUtils.CreateUIElement(out m_regListContainer, regListRow.transform);
             m_regListContainer.width = m_regionalContainer.width;
-            m_regListContainer.autoFitChildrenVertically = true;
             m_regListContainer.autoLayout = true;
             m_regListContainer.autoLayoutDirection = LayoutDirection.Vertical;
             m_regListContainer.autoLayoutPadding = new RectOffset(2, 2, 2, 2);
-            m_regListContainer.padding = new RectOffset(2, 2, 2, 2);
             m_regListContainer.autoLayoutStart = LayoutStart.TopLeft;
             m_regListContainer.wrapLayout = false;
-            m_regListContainer.name = "TLMLinesNearListRegional";
+            m_regListContainer.name = "TLMLinesNearRegionalList";
             m_regionalLinesTemplateList = new UITemplateList<TLMNearLineRowControl>(m_regListContainer, TLMNearLineRowControl.ROW_TEMPLATE);
+
+            MonoUtils.CreateUIElement(out UIPanel regScrollbarHost, regListRow.transform);
+            regScrollbarHost.width = SCROLLBAR_WIDTH;
+            regScrollbarHost.height = LIST_HEIGHT;
+            regScrollbarHost.name = "TLMLinesNearRegionalListScrollbarHost";
+
+            MonoUtils.CreateUIElement(out m_regListScrollbar, regScrollbarHost.transform);
+            m_regListScrollbar.width = SCROLLBAR_WIDTH;
+            m_regListScrollbar.height = LIST_HEIGHT;
+            m_regListScrollbar.orientation = UIOrientation.Vertical;
+            m_regListScrollbar.minValue = 0f;
+            m_regListScrollbar.value = 0f;
+            m_regListScrollbar.relativePosition = new Vector3(-2f, 0f);
+            m_regListScrollbar.incrementAmount = 42f;
+            m_regListScrollbar.name = "TLMLinesNearRegionalListScrollbar";
+
+            MonoUtils.CreateUIElement(out UISlicedSprite regScrollBg, m_regListScrollbar.transform);
+            regScrollBg.relativePosition = Vector2.zero;
+            regScrollBg.autoSize = true;
+            regScrollBg.size = m_regListScrollbar.size;
+            regScrollBg.fillDirection = UIFillDirection.Vertical;
+            regScrollBg.spriteName = "RegionalScrollbarTrack";
+            m_regListScrollbar.trackObject = regScrollBg;
+
+            MonoUtils.CreateUIElement(out UISlicedSprite regScrollThumb, regScrollBg.transform);
+            regScrollThumb.relativePosition = Vector2.zero;
+            regScrollThumb.fillDirection = UIFillDirection.Vertical;
+            regScrollThumb.autoSize = true;
+            regScrollThumb.width = localScrollBg.width - 4f;
+            regScrollThumb.spriteName = "RegionalScrollbarThumb";
+            m_regListScrollbar.thumbObject = regScrollThumb;
+
+            m_regListContainer.verticalScrollbar = m_regListScrollbar;
+            m_regListContainer.eventMouseWheel += (c, p) =>
+            {
+                m_regListContainer.scrollPosition = new Vector2(0f, m_regListContainer.scrollPosition.y + Mathf.Sign(p.wheelDelta) * -m_regListScrollbar.incrementAmount);
+                p.Use();
+            };
         }
         internal void EventWIPChanged(bool isGrow)
         {
@@ -166,6 +267,8 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
                 return;
             }
 
+            ushort previousBuilding = lastBuildingSelected;
+
             if (lastBuildingSelected == buildingId && !force)
             {
                 return;
@@ -173,6 +276,12 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             else
             {
                 lastBuildingSelected = buildingId;
+            }
+
+            if (previousBuilding != buildingId)
+            {
+                m_localListContainer.scrollPosition = Vector2.zero;
+                m_regListContainer.scrollPosition = Vector2.zero;
             }
 
             ref Building b = ref Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingId];
@@ -193,6 +302,9 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
                     int waiting = hasStationWaitData && waitingByLine.TryGetValue(lineId, out int count) ? count : -1;
                     itemsEntries[idx].ResetData(false, lineId, sidewalk, lineName, waiting);
                 }
+                m_localListContainer?.Invalidate();
+                m_localListContainer?.PerformLayout();
+
             }
             else
             {
@@ -214,6 +326,12 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
                         int waiting = hasStationWaitData && waitingByLine.TryGetValue(lineId, out int count) ? count : -1;
                         itemsEntries[idx].ResetData(true, lineId, sidewalk, lineName, waiting);
                     }
+                    m_regListContainer?.Invalidate();
+                    m_regListContainer?.PerformLayout();
+                }
+                else
+                {
+                    m_regionalLinesTemplateList.SetItemCount(0);
                 }
             }
             else
