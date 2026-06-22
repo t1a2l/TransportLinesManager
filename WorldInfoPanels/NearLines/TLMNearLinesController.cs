@@ -106,7 +106,6 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_localListScrollbar.orientation = UIOrientation.Vertical;
             m_localListScrollbar.minValue = 0f;
             m_localListScrollbar.value = 0f;
-            m_localListScrollbar.relativePosition = new Vector3(-2f, 0f);
             m_localListScrollbar.incrementAmount = 42f;
             m_localListScrollbar.name = "TLMLinesNearLocalListScrollbar";
 
@@ -187,7 +186,6 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_regListScrollbar.orientation = UIOrientation.Vertical;
             m_regListScrollbar.minValue = 0f;
             m_regListScrollbar.value = 0f;
-            m_regListScrollbar.relativePosition = new Vector3(-2f, 0f);
             m_regListScrollbar.incrementAmount = 42f;
             m_regListScrollbar.name = "TLMLinesNearRegionalListScrollbar";
 
