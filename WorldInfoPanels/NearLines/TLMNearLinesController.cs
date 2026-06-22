@@ -67,6 +67,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_localContainer.padding = new RectOffset(2, 2, 2, 2);
             m_localContainer.autoLayoutStart = LayoutStart.TopLeft;
             m_localContainer.name = "TLMLinesNearLocal";
+            m_localContainer.height = 215f;
 
             MonoUtils.CreateUIElement(out m_title, m_localContainer.transform);
             m_title.autoSize = false;
@@ -106,6 +107,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             MonoUtils.CreateUIElement(out m_localListScrollbar, localScrollbarHost.transform);
             m_localListScrollbar.width = SCROLLBAR_WIDTH;
             m_localListScrollbar.height = LIST_HEIGHT;
+            m_localListScrollbar.relativePosition = new Vector2(-2f, 0f);
             m_localListScrollbar.orientation = UIOrientation.Vertical;
             m_localListScrollbar.minValue = 0f;
             m_localListScrollbar.value = 0f;
@@ -113,7 +115,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_localListScrollbar.name = "TLMLinesNearLocalListScrollbar";
 
             MonoUtils.CreateUIElement(out UISlicedSprite localScrollBg, m_localListScrollbar.transform);
-            localScrollBg.relativePosition = new Vector2(-2f, 0f);
+            localScrollBg.relativePosition = Vector2.zero;
             localScrollBg.autoSize = true;
             localScrollBg.size = new Vector2(m_localListScrollbar.width + 2f, m_localListScrollbar.height); ;
             localScrollBg.fillDirection = UIFillDirection.Vertical;
@@ -147,6 +149,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_regionalContainer.padding = new RectOffset(2, 2, 2, 2);
             m_regionalContainer.autoLayoutStart = LayoutStart.TopLeft;
             m_regionalContainer.name = "TLMLinesNearRegional";
+            m_regionalContainer.height = 215f;
 
             MonoUtils.CreateUIElement(out m_regTitle, m_regionalContainer.transform);
             m_regTitle.autoSize = false;
@@ -186,6 +189,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             MonoUtils.CreateUIElement(out m_regListScrollbar, regScrollbarHost.transform);
             m_regListScrollbar.width = SCROLLBAR_WIDTH;
             m_regListScrollbar.height = LIST_HEIGHT;
+            m_regListScrollbar.relativePosition = new Vector2(-2f, 0f);
             m_regListScrollbar.orientation = UIOrientation.Vertical;
             m_regListScrollbar.minValue = 0f;
             m_regListScrollbar.value = 0f;
@@ -193,7 +197,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             m_regListScrollbar.name = "TLMLinesNearRegionalListScrollbar";
 
             MonoUtils.CreateUIElement(out UISlicedSprite regScrollBg, m_regListScrollbar.transform);
-            regScrollBg.relativePosition = new Vector2(-2f, 0f);
+            regScrollBg.relativePosition = Vector2.zero;
             regScrollBg.autoSize = true;
             regScrollBg.size = new Vector2(m_regListScrollbar.width + 2f, m_regListScrollbar.height);
             regScrollBg.fillDirection = UIFillDirection.Vertical;
