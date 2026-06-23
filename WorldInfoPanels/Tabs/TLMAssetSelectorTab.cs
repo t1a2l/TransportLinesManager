@@ -31,6 +31,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             Instance = this;
             CreateWindow();
+            TLMTransportLineExtension.Instance.EventAssetUsedCountChanged += OnAssetUsedCountChanged;
         }
 
         public void OnDestroy()
@@ -39,6 +40,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 Instance = null;
             }
+            TLMTransportLineExtension.Instance.EventAssetUsedCountChanged -= OnAssetUsedCountChanged;
         }
 
         public UIPanel MainPanel { get; private set; }
@@ -606,6 +608,20 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 m_weightColumnHeader.text = Locale.Get("TLM_ASSET_PERCENT_HEADER"); // e.g. "%"
                 m_vehicleCountLabel.isVisible = false;
                 m_usedCountColumnHeader.isVisible = false;
+            }
+        }
+
+        private void OnAssetUsedCountChanged(ushort lineId, int slotIndex)
+        {
+            UVMPublicTransportWorldInfoPanel.GetLineID(out ushort currentLine, out bool fromBuilding);
+            if (fromBuilding || currentLine == 0 || currentLine != lineId)
+            {
+                return;
+            }
+
+            foreach (var row in GetComponentsInChildren<TLMAssetItemLine>(true))
+            {
+                row.RefreshUsageDisplay(lineId, slotIndex);
             }
         }
 

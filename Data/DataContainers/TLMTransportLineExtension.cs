@@ -11,6 +11,7 @@ using TransportLinesManager.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
+using System;
 
 namespace TransportLinesManager.Data.DataContainers
 {
@@ -49,6 +50,8 @@ namespace TransportLinesManager.Data.DataContainers
         private readonly Dictionary<TransportSystemDefinition, List<TransportAsset>> m_basicAssetsList = [];
 
         private readonly Dictionary<ushort, int> m_lastUsedCountSlotByLine = [];
+
+        public event Action<ushort, int> EventAssetUsedCountChanged;
 
         public void SetUseCustomConfig(ushort lineId, bool value)
         {
@@ -168,6 +171,8 @@ namespace TransportLinesManager.Data.DataContainers
             asset.count[key] = assetcount;
             assetTransportList[assetindex] = asset;
             ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
+
+            NotifyAssetUsedCountChanged(lineID, index);
         }
 
         private int GetCurrentExactBudgetSlot(ushort lineID)
@@ -264,6 +269,12 @@ namespace TransportLinesManager.Data.DataContainers
             }
 
             ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
+            NotifyAssetUsedCountChanged(lineID, slotIndex);
+        }
+
+        private void NotifyAssetUsedCountChanged(ushort lineID, int slotIndex)
+        {
+            EventAssetUsedCountChanged?.Invoke(lineID, slotIndex);
         }
 
         #endregion
