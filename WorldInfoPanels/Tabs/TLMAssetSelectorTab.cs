@@ -326,19 +326,17 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             UVMPublicTransportWorldInfoPanel.GetLineID(out _, out bool fromBuilding);
             m_timeBudgetSelect.isVisible = !fromBuilding;
             m_weightColumnHeader.isVisible = !fromBuilding;
-            m_vehicleCountLabel.isVisible = !fromBuilding;
+            m_usedCountColumnHeader.isVisible = !fromBuilding;
 
             bool isCustom = TLMTransportLineExtension.Instance.IsUsingCustomConfig(GetLineID());
             bool isAbsolute = isCustom && UVMBudgetConfigTab.IsAbsoluteValue();
 
             if(isAbsolute)
-            {
-                m_usedCountColumnHeader.isVisible = true;
+            { 
                 m_vehicleCountLabel.isVisible = true;
             }
             else
             {
-                m_usedCountColumnHeader.isVisible = false;
                 m_vehicleCountLabel.isVisible = false;
             }
 
@@ -582,14 +580,15 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void UpdateModeIndicator(ushort lineId, int budgetIndex)
         {
+            m_usedCountColumnHeader.text = Locale.Get("TLM_ASSET_USED_HEADER");
+            m_usedCountColumnHeader.isVisible = true;
+
             bool isCustom = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId);
             bool isAbsolute = isCustom && UVMBudgetConfigTab.IsAbsoluteValue();
 
             if (isAbsolute)
             {
                 m_weightColumnHeader.text = Locale.Get("TLM_ASSET_COUNT_HEADER"); // e.g. "Count"
-                m_usedCountColumnHeader.text = Locale.Get("TLM_ASSET_USED_HEADER");
-                m_usedCountColumnHeader.isVisible = true;
                 IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
                 if (budgetIndex >= 0 && budgetIndex < currentConfig.BudgetEntries.Count)
                 {
@@ -635,7 +634,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 m_weightColumnHeader.text = Locale.Get("TLM_ASSET_PERCENT_HEADER"); // e.g. "%"
                 m_vehicleCountLabel.isVisible = false;
-                m_usedCountColumnHeader.isVisible = false;
             }
         }
 
