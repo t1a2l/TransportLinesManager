@@ -6,10 +6,11 @@ using Commons.Utils;
 using HarmonyLib;
 using TransportLinesManager.Data.DataContainers;
 using TransportLinesManager.Data.Extensions;
-using TransportLinesManager.Data.Managers;
 using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Interfaces;
 using TransportLinesManager.Utils;
+using TransportLinesManager.WorldInfoPanels.Tabs;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TransportLinesManager.Overrides
@@ -141,30 +142,76 @@ namespace TransportLinesManager.Overrides
 
         private static bool CheckDespawn(ushort vehicleID, ref Vehicle vehicleData, bool isEmpty = false)
         {
-            if (vehicleData.m_transportLine != 0)
+            ushort lineId = vehicleData.m_transportLine;
+            if (lineId == 0)
             {
-                int currentVehicleCount = TransportManager.instance.m_lines.m_buffer[vehicleData.m_transportLine].CountVehicles(vehicleData.m_transportLine);
-                int targetVehicleCount = TransportLineOverrides.NewCalculateTargetVehicleCount(vehicleData.m_transportLine);
-                IBasicExtension extension = TLMLineUtils.GetEffectiveExtensionForLine(vehicleData.m_transportLine);
-                if (currentVehicleCount > targetVehicleCount)
+                return false;
+            }
+
+            int currentVehicleCount = TransportManager.instance.m_lines.m_buffer[vehicleData.m_transportLine].CountVehicles(lineId);
+            int targetVehicleCount = TransportLineOverrides.NewCalculateTargetVehicleCount(lineId);
+
+            if (currentVehicleCount <= targetVehicleCount)
+            {
+                return false;
+            }
+
+            var extension = TLMTransportLineExtension.Instance;
+            bool isAbsoluteMode = TLMTransportLineExtension.Instance.IsUsingCustomConfig(vehicleData.m_transportLine) && UVMBudgetConfigTab.IsAbsoluteValue();
+
+            if(isAbsoluteMode)
+            {
+                int slotIndex = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                if (slotIndex < 0)
                 {
-                    var info = extension.GetAModel(vehicleData.m_transportLine);
-                    if(vehicleData.Info == info)
+                    slotIndex = 0;
+                }
+                string modelName = vehicleData.Info?.name;
+                if (!string.IsNullOrEmpty(modelName))
+                {
+                    List<TransportAsset> assetTransportList = extension.GetAssetTransportListForLine(lineId);
+                    int assetIndex = assetTransportList.FindIndex(x => x.name == modelName);
+
+                    if (assetIndex >= 0)
                     {
-                        extension.EditVehicleUsedCount(vehicleData.m_transportLine, info.name, "Remove");
-                        if (isEmpty)
+                        TransportAsset asset = assetTransportList[assetIndex];
+                        asset.count ??= [];
+
+                        string key = slotIndex.ToString();
+                        if (!asset.count.ContainsKey(key))
                         {
-                            vehicleData.Info.m_vehicleAI.SetTransportLine(vehicleID, ref vehicleData, 0);
+                            asset.count[key] = new CountEntry
+                            {
+                                TotalCount = 0,
+                                UsedCount = 0
+                            };
                         }
-                        else
+
+                        CountEntry entry = asset.count[key];
+
+                        // In absolute mode, only despawn this vehicle if its own family is over quota.
+                        if (entry.UsedCount <= entry.TotalCount)
                         {
-                            TLMVehicleUtils.DoSoftDespawn(vehicleID, ref vehicleData);
+                            return false;
                         }
-                        return true;
                     }
                 }
             }
-            return false;
+
+            string actualModel = vehicleData.Info?.name;
+            if (!string.IsNullOrEmpty(actualModel))
+            {
+                extension.EditVehicleUsedCount(lineId, actualModel, "Remove");
+            }
+            if (isEmpty)
+            {
+                vehicleData.Info.m_vehicleAI.SetTransportLine(vehicleID, ref vehicleData, 0);
+            }
+            else
+            {
+                TLMVehicleUtils.DoSoftDespawn(vehicleID, ref vehicleData);
+            }
+            return true;
         }
 
         private static int GetQuantityPassengerUnloadOnNextStop(ushort vehicleId, ref Vehicle data, out bool full, out bool empty)
