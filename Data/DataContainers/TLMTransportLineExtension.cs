@@ -177,7 +177,7 @@ namespace TransportLinesManager.Data.DataContainers
                 return 0;
             }
 
-            var exactBudget = TLMLineUtils.GetEffectiveConfigForLine(lineID).BudgetEntries.GetAtHourExact(SimulationManager.instance.m_currentGameTime.Hour);
+            var exactBudget = TLMLineUtils.GetEffectiveConfigForLine(lineID).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer);
 
             int index = exactBudget.Second;
             return index < 0 ? 0 : index;
