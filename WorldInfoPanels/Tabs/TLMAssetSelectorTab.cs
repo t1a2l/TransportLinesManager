@@ -24,6 +24,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private UILabel m_title;
         private Color m_lastColor = Color.clear;
         private static bool m_isDirty = false;
+        private bool m_pendingAssetUsageRefresh;
+        private ushort m_pendingAssetUsageLineId;
+        private int m_pendingAssetUsageSlotIndex = -1;
 
         internal static TLMAssetSelectorTab Instance { get; private set; }
 
@@ -41,6 +44,31 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 Instance = null;
             }
             TLMTransportLineExtension.Instance.EventAssetUsedCountChanged -= OnAssetUsedCountChanged;
+        }
+
+        private void OnAssetUsedCountChanged(ushort lineId, int slotIndex)
+        {
+            m_pendingAssetUsageLineId = lineId;
+            m_pendingAssetUsageSlotIndex = slotIndex;
+            m_pendingAssetUsageRefresh = true;
+        }
+
+        public void Update()
+        {
+            if (!m_pendingAssetUsageRefresh)
+            {
+                return;
+            }
+
+            m_pendingAssetUsageRefresh = false;
+
+            UVMPublicTransportWorldInfoPanel.GetLineID(out ushort currentLine, out bool fromBuilding);
+            if (fromBuilding || currentLine == 0 || currentLine != m_pendingAssetUsageLineId)
+            {
+                return;
+            }
+
+            RefreshAssetRows(m_pendingAssetUsageSlotIndex);
         }
 
         public UIPanel MainPanel { get; private set; }
@@ -611,10 +639,15 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
         }
 
-        private void OnAssetUsedCountChanged(ushort lineId, int slotIndex)
+        private void RefreshAssetRows(int slotIndex)
         {
-            UVMPublicTransportWorldInfoPanel.GetLineID(out ushort currentLine, out bool fromBuilding);
-            if (fromBuilding || currentLine == 0 || currentLine != lineId)
+            if (slotIndex < 0)
+            {
+                return;
+            }
+
+            UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding);
+            if (fromBuilding || lineId == 0)
             {
                 return;
             }
