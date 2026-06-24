@@ -175,7 +175,65 @@ namespace TransportLinesManager.Data.DataContainers
             NotifyAssetUsedCountChanged(lineID, index);
         }
 
-        private int GetCurrentExactBudgetSlot(ushort lineID)
+        internal bool RepairBrokenUsedCountForCurrentSlot(ushort lineID)
+        {
+            if (lineID == 0)
+            {
+                return false;
+            }
+
+            List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
+            if (assetTransportList == null || assetTransportList.Count == 0)
+            {
+                return false;
+            }
+
+            ref TransportLine tl = ref TransportManager.instance.m_lines.m_buffer[lineID];
+            int vehicleCount = tl.CountVehicles(lineID);
+            if (vehicleCount <= 0)
+            {
+                return false;
+            }
+
+            int slotIndex = GetCurrentExactBudgetSlot(lineID);
+            string key = slotIndex.ToString();
+
+            int totalUsedInSlot = 0;
+            bool hasNegativeUsedCount = false;
+
+            for (int i = 0; i < assetTransportList.Count; i++)
+            {
+                TransportAsset asset = assetTransportList[i];
+                asset.count ??= [];
+
+                if (!asset.count.ContainsKey(key))
+                {
+                    asset.count[key] = new CountEntry
+                    {
+                        TotalCount = 0,
+                        UsedCount = 0
+                    };
+                }
+
+                CountEntry entry = asset.count[key];
+                totalUsedInSlot += entry.UsedCount;
+                hasNegativeUsedCount |= entry.UsedCount < 0;
+
+                assetTransportList[i] = asset;
+            }
+
+            bool shouldRepair = hasNegativeUsedCount || totalUsedInSlot <= 0;
+            if (!shouldRepair)
+            {
+                return false;
+            }
+
+            RebuildUsedCountForCurrentSlot(lineID, slotIndex, true);
+            m_lastUsedCountSlotByLine[lineID] = slotIndex;
+            return true;
+        }
+
+        internal int GetCurrentExactBudgetSlot(ushort lineID)
         {
             if (lineID == 0)
             {
@@ -202,7 +260,7 @@ namespace TransportLinesManager.Data.DataContainers
             }
         }
 
-        private void RebuildUsedCountForCurrentSlot(ushort lineID, int slotIndex)
+        private void RebuildUsedCountForCurrentSlot(ushort lineID, int slotIndex, bool clampTotalCountToUsed = false)
         {
             if (lineID == 0 || slotIndex < 0)
             {
@@ -249,7 +307,6 @@ namespace TransportLinesManager.Data.DataContainers
             for (int i = 0; i < assetTransportList.Count; i++)
             {
                 TransportAsset asset = assetTransportList[i];
-
                 asset.count ??= [];
 
                 if (!asset.count.ContainsKey(key))
@@ -263,8 +320,13 @@ namespace TransportLinesManager.Data.DataContainers
 
                 CountEntry entry = asset.count[key];
                 entry.UsedCount = vehicleCountPerAsset.TryGetValue(asset.name, out int used) ? used : 0;
-                asset.count[key] = entry;
 
+                if (clampTotalCountToUsed && entry.TotalCount < entry.UsedCount)
+                {
+                    entry.TotalCount = entry.UsedCount;
+                }
+
+                asset.count[key] = entry;
                 assetTransportList[i] = asset;
             }
 

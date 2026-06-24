@@ -331,6 +331,8 @@ namespace TransportLinesManager
 
                     config.AssetTransportList[i] = asset; // struct re-assign
                 }
+
+                ext.RepairBrokenUsedCountForCurrentSlot(lineId);
             }
         }
     }
