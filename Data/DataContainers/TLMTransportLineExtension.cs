@@ -11,7 +11,6 @@ using TransportLinesManager.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
-using System;
 
 namespace TransportLinesManager.Data.DataContainers
 {
@@ -23,7 +22,7 @@ namespace TransportLinesManager.Data.DataContainers
         internal void SafeCleanEntry(ushort lineID)
         {
             Configurations[lineID] = new TLMTransportLineConfiguration();
-            m_lastUsedCountSlotByLine.Remove(lineID);
+            TLMLineUtils.m_lastUsedCountSlotByLine.Remove(lineID);
         }
         
         public TLMTransportLineConfiguration SafeGet(uint lineId)
@@ -48,10 +47,6 @@ namespace TransportLinesManager.Data.DataContainers
         public override string SaveId => $"TLM_TLMTransportLineExtension";
 
         private readonly Dictionary<TransportSystemDefinition, List<TransportAsset>> m_basicAssetsList = [];
-
-        private readonly Dictionary<ushort, int> m_lastUsedCountSlotByLine = [];
-
-        public event Action<ushort, int> EventAssetUsedCountChanged;
 
         public void SetUseCustomConfig(ushort lineId, bool value)
         {
@@ -120,11 +115,6 @@ namespace TransportLinesManager.Data.DataContainers
             return info;
         }
 
-        public int GetCurrentUsedCountSlot(ushort lineId)
-        {
-            return GetCurrentExactBudgetSlot(lineId);
-        }
-
         public void EditVehicleUsedCount(ushort lineID, string selectedModel, string status)
         {
             if (lineID == 0)
@@ -132,8 +122,8 @@ namespace TransportLinesManager.Data.DataContainers
                 return;
             }
 
-            int index = GetCurrentExactBudgetSlot(lineID);
-            EnsureUsedCountSlotSynchronized(lineID, index);
+            int index = TLMLineUtils.GetEffectiveConfigForLine(lineID).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+            TLMLineUtils.EnsureUsedCountSlotSynchronized(lineID, index);
 
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
             int assetindex = assetTransportList.FindIndex(item => item.name == selectedModel);
@@ -170,173 +160,9 @@ namespace TransportLinesManager.Data.DataContainers
 
             asset.count[key] = assetcount;
             assetTransportList[assetindex] = asset;
-            ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
-
-            NotifyAssetUsedCountChanged(lineID, index);
-        }
-
-        internal bool RepairBrokenUsedCountForCurrentSlot(ushort lineID)
-        {
-            if (lineID == 0)
-            {
-                return false;
-            }
-
-            List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
-            if (assetTransportList == null || assetTransportList.Count == 0)
-            {
-                return false;
-            }
-
-            ref TransportLine tl = ref TransportManager.instance.m_lines.m_buffer[lineID];
-            int vehicleCount = tl.CountVehicles(lineID);
-            if (vehicleCount <= 0)
-            {
-                return false;
-            }
-
-            int slotIndex = GetCurrentExactBudgetSlot(lineID);
-            string key = slotIndex.ToString();
-
-            int totalUsedInSlot = 0;
-            bool hasNegativeUsedCount = false;
-
-            for (int i = 0; i < assetTransportList.Count; i++)
-            {
-                TransportAsset asset = assetTransportList[i];
-                asset.count ??= [];
-
-                if (!asset.count.ContainsKey(key))
-                {
-                    asset.count[key] = new CountEntry
-                    {
-                        TotalCount = 0,
-                        UsedCount = 0
-                    };
-                }
-
-                CountEntry entry = asset.count[key];
-                totalUsedInSlot += entry.UsedCount;
-                hasNegativeUsedCount |= entry.UsedCount < 0;
-
-                assetTransportList[i] = asset;
-            }
-
-            bool shouldRepair = hasNegativeUsedCount || totalUsedInSlot <= 0;
-            if (!shouldRepair)
-            {
-                return false;
-            }
-
-            RebuildUsedCountForCurrentSlot(lineID, slotIndex, true);
-            m_lastUsedCountSlotByLine[lineID] = slotIndex;
-            return true;
-        }
-
-        internal int GetCurrentExactBudgetSlot(ushort lineID)
-        {
-            if (lineID == 0)
-            {
-                return 0;
-            }
-
-            var exactBudget = TLMLineUtils.GetEffectiveConfigForLine(lineID).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer);
-
-            int index = exactBudget.Second;
-            return index < 0 ? 0 : index;
-        }
-
-        private void EnsureUsedCountSlotSynchronized(ushort lineID, int currentSlot)
-        {
-            if (lineID == 0)
-            {
-                return;
-            }
-
-            if (!m_lastUsedCountSlotByLine.TryGetValue(lineID, out int lastSlot) || lastSlot != currentSlot)
-            {
-                RebuildUsedCountForCurrentSlot(lineID, currentSlot);
-                m_lastUsedCountSlotByLine[lineID] = currentSlot;
-            }
-        }
-
-        private void RebuildUsedCountForCurrentSlot(ushort lineID, int slotIndex, bool clampTotalCountToUsed = false)
-        {
-            if (lineID == 0 || slotIndex < 0)
-            {
-                return;
-            }
-
-            List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
-            if (assetTransportList == null || assetTransportList.Count == 0)
-            {
-                return;
-            }
-
-            var tm = TransportManager.instance;
-            var vm = VehicleManager.instance;
-            ref TransportLine tl = ref tm.m_lines.m_buffer[lineID];
-
-            Dictionary<string, int> vehicleCountPerAsset = [];
-            int vehicleCount = tl.CountVehicles(lineID);
-
-            for (int v = 0; v < vehicleCount; v++)
-            {
-                ushort vehicleId = tl.GetVehicle(v);
-                if (vehicleId == 0)
-                {
-                    continue;
-                }
-
-                VehicleInfo info = vm.m_vehicles.m_buffer[vehicleId].Info;
-                if (info == null || string.IsNullOrEmpty(info.name))
-                {
-                    continue;
-                }
-
-                if (!vehicleCountPerAsset.ContainsKey(info.name))
-                {
-                    vehicleCountPerAsset[info.name] = 0;
-                }
-
-                vehicleCountPerAsset[info.name]++;
-            }
-
-            string key = slotIndex.ToString();
-
-            for (int i = 0; i < assetTransportList.Count; i++)
-            {
-                TransportAsset asset = assetTransportList[i];
-                asset.count ??= [];
-
-                if (!asset.count.ContainsKey(key))
-                {
-                    asset.count[key] = new CountEntry
-                    {
-                        TotalCount = 0,
-                        UsedCount = 0
-                    };
-                }
-
-                CountEntry entry = asset.count[key];
-                entry.UsedCount = vehicleCountPerAsset.TryGetValue(asset.name, out int used) ? used : 0;
-
-                if (clampTotalCountToUsed && entry.TotalCount < entry.UsedCount)
-                {
-                    entry.TotalCount = entry.UsedCount;
-                }
-
-                asset.count[key] = entry;
-                assetTransportList[i] = asset;
-            }
 
             ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
-            NotifyAssetUsedCountChanged(lineID, slotIndex);
-        }
-
-        private void NotifyAssetUsedCountChanged(ushort lineID, int slotIndex)
-        {
-            EventAssetUsedCountChanged?.Invoke(lineID, slotIndex);
+            TLMLineUtils.NotifyAssetUsedCountChanged(lineID, index);
         }
 
         #endregion

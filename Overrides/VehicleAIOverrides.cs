@@ -9,7 +9,6 @@ using TransportLinesManager.Data.Extensions;
 using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Interfaces;
 using TransportLinesManager.Utils;
-using TransportLinesManager.WorldInfoPanels.Tabs;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,7 +17,6 @@ namespace TransportLinesManager.Overrides
     [HarmonyPatch(typeof(VehicleAI))]
     public static class VehicleAIOverrides
     {
-
         private static readonly MethodInfo BusAI_StartPathFind = typeof(BusAI).GetMethod("StartPathFind", Patcher.allFlags, null, [typeof(ushort), typeof(Vehicle).MakeByRefType()], null);
         private static readonly MethodInfo TramAI_StartPathFind = typeof(TramAI).GetMethod("StartPathFind", Patcher.allFlags, null, [typeof(ushort), typeof(Vehicle).MakeByRefType()], null);
         private static readonly MethodInfo TrolleyAI_StartPathFind = typeof(TrolleybusAI).GetMethod("StartPathFind", Patcher.allFlags, null, [typeof(ushort), typeof(Vehicle).MakeByRefType()], null);
@@ -115,7 +113,6 @@ namespace TransportLinesManager.Overrides
 
         [HarmonyPatch(typeof(VehicleAI), "GetColor", [typeof(ushort), typeof(Vehicle), typeof(InfoManager.InfoMode), typeof(InfoManager.SubInfoMode)], [ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Normal, ArgumentType.Normal])]
         [HarmonyPrefix]
-#pragma warning disable IDE0060 // Remove unused parameter
         public static bool PreGetColor(VehicleAI __instance, ushort vehicleID, ref Vehicle data, InfoManager.InfoMode infoMode, InfoManager.SubInfoMode subInfoMode, ref Color __result)
 #pragma warning restore IDE0060 // Remove unused parameter
         {
@@ -156,8 +153,10 @@ namespace TransportLinesManager.Overrides
                 return false;
             }
 
-            var extension = TLMTransportLineExtension.Instance;
-            bool isAbsoluteMode = TLMTransportLineExtension.Instance.IsUsingCustomConfig(vehicleData.m_transportLine) && UVMBudgetConfigTab.IsAbsoluteValue();
+            var extension = TLMLineUtils.GetEffectiveExtensionForLine(vehicleData.m_transportLine);
+            var lineExt = TLMTransportLineExtension.Instance;
+
+            bool isAbsoluteMode = lineExt.IsUsingCustomConfig(vehicleData.m_transportLine) && lineExt.IsDisplayAbsoluteValues(lineId);
 
             if(isAbsoluteMode)
             {

@@ -93,8 +93,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             bool isIntercity = lineId == 0;
             m_weightEditor.isVisible = !isIntercity;
 
-            bool isCustomConfig = !isIntercity && TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId);
-            bool isAbsolute = isCustomConfig && UVMBudgetConfigTab.IsAbsoluteValue();
+            var lineExt = TLMTransportLineExtension.Instance;
+            bool isCustomConfig = !isIntercity && lineExt.IsUsingCustomConfig(lineId);
+            bool isAbsolute = isCustomConfig && lineExt.IsDisplayAbsoluteValues(lineId);
 
             if (isAllowed)
             {
@@ -102,7 +103,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 m_weightEditor.opacity = 1f;
                 m_usedCount.isVisible = true;
                 string key = index.ToString();
-                bool isActiveSlot = index == TLMTransportLineExtension.Instance.GetCurrentUsedCountSlot(lineId);
+                bool isActiveSlot = index == TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
                 if (isActiveSlot)
                 {
                     m_usedCount.opacity = 1f;
@@ -159,7 +160,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 return;
             }
 
-            bool isActiveSlot = index == TLMTransportLineExtension.Instance.GetCurrentUsedCountSlot(lineId);
+            bool isActiveSlot = index == TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
             if (!isActiveSlot)
             {
                 m_usedCount.opacity = 0.3f;
@@ -168,8 +169,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 return;
             }
 
-            var ext = TLMTransportLineExtension.Instance;
-            List<TransportAsset> assets = ext.GetAssetTransportListForLine(lineId);
+            List<TransportAsset> assets = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetAssetTransportListForLine(lineId);
 
             int idx = assets.FindIndex(x => x.name == m_currentAsset);
             if (idx < 0)
@@ -250,7 +250,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                             index = hourIndex != -1 ? hourIndex : 0;
                         }
 
-                        bool isAbsolute = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId) && UVMBudgetConfigTab.IsAbsoluteValue();
+                        var lineExt = TLMTransportLineExtension.Instance;
+                        bool isAbsolute = lineExt.IsUsingCustomConfig(lineId) && lineExt.IsDisplayAbsoluteValues(lineId);
 
                         if (isAbsolute)
                         {

@@ -80,12 +80,19 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
             }
             return AssetConfigurations[assetName];
         }
+
         IAssetSelectorStorage ISafeGettable<IAssetSelectorStorage>.SafeGet(uint index) => SafeGet(index);
+
         INameableStorage ISafeGettable<INameableStorage>.SafeGet(uint index) => SafeGet(index);
+
         ITicketPriceStorage ISafeGettable<ITicketPriceStorage>.SafeGet(uint index) => SafeGet(index);
+
         IBudgetStorage ISafeGettable<IBudgetStorage>.SafeGet(uint index) => SafeGet(index);
+
         IColorSelectableStorage ISafeGettable<IColorSelectableStorage>.SafeGet(uint index) => SafeGet(index);
+
         IDepotSelectionStorage ISafeGettable<IDepotSelectionStorage>.SafeGet(uint index) => SafeGet(index);
+
         IBasicExtensionStorage ISafeGettable<IBasicExtensionStorage>.SafeGet(uint index) => SafeGet(index);
 
         public uint GetDefaultTicketPrice(uint x = 0)
@@ -93,9 +100,11 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
             int savedVal = Definition.GetConfig().DefaultTicketPrice;
             return savedVal > 0 ? (uint)savedVal : (uint)TransportManager.instance.GetTransportInfo(TransportType).m_ticketPrice;
         }
+
         #region Asset properties
 
         public bool IsCustomCapacity(string name) => AssetConfigurations.ContainsKey(name);
+
         public int GetCustomCapacity(string name)
         {
             int capacity = SafeGetAsset(name).Capacity;
@@ -254,6 +263,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 return ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineId).Intersect(m_basicAssetsListIntercity).ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x.name));
             }
         }
+
         public Dictionary<TransportAsset, string> GetAllBasicAssetsForLine(ushort lineId)
         {
             if (lineId > 0)
@@ -273,6 +283,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 return m_basicAssetsListIntercity.ToDictionary(x => x, x => Locale.GetUnchecked("VEHICLE_TITLE", x.name));
             }
         }
+
         public List<TransportAsset> GetBasicAssetListForLine(ushort lineId)
         {
             if (m_basicAssetsList == null)
@@ -323,6 +334,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
             TransportSystemDefinition tsd = Definition;
             m_basicAssetsList = TLMPrefabUtils.LoadBasicAssets(tsd);
         }
+
         private void LoadBasicAssetsInterCity()
         {
             TransportSystemDefinition tsd = Definition;
@@ -359,6 +371,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         }
 
         #endregion
+
         public uint LineToIndex(ushort lineId) => TLMPrefixesUtils.GetPrefix(lineId);
 
         public void OnReleased()
@@ -381,6 +394,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 }
             }
         }
+
         public static TLMTransportTypeConfigurations GetLoadData(ISerializableData serializableData, string ID)
         {
             if (ID == null || ToolManager.instance.m_properties.m_mode != ItemClass.Availability.Game)

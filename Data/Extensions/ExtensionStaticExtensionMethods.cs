@@ -27,8 +27,10 @@ namespace TransportLinesManager.Data.Extensions
         {
             List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
             IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
-            bool isCustomConfig = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId);
-            bool isAbsolute = isCustomConfig && UVMBudgetConfigTab.IsAbsoluteValue();
+            var ext = TLMTransportLineExtension.Instance;
+
+            bool isCustomConfig = ext.IsUsingCustomConfig(lineId);
+            bool isAbsolute = isCustomConfig && ext.IsDisplayAbsoluteValues(lineId);
 
             if (list.Any(item => item.name == assetId))
             {
@@ -154,6 +156,7 @@ namespace TransportLinesManager.Data.Extensions
             }
             list.RemoveAll(x => x.name == assetId);
         }
+
         public static void UseDefaultAssetsAtLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.GetAssetListForLine(lineId).Clear();
         #endregion
 
@@ -164,42 +167,52 @@ namespace TransportLinesManager.Data.Extensions
 
         #region Budget Multiplier
         public static TimeableList<BudgetEntryXml> GetBudgetsMultiplierForLine<T>(this T it, ushort lineId) where T : IBudgetableExtension => it.SafeGet(it.LineToIndex(lineId)).BudgetEntries;
+
         public static uint GetBudgetMultiplierForHourForLine<T>(this T it, ushort lineId, float hour) where T : IBudgetableExtension
         {
             TimeableList<BudgetEntryXml> budget = it.GetBudgetsMultiplierForLine(lineId);
             Tuple<Tuple<BudgetEntryXml, int>, Tuple<BudgetEntryXml, int>, float> currentBudget = budget.GetAtHour(hour);
             return (uint)Mathf.Lerp(currentBudget.First.First.Value, currentBudget.Second.First.Value, currentBudget.Third);
         }
+
         public static void SetBudgetMultiplierForLine<T>(this T it, ushort lineId, uint multiplier, int hour) where T : IBudgetableExtension => it.SafeGet(it.LineToIndex(lineId)).BudgetEntries.Add(new BudgetEntryXml()
         {
             Value = multiplier,
             HourOfDay = hour
         });
+
         public static void RemoveBudgetMultiplierForLine<T>(this T it, ushort lineId, int hour) where T : IBudgetableExtension => it.SafeGet(it.LineToIndex(lineId)).BudgetEntries.RemoveAtHour(hour);
+
         public static void RemoveAllBudgetMultipliersOfLine<T>(this T it, ushort lineId) where T : IBudgetableExtension => it.SafeGet(it.LineToIndex(lineId)).BudgetEntries =
         [
             new(){HourOfDay=0,Value=100}
         ];
+
         public static void SetAllBudgetMultipliersForLine<T>(this T it, ushort lineId, TimeableList<BudgetEntryXml> newValue) where T : IBudgetableExtension => it.SafeGet(it.LineToIndex(lineId)).BudgetEntries = newValue;
         #endregion
 
         #region Ticket Price
         public static TimeableList<TicketPriceEntryXml> GetTicketPricesForLine<T>(this T it, ushort lineId) where T : ITicketPriceExtension => it.SafeGet(it.LineToIndex(lineId)).TicketPriceEntries;
+        
         public static void SetTicketPricesForLine<T>(this T it, ushort lineId, TimeableList<TicketPriceEntryXml> newPrices) where T : ITicketPriceExtension => it.SafeGet(it.LineToIndex(lineId)).TicketPriceEntries = newPrices;
+        
         public static void ClearTicketPricesOfLine<T>(this T it, ushort lineId) where T : ITicketPriceExtension => it.SafeGet(it.LineToIndex(lineId)).TicketPriceEntries =
         [
             new(){HourOfDay=0,Value=0}
         ];
+        
         public static Tuple<TicketPriceEntryXml, int> GetTicketPriceForHourForLine<T>(this T it, ushort lineId, float hour) where T : ITicketPriceExtension
         {
             TimeableList<TicketPriceEntryXml> ticketPrices = it.GetTicketPricesForLine(lineId);
             return ticketPrices.GetAtHourExact(hour);
         }
+        
         public static void SetTicketPriceToLine<T>(this T it, ushort lineId, uint multiplier, int hour) where T : ITicketPriceExtension => it.SafeGet(it.LineToIndex(lineId)).TicketPriceEntries.Add(new TicketPriceEntryXml()
         {
             Value = multiplier,
             HourOfDay = hour
         });
+       
         public static void RemoveTicketPriceEntryToLine<T>(this T it, ushort lineId, int hour) where T : ITicketPriceExtension => it.SafeGet(it.LineToIndex(lineId)).TicketPriceEntries.RemoveAtHour(hour);
 
         #endregion

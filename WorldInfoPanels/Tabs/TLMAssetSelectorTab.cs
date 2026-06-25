@@ -34,7 +34,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             Instance = this;
             CreateWindow();
-            TLMTransportLineExtension.Instance.EventAssetUsedCountChanged += OnAssetUsedCountChanged;
+            TLMLineUtils.EventAssetUsedCountChanged += OnAssetUsedCountChanged;
         }
 
         public void OnDestroy()
@@ -43,7 +43,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 Instance = null;
             }
-            TLMTransportLineExtension.Instance.EventAssetUsedCountChanged -= OnAssetUsedCountChanged;
+            TLMLineUtils.EventAssetUsedCountChanged -= OnAssetUsedCountChanged;
         }
 
         private void OnAssetUsedCountChanged(ushort lineId, int slotIndex)
@@ -323,13 +323,13 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 return;
             }
 
-            UVMPublicTransportWorldInfoPanel.GetLineID(out _, out bool fromBuilding);
+            UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding);
             m_timeBudgetSelect.isVisible = !fromBuilding;
             m_weightColumnHeader.isVisible = !fromBuilding;
             m_usedCountColumnHeader.isVisible = !fromBuilding;
 
-            bool isCustom = TLMTransportLineExtension.Instance.IsUsingCustomConfig(GetLineID());
-            bool isAbsolute = isCustom && UVMBudgetConfigTab.IsAbsoluteValue();
+            var lineExt = TLMTransportLineExtension.Instance;
+            bool isAbsolute = lineExt.IsUsingCustomConfig(lineId) && lineExt.IsDisplayAbsoluteValues(lineId);
 
             if(isAbsolute)
             { 
@@ -341,11 +341,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
 
             LogUtils.DoLog("tsd = {0}", tsd);
-            IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
+            IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
 
             UpdateAssetList(config);
 
-            if (GetLineID() == 0)
+            if (lineId == 0)
             {
                 m_title.text = Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE_OUTSIDECONNECTION");
             }
@@ -583,8 +583,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_usedCountColumnHeader.text = Locale.Get("TLM_ASSET_USED_HEADER");
             m_usedCountColumnHeader.isVisible = true;
 
-            bool isCustom = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId);
-            bool isAbsolute = isCustom && UVMBudgetConfigTab.IsAbsoluteValue();
+            var lineExt = TLMTransportLineExtension.Instance;
+            bool isAbsolute = lineExt.IsUsingCustomConfig(lineId) && lineExt.IsDisplayAbsoluteValues(lineId);
 
             if (isAbsolute)
             {

@@ -46,6 +46,10 @@ namespace TransportLinesManager.Utils
             TransferManager.TransferReason.Bus
         ];
 
+        public static event Action<ushort, int> EventAssetUsedCountChanged;
+
+        public static readonly Dictionary<ushort, int> m_lastUsedCountSlotByLine = [];
+
         private static int colorChangeCooldown = 0;
 
         private static readonly Dictionary<ushort, Color> colorChangeTarget = [];
@@ -768,7 +772,151 @@ namespace TransportLinesManager.Utils
 
             return ticketPriceDefault;
         }
- 
+
+        public static bool RepairBrokenUsedCountForCurrentSlot(ushort lineID)
+        {
+            ref TransportLine tl = ref TransportManager.instance.m_lines.m_buffer[lineID];
+            int vehicleCount = tl.CountVehicles(lineID);
+            if (vehicleCount <= 0)
+            {
+                return false;
+            }
+
+            int slotIndex = GetEffectiveConfigForLine(lineID).BudgetEntries.GetAtHourExact(ReferenceTimer).Second;
+            string key = slotIndex.ToString();
+
+            List<TransportAsset> assetTransportList = GetEffectiveExtensionForLine(lineID).GetAssetTransportListForLine(lineID);
+
+            int totalUsedInSlot = 0;
+            bool hasNegativeUsedCount = false;
+
+            for (int i = 0; i < assetTransportList.Count; i++)
+            {
+                TransportAsset asset = assetTransportList[i];
+                asset.count ??= [];
+
+                if (!asset.count.ContainsKey(key))
+                {
+                    asset.count[key] = new CountEntry
+                    {
+                        TotalCount = 0,
+                        UsedCount = 0
+                    };
+                }
+
+                CountEntry entry = asset.count[key];
+                totalUsedInSlot += entry.UsedCount;
+                hasNegativeUsedCount |= entry.UsedCount < 0;
+
+                assetTransportList[i] = asset;
+            }
+
+            GetEffectiveExtensionForLine(lineID).SetAssetTransportListForLine(lineID, assetTransportList);
+
+            bool shouldRepair = hasNegativeUsedCount || totalUsedInSlot <= 0;
+            if (!shouldRepair)
+            {
+                return false;
+            }
+
+            RebuildUsedCountForCurrentSlot(lineID, slotIndex, true);
+            m_lastUsedCountSlotByLine[lineID] = slotIndex;
+            return true;
+        }
+
+        public static void EnsureUsedCountSlotSynchronized(ushort lineID, int currentSlot)
+        {
+            if (lineID == 0)
+            {
+                return;
+            }
+
+            if (!m_lastUsedCountSlotByLine.TryGetValue(lineID, out int lastSlot) || lastSlot != currentSlot)
+            {
+                RebuildUsedCountForCurrentSlot(lineID, currentSlot);
+                m_lastUsedCountSlotByLine[lineID] = currentSlot;
+            }
+        }
+
+        public static void NotifyAssetUsedCountChanged(ushort lineID, int slotIndex)
+        {
+            EventAssetUsedCountChanged?.Invoke(lineID, slotIndex);
+        }
+
+        private static void RebuildUsedCountForCurrentSlot(ushort lineID, int slotIndex, bool clampTotalCountToUsed = false)
+        {
+            if (lineID == 0 || slotIndex < 0)
+            {
+                return;
+            }
+
+            List<TransportAsset> assetTransportList = GetEffectiveExtensionForLine(lineID).GetAssetTransportListForLine(lineID);
+            if (assetTransportList == null || assetTransportList.Count == 0)
+            {
+                return;
+            }
+
+            var tm = TransportManager.instance;
+            var vm = VehicleManager.instance;
+            ref TransportLine tl = ref tm.m_lines.m_buffer[lineID];
+
+            Dictionary<string, int> vehicleCountPerAsset = [];
+            int vehicleCount = tl.CountVehicles(lineID);
+
+            for (int v = 0; v < vehicleCount; v++)
+            {
+                ushort vehicleId = tl.GetVehicle(v);
+                if (vehicleId == 0)
+                {
+                    continue;
+                }
+
+                VehicleInfo info = vm.m_vehicles.m_buffer[vehicleId].Info;
+                if (info == null || string.IsNullOrEmpty(info.name))
+                {
+                    continue;
+                }
+
+                if (!vehicleCountPerAsset.ContainsKey(info.name))
+                {
+                    vehicleCountPerAsset[info.name] = 0;
+                }
+
+                vehicleCountPerAsset[info.name]++;
+            }
+
+            string key = slotIndex.ToString();
+
+            for (int i = 0; i < assetTransportList.Count; i++)
+            {
+                TransportAsset asset = assetTransportList[i];
+                asset.count ??= [];
+
+                if (!asset.count.ContainsKey(key))
+                {
+                    asset.count[key] = new CountEntry
+                    {
+                        TotalCount = 0,
+                        UsedCount = 0
+                    };
+                }
+
+                CountEntry entry = asset.count[key];
+                entry.UsedCount = vehicleCountPerAsset.TryGetValue(asset.name, out int used) ? used : 0;
+
+                if (clampTotalCountToUsed && entry.TotalCount < entry.UsedCount)
+                {
+                    entry.TotalCount = entry.UsedCount;
+                }
+
+                asset.count[key] = entry;
+                assetTransportList[i] = asset;
+            }
+
+            GetEffectiveExtensionForLine(lineID).SetAssetTransportListForLine(lineID, assetTransportList);
+            NotifyAssetUsedCountChanged(lineID, slotIndex);
+        }
+
         private static IEnumerator MakePassengersBored(ushort transportLine, uint simulationFrameStart)
         {
             int citizensCount = 0;

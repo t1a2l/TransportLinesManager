@@ -78,6 +78,7 @@ namespace TransportLinesManager
             base.OnLevelLoadingInternal();
             TLMController.VerifyIfIsRealTimeEnabled();
             TransportSystemDefinition.TransportInfoDict.ToString();
+            TLMController.MigrateOldVehicleCountData();
         }
 
 

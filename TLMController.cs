@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 
 namespace TransportLinesManager
 {
@@ -36,10 +37,13 @@ namespace TransportLinesManager
         public const ulong REALTIME_MOD_ID = 1420955187;
         public const ulong IPT2_MOD_ID = 928128676;
         public const ulong RETURN_VEHICLE_MOD_ID = 2101977903UL;
+
         public BuildingTransportLinesCache BuildingLines { get; private set; }
 
         private bool? m_isRealTimeEnabled = null;
+
         protected static string GlobalBaseConfigFileName { get; } = "TLM_GlobalData.xml";
+
         public static string GlobalBaseConfigPath { get; } = Path.Combine(FOLDER_PATH, GlobalBaseConfigFileName);
 
         public static bool IsRealTimeEnabled
@@ -53,6 +57,7 @@ namespace TransportLinesManager
                 return Instance?.m_isRealTimeEnabled == true;
             }
         }
+
         public static void VerifyIfIsRealTimeEnabled()
         {
             Instance?.m_isRealTimeEnabled = VerifyModEnabled(REALTIME_MOD_ID);
@@ -67,15 +72,19 @@ namespace TransportLinesManager
         }
 
         public static string PalettesFolder { get; } = FOLDER_PATH + Path.DirectorySeparatorChar + PALETTE_SUBFOLDER_NAME;
+
         public static string ExportedMapsFolder { get; } = FOLDER_PATH + Path.DirectorySeparatorChar + EXPORTED_MAPS_SUBFOLDER_NAME;
 
         public ushort CurrentSelectedId { get; private set; }
+
         public void SetCurrentSelectedId(ushort line) => CurrentSelectedId = line;
 
         internal TLMLineCreationToolbox LineCreationToolbox => PublicTransportInfoViewPanelOverrides.Toolbox;
 
         public TLMFacade SharedInstance { get; internal set; }
+
         internal IBridgeADR ConnectorADR { get; private set; }
+
         internal IBridgeWTS ConnectorWTS { get; private set; }
 
         private bool m_dirtyRegionalLines;
@@ -119,8 +128,6 @@ namespace TransportLinesManager
             BuildingLines = gameObject.AddComponent<BuildingTransportLinesCache>();
 
             TLMTransportTypeDataContainer.Instance.RefreshCapacities();
-
-            MigrateOldVehicleCountData();
             StartCoroutine(VehicleUtils.UpdateCapacityUnits());
             InitWipSidePanels();
 
@@ -261,26 +268,26 @@ namespace TransportLinesManager
             Color.Lerp( Color.white, Color.black,0.75f)
         ];
 
-        private static void MigrateOldVehicleCountData()
+        public static void MigrateOldVehicleCountData()
         {
-            var ext = TLMTransportLineExtension.Instance;
+            LogUtils.DoLog($"MigrateOldVehicleCountData");
             var vm = VehicleManager.instance;
             var tm = TransportManager.instance;
 
-            foreach (var kvp in ext.Configurations)
+            for (ushort lineId = 1; lineId < tm.m_lines.m_size; lineId++)
             {
-                ushort lineId = (ushort)kvp.Key;
-                var config = kvp.Value;
+                var currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
 
-                if (config.AssetTransportList == null || config.AssetTransportList.Count == 0)
+                if (currentConfig.AssetTransportList == null || currentConfig.AssetTransportList.Count == 0)
                     continue;
 
                 // Detect old format: assets with no count/spawn_percent dictionaries
-                bool isOldFormat = config.AssetTransportList.Any(a => a.count == null || a.count.Count == 0);
+                bool isOldFormat = currentConfig.AssetTransportList.Any(a => a.count == null || a.count.Count == 0);
                 if (!isOldFormat) continue;
 
-                int budgetCount = config.BudgetEntries?.Count > 0 ? config.BudgetEntries.Count : 1;
-                bool isCountBased = config.DisplayAbsoluteValues;
+                int budgetCount = currentConfig.BudgetEntries?.Count > 0 ? currentConfig.BudgetEntries.Count : 1;
+                var lineExt = TLMTransportLineExtension.Instance;
+                bool isCountBased = lineExt.IsUsingCustomConfig(lineId) && lineExt.IsDisplayAbsoluteValues(lineId);
 
                 // For count-based: count actual vehicles on the line per asset name
                 Dictionary<string, int> vehicleCountPerAsset = null;
@@ -299,9 +306,9 @@ namespace TransportLinesManager
                     }
                 }
 
-                for (int i = 0; i < config.AssetTransportList.Count; i++)
+                for (int i = 0; i < currentConfig.AssetTransportList.Count; i++)
                 {
-                    var asset = config.AssetTransportList[i];
+                    var asset = currentConfig.AssetTransportList[i];
                     asset.count ??= [];
                     asset.spawn_percent ??= [];
 
@@ -329,10 +336,10 @@ namespace TransportLinesManager
                         }
                     }
 
-                    config.AssetTransportList[i] = asset; // struct re-assign
+                    currentConfig.AssetTransportList[i] = asset; // struct re-assign
                 }
 
-                ext.RepairBrokenUsedCountForCurrentSlot(lineId);
+                TLMLineUtils.RepairBrokenUsedCountForCurrentSlot(lineId);
             }
         }
     }
