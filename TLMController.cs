@@ -201,6 +201,8 @@ namespace TransportLinesManager
                 parent.eventVisibilityChanged += (x, y) => controller?.EventWIPChanged(isGrow);
                 parent.eventPositionChanged += (x, y) => controller?.EventWIPChanged(isGrow);
                 parent.eventSizeChanged += (x, y) => controller?.EventWIPChanged(isGrow);
+                parent.eventPositionChanged += (x, y) => RepositionSidePanel(parent, parent2);
+                parent.eventSizeChanged += (x, y) => RepositionSidePanel(parent, parent2);
                 if (wip is CityServiceWorldInfoPanel)
                 {
                     var controllerP = TLMRegionalPlatformSelection.Init(parent2);
@@ -216,6 +218,12 @@ namespace TransportLinesManager
 
             }
 
+        }
+
+        public static void RepositionSidePanel(UIComponent parent, UIPanel parent2)
+        {
+            if (parent2 == null || parent == null) return;
+            parent2.relativePosition = new Vector3(parent.width + 15f, 50f);
         }
 
         public void OpenTLMPanel() => TransportLinesManagerMod.Instance.OpenPanelAtModTab();

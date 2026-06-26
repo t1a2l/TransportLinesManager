@@ -109,6 +109,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
             var multiplier = newSize * .02f;
             button.width = newSize;
             button.height = newSize;
+            button.relativePosition = new Vector3(2, 2);
             daytimeIndicatorLabel.width = newSize;
             daytimeIndicatorLabel.height = newSize;
             lineIdentifierLabel.height = newSize;
@@ -152,6 +153,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
                 button.focusedColor = color;
                 button.normalBgSprite = ResourceLoader.GetDefaultSpriteNameFor(ldo?.LineBgSprite ?? TransportSystemDefinition.FromIntercity(lineObj.Info)?.DefaultIcon ?? Commons.UI.SpriteNames.LineIconSpriteNames.S10StarIcon, true);
                 button.tooltip = TLMStationUtils.GetStationName(lineObj.DstStop, lineObj.SrcStop, lineObj.Info.m_class.m_subService, fromBuilding);
+                button.relativePosition = new Vector3(2, 2);
 
                 var text = TLMLineUtils.GetLineStringId(lineId, fromBuilding).Trim();
                 GetLineNumberCircleOnRefParams(text, false, out Color textColor, out float textScale, out Vector3 relativePosition);
@@ -172,6 +174,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
                     button.focusedColor = targetColor;
                     button.normalBgSprite = targetBg;
                     button.tooltip = "";
+                    button.relativePosition = new Vector3(2, 2);
                     daytimeIndicatorLabel.isVisible = false;
 
                     GetLineNumberCircleOnRefParams(targetText, false, out Color textColor, out float textScale, out Vector3 relativePosition);
@@ -194,6 +197,7 @@ namespace TransportLinesManager.WorldInfoPanels.NearLines
                     button.focusedColor = lineObj.m_color;
                     button.normalBgSprite = TLMLineUtils.GetIconForLine(lineId, false);
                     button.tooltip = tm.GetLineName(lineId);
+                    button.relativePosition = new Vector3(2, 2);
                     bool zeroed = TLMTransportLineExtension.Instance.SafeGet(lineId).IsZeroed;
                     if (!day || !night || zeroed)
                     {
