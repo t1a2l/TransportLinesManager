@@ -326,7 +326,32 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
 
         public void EditVehicleUsedCount(ushort lineID, string selectedModel, string status)
         {
-            return;
+            if (lineID == 0 || string.IsNullOrEmpty(selectedModel))
+            {
+                return;
+            }
+
+            int index = TLMLineUtils.GetEffectiveConfigForLine(lineID).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+            TLMLineUtils.EnsureUsedCountSlotSynchronized(lineID, index);
+
+            List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
+            int assetindex = assetTransportList?.FindIndex(item => item.name == selectedModel) ?? -1;
+            if (assetindex == -1)
+            {
+                LogUtils.DoErrorLog($"EditVehicleUsedCount: Could not find asset {selectedModel} in line {lineID} asset list");
+                return;
+            }
+
+            if (status == "Add")
+            {
+                TLMLineUtils.ChangeRuntimeUsedCount(lineID, index, selectedModel, 1);
+            }
+            else if (status == "Remove")
+            {
+                TLMLineUtils.ChangeRuntimeUsedCount(lineID, index, selectedModel, -1);
+            }
+
+            TLMLineUtils.NotifyAssetUsedCountChanged(lineID, index);
         }
 
         private void LoadBasicAssets()

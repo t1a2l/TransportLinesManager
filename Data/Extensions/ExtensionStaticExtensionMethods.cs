@@ -51,8 +51,7 @@ namespace TransportLinesManager.Data.Extensions
                 {
                     var count = new CountEntry
                     {
-                        TotalCount = 0,
-                        UsedCount = 0
+                        TotalCount = 0
                     };
                     item.count.Add(i.ToString(), count);
 
@@ -104,8 +103,7 @@ namespace TransportLinesManager.Data.Extensions
             {
                 var count = new CountEntry
                 {
-                    TotalCount = 0,
-                    UsedCount = 0
+                    TotalCount = 0
                 };
                 list[i].count[newIndex.ToString()] = count;
 

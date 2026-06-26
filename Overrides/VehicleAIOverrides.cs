@@ -145,7 +145,7 @@ namespace TransportLinesManager.Overrides
                 return false;
             }
 
-            int currentVehicleCount = TransportManager.instance.m_lines.m_buffer[vehicleData.m_transportLine].CountVehicles(lineId);
+            int currentVehicleCount = TransportManager.instance.m_lines.m_buffer[lineId].CountVehicles(lineId);
             int targetVehicleCount = TransportLineOverrides.NewCalculateTargetVehicleCount(lineId);
 
             if (currentVehicleCount <= targetVehicleCount)
@@ -161,10 +161,14 @@ namespace TransportLinesManager.Overrides
             if(isAbsoluteMode)
             {
                 int slotIndex = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+
                 if (slotIndex < 0)
                 {
                     slotIndex = 0;
                 }
+
+                TLMLineUtils.EnsureUsedCountSlotSynchronized(lineId, slotIndex);
+
                 string modelName = vehicleData.Info?.name;
                 if (!string.IsNullOrEmpty(modelName))
                 {
@@ -174,22 +178,17 @@ namespace TransportLinesManager.Overrides
                     if (assetIndex >= 0)
                     {
                         TransportAsset asset = assetTransportList[assetIndex];
-                        asset.count ??= [];
-
                         string key = slotIndex.ToString();
-                        if (!asset.count.ContainsKey(key))
+
+                        int configuredTotal = 0;
+                        if (asset.count != null && asset.count.ContainsKey(key))
                         {
-                            asset.count[key] = new CountEntry
-                            {
-                                TotalCount = 0,
-                                UsedCount = 0
-                            };
+                            configuredTotal = asset.count[key].TotalCount;
                         }
 
-                        CountEntry entry = asset.count[key];
+                        int runtimeUsed = TLMLineUtils.GetRuntimeUsedCount(lineId, slotIndex, modelName);
 
-                        // In absolute mode, only despawn this vehicle if its own family is over quota.
-                        if (entry.UsedCount <= entry.TotalCount)
+                        if (runtimeUsed <= configuredTotal)
                         {
                             return false;
                         }

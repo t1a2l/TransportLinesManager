@@ -486,8 +486,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 var item_count = new CountEntry
                 {
-                    TotalCount = 0,
-                    UsedCount = 0
+                    TotalCount = 0
                 };
                 item.count.Add(i.ToString(), item_count);
 

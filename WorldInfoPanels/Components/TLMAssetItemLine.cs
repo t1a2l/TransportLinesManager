@@ -86,6 +86,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_currentAsset = asset.name;
             m_checkbox.label.text = Locale.GetUnchecked("VEHICLE_TITLE", asset.name);
             m_checkbox.isChecked = isAllowed;
+
             var info = PrefabCollection<VehicleInfo>.FindLoaded(m_currentAsset);
             var tsd = TransportSystemDefinition.From(info);
             UpdateMaintenanceCost(info, tsd);
@@ -102,13 +103,19 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 m_weightEditor.isInteractive = true;
                 m_weightEditor.opacity = 1f;
                 m_usedCount.isVisible = true;
-                string key = index.ToString();
-                bool isActiveSlot = index == TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+
+                bool isActiveSlot = false;
+                if (!isIntercity)
+                {
+                    int activeSlot = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                    isActiveSlot = index == activeSlot;
+                }
+
                 if (isActiveSlot)
                 {
+                    TLMLineUtils.EnsureUsedCountSlotSynchronized(lineId, index);
                     m_usedCount.opacity = 1f;
-                    CountEntry countEntry = asset.count.ContainsKey(key) ? asset.count[key] : new CountEntry { TotalCount = 0, UsedCount = 0 };
-                    m_usedCount.text = countEntry.UsedCount.ToString();
+                    m_usedCount.text = TLMLineUtils.GetRuntimeUsedCount(lineId, index, asset.name).ToString();
                     m_usedCount.tooltip = Locale.Get("TLM_ASSET_USED_LABEL_DESCRIPTION");
                 }
                 else
@@ -117,6 +124,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                     m_usedCount.text = "-";
                     m_usedCount.tooltip = null;
                 }
+
                 if (isAbsolute)
                 {
                     m_weightEditor.text = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()].TotalCount.ToString() : "0"; 
@@ -139,10 +147,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             if (isAbsolute)
             {
                 m_weightEditor.tooltip = Locale.Get("TLM_ASSET_COUNT_FIELD_DESCRIPTION");
-            }
-            else if (isCustomConfig)
-            {
-                m_weightEditor.tooltip = Locale.Get("TLM_ASSET_WEIGHT_FIELD_DESCRIPTION");
             }
             else
             {
@@ -169,23 +173,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 return;
             }
 
-            List<TransportAsset> assets = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetAssetTransportListForLine(lineId);
-
-            int idx = assets.FindIndex(x => x.name == m_currentAsset);
-            if (idx < 0)
-            {
-                m_usedCount.text = string.Empty;
-                return;
-            }
-
-            TransportAsset asset = assets[idx];
-            string key = index.ToString();
-
-            asset.count ??= [];
-            CountEntry countEntry = asset.count.ContainsKey(key) ? asset.count[key] : new CountEntry { TotalCount = 0, UsedCount = 0 };
-
+            TLMLineUtils.EnsureUsedCountSlotSynchronized(lineId, index);
             m_usedCount.opacity = 1f;
-            m_usedCount.text = countEntry.UsedCount.ToString();
+            m_usedCount.text = TLMLineUtils.GetRuntimeUsedCount(lineId, index, m_currentAsset).ToString();
             m_usedCount.tooltip = Locale.Get("TLM_ASSET_USED_LABEL_DESCRIPTION");
         }
 

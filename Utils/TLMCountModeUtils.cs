@@ -41,35 +41,47 @@ namespace TransportLinesManager.Utils
         private static void ScaleCountsDown(List<TransportAsset> assets, string key, int newBudget)
         {
             int currentSum = assets.Sum(a => a.count.TryGetValue(key, out var ce) ? ce.TotalCount : 0);
-            if (currentSum == 0) return;
+            if (currentSum == 0)
+            {
+                return;
+            }
 
             float ratio = (float)newBudget / currentSum;
             int assigned = 0;
+            int highestIdx = -1;
+            int highestCount = -1;
 
             // Find highest-weight (highest TotalCount) asset for remainder
-            TransportAsset highestAsset = assets.OrderByDescending(a => a.count.TryGetValue(key, out var ce) ? ce.TotalCount : 0).First();
-
             for (int i = 0; i < assets.Count; i++)
             {
                 var asset = assets[i];
-                if (!asset.count.TryGetValue(key, out var ce)) continue;
+                if (!asset.count.TryGetValue(key, out var ce))
+                {
+                    continue;
+                }
+
+                if (ce.TotalCount > highestCount)
+                {
+                    highestCount = ce.TotalCount;
+                    highestIdx = i;
+                }
+
                 int scaled = Mathf.FloorToInt(ce.TotalCount * ratio);
-                scaled = Mathf.Max(0, scaled); // never negative
-                ce.TotalCount = scaled;
-                ce.UsedCount = Mathf.Min(ce.UsedCount, scaled);
+                ce.TotalCount = Mathf.Max(0, scaled); // never negative
                 asset.count[key] = ce;
                 assets[i] = asset;
-                assigned += scaled;
+                assigned += ce.TotalCount;
             }
 
             // Give remainder to highest-weight asset
             int remainder = newBudget - assigned;
-            if (remainder > 0)
+            if (remainder > 0 && highestIdx >= 0)
             {
-                int idx = assets.IndexOf(highestAsset); // by name match
-                var ce = assets[idx].count[key];
+                var asset = assets[highestIdx];
+                var ce = asset.count[key];
                 ce.TotalCount += remainder;
-                var a = assets[idx]; a.count[key] = ce; assets[idx] = a;
+                asset.count[key] = ce;
+                assets[highestIdx] = asset;
             }
         }
 

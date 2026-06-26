@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using TransportLinesManager.WorldInfoPanels.Tabs;
 
 namespace TransportLinesManager
 {
@@ -143,6 +142,7 @@ namespace TransportLinesManager
             }
             return false;
         }
+
         internal static bool UpdateRegionalLinesFromNode(ushort nodeId)
         {
             if (NetManager.instance.m_nodes.m_buffer[nodeId].Info.m_netAI is TransportLineAI && NetManager.instance.m_nodes.m_buffer[nodeId].m_transportLine == 0)
@@ -271,22 +271,28 @@ namespace TransportLinesManager
         public static void MigrateOldVehicleCountData()
         {
             LogUtils.DoLog($"MigrateOldVehicleCountData");
+
             var vm = VehicleManager.instance;
             var tm = TransportManager.instance;
+            var lineExt = TLMTransportLineExtension.Instance;
 
             for (ushort lineId = 1; lineId < tm.m_lines.m_size; lineId++)
             {
                 var currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
 
                 if (currentConfig.AssetTransportList == null || currentConfig.AssetTransportList.Count == 0)
+                {
                     continue;
+                }
 
-                // Detect old format: assets with no count/spawn_percent dictionaries
-                bool isOldFormat = currentConfig.AssetTransportList.Any(a => a.count == null || a.count.Count == 0);
-                if (!isOldFormat) continue;
+                bool needsMigration = currentConfig.AssetTransportList.Any(a => a.count == null || a.count.Count == 0 || a.spawn_percent == null || a.spawn_percent.Count == 0);
 
-                int budgetCount = currentConfig.BudgetEntries?.Count > 0 ? currentConfig.BudgetEntries.Count : 1;
-                var lineExt = TLMTransportLineExtension.Instance;
+                if (!needsMigration)
+                {
+                    continue;
+                }
+
+                int budgetCount = currentConfig.BudgetEntries?.Count > 0 ? currentConfig.BudgetEntries.Count : 1;                   
                 bool isCountBased = lineExt.IsUsingCustomConfig(lineId) && lineExt.IsDisplayAbsoluteValues(lineId);
 
                 // For count-based: count actual vehicles on the line per asset name
@@ -294,20 +300,31 @@ namespace TransportLinesManager
                 if (isCountBased)
                 {
                     vehicleCountPerAsset = [];
+
                     ref TransportLine tl = ref tm.m_lines.m_buffer[lineId];
                     int vehicleCount = tl.CountVehicles(lineId);
                     for (int v = 0; v < vehicleCount; v++)
                     {
                         ushort vehicleId = tl.GetVehicle(v);
-                        if (vehicleId == 0) continue;
-                        string assetName = vm.m_vehicles.m_buffer[vehicleId].Info.name;
+                        if (vehicleId == 0)
+                        {
+                            continue;
+                        }
+
+                        var info = vm.m_vehicles.m_buffer[vehicleId].Info;
+                        if (info == null)
+                        {
+                            continue;
+                        }
+
+                        string assetName = info.name;
                         vehicleCountPerAsset.TryGetValue(assetName, out int current);
                         vehicleCountPerAsset[assetName] = current + 1;
                     }
                 }
 
                 for (int i = 0; i < currentConfig.AssetTransportList.Count; i++)
-                {
+                {       
                     var asset = currentConfig.AssetTransportList[i];
                     asset.count ??= [];
                     asset.spawn_percent ??= [];
@@ -317,21 +334,21 @@ namespace TransportLinesManager
                         string key = idx.ToString();
 
                         if (!asset.spawn_percent.ContainsKey(key))
-                            asset.spawn_percent[key] = new SpawnPercentEntry { Value = 100 };
+                        { 
+                            asset.spawn_percent[key] = new SpawnPercentEntry { Value = 100 }; 
+                        }
 
                         if (!asset.count.ContainsKey(key))
                         {
-                            int usedCount = 0;
                             int totalCount = 0;
                             if (isCountBased && vehicleCountPerAsset != null)
                             {
-                                vehicleCountPerAsset.TryGetValue(asset.name, out usedCount);
-                                totalCount = usedCount; // best guess: assign what's deployed
+                                vehicleCountPerAsset.TryGetValue(asset.name, out totalCount);
                             }
+
                             asset.count[key] = new CountEntry
                             {
-                                TotalCount = totalCount,
-                                UsedCount = usedCount
+                                TotalCount = totalCount
                             };
                         }
                     }
@@ -339,7 +356,8 @@ namespace TransportLinesManager
                     currentConfig.AssetTransportList[i] = asset; // struct re-assign
                 }
 
-                TLMLineUtils.RepairBrokenUsedCountForCurrentSlot(lineId);
+                var curreentSlot = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                TLMLineUtils.EnsureUsedCountSlotSynchronized(lineId, curreentSlot);
             }
         }
     }

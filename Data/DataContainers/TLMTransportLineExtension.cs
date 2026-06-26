@@ -22,7 +22,7 @@ namespace TransportLinesManager.Data.DataContainers
         internal void SafeCleanEntry(ushort lineID)
         {
             Configurations[lineID] = new TLMTransportLineConfiguration();
-            TLMLineUtils.m_lastUsedCountSlotByLine.Remove(lineID);
+            TLMLineUtils.ClearRuntimeUsedCountForLine(lineID);
         }
         
         public TLMTransportLineConfiguration SafeGet(uint lineId)
@@ -117,7 +117,7 @@ namespace TransportLinesManager.Data.DataContainers
 
         public void EditVehicleUsedCount(ushort lineID, string selectedModel, string status)
         {
-            if (lineID == 0)
+            if (lineID == 0 || string.IsNullOrEmpty(selectedModel))
             {
                 return;
             }
@@ -126,42 +126,22 @@ namespace TransportLinesManager.Data.DataContainers
             TLMLineUtils.EnsureUsedCountSlotSynchronized(lineID, index);
 
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
-            int assetindex = assetTransportList.FindIndex(item => item.name == selectedModel);
+            int assetindex = assetTransportList?.FindIndex(item => item.name == selectedModel) ?? -1;
             if (assetindex == -1)
             {
                 LogUtils.DoErrorLog($"EditVehicleUsedCount: Could not find asset {selectedModel} in line {lineID} asset list");
                 return;
             }
 
-            string key = index.ToString();
-            TransportAsset asset = assetTransportList[assetindex];
-
-            asset.count ??= [];
-
-            if (!asset.count.ContainsKey(key))
-            {
-                asset.count[key] = new CountEntry
-                {
-                    TotalCount = 0,
-                    UsedCount = 0
-                };
-            }
-
-            CountEntry assetcount = asset.count[key];
-
             if (status == "Add")
             {
-                assetcount.UsedCount++;
+                TLMLineUtils.ChangeRuntimeUsedCount(lineID, index, selectedModel, 1);
             }
-            else if (status == "Remove" && assetcount.UsedCount > 0)
+            else if (status == "Remove")
             {
-                assetcount.UsedCount--;
+                TLMLineUtils.ChangeRuntimeUsedCount(lineID, index, selectedModel, -1);
             }
 
-            asset.count[key] = assetcount;
-            assetTransportList[assetindex] = asset;
-
-            ExtensionStaticExtensionMethods.SetAssetTransportListForLine(this, lineID, assetTransportList);
             TLMLineUtils.NotifyAssetUsedCountChanged(lineID, index);
         }
 

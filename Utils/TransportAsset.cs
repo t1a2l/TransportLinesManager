@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Xml.Serialization;
 using Commons.Utils.UtilitiesClasses;
 
 namespace TransportLinesManager.Utils
@@ -30,6 +31,7 @@ namespace TransportLinesManager.Utils
         public int TotalCount { get; set; }
 
         [XmlAttribute("used")]
+        [Obsolete("Legacy serialized field. Runtime used count is no longer persisted.")]
         public int UsedCount { get; set; }
     }
 }

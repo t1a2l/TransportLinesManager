@@ -54,6 +54,8 @@ namespace TransportLinesManager.Utils
 
         private static readonly Dictionary<ushort, Color> colorChangeTarget = [];
 
+        private static readonly Dictionary<ushort, Dictionary<int, Dictionary<string, int>>> m_runtimeUsedCountByLine = [];
+
         public static void GetQuantityPassengerWaiting(ushort currentStop, out int residents, out int tourists, out int timeTilBored)
         {
             var residentsIn = 0;
@@ -773,55 +775,92 @@ namespace TransportLinesManager.Utils
             return ticketPriceDefault;
         }
 
-        public static bool RepairBrokenUsedCountForCurrentSlot(ushort lineID)
+        private static Dictionary<string, int> EnsureRuntimeUsedCountSlot(ushort lineId, int slotIndex)
         {
-            ref TransportLine tl = ref TransportManager.instance.m_lines.m_buffer[lineID];
-            int vehicleCount = tl.CountVehicles(lineID);
-            if (vehicleCount <= 0)
+            if (!m_runtimeUsedCountByLine.TryGetValue(lineId, out var lineSlots))
             {
-                return false;
+                lineSlots = [];
+                m_runtimeUsedCountByLine[lineId] = lineSlots;
             }
 
-            int slotIndex = GetEffectiveConfigForLine(lineID).BudgetEntries.GetAtHourExact(ReferenceTimer).Second;
-            string key = slotIndex.ToString();
-
-            List<TransportAsset> assetTransportList = GetEffectiveExtensionForLine(lineID).GetAssetTransportListForLine(lineID);
-
-            int totalUsedInSlot = 0;
-            bool hasNegativeUsedCount = false;
-
-            for (int i = 0; i < assetTransportList.Count; i++)
+            if (!lineSlots.TryGetValue(slotIndex, out var slotAssets))
             {
-                TransportAsset asset = assetTransportList[i];
-                asset.count ??= [];
+                slotAssets = [];
+                lineSlots[slotIndex] = slotAssets;
+            }
 
-                if (!asset.count.ContainsKey(key))
+            return slotAssets;
+        }
+
+        public static int GetRuntimeUsedCount(ushort lineId, int slotIndex, string assetName)
+        {
+            if (lineId == 0 || slotIndex < 0 || string.IsNullOrEmpty(assetName))
+            {
+                return 0;
+            }
+
+            if (!m_runtimeUsedCountByLine.TryGetValue(lineId, out var lineSlots))
+            {
+                return 0;
+            }
+
+            if (!lineSlots.TryGetValue(slotIndex, out var slotAssets))
+            {
+                return 0;
+            }
+
+            return slotAssets.TryGetValue(assetName, out int usedCount) ? usedCount : 0;
+        }
+
+        public static void SetRuntimeUsedCount(ushort lineId, int slotIndex, string assetName, int value)
+        {
+            if (lineId == 0 || slotIndex < 0 || string.IsNullOrEmpty(assetName))
+            {
+                return;
+            }
+
+            var slotAssets = EnsureRuntimeUsedCountSlot(lineId, slotIndex);
+            slotAssets[assetName] = Mathf.Max(0, value);
+        }
+
+        public static void ChangeRuntimeUsedCount(ushort lineId, int slotIndex, string assetName, int delta)
+        {
+            if (lineId == 0 || slotIndex < 0 || string.IsNullOrEmpty(assetName) || delta == 0)
+            {
+                return;
+            }
+
+            var slotAssets = EnsureRuntimeUsedCountSlot(lineId, slotIndex);
+            slotAssets.TryGetValue(assetName, out int currentValue);
+            slotAssets[assetName] = Mathf.Max(0, currentValue + delta);
+        }
+
+        public static void ClearRuntimeUsedCountForSlot(ushort lineId, int slotIndex)
+        {
+            if (lineId == 0 || slotIndex < 0)
+            {
+                return;
+            }
+
+            if (m_runtimeUsedCountByLine.TryGetValue(lineId, out var lineSlots))
+            {
+                lineSlots.Remove(slotIndex);
+                if (lineSlots.Count == 0)
                 {
-                    asset.count[key] = new CountEntry
-                    {
-                        TotalCount = 0,
-                        UsedCount = 0
-                    };
+                    m_runtimeUsedCountByLine.Remove(lineId);
                 }
-
-                CountEntry entry = asset.count[key];
-                totalUsedInSlot += entry.UsedCount;
-                hasNegativeUsedCount |= entry.UsedCount < 0;
-
-                assetTransportList[i] = asset;
             }
+        }
 
-            GetEffectiveExtensionForLine(lineID).SetAssetTransportListForLine(lineID, assetTransportList);
-
-            bool shouldRepair = hasNegativeUsedCount || totalUsedInSlot <= 0;
-            if (!shouldRepair)
+        public static void ClearRuntimeUsedCountForLine(ushort lineId)
+        {
+            if (lineId == 0)
             {
-                return false;
+                return;
             }
 
-            RebuildUsedCountForCurrentSlot(lineID, slotIndex, true);
-            m_lastUsedCountSlotByLine[lineID] = slotIndex;
-            return true;
+            m_runtimeUsedCountByLine.Remove(lineId);
+            m_lastUsedCountSlotByLine.Remove(lineId);
         }
 
         public static void EnsureUsedCountSlotSynchronized(ushort lineID, int currentSlot)
@@ -843,7 +882,7 @@ namespace TransportLinesManager.Utils
             EventAssetUsedCountChanged?.Invoke(lineID, slotIndex);
         }
 
-        private static void RebuildUsedCountForCurrentSlot(ushort lineID, int slotIndex, bool clampTotalCountToUsed = false)
+        private static void RebuildUsedCountForCurrentSlot(ushort lineID, int slotIndex)
         {
             if (lineID == 0 || slotIndex < 0)
             {
@@ -853,6 +892,8 @@ namespace TransportLinesManager.Utils
             List<TransportAsset> assetTransportList = GetEffectiveExtensionForLine(lineID).GetAssetTransportListForLine(lineID);
             if (assetTransportList == null || assetTransportList.Count == 0)
             {
+                ClearRuntimeUsedCountForSlot(lineID, slotIndex);
+                NotifyAssetUsedCountChanged(lineID, slotIndex);
                 return;
             }
 
@@ -885,35 +926,15 @@ namespace TransportLinesManager.Utils
                 vehicleCountPerAsset[info.name]++;
             }
 
-            string key = slotIndex.ToString();
+            var slotAssets = EnsureRuntimeUsedCountSlot(lineID, slotIndex);
+            slotAssets.Clear();
 
             for (int i = 0; i < assetTransportList.Count; i++)
             {
                 TransportAsset asset = assetTransportList[i];
-                asset.count ??= [];
-
-                if (!asset.count.ContainsKey(key))
-                {
-                    asset.count[key] = new CountEntry
-                    {
-                        TotalCount = 0,
-                        UsedCount = 0
-                    };
-                }
-
-                CountEntry entry = asset.count[key];
-                entry.UsedCount = vehicleCountPerAsset.TryGetValue(asset.name, out int used) ? used : 0;
-
-                if (clampTotalCountToUsed && entry.TotalCount < entry.UsedCount)
-                {
-                    entry.TotalCount = entry.UsedCount;
-                }
-
-                asset.count[key] = entry;
-                assetTransportList[i] = asset;
+                slotAssets[asset.name] = vehicleCountPerAsset.TryGetValue(asset.name, out int used) ? used : 0;
             }
 
-            GetEffectiveExtensionForLine(lineID).SetAssetTransportListForLine(lineID, assetTransportList);
             NotifyAssetUsedCountChanged(lineID, slotIndex);
         }
 
