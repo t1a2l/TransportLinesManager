@@ -13,10 +13,8 @@ using UnityEngine;
 
 namespace TransportLinesManager.UI
 {
-
     internal class TLMLineCreationToolbox : UICustomControl
     {
-
         #region Line Draw Button Click Impl
 
         public static void OnButtonClickedPre(ref TransportInfo __state) => __state = ToolManager.instance.m_properties?.CurrentTool is TransportTool tt ? tt.m_prefab : null;
@@ -24,6 +22,10 @@ namespace TransportLinesManager.UI
         public static void OnButtonClickedPos(ref TransportInfo __state)
         {
             TransportInfo newPrefab = ToolManager.instance.m_properties?.CurrentTool is TransportTool tt ? tt.m_prefab : null;
+            if (newPrefab != null)
+            {
+                TLMController.Instance.LineCreationToolbox.SetCurrentContext(newPrefab);
+            }
             if (newPrefab != null && __state != newPrefab)
             {
                 TLMController.Instance.LineCreationToolbox.SyncForm();
@@ -34,7 +36,7 @@ namespace TransportLinesManager.UI
         private static readonly FieldInfo tt_nextLineNum = typeof(TransportManager).GetField("m_lineNumber", Patcher.allFlags);
         private static readonly SavedBool m_showLineCreationToolBox = new("TLM_showLineToolbox", Settings.gameSettingsFile, true);
 
-        public TransportInfo.TransportType CurrentType => TransportTool.m_prefab?.m_transportType ?? TransportInfo.TransportType.Bus;
+        public TransportInfo.TransportType CurrentType => ResolveCurrentPrefab()?.m_transportType ?? TransportInfo.TransportType.Bus;
 
         private UIHelperExtension uiHelper;
 
@@ -50,6 +52,7 @@ namespace TransportLinesManager.UI
 
         private TransportTool TransportTool => ToolManager.instance.m_properties?.CurrentTool as TransportTool;
 
+        private bool alreadySyncing = false;
 
         private ushort NextLineNumber
         {
@@ -88,10 +91,10 @@ namespace TransportLinesManager.UI
             m_toolboxToggleButton.name = "TLMLineCreationToolboxToggle";
             m_toolboxToggleButton.Resize(36);
             m_toolboxToggleButton.OverrideClickEvent((x, y) =>
-           {
+            {
                m_showLineCreationToolBox.value = !m_showLineCreationToolBox;
                UpdateToolBoxVisibility();
-           });
+            });
 
             MonoUtils.CreateUIElement(out mainContainer, m_bg.transform);
             mainContainer.name = "TLMLineCreationToolbox";
@@ -99,7 +102,6 @@ namespace TransportLinesManager.UI
             mainContainer.width = 180;
             mainContainer.backgroundSprite = "MenuPanel2";
             mainContainer.relativePosition = new Vector3(parent.component.width, 0);
-
 
             MonoUtils.CreateUIElement(out UILabel title, mainContainer.transform);
             title.autoSize = false;
@@ -120,8 +122,7 @@ namespace TransportLinesManager.UI
 
             uiHelper = new UIHelperExtension(contentContainer);
 
-
-            var lpddgo = GameObject.Instantiate(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate).GetComponent<UIPanel>().Find<UIDropDown>("Dropdown").gameObject, contentContainer.transform);
+            var lpddgo = Instantiate(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate).GetComponent<UIPanel>().Find<UIDropDown>("Dropdown").gameObject, contentContainer.transform);
             linePrefixDropDown = lpddgo.GetComponent<UIDropDown>();
             linePrefixDropDown.isLocalized = false;
             linePrefixDropDown.autoSize = false;
@@ -158,14 +159,14 @@ namespace TransportLinesManager.UI
             lineNumberTxtBox.text = "0";
             lineNumberTxtBox.relativePosition = new Vector3(85f, 13f);
 
-
             prefixIncrementChk = uiHelper.AddCheckboxLocale("TLM_AUTOINCREMENT_PREFIX", false, delegate (bool value)
-             {
-                 if (!alreadySyncing)
+            {
+                 if (!alreadySyncing && TryGetCurrentTsd(out var tsd))
                  {
-                     TransportSystemDefinition.FromLocal(TransportTool.m_prefab).GetConfig().IncrementPrefixOnNewLine = value;
+                    tsd.GetConfig().IncrementPrefixOnNewLine = value;
                  }
-             });
+            });
+
             prefixIncrementChk.relativePosition = new Vector3(5f, 50f);
 
             UpdateToolBoxVisibility();
@@ -185,41 +186,91 @@ namespace TransportLinesManager.UI
             }
         }
 
+        private TransportInfo ResolveCurrentPrefab()
+        {
+            if (TransportTool?.m_prefab != null)
+            {
+                lastPrefab = TransportTool.m_prefab;
+            }
+            return lastPrefab;
+        }
+
+        private TransportSystemDefinition ResolveCurrentTsd()
+        {
+            var prefab = ResolveCurrentPrefab();
+            return prefab != null ? TransportSystemDefinition.FromLocal(prefab) : null;
+        }
+
+        private bool TryGetCurrentTsd(out TransportSystemDefinition tsd)
+        {
+            tsd = ResolveCurrentTsd();
+            if (tsd == null)
+            {
+                LogUtils.DoLog("No transport context available for toolbox");
+                return false;
+            }
+            return true;
+        }
+
+        public void SetCurrentContext(TransportSystemDefinition tsd)
+        {
+            lastPrefab = tsd?.GetTransportInfoLocal();
+        }
+
+        public void SetCurrentContext(TransportInfo prefab)
+        {
+            if (prefab != null)
+            {
+                lastPrefab = prefab;
+            }
+        }
+
         private void SetNextLinePrefix(UIComponent component, int value) => SaveLineNumber();
 
         private void SetNextLineNumber(UIComponent component, UIFocusEventParameter eventParam) => SaveLineNumber();
 
         private void SaveLineNumber()
         {
-            if (!alreadySyncing)
+            if (alreadySyncing || !TryGetCurrentTsd(out var tsd))
             {
-                string value = "0" + lineNumberTxtBox.text;
-                int valPrefixo = linePrefixDropDown.selectedIndex;
-
-                var tsd = TransportSystemDefinition.FromLocal(TransportTool.m_prefab);
-                TLMLineUtils.GetNamingRulesFromTSD(out NamingMode prefixo, out _, out _, out _, out _, out _, tsd);
-                ushort num = ushort.Parse(value);
-                if (prefixo != NamingMode.None)
-                {
-                    num = (ushort)((valPrefixo * 1000) + (num % 1000));
-                }
-                NextLineNumber = (ushort)(num - 1);
-                IncrementNumber();
+                return;
             }
+
+            string value = "0" + lineNumberTxtBox.text;
+            int valPrefixo = linePrefixDropDown.selectedIndex;
+
+            TLMLineUtils.GetNamingRulesFromTSD(out NamingMode prefixo, out _, out _, out _, out _, out _, tsd);
+
+            ushort num = ushort.Parse(value);
+            if (prefixo != NamingMode.None)
+            {
+                num = (ushort)((valPrefixo * 1000) + (num % 1000));
+            }
+
+            NextLineNumber = (ushort)(num - 1);
+            IncrementNumber();
         }
 
         public int GetCurrentPrefix() => ((NextLineNumber + 1) & 0xFFFF) / 1000;
 
-        public void IncrementNumber()
+        public void IncrementNumber(TransportSystemDefinition tsd)
         {
-            //TLMUtils.doLog("Increment Toolbox num");
-            var tsd = TransportSystemDefinition.FromLocal(TransportTool.m_prefab);
+            if (tsd == null)
+            {
+                LogUtils.DoLog("tsd is null");
+                return;
+            }
+
+            SetCurrentContext(tsd);
+
             int num = NextLineNumber;
             bool prefixIncrementVal = tsd.GetConfig().IncrementPrefixOnNewLine;
+            bool hasPrefix = TLMPrefixesUtils.HasPrefix(tsd.GetTransportInfoLocal());
+
             //TLMUtils.doLog("prefixIncrement = " + prefixIncrementVal + "| num = " + num);
             while (((num + 1) & 0xFFFF) == 0 || TLMLineUtils.IsLineNumberAlredyInUse((num + 1) & 0xFFFF, tsd, 0))
             {
-                if (!TLMPrefixesUtils.HasPrefix(TransportTool.m_prefab) || !prefixIncrementVal)
+                if (!hasPrefix || !prefixIncrementVal)
                 {
                     num++;
                 }
@@ -234,22 +285,47 @@ namespace TransportLinesManager.UI
 
                 }
             }
+
             NextLineNumber = (ushort)num;
             StartCoroutine(SyncFormAsync());
         }
+
+        public void IncrementNumber()
+        {
+            if (TryGetCurrentTsd(out var tsd))
+            {
+                IncrementNumber(tsd);
+            }
+        }
+
         public void SyncForm() => StartCoroutine(SyncFormAsync());
-        private bool alreadySyncing = false;
+
+        public void SyncForm(TransportSystemDefinition tsd)
+        {
+            SetCurrentContext(tsd);
+            StartCoroutine(SyncFormAsync());
+        }
+
         private IEnumerator SyncFormAsync()
         {
             if (alreadySyncing)
             {
                 yield break;
             }
+
             alreadySyncing = true;
             yield return 0;
-            var tsd = TransportSystemDefinition.FromLocal(TransportTool.m_prefab);
+
+            if (!TryGetCurrentTsd(out var tsd))
+            {
+                alreadySyncing = false;
+                yield break;
+            }
+
             var config = tsd.GetConfig();
-            if (TLMPrefixesUtils.HasPrefix(TransportTool.m_prefab))
+            bool hasPrefix = TLMPrefixesUtils.HasPrefix(tsd.GetTransportInfoLocal());
+
+            if (hasPrefix)
             {
                 linePrefixDropDown.isVisible = true;
                 linePrefixDropDown.items = [.. TLMPrefixesUtils.GetPrefixesOptions(tsd, false)];
@@ -270,6 +346,7 @@ namespace TransportLinesManager.UI
                 lineNumberTxtBox.maxLength = 4;
                 prefixIncrementChk.isVisible = false;
             }
+
             alreadySyncing = false;
             m_isDirty = true;
         }
@@ -330,9 +407,7 @@ namespace TransportLinesManager.UI
             m_isDirty = false;
         }
 
-        public int GetCurrentNumber() => TLMPrefixesUtils.HasPrefix(TransportTool.m_prefab)
-            ? ((NextLineNumber + 1) & 0xFFFF) % 1000
-            : (NextLineNumber + 1) & 0xFFFF;
+        public int GetCurrentNumber() => TLMPrefixesUtils.HasPrefix(TransportTool.m_prefab) ? ((NextLineNumber + 1) & 0xFFFF) % 1000 : (NextLineNumber + 1) & 0xFFFF;
 
     }
 }

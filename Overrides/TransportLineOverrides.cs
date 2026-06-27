@@ -53,7 +53,8 @@ namespace TransportLinesManager.Overrides
                     {
                         TLMController.AutoName(lineID);
                     }
-                    TLMController.Instance.LineCreationToolbox.IncrementNumber();
+                    var tsd = TransportSystemDefinition.GetDefinitionForLine(lineID, false);
+                    TLMController.Instance.LineCreationToolbox.IncrementNumber(tsd);
                 }
             }
             if ((Singleton<TransportManager>.instance.m_lines.m_buffer[lineID].m_flags & TransportLine.Flags.Complete) == TransportLine.Flags.None)
