@@ -197,8 +197,19 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private void UpdateDepotList(IBasicExtension config)
         {
             var lineId = GetLineID(out _);
-            List<ushort> cityDepotList = [.. TLMDepotUtils.GetAllDepotsFromCity(TransportSystem).Where(x => BuildingUtils.GetBuildingName(x, out _, out _).ToLower().Contains(m_nameFilter.text.ToLower()))];
-            List<ushort> targetDepotList = config.GetAllowedDepots(TransportSystem, lineId);
+            List<ushort> cityDepotList = [];
+            List<ushort> targetDepotList = [];
+            if (SchoolBusUtils.IsSchoolOwnedLine(lineId) && SchoolBusUtils.GetSchoolBuilding(lineId) != 0)
+            {
+                var buildingId = SchoolBusUtils.GetSchoolBuilding(lineId);
+                cityDepotList.Add(buildingId);
+                targetDepotList.Add(buildingId);
+            }
+            else
+            {
+                cityDepotList = [.. TLMDepotUtils.GetAllDepotsFromCity(TransportSystem).Where(x => BuildingUtils.GetBuildingName(x, out _, out _).ToLower().Contains(m_nameFilter.text.ToLower()))];
+                targetDepotList = config.GetAllowedDepots(TransportSystem, lineId);
+            }   
             UIPanel[] depotChecks = m_checkboxTemplateList.SetItemCount(cityDepotList.Count);
             LogUtils.DoLog($"depotChecks = {depotChecks.Length}");
             for (int idx = 0; idx < cityDepotList.Count; idx++)
