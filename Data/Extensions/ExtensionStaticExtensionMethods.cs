@@ -250,9 +250,15 @@ namespace TransportLinesManager.Data.Extensions
         public static void RemoveAllDepotsForLine<T>(this T it, ushort lineId) where T : IDepotSelectableExtension => EnsureCreationDepotConfig(it, it.LineToIndex(lineId)).DepotsAllowed.Clear();
 
         public static void AddAllDepots<T>(this T it, uint idx) where T : IDepotSelectableExtension => it.SafeGet(idx).DepotsAllowed = null;
+        
         public static List<ushort> GetAllowedDepots<T>(this T it, TransportSystemDefinition tsd, ushort lineId) where T : IDepotSelectableExtension
         {
             IDepotSelectionStorage data = it.SafeGet(it.LineToIndex(lineId));
+            if (SchoolBusUtils.IsSchoolOwnedLine(lineId) && SchoolBusUtils.GetSchoolBuilding(lineId) != 0)
+            {
+                var buildingId = SchoolBusUtils.GetSchoolBuilding(lineId);
+                return [buildingId];
+            }
             List<ushort> saida = TLMDepotUtils.GetAllDepotsFromCity(tsd);
             if (data.DepotsAllowed == null)
             {
