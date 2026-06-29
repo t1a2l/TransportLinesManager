@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Reflection;
 using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
@@ -5,12 +7,11 @@ using Commons.Extensions.UI;
 using Commons.Interfaces;
 using Commons.Utils.UtilitiesClasses;
 using TransportLinesManager.CommonsWindow;
-using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.MapDrawer;
 using TransportLinesManager.OptionsMenu;
-using System.Collections.Generic;
-using System.Reflection;
+using TransportLinesManager.Utils;
 
 [assembly: AssemblyVersion("14.6.0.*")]
 namespace TransportLinesManager
@@ -26,15 +27,18 @@ namespace TransportLinesManager
         public TransportLinesManagerMod() : base()
         {
             IncompatibleModList[TLMController.IPT2_MOD_ID] = "IPT2 is incompatible since TLM changes the same code behavior. Isn't recommended to use both together.";
+            IncompatibleModList[TLMController.IPT2_ESSENTIALS_MOD_ID] = "IPT2 Essentials is incompatible since TLM changes the same code behavior. Isn't recommended to use both together.";
+            IncompatibleModList[TLMController.IPT3_MOD_ID] = "IPT3 is incompatible since TLM changes the same code behavior. Isn't recommended to use both together.";
             IncompatibleModList[TLMController.RETURN_VEHICLE_MOD_ID] = "Transport Vehicle Return Patch is not necessary to use along the TLM since version 14." +
             " With the introduction of the Express Buses system, now the vehicles are emptied in the next terminal stop before get to the depot.";
         }
 
         protected override List<string> IncompatibleDllModList { get; } =
         [
-            "ImprovedPublicTransport2"
+            "ImprovedPublicTransport2",
+            "ImprovedPublicTransportEssentials",
+            "ImprovedPublicTransport3"
         ];
-
 
         public override void TopSettingsUI(UIHelperExtension helper) => TLMConfigOptions.instance.GenerateOptionsMenu(helper);
 
@@ -76,9 +80,15 @@ namespace TransportLinesManager
         protected override void OnLevelLoadingInternal()
         {
             base.OnLevelLoadingInternal();
-            TLMController.VerifyIfIsRealTimeEnabled();
+            TLMController.VerifyIfRealTimeIsEnabled();
             TransportSystemDefinition.TransportInfoDict.ToString();
             TLMController.MigrateOldVehicleCountData();
+
+            if(TLMController.IsSchoolBusesEnabled)
+            {
+                SchoolBusUtils.SetExternalSpawnControl(true);
+                SchoolBusUtils.SetVehicleSupplyEnabled(false);
+            }
         }
 
 

@@ -1,12 +1,18 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using ColossalFramework;
 using ColossalFramework.Plugins;
 using ColossalFramework.UI;
 using Commons.Interfaces;
 using Commons.Utils;
 using Commons.Utils.StructExtensions;
+using ICities;
 using TransportLinesManager.Cache.BuildingData;
-using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.ModShared;
 using TransportLinesManager.Overrides;
 using TransportLinesManager.UI;
@@ -14,11 +20,6 @@ using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels;
 using TransportLinesManager.WorldInfoPanels.NearLines;
 using TransportLinesManager.WorldInfoPanels.PlatformEditor;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using UnityEngine;
 
 namespace TransportLinesManager
@@ -33,13 +34,20 @@ namespace TransportLinesManager
         public static readonly string FOLDER_PATH = FileUtils.BASE_FOLDER_PATH + FOLDER_NAME;
         public const string PALETTE_SUBFOLDER_NAME = "ColorPalettes";
         public const string EXPORTED_MAPS_SUBFOLDER_NAME = "ExportedMaps";
-        public const ulong REALTIME_MOD_ID = 1420955187;
+        public const ulong REALTIME_MOD_ID = 3059406297;
+        public const ulong SCHOOLBUSES_MOD_ID = 3736948306;
         public const ulong IPT2_MOD_ID = 928128676;
+        public const ulong IPT2_ESSENTIALS_MOD_ID = 3714961481;
+        public const ulong IPT3_MOD_ID = 3690061052;
+
+
         public const ulong RETURN_VEHICLE_MOD_ID = 2101977903UL;
 
         public BuildingTransportLinesCache BuildingLines { get; private set; }
 
         private bool? m_isRealTimeEnabled = null;
+
+        private bool? m_isSchoolBusesEnabled = null;
 
         protected static string GlobalBaseConfigFileName { get; } = "TLM_GlobalData.xml";
 
@@ -51,23 +59,60 @@ namespace TransportLinesManager
             {
                 if (Instance?.m_isRealTimeEnabled == null)
                 {
-                    VerifyIfIsRealTimeEnabled();
+                    VerifyIfRealTimeIsEnabled();
                 }
                 return Instance?.m_isRealTimeEnabled == true;
             }
         }
 
-        public static void VerifyIfIsRealTimeEnabled()
+        public static bool IsSchoolBusesEnabled
         {
-            Instance?.m_isRealTimeEnabled = VerifyModEnabled(REALTIME_MOD_ID);
+            get
+            {
+                if (Instance?.m_isSchoolBusesEnabled == null)
+                {
+                    VerifyIfSchoolBusesIsEnabled();
+                }
+                return Instance?.m_isSchoolBusesEnabled == true;
+            }
         }
 
-        public static bool IsIPT2Enabled() => VerifyModEnabled(IPT2_MOD_ID);
+        public static void VerifyIfRealTimeIsEnabled()
+        {
+            Instance?.m_isRealTimeEnabled = VerifyWorkshopModEnabled(REALTIME_MOD_ID) || VerifyLocalModActive("Real Time");
+        }
 
-        private static bool VerifyModEnabled(ulong modId)
+        public static void VerifyIfSchoolBusesIsEnabled()
+        {
+            Instance?.m_isSchoolBusesEnabled = VerifyWorkshopModEnabled(SCHOOLBUSES_MOD_ID);
+        }
+
+        private static bool VerifyWorkshopModEnabled(ulong modId)
         {
             PluginManager.PluginInfo pluginInfo = Singleton<PluginManager>.instance.GetPluginsInfo().FirstOrDefault(pi => pi.publishedFileID.AsUInt64 == modId);
             return !(pluginInfo == null || !pluginInfo.isEnabled);
+        }
+
+        private static bool VerifyLocalModActive(string modNamePart)
+        {
+            try
+            {
+                var plugins = PluginManager.instance.GetPluginsInfo();
+                return (from plugin in plugins.Where(p => p.isEnabled)
+                        select plugin.GetInstances<IUserMod>()
+                    into instances
+                        where instances.Any()
+                        select instances[0].Name
+                    into name
+                        where name != null && name.Contains(modNamePart)
+                        select name).Any();
+            }
+            catch (Exception e)
+            {
+                LogUtils.DoErrorLog($"Failed to detect if mod with name containing {modNamePart} is active");
+                LogUtils.DoErrorLog(e.ToString());
+                return false;
+            }
         }
 
         public static string PalettesFolder { get; } = FOLDER_PATH + Path.DirectorySeparatorChar + PALETTE_SUBFOLDER_NAME;

@@ -11,6 +11,8 @@ namespace TransportLinesManager.Utils
         private static Func<ushort, bool> _isSchoolLine;
         private static Func<ushort, bool> _isSchoolOwnedLine;
         private static Func<ushort, ushort> _getSchoolBuilding;
+        private static Func<bool, bool> _setExternalSpawnControl;
+        private static Func<bool, bool> _setVehicleSupplyEnabled;
 
         // True if the line is a registered school line (generated OR manually flagged).
         public static bool IsSchoolLine(ushort lineId)
@@ -46,6 +48,18 @@ namespace TransportLinesManager.Utils
             return buildingId;
         }
 
+        public static bool SetExternalSpawnControl(bool engaged)
+        {
+            if (!_resolved) Resolve();
+            return _setExternalSpawnControl != null && _setExternalSpawnControl(engaged);
+        }
+
+        public static bool SetVehicleSupplyEnabled(bool enabled)
+        {
+            if (!_resolved) Resolve();
+            return _setVehicleSupplyEnabled != null && _setVehicleSupplyEnabled(enabled);
+        }
+
         private static void Resolve()
         {
             _resolved = true;
@@ -61,10 +75,13 @@ namespace TransportLinesManager.Utils
                 { 
                     return; 
                 }
-                _isSchoolLine = (Func<ushort, bool>)CreateQuery(bridge, "IsSchoolLine");
-                _isSchoolOwnedLine = (Func<ushort, bool>)CreateQuery(bridge, "IsSchoolOwnedLine");
-                _getSchoolBuilding = (Func<ushort, ushort>)CreateQuery(bridge, "GetSchoolBuilding");
-                if (_isSchoolLine != null && _isSchoolOwnedLine != null)
+                _isSchoolLine = (Func<ushort, bool>)CreateQuery(bridge, "IsSchoolLine", [typeof(ushort)], typeof(bool));
+                _isSchoolOwnedLine = (Func<ushort, bool>)CreateQuery(bridge, "IsSchoolOwnedLine", [typeof(ushort)], typeof(bool));
+                _getSchoolBuilding = (Func<ushort, ushort>)CreateQuery(bridge, "GetSchoolBuilding", [typeof(ushort)], typeof(ushort));
+                _setExternalSpawnControl = (Func<bool, bool>)CreateQuery(bridge, "SetExternalSpawnControl", [typeof(bool)], typeof(bool));
+                _setVehicleSupplyEnabled = (Func<bool, bool>)CreateQuery(bridge, "SetVehicleSupplyEnabled", [typeof(bool)], typeof(bool));
+                if (_isSchoolLine != null && _isSchoolOwnedLine != null && _getSchoolBuilding != null 
+                    && _setExternalSpawnControl != null && _setVehicleSupplyEnabled != null)
                 {
                     LogUtils.DoLog("SchoolBusesUtil: School Buses bridge bound (ApiVersion >= 2) — " +
                              "school lines run as a free school service; school-owned lines hide the depot selector.");
@@ -74,32 +91,36 @@ namespace TransportLinesManager.Utils
             {
                 _isSchoolLine = null;
                 _isSchoolOwnedLine = null;
+                _getSchoolBuilding = null;
+                _setExternalSpawnControl = null;
+                _setVehicleSupplyEnabled = null;
                 LogUtils.DoLog("SchoolBusesUtil: School Buses bridge unavailable (" + e.Message + ")");
             }
         }
 
         // Bound as a typed delegate (not MethodInfo.Invoke) — these run per frame and per
         // SimulationStep, so avoid the boxing/array allocation of reflective invocation.
-        private static Delegate CreateQuery(Type bridge, string method)
+        private static Delegate CreateQuery(Type bridge, string method, Type[] parameterTypes, Type returnType)
         {
             // Find the static method taking a single ushort parameter
-            MethodInfo mi = bridge.GetMethod(method, BindingFlags.Public | BindingFlags.Static, null, [typeof(ushort)], null);
+            MethodInfo mi = bridge.GetMethod(method, BindingFlags.Public | BindingFlags.Static, null, parameterTypes, null);
 
-            if (mi == null) return null;
+            if(mi == null || mi.ReturnType != returnType) return null;
 
-            // Check if the return type is bool
-            if (mi.ReturnType == typeof(bool))
+            Type[] funcTypes = [.. parameterTypes, returnType];
+
+            Type genericFuncDefinition = funcTypes.Length switch
             {
-                return Delegate.CreateDelegate(typeof(Func<ushort, bool>), mi, false);
-            }
+                1 => typeof(Func<>),
+                2 => typeof(Func<,>),
+                3 => typeof(Func<,,>),
+                4 => typeof(Func<,,,>),
+                _ => throw new ArgumentException("Too many parameters for standard Func delegate."),
+            };
 
-            // Check if the return type is ushort
-            if (mi.ReturnType == typeof(ushort))
-            {
-                return Delegate.CreateDelegate(typeof(Func<ushort, ushort>), mi, false);
-            }
+            Type specificFuncType = genericFuncDefinition.MakeGenericType(funcTypes);
 
-            return null;
+            return Delegate.CreateDelegate(specificFuncType, mi, false);
         }
     }
 }
