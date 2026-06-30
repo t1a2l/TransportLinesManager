@@ -185,33 +185,60 @@ namespace TransportLinesManager
             {
                 RealTimeUtils.GetSchoolOperationHours(out float schoolStartHour, out float schoolEndHour);
 
-                Debug.Log("schoolStartHour: " + schoolStartHour + ", schoolEndHour: " + schoolEndHour);
-
                 int start = Mathf.Clamp(Mathf.FloorToInt(schoolStartHour - 2f), 0, 23);
                 int end = Mathf.Clamp(Mathf.CeilToInt(schoolEndHour + 2f), 0, 23);
 
-                Debug.Log("start: " + start + ", end: " + end);
-
-                var newBudget = new TimeableList<BudgetEntryXml>
+                var fleetBudget = new TimeableList<BudgetEntryXml>
                 {
                     new() { HourOfDay = start, Value = 100 },
                     new() { HourOfDay = end, Value = 0 }
                 };
 
-                lineExt.SetAllBudgetMultipliersForLine(lineId, newBudget);
+                var ticketBudget = new TimeableList<TicketPriceEntryXml>
+                {
+                    new() { HourOfDay = start, Value = 0 },
+                    new() { HourOfDay = end, Value = 0 }
+                };
+
+                lineExt.SetAllBudgetMultipliersForLine(lineId, fleetBudget);
+                lineExt.SetTicketPricesForLine(lineId, ticketBudget);
             }
             else
             {
-                var newBudget = new TimeableList<BudgetEntryXml>
+                var fleetBudget = new TimeableList<BudgetEntryXml>
                 {
                     new() { HourOfDay = 0, Value = 100 }
                 };
 
-                lineExt.SetAllBudgetMultipliersForLine(lineId, newBudget);
+                var ticketBudget = new TimeableList<TicketPriceEntryXml>
+                {
+                    new() { HourOfDay = 0, Value = 0 }
+                };
+
+                lineExt.SetAllBudgetMultipliersForLine(lineId, fleetBudget);
+                lineExt.SetTicketPricesForLine(lineId, ticketBudget);
             }
 
             lineExt.SetAssetTransportListForLine(lineId, []);
-            lineExt.AddAssetToLine(lineId, "SchoolBus", "30", "100");
+
+            var currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+
+            var asset = new TransportAsset
+            {
+                name = "School Bus 01",
+                capacity = 30,
+                count = [],
+                spawn_percent = []
+            };
+
+            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
+            {
+                string key = i.ToString();
+                asset.count[key] = new CountEntry { TotalCount = 0 };
+                asset.spawn_percent[key] = new SpawnPercentEntry { Value = 100 };
+            }
+
+            lineExt.SetAssetTransportListForLine(lineId, [asset]);
         }
 
         //------------------------------------
