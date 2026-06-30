@@ -750,29 +750,31 @@ namespace TransportLinesManager.Utils
 
         public static Tuple<TicketPriceEntryXml, int> GetTicketPriceForLine(TransportSystemDefinition tsd, ushort lineId, float hour)
         {
-            Tuple<TicketPriceEntryXml, int> ticketPriceDefault = null;
+            Tuple<TicketPriceEntryXml, int> ticketPrice = null;
             if (lineId > 0)
             {
                 if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
                 {
-                    ticketPriceDefault = TLMTransportLineExtension.Instance.GetTicketPriceForHourForLine(lineId, hour);
+                    ticketPrice = TLMTransportLineExtension.Instance.GetTicketPriceForHourForLine(lineId, hour);
                 }
-                if ((ticketPriceDefault?.First?.Value ?? 0) == 0)
+                if (ticketPrice == null || ticketPrice.Second < 0)
                 {
-                    ticketPriceDefault = tsd.GetTransportExtension().GetTicketPriceForHourForLine(lineId, hour);
+                    ticketPrice = tsd.GetTransportExtension().GetTicketPriceForHourForLine(lineId, hour);
                 }
-
             }
-            if ((ticketPriceDefault?.First?.Value ?? 0) == 0)
+            if (ticketPrice == null || ticketPrice.Second < 0)
             {
-                ticketPriceDefault = Tuple.New(new TicketPriceEntryXml() { Value = (uint)tsd.GetConfig().DefaultTicketPrice }, -1);
+                uint defaultPrice = (uint)tsd.GetConfig().DefaultTicketPrice;
+
+                ticketPrice = Tuple.New(new TicketPriceEntryXml() { Value = defaultPrice }, -1);
             }
-            if ((ticketPriceDefault?.First?.Value ?? 0) == 0)
+            if (ticketPrice?.First == null)
             {
-                ticketPriceDefault = Tuple.New(new TicketPriceEntryXml() { Value = (uint)TransportManager.instance.m_lines.m_buffer[lineId].Info.m_ticketPrice }, -1);
+                uint gameDefault = (uint)TransportManager.instance.m_lines.m_buffer[lineId].Info.m_ticketPrice;
+                ticketPrice = Tuple.New(new TicketPriceEntryXml { Value = gameDefault }, -1);
             }
 
-            return ticketPriceDefault;
+            return ticketPrice;
         }
 
         private static Dictionary<string, int> EnsureRuntimeUsedCountSlot(ushort lineId, int slotIndex)
