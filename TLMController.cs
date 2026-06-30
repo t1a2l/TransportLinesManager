@@ -185,19 +185,26 @@ namespace TransportLinesManager
             {
                 RealTimeUtils.GetSchoolOperationHours(out float schoolStartHour, out float schoolEndHour);
 
-                int start = Mathf.Clamp(Mathf.FloorToInt(schoolStartHour - 2f), 0, 23);
-                int end = Mathf.Clamp(Mathf.CeilToInt(schoolEndHour + 2f), 0, 23);
+                int start_pickup = Mathf.Clamp(Mathf.FloorToInt(schoolStartHour - 2f), 0, 23);
+                int end_pickup = Mathf.Clamp(Mathf.FloorToInt(schoolStartHour + 1f), 0, 23);
+
+                int start_dropoff = Mathf.Clamp(Mathf.FloorToInt(schoolEndHour - 1f), 0, 23);
+                int end_dropoff = Mathf.Clamp(Mathf.CeilToInt(schoolEndHour + 2f), 0, 23);
 
                 var fleetBudget = new TimeableList<BudgetEntryXml>
                 {
-                    new() { HourOfDay = start, Value = 100 },
-                    new() { HourOfDay = end, Value = 0 }
+                    new() { HourOfDay = start_pickup, Value = 100 },
+                    new() { HourOfDay = end_pickup, Value = 0 },
+                    new() { HourOfDay = start_dropoff, Value = 100 },
+                    new() { HourOfDay = end_dropoff, Value = 0 }
                 };
 
                 var ticketBudget = new TimeableList<TicketPriceEntryXml>
                 {
-                    new() { HourOfDay = start, Value = 0 },
-                    new() { HourOfDay = end, Value = 0 }
+                    new() { HourOfDay = start_pickup, Value = 0 },
+                    new() { HourOfDay = end_pickup, Value = 0 },
+                    new() { HourOfDay = start_dropoff, Value = 0 },
+                    new() { HourOfDay = end_dropoff, Value = 0 }
                 };
 
                 lineExt.SetAllBudgetMultipliersForLine(lineId, fleetBudget);
@@ -239,6 +246,9 @@ namespace TransportLinesManager
             }
 
             lineExt.SetAssetTransportListForLine(lineId, [asset]);
+
+            ushort buildingId = SchoolBusUtils.GetSchoolBuilding(lineId);
+            lineExt.AddDepotForLine(lineId, buildingId);
         }
 
         //------------------------------------
