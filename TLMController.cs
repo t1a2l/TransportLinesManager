@@ -9,9 +9,12 @@ using ColossalFramework.UI;
 using Commons.Interfaces;
 using Commons.Utils;
 using Commons.Utils.StructExtensions;
+using Commons.Utils.UtilitiesClasses;
 using ICities;
 using TransportLinesManager.Cache.BuildingData;
+using TransportLinesManager.Data.Base;
 using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Data.Extensions;
 using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.ModShared;
 using TransportLinesManager.Overrides;
@@ -164,6 +167,45 @@ namespace TransportLinesManager
         }
 
         public static void AutoName(ushort m_LineID) => TLMLineUtils.SetLineName(m_LineID, TLMLineUtils.CalculateAutoName(m_LineID, false, out _));
+
+        public static void ApplySchoolBusPresetToNewLine(ushort lineId, TransportSystemDefinition tsd)
+        {
+            if (lineId == 0 || tsd == null)
+            {
+                return;
+            }
+
+            var lineExt = TLMTransportLineExtension.Instance;
+            lineExt.SetUseCustomConfig(lineId, true);
+
+            if(IsRealTimeEnabled)
+            {
+                RealTimeUtils.GetSchoolOperationHours(out float schoolStartHour, out float schoolEndHour);
+
+                int start = Mathf.Clamp(Mathf.FloorToInt(schoolStartHour - 2f), 0, 23);
+                int end = Mathf.Clamp(Mathf.CeilToInt(schoolEndHour + 2f), 0, 23);
+
+                var newBudget = new TimeableList<BudgetEntryXml>
+                {
+                    new() { HourOfDay = start, Value = 100 },
+                    new() { HourOfDay = end, Value = 0 }
+                };
+
+                lineExt.SetAllBudgetMultipliersForLine(lineId, newBudget);
+            }
+            else
+            {
+                var newBudget = new TimeableList<BudgetEntryXml>
+                {
+                    new() { HourOfDay = 0, Value = 100 }
+                };
+
+                lineExt.SetAllBudgetMultipliersForLine(lineId, newBudget);
+            }
+
+            lineExt.SetAssetTransportListForLine(lineId, []);
+            lineExt.AddAssetToLine(lineId, "School Bus", "30", "100");
+        }
 
         //------------------------------------
 

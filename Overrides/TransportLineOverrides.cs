@@ -55,6 +55,10 @@ namespace TransportLinesManager.Overrides
                     }
                     var tsd = TransportSystemDefinition.GetDefinitionForLine(lineID, false);
                     TLMController.Instance.LineCreationToolbox.IncrementNumber(tsd);
+                    if (TLMController.IsSchoolBusesEnabled)
+                    {
+                        TLMController.ApplySchoolBusPresetToNewLine(lineID, tsd);
+                    }
                 }
             }
             if ((Singleton<TransportManager>.instance.m_lines.m_buffer[lineID].m_flags & TransportLine.Flags.Complete) == TransportLine.Flags.None)
@@ -62,7 +66,6 @@ namespace TransportLinesManager.Overrides
                 Singleton<TransportManager>.instance.m_lines.m_buffer[lineID].m_flags &= ~TransportLine.Flags.CustomColor;
                 TLMTransportLineExtension.Instance.SafeCleanEntry(lineID);
             }
-
         }
        
         [HarmonyPatch(typeof(TransportLine), "SimulationStep")]
