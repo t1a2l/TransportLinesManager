@@ -199,9 +199,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             var lineId = GetLineID(out _);
             List<ushort> cityDepotList = [];
             List<ushort> targetDepotList = [];
-            if (SchoolBusUtils.IsSchoolOwnedLine(lineId) && SchoolBusUtils.GetSchoolBuilding(lineId) != 0)
+            var buildingId = SchoolBusUtils.GetSchoolBuilding(lineId);
+            if (buildingId != 0)
             {
-                var buildingId = SchoolBusUtils.GetSchoolBuilding(lineId);
                 cityDepotList.Add(buildingId);
                 targetDepotList.Add(buildingId);
             }
