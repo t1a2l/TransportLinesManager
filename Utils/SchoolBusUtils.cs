@@ -83,7 +83,7 @@ namespace TransportLinesManager.Utils
                 if (_isSchoolLine != null && _isSchoolOwnedLine != null && _getSchoolBuilding != null 
                     && _setExternalSpawnControl != null && _setVehicleSupplyEnabled != null)
                 {
-                    LogUtils.DoLog("SchoolBusesUtil: School Buses bridge bound (ApiVersion >= 2) — " +
+                    LogUtils.DoLog("SchoolBusesUtils: School Buses bridge bound (ApiVersion >= 2) — " +
                              "school lines run as a free school service; school-owned lines hide the depot selector.");
                 }
             }
@@ -94,7 +94,7 @@ namespace TransportLinesManager.Utils
                 _getSchoolBuilding = null;
                 _setExternalSpawnControl = null;
                 _setVehicleSupplyEnabled = null;
-                LogUtils.DoLog("SchoolBusesUtil: School Buses bridge unavailable (" + e.Message + ")");
+                LogUtils.DoLog("SchoolBusesUtils: School Buses bridge unavailable (" + e.Message + ")");
             }
         }
 

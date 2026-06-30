@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
-using Commons.Utils;
+using UnityEngine;
 
 namespace TransportLinesManager.Utils
 {
@@ -30,71 +31,60 @@ namespace TransportLinesManager.Utils
             _resolved = true;
             try
             {
-                Type bridge = Type.GetType("RealTime.Integration.RealTimeBridge, RealTime", false);
+                var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RealTime");
+                if (assembly == null)
+                {
+                    Debug.Log("RealTimeUtils: Real Time assembly not found");
+                    return;
+                }
+                Type bridge = assembly.GetType("RealTime.Integration.RealTimeBridge", false);
                 if (bridge == null)
-                { 
+                {
+                    Debug.Log("RealTimeUtils: Real Time bridge is null");
                     return; 
                 }
                 MethodInfo version = bridge.GetMethod("GetApiVersion", BindingFlags.Public | BindingFlags.Static);
                 if (version == null || (int)version.Invoke(null, null) < 1)
-                { 
+                {
+                    Debug.Log("RealTimeUtils: Real Time bridge ApiVersion less then 1");
                     return; 
                 }
                 Type[] paramTypes = [typeof(float).MakeByRefType(), typeof(float).MakeByRefType()];
-                _getSchoolOperationHours = (GetSchoolOperationHoursDelegate)CreateQuery(bridge, "GetSchoolOperationHours", paramTypes, typeof(void));
+                _getSchoolOperationHours = CreateQuery<GetSchoolOperationHoursDelegate>(bridge, "GetSchoolOperationHours", paramTypes, typeof(void));
                 if (_getSchoolOperationHours != null)
                 {
-                    LogUtils.DoLog("RealTimeUtils: Real Time bridge bound (ApiVersion >= 1) — ");
+                    Debug.Log("RealTimeUtils: Real Time bridge bound (ApiVersion >= 1) — _getSchoolOperationHours is not null");
+                }
+                else
+                {
+                    Debug.Log("RealTimeUtils: Real Time bridge bound (ApiVersion >= 1) — _getSchoolOperationHours is null");
                 }
             }
             catch (Exception e)
             {
                 _getSchoolOperationHours = null;
-                LogUtils.DoLog("RealTimeUtils: Real Time bridge unavailable (" + e.Message + ")");
+                Debug.Log("RealTimeUtils: Real Time bridge unavailable (" + e.Message + ")");
             }
+        }
+
+        private static MethodInfo FindStaticMethod(Type bridge, string method, Type[] parameterTypes, Type returnType)
+        {
+            MethodInfo mi = bridge.GetMethod(method, BindingFlags.Public | BindingFlags.Static, null, parameterTypes, null);
+            return mi != null && mi.ReturnType == returnType ? mi : null;
         }
 
         // Bound as a typed delegate (not MethodInfo.Invoke) — these run per frame and per
         // SimulationStep, so avoid the boxing/array allocation of reflective invocation.
-        private static Delegate CreateQuery(Type bridge, string method, Type[] parameterTypes, Type returnType)
+        private static TDelegate CreateQuery<TDelegate>(Type bridge, string method, Type[] parameterTypes, Type returnType) where TDelegate : class
         {
             // Find the static method taking a single ushort parameter
-            MethodInfo mi = bridge.GetMethod(method, BindingFlags.Public | BindingFlags.Static, null, parameterTypes, null);
+            MethodInfo mi = FindStaticMethod(bridge, method, parameterTypes, returnType);
 
-            if(mi == null || mi.ReturnType != returnType) return null;
+            if (mi == null) return null;
 
             try
             {
-                if (returnType == typeof(void))
-                {
-                    Type genericActionDefinition;
-                    switch (parameterTypes.Length)
-                    {
-                        case 0: return Delegate.CreateDelegate(typeof(Action), mi, false);
-                        case 1: genericActionDefinition = typeof(Action<>); break;
-                        case 2: genericActionDefinition = typeof(Action<,>); break;
-                        case 3: genericActionDefinition = typeof(Action<,,>); break;
-                        default: throw new ArgumentException("Too many parameters for standard Action delegate.");
-                    }
-
-                    Type specificActionType = genericActionDefinition.MakeGenericType(parameterTypes);
-                    return Delegate.CreateDelegate(specificActionType, mi, false);
-                }
-
-                Type[] funcTypes = [.. parameterTypes, returnType];
-
-                Type genericFuncDefinition = funcTypes.Length switch
-                {
-                    1 => typeof(Func<>),
-                    2 => typeof(Func<,>),
-                    3 => typeof(Func<,,>),
-                    4 => typeof(Func<,,,>),
-                    _ => throw new ArgumentException("Too many parameters for standard Func delegate."),
-                };
-
-                Type specificFuncType = genericFuncDefinition.MakeGenericType(funcTypes);
-
-                return Delegate.CreateDelegate(specificFuncType, mi, false);
+                return Delegate.CreateDelegate(typeof(TDelegate), mi, false) as TDelegate;
             }
             catch
             {
