@@ -178,12 +178,19 @@ namespace TransportLinesManager
             var lineExt = TLMTransportLineExtension.Instance;
             lineExt.SetUseCustomConfig(lineId, true);
 
-            if(IsRealTimeEnabled)
+            TLMLineUtils.SetLineName(lineId, "School Bus Line");
+            TLMLineUtils.SetLineColor(UVMPublicTransportWorldInfoPanel.m_obj.origInstance, lineId, Color.yellow);
+
+            if (IsRealTimeEnabled)
             {
                 RealTimeUtils.GetSchoolOperationHours(out float schoolStartHour, out float schoolEndHour);
 
+                Debug.Log("schoolStartHour: " + schoolStartHour + ", schoolEndHour: " + schoolEndHour);
+
                 int start = Mathf.Clamp(Mathf.FloorToInt(schoolStartHour - 2f), 0, 23);
                 int end = Mathf.Clamp(Mathf.CeilToInt(schoolEndHour + 2f), 0, 23);
+
+                Debug.Log("start: " + start + ", end: " + end);
 
                 var newBudget = new TimeableList<BudgetEntryXml>
                 {
@@ -204,7 +211,7 @@ namespace TransportLinesManager
             }
 
             lineExt.SetAssetTransportListForLine(lineId, []);
-            lineExt.AddAssetToLine(lineId, "School Bus", "30", "100");
+            lineExt.AddAssetToLine(lineId, "SchoolBus", "30", "100");
         }
 
         //------------------------------------

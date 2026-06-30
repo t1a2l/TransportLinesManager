@@ -407,7 +407,17 @@ namespace TransportLinesManager.UI
             m_isDirty = false;
         }
 
-        public int GetCurrentNumber() => TLMPrefixesUtils.HasPrefix(TransportTool.m_prefab) ? ((NextLineNumber + 1) & 0xFFFF) % 1000 : (NextLineNumber + 1) & 0xFFFF;
+        public int GetCurrentNumber()
+        {
+            int nextNumber = (NextLineNumber + 1) & 0xFFFF;
+
+            if (!TryGetCurrentTsd(out var tsd))
+            {
+                return nextNumber;
+            }
+
+            return TLMPrefixesUtils.HasPrefix(tsd.GetTransportInfoLocal()) ? nextNumber % 1000 : nextNumber;
+        }
 
     }
 }
