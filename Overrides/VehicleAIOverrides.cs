@@ -145,14 +145,6 @@ namespace TransportLinesManager.Overrides
                 return false;
             }
 
-            int currentVehicleCount = TransportManager.instance.m_lines.m_buffer[lineId].CountVehicles(lineId);
-            int targetVehicleCount = TransportLineOverrides.NewCalculateTargetVehicleCount(lineId);
-
-            if (currentVehicleCount <= targetVehicleCount)
-            {
-                return false;
-            }
-
             var extension = TLMLineUtils.GetEffectiveExtensionForLine(vehicleData.m_transportLine);
             var lineExt = TLMTransportLineExtension.Instance;
 
@@ -188,12 +180,30 @@ namespace TransportLinesManager.Overrides
 
                         int runtimeUsed = TLMLineUtils.GetRuntimeUsedCount(lineId, slotIndex, modelName);
 
-                        if (runtimeUsed <= configuredTotal)
+                        if (runtimeUsed > configuredTotal)
                         {
-                            return false;
+                            extension.EditVehicleUsedCount(lineId, modelName, "Remove");
+
+                            if (isEmpty)
+                            {
+                                vehicleData.Info.m_vehicleAI.SetTransportLine(vehicleID, ref vehicleData, 0);
+                            }
+                            else
+                            {
+                                TLMVehicleUtils.DoSoftDespawn(vehicleID, ref vehicleData);
+                            }
+                            return true;
                         }
                     }
                 }
+            }
+
+            int currentVehicleCount = TransportManager.instance.m_lines.m_buffer[lineId].CountVehicles(lineId);
+            int targetVehicleCount = TransportLineOverrides.NewCalculateTargetVehicleCount(lineId);
+
+            if (currentVehicleCount <= targetVehicleCount)
+            {
+                return false;
             }
 
             string actualModel = vehicleData.Info?.name;
