@@ -18,6 +18,10 @@ namespace TransportLinesManager.Interfaces
     public interface IBudgetStorage
     {
         TimeableList<BudgetEntryXml> BudgetEntries { get; set; }
+
+        TimeableList<BudgetEntryXml> WeekendBudgetEntries { get; set; }
+
+        bool UseSeparateWeekendBudget { get; set; }
     }
 
     public interface INameableExtension : ISafeGettable<INameableStorage>, ILineNumberToIndexable

@@ -56,6 +56,8 @@ namespace TransportLinesManager.Utils
 
         private static readonly Dictionary<ushort, Dictionary<int, Dictionary<string, int>>> m_runtimeUsedCountByLine = [];
 
+        private static readonly TransportInfo.TransportType[] m_roadTransportTypes = [TransportInfo.TransportType.Bus, TransportInfo.TransportType.Tram, TransportInfo.TransportType.Trolleybus];
+
         public static void GetQuantityPassengerWaiting(ushort currentStop, out int residents, out int tourists, out int timeTilBored)
         {
             var residentsIn = 0;
@@ -221,19 +223,28 @@ namespace TransportLinesManager.Utils
 
         public static Tuple<float, int, int, float, bool> GetBudgetMultiplierLineWithIndexes(ushort lineId)
         {
+            IBasicExtension ext = GetEffectiveExtensionForLine(lineId);
             IBasicExtensionStorage currentConfig = GetEffectiveConfigForLine(lineId);
-            TimeableList<BudgetEntryXml> budgetConfig = currentConfig.BudgetEntries;
-            if (budgetConfig.Count == 0)
-            {
-                GetEffectiveExtensionForLine(lineId).SetBudgetMultiplierForLine(lineId, Singleton<TransportManager>.instance.m_lines.m_buffer[lineId].m_budget, 0);
-                currentConfig = GetEffectiveConfigForLine(lineId);
-                budgetConfig = currentConfig.BudgetEntries;
-            }
-            Tuple<Tuple<BudgetEntryXml, int>, Tuple<BudgetEntryXml, int>, float> currentBudget = budgetConfig.GetAtHour(ReferenceTimer);
-            return Tuple.New(Mathf.Lerp(currentBudget.First.First.Value, currentBudget.Second.First.Value, currentBudget.Third) / 100f, currentBudget.First.Second, currentBudget.Second.Second, currentBudget.Third, currentConfig is TLMTransportLineConfiguration);
+            TimeableList<BudgetEntryXml> budgetConfig = ext.GetActiveBudgetEntries(lineId);
 
+            if (budgetConfig == null || budgetConfig.Count == 0)
+            {
+                ext.SetActiveBudgetMultiplierForLine(lineId, Singleton<TransportManager>.instance.m_lines.m_buffer[lineId].m_budget, 0);
+
+                currentConfig = GetEffectiveConfigForLine(lineId);
+                budgetConfig = ext.GetActiveBudgetEntries(lineId);
+            }
+
+            var currentBudget = budgetConfig.GetAtHour(ReferenceTimer);
+
+            return Tuple.New(
+                Mathf.Lerp(currentBudget.First.First.Value, currentBudget.Second.First.Value, currentBudget.Third) / 100f,
+                currentBudget.First.Second,
+                currentBudget.Second.Second,
+                currentBudget.Third,
+                currentConfig is TLMTransportLineConfiguration);
         }
-        
+
         public static string GetLineStringId(ushort lineIdx, bool fromBuilding)
         {
             if (fromBuilding)
@@ -539,30 +550,6 @@ namespace TransportLinesManager.Utils
 
         public static void SetLineColor(MonoBehaviour parent, ushort lineId, Color color) => parent.StartCoroutine(ChangeColorCoroutine(parent, lineId, color));
 
-        private static IEnumerator ChangeColorCoroutine(MonoBehaviour comp, ushort id, Color newColor)
-        {
-            colorChangeTarget[id] = newColor;
-            if (colorChangeCooldown > 0)
-            {
-                yield break;
-            }
-            colorChangeCooldown = 3;
-            var targetColor = colorChangeTarget[id];
-            do
-            {
-                colorChangeCooldown--;
-                yield return 0;
-                if (targetColor != colorChangeTarget[id])
-                {
-                    colorChangeCooldown = 3;
-                    targetColor = colorChangeTarget[id];
-                }
-            } while (colorChangeCooldown > 0);
-
-            yield return RunColorChange(comp, id, targetColor);
-            yield break;
-        }
-
         public static IEnumerator RunColorChange(MonoBehaviour comp, ushort id, Color targetColor)
         {
             if (Singleton<SimulationManager>.exists)
@@ -577,8 +564,6 @@ namespace TransportLinesManager.Utils
         }
 
         public static AsyncTask<bool> SetLineName(ushort lineIdx, string name) => Singleton<SimulationManager>.instance.AddAction(TransportManager.instance.SetLineName(lineIdx, name));
-
-        private static readonly TransportInfo.TransportType[] m_roadTransportTypes = [TransportInfo.TransportType.Bus, TransportInfo.TransportType.Tram, TransportInfo.TransportType.Trolleybus];
 
         public static bool IsRoadLine(ushort lineId, bool regional) => regional
             ? NetManager.instance.m_nodes.m_buffer[lineId].Info.m_netAI is TransportLineAI { m_vehicleType: VehicleInfo.VehicleType.Car }
@@ -777,23 +762,6 @@ namespace TransportLinesManager.Utils
             return ticketPrice;
         }
 
-        private static Dictionary<string, int> EnsureRuntimeUsedCountSlot(ushort lineId, int slotIndex)
-        {
-            if (!m_runtimeUsedCountByLine.TryGetValue(lineId, out var lineSlots))
-            {
-                lineSlots = [];
-                m_runtimeUsedCountByLine[lineId] = lineSlots;
-            }
-
-            if (!lineSlots.TryGetValue(slotIndex, out var slotAssets))
-            {
-                slotAssets = [];
-                lineSlots[slotIndex] = slotAssets;
-            }
-
-            return slotAssets;
-        }
-
         public static int GetRuntimeUsedCount(ushort lineId, int slotIndex, string assetName)
         {
             if (lineId == 0 || slotIndex < 0 || string.IsNullOrEmpty(assetName))
@@ -882,6 +850,47 @@ namespace TransportLinesManager.Utils
         public static void NotifyAssetUsedCountChanged(ushort lineID, int slotIndex)
         {
             EventAssetUsedCountChanged?.Invoke(lineID, slotIndex);
+        }
+
+        private static Dictionary<string, int> EnsureRuntimeUsedCountSlot(ushort lineId, int slotIndex)
+        {
+            if (!m_runtimeUsedCountByLine.TryGetValue(lineId, out var lineSlots))
+            {
+                lineSlots = [];
+                m_runtimeUsedCountByLine[lineId] = lineSlots;
+            }
+
+            if (!lineSlots.TryGetValue(slotIndex, out var slotAssets))
+            {
+                slotAssets = [];
+                lineSlots[slotIndex] = slotAssets;
+            }
+
+            return slotAssets;
+        }
+
+        private static IEnumerator ChangeColorCoroutine(MonoBehaviour comp, ushort id, Color newColor)
+        {
+            colorChangeTarget[id] = newColor;
+            if (colorChangeCooldown > 0)
+            {
+                yield break;
+            }
+            colorChangeCooldown = 3;
+            var targetColor = colorChangeTarget[id];
+            do
+            {
+                colorChangeCooldown--;
+                yield return 0;
+                if (targetColor != colorChangeTarget[id])
+                {
+                    colorChangeCooldown = 3;
+                    targetColor = colorChangeTarget[id];
+                }
+            } while (colorChangeCooldown > 0);
+
+            yield return RunColorChange(comp, id, targetColor);
+            yield break;
         }
 
         private static void RebuildUsedCountForCurrentSlot(ushort lineID, int slotIndex)

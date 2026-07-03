@@ -15,6 +15,12 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         [XmlElement("Budget")]        
         public TimeableList<BudgetEntryXml> BudgetEntries { get; set; } = [];
 
+        [XmlElement("BudgetWeekend")]
+        public TimeableList<BudgetEntryXml> WeekendBudgetEntries { get; set; } = [];
+
+        [XmlAttribute("useSeparateWeekendBudget")]
+        public bool UseSeparateWeekendBudget { get; set; }
+
         [XmlElement("TicketPrices")]
         public TimeableList<TicketPriceEntryXml> TicketPriceEntries { get; set; } = [];
 

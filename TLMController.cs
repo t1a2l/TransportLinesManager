@@ -23,6 +23,7 @@ using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels;
 using TransportLinesManager.WorldInfoPanels.NearLines;
 using TransportLinesManager.WorldInfoPanels.PlatformEditor;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 using UnityEngine;
 
 namespace TransportLinesManager
@@ -207,7 +208,7 @@ namespace TransportLinesManager
                     new() { HourOfDay = end_dropoff, Value = 0 }
                 };
 
-                lineExt.SetAllBudgetMultipliersForLine(lineId, fleetBudget);
+                lineExt.SetAllBudgetMultipliersForLine(lineId, UVMBudgetConfigTab.Instance.CurrentBudgetTarget, fleetBudget);
                 lineExt.SetTicketPricesForLine(lineId, ticketBudget);
             }
             else
@@ -222,7 +223,7 @@ namespace TransportLinesManager
                     new() { HourOfDay = 0, Value = 0 }
                 };
 
-                lineExt.SetAllBudgetMultipliersForLine(lineId, fleetBudget);
+                lineExt.SetAllBudgetMultipliersForLine(lineId, UVMBudgetConfigTab.Instance.CurrentBudgetTarget, fleetBudget);
                 lineExt.SetTicketPricesForLine(lineId, ticketBudget);
             }
 

@@ -13,6 +13,8 @@ namespace TransportLinesManager.Utils
 
         private static GetSchoolOperationHoursDelegate _getSchoolOperationHours;
 
+        private static Func<bool> _isWeekend;
+
         // return real time mod school operation hours.
         public static void GetSchoolOperationHours(out float schoolStartHour, out float schoolEndHour)
         {
@@ -24,6 +26,12 @@ namespace TransportLinesManager.Utils
             }
             schoolStartHour = 0f;
             schoolEndHour = 0f;
+        }
+
+        public static bool IsWeekend()
+        {
+            if (!_resolved) Resolve();
+            return _isWeekend != null && _isWeekend();
         }
 
         private static void Resolve()
@@ -51,13 +59,14 @@ namespace TransportLinesManager.Utils
                 }
                 Type[] paramTypes = [typeof(float).MakeByRefType(), typeof(float).MakeByRefType()];
                 _getSchoolOperationHours = CreateQuery<GetSchoolOperationHoursDelegate>(bridge, "GetSchoolOperationHours", paramTypes, typeof(void));
-                if (_getSchoolOperationHours != null)
+                _isWeekend = CreateQuery<Func<bool>>(bridge, "IsWeekend", Type.EmptyTypes, typeof(bool));
+                if (_getSchoolOperationHours != null && _isWeekend != null)
                 {
-                    Debug.Log("RealTimeUtils: Real Time bridge bound (ApiVersion >= 1) — _getSchoolOperationHours is not null");
+                    Debug.Log("RealTimeUtils: Real Time bridge bound (ApiVersion >= 1) Success");
                 }
                 else
                 {
-                    Debug.Log("RealTimeUtils: Real Time bridge bound (ApiVersion >= 1) — _getSchoolOperationHours is null");
+                    Debug.Log("RealTimeUtils: Real Time bridge bound (ApiVersion >= 1) Failed");
                 }
             }
             catch (Exception e)

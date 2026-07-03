@@ -15,6 +15,7 @@ namespace TransportLinesManager.Data.Extensions
     public static class ExtensionStaticExtensionMethods
     {
         #region Assets List
+
         public static List<TransportAsset> GetAssetTransportListForLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetTransportList;
 
         public static void SetAssetTransportListForLine<T>(this T it, ushort lineId, List<TransportAsset> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetTransportList = [.. list];
@@ -156,40 +157,134 @@ namespace TransportLinesManager.Data.Extensions
         }
 
         public static void UseDefaultAssetsAtLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.GetAssetListForLine(lineId).Clear();
+
         #endregion
 
         #region Name
+
         public static string GetName<T>(this T it, uint prefix) where T : INameableExtension => it.SafeGet(prefix).Name;
+
         public static void SetName<T>(this T it, uint prefix, string name) where T : INameableExtension => it.SafeGet(prefix).Name = name;
+
         #endregion
 
         #region Budget Multiplier
-        public static TimeableList<BudgetEntryXml> GetBudgetsMultiplierForLine<T>(this T it, ushort lineId) where T : IBudgetableExtension => it.SafeGet(it.LineToIndex(lineId)).BudgetEntries;
 
-        public static uint GetBudgetMultiplierForHourForLine<T>(this T it, ushort lineId, float hour) where T : IBudgetableExtension
+        public enum BudgetTarget
         {
-            TimeableList<BudgetEntryXml> budget = it.GetBudgetsMultiplierForLine(lineId);
+            Weekday,
+            Weekend
+        }
+
+        public static TimeableList<BudgetEntryXml> GetBudgetsMultiplierForLine<T>(this T it, ushort lineId, BudgetTarget budgetTarget) where T : IBudgetableExtension
+        {
+            var budgetStorage = it.SafeGet(it.LineToIndex(lineId));
+
+            if (budgetTarget == BudgetTarget.Weekend && budgetStorage.UseSeparateWeekendBudget)
+            {
+                return budgetStorage.WeekendBudgetEntries ?? budgetStorage.BudgetEntries;
+            }
+
+            return budgetStorage.BudgetEntries;
+        }
+
+        public static uint GetBudgetMultiplierForHourForLine<T>(this T it, ushort lineId, float hour, BudgetTarget budgetTarget) where T : IBudgetableExtension
+        {
+            TimeableList<BudgetEntryXml> budget = it.GetBudgetsMultiplierForLine(lineId, budgetTarget);
             Tuple<Tuple<BudgetEntryXml, int>, Tuple<BudgetEntryXml, int>, float> currentBudget = budget.GetAtHour(hour);
             return (uint)Mathf.Lerp(currentBudget.First.First.Value, currentBudget.Second.First.Value, currentBudget.Third);
         }
 
-        public static void SetBudgetMultiplierForLine<T>(this T it, ushort lineId, uint multiplier, int hour) where T : IBudgetableExtension => it.SafeGet(it.LineToIndex(lineId)).BudgetEntries.Add(new BudgetEntryXml()
+        public static void SetBudgetMultiplierForLine<T>(this T it, ushort lineId, uint multiplier, int hour, BudgetTarget budgetTarget) where T : IBudgetableExtension => it.GetBudgetsMultiplierForLine(lineId, budgetTarget).Add(new BudgetEntryXml()
         {
             Value = multiplier,
             HourOfDay = hour
         });
 
-        public static void RemoveBudgetMultiplierForLine<T>(this T it, ushort lineId, int hour) where T : IBudgetableExtension => it.SafeGet(it.LineToIndex(lineId)).BudgetEntries.RemoveAtHour(hour);
+        public static void RemoveBudgetMultiplierForLine<T>(this T it, ushort lineId, int hour, BudgetTarget budgetTarget) where T : IBudgetableExtension => it.GetBudgetsMultiplierForLine(lineId, budgetTarget).RemoveAtHour(hour);
 
-        public static void RemoveAllBudgetMultipliersOfLine<T>(this T it, ushort lineId) where T : IBudgetableExtension => it.SafeGet(it.LineToIndex(lineId)).BudgetEntries =
-        [
-            new(){HourOfDay=0,Value=100}
-        ];
+        public static void RemoveAllBudgetMultipliersOfLine<T>(this T it, ushort lineId, BudgetTarget budgetTarget) where T : IBudgetableExtension
+        {
+            var budgetStorage = it.SafeGet(it.LineToIndex(lineId));
 
-        public static void SetAllBudgetMultipliersForLine<T>(this T it, ushort lineId, TimeableList<BudgetEntryXml> newValue) where T : IBudgetableExtension => it.SafeGet(it.LineToIndex(lineId)).BudgetEntries = newValue;
+            if (budgetTarget == BudgetTarget.Weekend && budgetStorage.UseSeparateWeekendBudget)
+            {
+                budgetStorage.WeekendBudgetEntries =
+                [
+                    new() { HourOfDay = 0, Value = 100 }
+                ];
+            }
+            else
+            {
+                budgetStorage.BudgetEntries =
+                [
+                    new() { HourOfDay = 0, Value = 100 }
+                ];
+            }
+        }
+
+        public static void SetAllBudgetMultipliersForLine<T>(this T it, ushort lineId, BudgetTarget budgetTarget, TimeableList<BudgetEntryXml> newValue) where T : IBudgetableExtension
+        {
+            var budgetStorage = it.SafeGet(it.LineToIndex(lineId));
+
+            if (budgetTarget == BudgetTarget.Weekend && budgetStorage.UseSeparateWeekendBudget)
+            {
+                budgetStorage.WeekendBudgetEntries = newValue;
+            }
+            else
+            {
+                budgetStorage.BudgetEntries = newValue;
+            }
+        }
+
+        public static bool IsWeekendBudgetActive(IBudgetStorage cfg)
+        {
+            if (cfg is null || !TLMController.IsRealTimeEnabled)
+            {
+                return false;
+            }
+
+            if (!cfg.UseSeparateWeekendBudget)
+            {
+                return false;
+            }
+
+            return RealTimeUtils.IsWeekend();
+        }
+
+        public static TimeableList<BudgetEntryXml> GetActiveBudgetEntries<T>(this T it, ushort lineId) where T : IBudgetableExtension
+        {
+            var budgetStorage = it.SafeGet(it.LineToIndex(lineId));
+            bool useWeekend = IsWeekendBudgetActive(budgetStorage);
+            return useWeekend ? (budgetStorage.WeekendBudgetEntries ?? budgetStorage.BudgetEntries) : budgetStorage.BudgetEntries;
+        }
+
+        public static void SetActiveBudgetMultiplierForLine<T>(this T it, ushort lineId, uint multiplier, int hour) where T : IBudgetableExtension
+        {
+            var budgetStorage = it.SafeGet(it.LineToIndex(lineId));
+            bool useWeekend = IsWeekendBudgetActive(budgetStorage);
+
+            TimeableList<BudgetEntryXml> targetList;
+            if (useWeekend)
+            {
+                targetList = budgetStorage.WeekendBudgetEntries ??= [];
+            }
+            else
+            {
+                targetList = budgetStorage.BudgetEntries;
+            }
+
+            targetList.Add(new BudgetEntryXml
+            {
+                HourOfDay = hour,
+                Value = multiplier
+            });
+        }
+
         #endregion
 
         #region Ticket Price
+
         public static TimeableList<TicketPriceEntryXml> GetTicketPricesForLine<T>(this T it, ushort lineId) where T : ITicketPriceExtension => it.SafeGet(it.LineToIndex(lineId)).TicketPriceEntries;
         
         public static void SetTicketPricesForLine<T>(this T it, ushort lineId, TimeableList<TicketPriceEntryXml> newPrices) where T : ITicketPriceExtension => it.SafeGet(it.LineToIndex(lineId)).TicketPriceEntries = newPrices;
@@ -216,6 +311,7 @@ namespace TransportLinesManager.Data.Extensions
         #endregion
 
         #region Color
+
         public static Color GetColor<T>(this T it, uint prefix) where T : IColorSelectableExtension => it.SafeGet(prefix).Color;
 
         public static void SetColor<T>(this T it, uint prefix, Color value) where T : IColorSelectableExtension
@@ -232,10 +328,10 @@ namespace TransportLinesManager.Data.Extensions
         }
 
         public static void CleanColor<T>(this T it, uint prefix) where T : IColorSelectableExtension => it.SafeGet(prefix).Color = default;
+
         #endregion
 
         #region Depot
-
 
         private static IDepotSelectionStorage EnsureCreationDepotConfig<T>(T it, uint idx) where T : IDepotSelectableExtension
         {
@@ -243,6 +339,7 @@ namespace TransportLinesManager.Data.Extensions
             config.DepotsAllowed ??= [];
             return config;
         }
+
         public static void AddDepotForLine<T>(this T it, ushort lineId, ushort buildingID) where T : IDepotSelectableExtension => EnsureCreationDepotConfig(it, it.LineToIndex(lineId)).DepotsAllowed.Add(buildingID);
 
         public static void RemoveDepotForLine<T>(this T it, ushort lineId, ushort buildingID) where T : IDepotSelectableExtension => EnsureCreationDepotConfig(it, it.LineToIndex(lineId)).DepotsAllowed.Remove(buildingID);

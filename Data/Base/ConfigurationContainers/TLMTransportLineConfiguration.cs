@@ -20,6 +20,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 {
                     DisplayAbsoluteValues = false;
                     BudgetEntries = [];
+                    WeekendBudgetEntries = [];
                     AssetList = [];
                     AssetTransportList = [];
                     TicketPriceEntries = [];
@@ -33,6 +34,12 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
 
         [XmlElement("Budget")]
         public TimeableList<BudgetEntryXml> BudgetEntries { get; set; } = [];
+
+        [XmlElement("BudgetWeekend")]
+        public TimeableList<BudgetEntryXml> WeekendBudgetEntries { get; set; } = [];
+
+        [XmlAttribute("useSeparateWeekendBudget")]
+        public bool UseSeparateWeekendBudget { get; set; }
 
         [XmlElement("AssetsList")]
         public SimpleXmlList<string> AssetList { get; set; } = [];
