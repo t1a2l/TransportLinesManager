@@ -20,20 +20,27 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
     public abstract class TLMBaseTimedConfigTab<T, C, L, V> : UICustomControl, IUVMPTWIPChild where T : TLMBaseTimedConfigTab<T, C, L, V> where V : UintValueHourEntryXml<V> where L : TLMBaseSliderEditorLine<L, V> where C : TLMBaseTimeChart<T, C, L, V>
     {
         public abstract string GetTitleLocale();
+
         public abstract string GetValueColumnLocale();
+
         public abstract string GetTemplateName();
+
         public abstract void EnsureTemplate();
+
         public abstract float GetMaxSliderValue();
 
         public virtual void ExtraAwake() { }
+
         public virtual void ExtraOnSetTarget(ushort lineID) { }
 
         internal abstract List<Color> ColorOrder { get; }
 
         protected abstract TimeableList<V> Config { get; }
+
         protected abstract V DefaultEntry();
 
         public UIComponent MainContainer { get; private set; }
+
         internal static T Instance { get; private set; }
 
         protected UIHelperExtension m_uiHelper;
@@ -44,8 +51,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private UIScrollablePanel m_entryListContainer;
 
-
         #region Awake
+
         public void Awake()
         {
             Instance = (T)this;
@@ -72,6 +79,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             EnsureTemplate();
             m_timeRows = new UITemplateList<UIPanel>(m_entryListContainer, GetTemplateName());
         }
+
         #endregion
 
         private bool m_isDirty = false;
@@ -124,7 +132,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             label.verticalAlignment = UIVerticalAlignment.Middle;
             label.minimumSize = new Vector2(width, 0);
         }
-
 
         public void RebuildList() => RecountRows();
 
@@ -196,6 +203,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(UVMBudgetConfigTab));
             TLMAssetSelectorTab.MarkDirty();
         }
+
         private void SetTime(V idx, int val)
         {
             idx.HourOfDay = val;
@@ -246,13 +254,12 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
             {
                 IBasicExtension extension = lineId > 0 && !fromBuilding ? TLMLineUtils.GetEffectiveExtensionForLine(lineId) : UVMPublicTransportWorldInfoPanel.GetCurrentTSD().GetTransportExtension();
-                extension.AddDefaultToNewBudgetEntry(lineId);
+                extension.AddDefaultToNewBudgetEntry(lineId, TLMAssetSelectorTab.Instance.CurrentBudgetTarget);
             }
             RebuildList();
             UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(UVMBudgetConfigTab));
             TLMAssetSelectorTab.MarkDirty();
         }
-
 
         protected Color GetColorForNumber(int num)
         {
@@ -269,9 +276,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             return Color.Lerp(ColorOrder[num % 10], Color.black, num / 10 / 5f);
         }
 
-
         public void OnEnable() { }
+
         public void OnDisable() { }
+
         public void OnSetTarget(Type source)
         {
             if (source == GetType())
@@ -285,6 +293,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 RebuildList();
             }
         }
+
         public void UpdateBindings()
         {
             if (m_isDirty)
@@ -293,8 +302,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 m_isDirty = false;
             }
         }
+
         public void OnGotFocus() { }
+
         public bool MayBeVisible() => UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && !fromBuilding && lineId > 0 && TransportSystemDefinition.FromLineId(lineId, fromBuilding).HasVehicles();
+        
         public void Hide() => MainContainer.isVisible = false;
     }
 

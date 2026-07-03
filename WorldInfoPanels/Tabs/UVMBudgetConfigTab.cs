@@ -115,7 +115,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     return null;
                 }
 
-                return CurrentBudgetTarget == BudgetTarget.Weekend ? (cfg.WeekendBudgetEntries ?? cfg.BudgetEntries) : cfg.BudgetEntries;
+                return CurrentBudgetTarget == BudgetTarget.Weekend ? (cfg.WeekendBudgetEntries ?? []) : cfg.BudgetEntries;
             }
         }
 
@@ -181,7 +181,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_copyWeekdayToWeekendButton.normalBgSprite = "ButtonMenu";
             m_copyWeekdayToWeekendButton.hoveredBgSprite = "ButtonMenuHovered";
             m_copyWeekdayToWeekendButton.pressedBgSprite = "ButtonMenuPressed";
-            m_copyWeekdayToWeekendButton.tooltip = Locale.Get("TLM_COPY_WEEKDAY_TOWEEKEND_TOOLTIP");
+            m_copyWeekdayToWeekendButton.tooltip = Locale.Get("TLM_COPY_WEEKDAY_TO_WEEKEND_TOOLTIP");
             m_copyWeekdayToWeekendButton.eventClicked += (_, __) => CopyWeekdayBudgetToWeekend();
 
             UpdateWeekendBudgetUiState();

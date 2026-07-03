@@ -50,7 +50,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                     LogUtils.DoLog($"checkbox event: {x.objectUserData} => {y} at {extension}[{lineId}-{fromBuilding}]");
                     if (y)
                     {
-                        extension.AddAssetToLine(fromBuilding ? (ushort)0 : lineId, m_currentAsset, m_capacityEditor.text, m_weightEditor.text);
+                        extension.AddAssetToLine(fromBuilding ? (ushort)0 : lineId, m_currentAsset, m_capacityEditor.text, m_weightEditor.text, TLMAssetSelectorTab.Instance.CurrentBudgetTarget);
                     }
                     else
                     {
@@ -107,7 +107,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 bool isActiveSlot = false;
                 if (!isIntercity)
                 {
-                    int activeSlot = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId).GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                    int activeSlot = GetRuntimeActiveSlotIndex(lineId);
                     isActiveSlot = index == activeSlot;
                 }
 
@@ -164,7 +164,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 return;
             }
 
-            bool isActiveSlot = index == TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId).GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+            bool isActiveSlot = index == GetRuntimeActiveSlotIndex(lineId);
             if (!isActiveSlot)
             {
                 m_usedCount.opacity = 0.3f;
@@ -224,7 +224,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 {
                     IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
                     List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
-                    var budgetEntries = config.GetActiveBudgetEntries(lineId);
+                    var budgetEntries = config.GetBudgetsMultiplierForLine(lineId, TLMAssetSelectorTab.Instance.CurrentBudgetTarget);
 
                     if (allowedTransportAssets.Any(item => item.name == m_currentAsset))
                     {
@@ -347,6 +347,12 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
             go.AddComponent<TLMAssetItemLine>();
             TLMUiTemplateUtils.GetTemplateDict()[TEMPLATE_NAME] = panel;
+        }
+
+        private static int GetRuntimeActiveSlotIndex(ushort lineId)
+        {
+            var activeEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId);
+            return activeEntries?.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second ?? -1;
         }
     }
 

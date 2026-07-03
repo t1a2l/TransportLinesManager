@@ -24,11 +24,11 @@ namespace TransportLinesManager.Data.Extensions
 
         public static void SetAssetListForLine<T>(this T it, ushort lineId, List<string> list) where T : IAssetSelectorExtension => it.SafeGet(it.LineToIndex(lineId)).AssetList = [.. list];
 
-        public static void AddAssetToLine<T>(this T it, ushort lineId, string assetId, string capacity, string weight) where T : IAssetSelectorExtension
+        public static void AddAssetToLine<T>(this T it, ushort lineId, string assetId, string capacity, string weight, BudgetTarget budgetTarget) where T : IAssetSelectorExtension
         {
             List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
             IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
-            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId);
+            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetBudgetsMultiplierForLine(lineId, budgetTarget);
             var ext = TLMTransportLineExtension.Instance;
 
             bool isCustomConfig = ext.IsUsingCustomConfig(lineId);
@@ -96,11 +96,11 @@ namespace TransportLinesManager.Data.Extensions
             SetAssetTransportListForLine(it, lineId, list);
         }
 
-        public static void AddDefaultToNewBudgetEntry<T>(this T it, ushort lineId) where T : IAssetSelectorExtension
+        public static void AddDefaultToNewBudgetEntry<T>(this T it, ushort lineId, BudgetTarget budgetTarget) where T : IAssetSelectorExtension
         {
             List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
 
-            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId);
+            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetBudgetsMultiplierForLine(lineId, budgetTarget);
 
             int newIndex = budgetEntries.Count - 1;
             for (int i = 0; i < list.Count; i++)

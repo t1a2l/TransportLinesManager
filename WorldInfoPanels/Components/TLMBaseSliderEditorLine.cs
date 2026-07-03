@@ -5,8 +5,7 @@ using Commons.Extensions.UI;
 using Commons.UI.SpriteNames;
 using Commons.Utils;
 using TransportLinesManager.Data.Base;
-using TransportLinesManager.Data.Extensions;
-using TransportLinesManager.Utils;
+using System.Collections.Generic;
 using TransportLinesManager.WorldInfoPanels.Tabs;
 using UnityEngine;
 
@@ -92,8 +91,15 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         protected virtual void ExtraOnFillData(ref TransportLine t) { }
 
         public abstract string GetValueFormat(ref TransportLine t);
+
         public abstract uint GetValueAsInt(ref TransportLine t);
+
         public abstract void SetValueFromTyping(ref TransportLine t, uint value);
+
+        protected virtual IEnumerable<V> GetEntriesForDuplicateCheck(ushort lineId)
+        {
+            return null;
+        }
 
         public void Awake()
         {
@@ -256,6 +262,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         }
 
         private bool alreadyCalling = false;
+
         private void SendText(UIComponent x, string y)
         {
             if (m_loading)
@@ -280,15 +287,20 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                         bool isDuplicate = false;
                         if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && !fromBuilding)
                         {
-                            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId);
-                            foreach (var entry in budgetEntries)
+                            var entries = GetEntriesForDuplicateCheck(lineId);
+                            if (entries != null)
                             {
-                                // skip checking against self
-                                if (entry.HourOfDay == Entry.HourOfDay) continue;
-                                if (entry.HourOfDay == time)
+                                foreach (var entry in entries)
                                 {
-                                    isDuplicate = true;
-                                    break;
+                                    if (ReferenceEquals(entry, Entry))
+                                    {
+                                        continue;
+                                    }
+                                    if (entry.HourOfDay == time)
+                                    {
+                                        isDuplicate = true;
+                                        break;
+                                    }
                                 }
                             }
                         }

@@ -16,6 +16,7 @@ using UnityEngine;
 using Commons.Extensions.UI;
 using TransportLinesManager.Data.DataContainers;
 using TransportLinesManager.Data.Base;
+using static TransportLinesManager.Data.Extensions.ExtensionStaticExtensionMethods;
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
@@ -95,9 +96,13 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private UISprite m_timeBudgetSelectLabelSprite;
         private static UIDropDown m_timeBudgetSelect;
 
+        private UIDropDown m_budgetProfileDropdown;
+
         private TransportSystemDefinition TransportSystem => UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
 
         private static readonly List<BudgetEntryXml> m_budgetEntriesInUiOrder = [];
+
+        public BudgetTarget CurrentBudgetTarget => m_budgetProfileDropdown?.selectedIndex == 1 ? BudgetTarget.Weekend : BudgetTarget.Weekday;
 
         internal static ushort GetLineID()
         {
@@ -143,6 +148,26 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_timeBudgetSelect.horizontalAlignment = UIHorizontalAlignment.Left;
             m_timeBudgetSelect.listPosition = UIDropDown.PopupListPosition.Automatic;
             m_timeBudgetSelect.eventSelectedIndexChanged += TimeBudgetSelect_eventSelectedIndexChanged;
+
+            var ddGo = Instantiate(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate).GetComponent<UIPanel>().Find<UIDropDown>("Dropdown").gameObject, MainPanel.transform);
+
+            m_budgetProfileDropdown = ddGo.GetComponent<UIDropDown>();
+            m_budgetProfileDropdown.name = "BudgetProfileDropdown";
+            m_budgetProfileDropdown.width = 110f;
+            m_budgetProfileDropdown.height = 24f;
+            m_budgetProfileDropdown.textScale = 0.85f;
+            m_budgetProfileDropdown.itemHeight = 24;
+            m_budgetProfileDropdown.textFieldPadding = new RectOffset(6, 6, 4, 4);
+            m_budgetProfileDropdown.itemPadding = new RectOffset(6, 6, 2, 2);
+            m_budgetProfileDropdown.normalBgSprite = "OptionsDropboxListbox";
+            m_budgetProfileDropdown.items =
+            [
+                Locale.Get("TLM_BUDGET_PROFILE_WEEKDAY"),
+                Locale.Get("TLM_BUDGET_PROFILE_WEEKEND")
+            ];
+            m_budgetProfileDropdown.selectedIndex = 0;
+            m_budgetProfileDropdown.relativePosition = new Vector3(102f, 94f);
+            m_budgetProfileDropdown.eventSelectedIndexChanged += OnBudgetProfileChanged;
 
             CreateScrollPanel();
 
@@ -191,6 +216,12 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private void TimeBudgetSelect_eventSelectedIndexChanged(UIComponent component, int value)
         {
             ChangeBudgetTime(value);
+        }
+
+        private void OnBudgetProfileChanged(UIComponent component, int value)
+        {
+            IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
+            UpdateAssetList(config);
         }
 
         private void CreateTemplateList()
@@ -370,7 +401,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(targetAssets.Count);
             List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
             List<string> allowedAssets = config.GetAssetListForLine(lineId);
-            var budgetEntries = config.GetActiveBudgetEntries(lineId);
+            var budgetEntries = config.GetBudgetsMultiplierForLine(lineId, CurrentBudgetTarget);
 
             if (lineId > 0 && budgetEntries.Count == 0)
             {
@@ -476,7 +507,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private TransportAsset InitTransportItem(string assetName, IBasicExtension currentConfig, ushort lineId)
         {
-            var budgetEntries = currentConfig.GetActiveBudgetEntries(lineId);
+            var budgetEntries = currentConfig.GetBudgetsMultiplierForLine(lineId, CurrentBudgetTarget);
             var item = new TransportAsset
             {
                 name = assetName,
@@ -591,7 +622,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 m_weightColumnHeader.text = Locale.Get("TLM_ASSET_COUNT_HEADER"); // e.g. "Count"
                 IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
-                var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId);
+                var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetBudgetsMultiplierForLine(lineId, CurrentBudgetTarget);
 
                 if (budgetIndex >= 0 && budgetIndex < budgetEntries.Count)
                 {
@@ -677,7 +708,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public static int GetBudgetEntryBackingIndex(ushort lineId, BudgetEntryXml target)
         {
-            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId);
+            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetBudgetsMultiplierForLine(lineId, Instance.CurrentBudgetTarget);
             for (int i = 0; i < budgetEntries.Count; i++)
             {
                 if (ReferenceEquals(budgetEntries[i], target))

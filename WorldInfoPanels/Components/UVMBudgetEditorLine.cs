@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using TransportLinesManager.Data.Base;
+using TransportLinesManager.Data.Extensions;
 using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.Tabs;
 
@@ -7,6 +9,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
     public class UVMBudgetEditorLine : TLMBaseSliderEditorLine<UVMBudgetEditorLine, BudgetEntryXml>
     {
         public const string BUDGET_LINE_TEMPLATE = "TLM_BudgetLineTemplate";
+
         protected override void ExtraOnFillData(ref TransportLine t)
         {
 
@@ -17,6 +20,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         }
 
         public static void EnsureTemplate() => EnsureTemplate(BUDGET_LINE_TEMPLATE);
+        
         public override string GetValueFormat(ref TransportLine t)
         {
             string text = $"{(UVMBudgetConfigTab.IsAbsoluteValue() ? TLMLineUtils.ProjectTargetVehicleCount(t.Info, t.m_totalLength, Entry.Value / 100f) : (int)Entry.Value)}";
@@ -25,6 +29,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         }
 
         public override uint GetValueAsInt(ref TransportLine t) => UVMBudgetConfigTab.IsAbsoluteValue() ? (uint)TLMLineUtils.ProjectTargetVehicleCount(t.Info, t.m_totalLength, Entry.Value / 100f) : Entry.Value;
+        
         public override void SetValueFromTyping(ref TransportLine t, uint value)
         {
             if (UVMBudgetConfigTab.IsAbsoluteValue())
@@ -35,6 +40,11 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             {
                 SetValue(value);
             }
+        }
+
+        protected override IEnumerable<BudgetEntryXml> GetEntriesForDuplicateCheck(ushort lineId)
+        {
+            return TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetBudgetsMultiplierForLine(lineId, UVMBudgetConfigTab.Instance.CurrentBudgetTarget);
         }
     }
 
