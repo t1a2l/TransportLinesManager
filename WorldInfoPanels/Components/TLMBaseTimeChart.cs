@@ -20,26 +20,17 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         where C : TLMBaseTimeChart<T, C, L, V>
     {
 
-
         public abstract string ClockTooltip { get; }
 
         public abstract void OnUpdate();
 
-
         public abstract void CreateLabels();
-
-
 
         public abstract void OnDeleteTarget();
 
         public abstract void SetPasteTarget(TimeableList<V> newVal);
 
         public abstract TimeableList<V> GetCopyTarget();
-
-
-
-
-
 
         protected UIPanel m_container;
         private UIRadialChartExtended m_clock;

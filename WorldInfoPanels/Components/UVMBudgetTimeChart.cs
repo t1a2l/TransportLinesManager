@@ -5,7 +5,6 @@ using Commons.Utils.UtilitiesClasses;
 using TransportLinesManager.Data.Base;
 using TransportLinesManager.Data.Extensions;
 using TransportLinesManager.Overrides;
-using TransportLinesManager.UI;
 using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.Tabs;
 using UnityEngine;
@@ -23,24 +22,26 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineID, out bool fromBuilding);
             if (!fromBuilding)
             {
-                return TLMLineUtils.GetEffectiveExtensionForLine(lineID).GetBudgetsMultiplierForLine(lineID);
+                return TLMLineUtils.GetEffectiveExtensionForLine(lineID).GetBudgetsMultiplierForLine(lineID, UVMBudgetConfigTab.Instance.CurrentBudgetTarget);
             }
             return null;
         }
+
         public override void SetPasteTarget(TimeableList<BudgetEntryXml> newVal)
         {
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineID, out bool fromBuilding);
             if (!fromBuilding)
             {
-                TLMLineUtils.GetEffectiveExtensionForLine(lineID).SetAllBudgetMultipliersForLine(lineID, newVal);
+                TLMLineUtils.GetEffectiveExtensionForLine(lineID).SetAllBudgetMultipliersForLine(lineID, UVMBudgetConfigTab.Instance.CurrentBudgetTarget, newVal);
             }
         }
+
         public override void OnDeleteTarget()
         {
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineID, out bool fromBuilding);
             if (!fromBuilding)
             {
-                TLMLineUtils.GetEffectiveExtensionForLine(lineID).RemoveAllBudgetMultipliersOfLine(lineID);
+                TLMLineUtils.GetEffectiveExtensionForLine(lineID).RemoveAllBudgetMultipliersOfLine(lineID, UVMBudgetConfigTab.Instance.CurrentBudgetTarget);
             }
         }
 

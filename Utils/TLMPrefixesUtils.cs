@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-
 namespace TransportLinesManager.Utils
 {
     public static class TLMPrefixesUtils
@@ -29,11 +28,28 @@ namespace TransportLinesManager.Utils
 
         public static bool HasPrefix(TransportInfo t) => HasPrefix(TransportSystemDefinition.FromLocal(t));
 
-        public static uint GetPrefix(ushort idx) =>
-            idx == 0 ? PREFIX_REGIONAL :
-            HasPrefix(idx)
-                ? Singleton<TransportManager>.instance.m_lines.m_buffer[idx].m_lineNumber / 1000u
-                : 0;
+        public static uint GetPrefix(ushort idx)
+        {
+            if(idx == 0)
+            {
+                return PREFIX_REGIONAL;
+            }
+            if (!HasPrefix(idx))
+            {
+                return 0;
+            }
+            var line = Singleton<TransportManager>.instance.m_lines.m_buffer[idx];
+            uint prefix = line.m_lineNumber / 1000u;
+            if (prefix > 0)
+            {
+                return prefix;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
         internal static Color CalculateAutoColor(ushort num, TransportSystemDefinition tsdRef, bool avoidRandom = false, bool allowClear = false)
         {
             var config = tsdRef.GetConfig();
@@ -84,6 +100,7 @@ namespace TransportLinesManager.Utils
             }
             return c;
         }
+
         internal static LineIconSpriteNames GetLineIcon(ushort num, TransportSystemDefinition tsdRef)
         {
             var config = tsdRef.GetConfig();
@@ -101,6 +118,7 @@ namespace TransportLinesManager.Utils
             }
             return tsdRef.GetBgIcon();
         }
+
         internal static string[] GetStringOptionsForPrefix(TransportSystemDefinition tsd, bool showUnprefixed = false, bool useNameRefSystem = false, bool noneOption = true)
         {
             var config = tsd.GetConfig();
@@ -320,9 +338,6 @@ namespace TransportLinesManager.Utils
             }
             return saida;
         }
-
-
-
 
         internal static string GetStringFromNameMode(NamingMode mode, int num) =>
                   mode == NamingMode.Roman ? NumberingUtils.ToRomanNumeral((ushort)num)
