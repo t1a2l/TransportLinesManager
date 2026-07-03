@@ -152,7 +152,7 @@ namespace TransportLinesManager.Overrides
 
             if(isAbsoluteMode)
             {
-                int slotIndex = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                int slotIndex = extension.GetActiveBudgetEntries(lineId).GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
 
                 if (slotIndex < 0)
                 {

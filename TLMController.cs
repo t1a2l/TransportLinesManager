@@ -229,8 +229,6 @@ namespace TransportLinesManager
 
             lineExt.SetAssetTransportListForLine(lineId, []);
 
-            var currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
-
             var asset = new TransportAsset
             {
                 name = "School Bus 01",
@@ -239,7 +237,9 @@ namespace TransportLinesManager
                 spawn_percent = []
             };
 
-            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
+            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId);
+
+            for (int i = 0; i < budgetEntries.Count; i++)
             {
                 string key = i.ToString();
                 asset.count[key] = new CountEntry { TotalCount = 0 };
@@ -432,7 +432,9 @@ namespace TransportLinesManager
                     continue;
                 }
 
-                int budgetCount = currentConfig.BudgetEntries?.Count > 0 ? currentConfig.BudgetEntries.Count : 1;                   
+                var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId);
+
+                int budgetCount = budgetEntries?.Count > 0 ? budgetEntries.Count : 1;                   
                 bool isCountBased = lineExt.IsUsingCustomConfig(lineId) && lineExt.IsDisplayAbsoluteValues(lineId);
 
                 // For count-based: count actual vehicles on the line per asset name
@@ -496,8 +498,8 @@ namespace TransportLinesManager
                     currentConfig.AssetTransportList[i] = asset; // struct re-assign
                 }
 
-                var curreentSlot = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
-                TLMLineUtils.EnsureUsedCountSlotSynchronized(lineId, curreentSlot);
+                var currentSlot = budgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                TLMLineUtils.EnsureUsedCountSlotSynchronized(lineId, currentSlot);
             }
         }
     }

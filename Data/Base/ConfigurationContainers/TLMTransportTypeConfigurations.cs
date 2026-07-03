@@ -331,7 +331,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 return;
             }
 
-            int index = TLMLineUtils.GetEffectiveConfigForLine(lineID).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+            int index = TLMLineUtils.GetEffectiveExtensionForLine(lineID).GetActiveBudgetEntries(lineID).GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
             TLMLineUtils.EnsureUsedCountSlotSynchronized(lineID, index);
 
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);

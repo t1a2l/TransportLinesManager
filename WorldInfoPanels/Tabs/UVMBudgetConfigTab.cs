@@ -50,12 +50,13 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
                     IBasicExtension ext = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
                     List<TransportAsset> assets = ext.GetAssetTransportListForLine(lineId);
-                    IBasicExtensionStorage cfg = TLMLineUtils.GetEffectiveConfigForLine(lineId);
 
-                    for (int i = 0; i < cfg.BudgetEntries.Count; i++)
+                    var budgetEntries = ext.GetActiveBudgetEntries(lineId);
+
+                    for (int i = 0; i < budgetEntries.Count; i++)
                     {
                         string key = i.ToString();
-                        float pct = cfg.BudgetEntries[i].Value / 100f;
+                        float pct = budgetEntries[i].Value / 100f;
                         int budget = TLMLineUtils.ProjectTargetVehicleCount(
                             TransportManager.instance.m_lines.m_buffer[lineId].Info,
                             TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength, pct);

@@ -61,7 +61,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                     var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
                     if (index == -1)
                     {
-                        var hourIndex = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                        var hourIndex = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId).GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
                         index = hourIndex != -1 ? hourIndex : 0;
                     }
                     bool isAllowed = allowedTransportAssets.Any(item => item.name == m_currentAsset);
@@ -107,7 +107,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 bool isActiveSlot = false;
                 if (!isIntercity)
                 {
-                    int activeSlot = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                    int activeSlot = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId).GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
                     isActiveSlot = index == activeSlot;
                 }
 
@@ -164,7 +164,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 return;
             }
 
-            bool isActiveSlot = index == TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+            bool isActiveSlot = index == TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId).GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
             if (!isActiveSlot)
             {
                 m_usedCount.opacity = 0.3f;
@@ -224,6 +224,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 {
                     IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
                     List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
+                    var budgetEntries = config.GetActiveBudgetEntries(lineId);
+
                     if (allowedTransportAssets.Any(item => item.name == m_currentAsset))
                     {
                         IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
@@ -236,7 +238,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                         var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
                         if (index == -1)
                         {
-                            var hourIndex = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                            var hourIndex = budgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
                             index = hourIndex != -1 ? hourIndex : 0;
                         }
 
@@ -245,7 +247,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
                         if (isAbsolute)
                         {
-                            float budgetPercent = currentConfig.BudgetEntries[index].Value / 100f;
+                            float budgetPercent = budgetEntries[index].Value / 100f;
                             float lineLength = TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength;
                             TransportInfo transportInfo = TransportManager.instance.m_lines.m_buffer[lineId].Info;
                             int maxVehicles = TLMLineUtils.ProjectTargetVehicleCount(transportInfo, lineLength, budgetPercent);

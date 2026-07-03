@@ -5,6 +5,7 @@ using Commons.Extensions.UI;
 using Commons.UI.SpriteNames;
 using Commons.Utils;
 using TransportLinesManager.Data.Base;
+using TransportLinesManager.Data.Extensions;
 using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.Tabs;
 using UnityEngine;
@@ -279,8 +280,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                         bool isDuplicate = false;
                         if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && !fromBuilding)
                         {
-                            var config = TLMLineUtils.GetEffectiveConfigForLine(lineId);
-                            foreach (var entry in config.BudgetEntries)
+                            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId);
+                            foreach (var entry in budgetEntries)
                             {
                                 // skip checking against self
                                 if (entry.HourOfDay == Entry.HourOfDay) continue;

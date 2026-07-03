@@ -28,6 +28,7 @@ namespace TransportLinesManager.Data.Extensions
         {
             List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
             IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId);
             var ext = TLMTransportLineExtension.Instance;
 
             bool isCustomConfig = ext.IsUsingCustomConfig(lineId);
@@ -48,7 +49,7 @@ namespace TransportLinesManager.Data.Extensions
 
             if (lineId != 0)
             {    
-                for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
+                for (int i = 0; i < budgetEntries.Count; i++)
                 {
                     var count = new CountEntry
                     {
@@ -65,7 +66,7 @@ namespace TransportLinesManager.Data.Extensions
                 var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
                 if (index == -1)
                 {
-                    var hourIndex = TLMLineUtils.GetEffectiveConfigForLine(lineId).BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                    var hourIndex = budgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
                     index = hourIndex != -1 ? hourIndex : 0;
                 }
                 if (isAbsolute)
@@ -77,7 +78,7 @@ namespace TransportLinesManager.Data.Extensions
                     }
                     var newCount = int.Parse(weight);
                     // check if the new total is more then allowed if so make it zero
-                    if (totalCount + newCount > currentConfig.BudgetEntries[index].Value)
+                    if (totalCount + newCount > budgetEntries[index].Value)
                     {
                         newCount = 0;
                     }
@@ -98,8 +99,10 @@ namespace TransportLinesManager.Data.Extensions
         public static void AddDefaultToNewBudgetEntry<T>(this T it, ushort lineId) where T : IAssetSelectorExtension
         {
             List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
-            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
-            int newIndex = currentConfig.BudgetEntries.Count - 1;
+
+            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId);
+
+            int newIndex = budgetEntries.Count - 1;
             for (int i = 0; i < list.Count; i++)
             {
                 var count = new CountEntry

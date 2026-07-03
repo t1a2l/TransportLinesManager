@@ -370,17 +370,18 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(targetAssets.Count);
             List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
             List<string> allowedAssets = config.GetAssetListForLine(lineId);
-            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
-            if (lineId > 0 && currentConfig.BudgetEntries.Count == 0)
+            var budgetEntries = config.GetActiveBudgetEntries(lineId);
+
+            if (lineId > 0 && budgetEntries.Count == 0)
             {
                 TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineId); // triggers lazy init
-                currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId); // re-fetch
+                config = TLMLineUtils.GetEffectiveExtensionForLine(lineId); // re-fetch
             }
             if (allowedAssets.Count > 0)
             {
                 foreach (var asset in allowedAssets)
                 {
-                    var item = InitTransportItem(asset, currentConfig);
+                    var item = InitTransportItem(asset, config, lineId);
                     allowedTransportAssets.Add(item);
                 }
                 config.SetAssetListForLine(lineId, []);
@@ -402,7 +403,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
                 m_budgetEntriesInUiOrder.Clear();
 
-                var entriesInUiOrder = currentConfig.BudgetEntries.Cast<BudgetEntryXml>().OrderBy(x => x.HourOfDay).ToList();
+                var entriesInUiOrder = budgetEntries.Cast<BudgetEntryXml>().OrderBy(x => x.HourOfDay).ToList();
 
                 m_budgetEntriesInUiOrder.AddRange(entriesInUiOrder);
                 m_timeBudgetSelect.items = [.. entriesInUiOrder.Select(x => x.HourOfDay.ToString())];
@@ -416,7 +417,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
                 if (selectedUiIndex < 0)
                 {
-                    var currentExact = currentConfig.BudgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer);
+                    var currentExact = budgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer);
                     int backingIndex = currentExact.Second;
 
                     if (backingIndex >= 0 && currentExact.First is BudgetEntryXml currentEntry)
@@ -473,8 +474,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
         }
 
-        private TransportAsset InitTransportItem(string assetName, IBasicExtensionStorage currentConfig)
+        private TransportAsset InitTransportItem(string assetName, IBasicExtension currentConfig, ushort lineId)
         {
+            var budgetEntries = currentConfig.GetActiveBudgetEntries(lineId);
             var item = new TransportAsset
             {
                 name = assetName,
@@ -482,7 +484,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 count = [],
                 spawn_percent = []
             };
-            for (int i = 0; i < currentConfig.BudgetEntries.Count; i++)
+            for (int i = 0; i < budgetEntries.Count; i++)
             {
                 var item_count = new CountEntry
                 {
@@ -589,9 +591,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 m_weightColumnHeader.text = Locale.Get("TLM_ASSET_COUNT_HEADER"); // e.g. "Count"
                 IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
-                if (budgetIndex >= 0 && budgetIndex < currentConfig.BudgetEntries.Count)
+                var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId);
+
+                if (budgetIndex >= 0 && budgetIndex < budgetEntries.Count)
                 {
-                    float budgetPercent = currentConfig.BudgetEntries[budgetIndex].Value / 100f;
+                    float budgetPercent = budgetEntries[budgetIndex].Value / 100f;
                     float lineLength = TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength;
                     TransportInfo info = TransportManager.instance.m_lines.m_buffer[lineId].Info;
                     int maxVehicles = TLMLineUtils.ProjectTargetVehicleCount(info, lineLength, budgetPercent);
@@ -673,10 +677,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public static int GetBudgetEntryBackingIndex(ushort lineId, BudgetEntryXml target)
         {
-            var cfg = TLMLineUtils.GetEffectiveConfigForLine(lineId);
-            for (int i = 0; i < cfg.BudgetEntries.Count; i++)
+            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId);
+            for (int i = 0; i < budgetEntries.Count; i++)
             {
-                if (ReferenceEquals(cfg.BudgetEntries[i], target))
+                if (ReferenceEquals(budgetEntries[i], target))
                 {
                     return i;
                 }
