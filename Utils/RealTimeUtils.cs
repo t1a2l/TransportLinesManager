@@ -13,6 +13,8 @@ namespace TransportLinesManager.Utils
 
         private static GetSchoolOperationHoursDelegate _getSchoolOperationHours;
 
+        private static Func<bool> _isWeekendEnabled;
+
         private static Func<bool> _isWeekend;
 
         // return real time mod school operation hours.
@@ -26,6 +28,12 @@ namespace TransportLinesManager.Utils
             }
             schoolStartHour = 0f;
             schoolEndHour = 0f;
+        }
+
+        public static bool IsWeekendEnabled()
+        {
+            if (!_resolved) Resolve();
+            return _isWeekendEnabled != null && _isWeekendEnabled();
         }
 
         public static bool IsWeekend()
@@ -59,8 +67,9 @@ namespace TransportLinesManager.Utils
                 }
                 Type[] paramTypes = [typeof(float).MakeByRefType(), typeof(float).MakeByRefType()];
                 _getSchoolOperationHours = CreateQuery<GetSchoolOperationHoursDelegate>(bridge, "GetSchoolOperationHours", paramTypes, typeof(void));
+                _isWeekendEnabled = CreateQuery<Func<bool>>(bridge, "IsWeekendEnabled", Type.EmptyTypes, typeof(bool));
                 _isWeekend = CreateQuery<Func<bool>>(bridge, "IsWeekend", Type.EmptyTypes, typeof(bool));
-                if (_getSchoolOperationHours != null && _isWeekend != null)
+                if (_getSchoolOperationHours != null && _isWeekendEnabled != null && _isWeekend != null)
                 {
                     Debug.Log("RealTimeUtils: Real Time bridge bound (ApiVersion >= 1) Success");
                 }

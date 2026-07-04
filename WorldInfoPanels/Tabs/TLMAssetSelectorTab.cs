@@ -96,6 +96,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private UISprite m_timeBudgetSelectLabelSprite;
         private static UIDropDown m_timeBudgetSelect;
 
+        private UILabel m_budgetProfileLabel;
         private UIDropDown m_budgetProfileDropdown;
 
         private TransportSystemDefinition TransportSystem => UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
@@ -149,6 +150,15 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_timeBudgetSelect.listPosition = UIDropDown.PopupListPosition.Automatic;
             m_timeBudgetSelect.eventSelectedIndexChanged += TimeBudgetSelect_eventSelectedIndexChanged;
 
+            MonoUtils.CreateUIElement(out m_budgetProfileLabel, MainPanel.transform);
+            m_budgetProfileLabel.name = "BudgetProfileLabel";
+            m_budgetProfileLabel.text = Locale.Get("TLM_BUDGET_PROFILE");
+            m_budgetProfileLabel.textScale = 0.9f;
+            m_budgetProfileLabel.autoSize = false;
+            m_budgetProfileLabel.width = 120f;
+            m_budgetProfileLabel.height = 22f;
+            m_budgetProfileLabel.relativePosition = new Vector3(5f, 0f);
+
             var ddGo = Instantiate(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate).GetComponent<UIPanel>().Find<UIDropDown>("Dropdown").gameObject, MainPanel.transform);
 
             m_budgetProfileDropdown = ddGo.GetComponent<UIDropDown>();
@@ -166,7 +176,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 Locale.Get("TLM_BUDGET_PROFILE_WEEKEND")
             ];
             m_budgetProfileDropdown.selectedIndex = 0;
-            m_budgetProfileDropdown.relativePosition = new Vector3(102f, 94f);
+            m_budgetProfileDropdown.relativePosition = new Vector3(5f, 24f);
             m_budgetProfileDropdown.eventSelectedIndexChanged += OnBudgetProfileChanged;
 
             CreateScrollPanel();
@@ -390,6 +400,21 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 int prefix = (int)TLMPrefixesUtils.GetPrefix(GetLineID());
                 m_title.text = string.Format(Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE_PREFIX"), prefix > 0 ? NumberingUtils.GetStringFromNumber(TLMPrefixesUtils.GetStringOptionsForPrefix(tsd), prefix + 1) : Locale.Get("TLM_UNPREFIXED"), tsd.GetTransportName());
             }
+
+            bool enabled = false;
+
+            var cfg = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+
+            if (cfg != null)
+            {
+                enabled = cfg?.UseSeparateWeekendBudget == true;
+            }
+
+            m_budgetProfileLabel?.isVisible = enabled;
+            m_budgetProfileDropdown?.isVisible = enabled;
+
+            m_budgetProfileLabel.relativePosition = new Vector3(5f, 0f);
+            m_budgetProfileDropdown?.relativePosition = new Vector3(5f, 24f);
         }
 
         private void UpdateAssetList(IBasicExtension config)

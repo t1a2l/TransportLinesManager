@@ -259,7 +259,7 @@ namespace TransportLinesManager.Data.Extensions
         {
             var budgetStorage = it.SafeGet(it.LineToIndex(lineId));
             bool useWeekend = IsWeekendBudgetActive(budgetStorage);
-            return useWeekend ? (budgetStorage.WeekendBudgetEntries ?? budgetStorage.BudgetEntries) : budgetStorage.BudgetEntries;
+            return useWeekend ? (budgetStorage.WeekendBudgetEntries ?? []) : budgetStorage.BudgetEntries;
         }
 
         public static void SetActiveBudgetMultiplierForLine<T>(this T it, ushort lineId, uint multiplier, int hour) where T : IBudgetableExtension

@@ -20,13 +20,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
     {
         private UICheckBox m_showAbsoluteCheckbox;
 
-        private UICheckBox m_useSeparateWeekendBudget;
+        private UICheckBox m_useSeparateWeekendBudgetCheckbox;
 
         private UILabel m_budgetProfileLabel;
 
         private UIDropDown m_budgetProfileDropdown;
-
-        private UIButton m_copyWeekdayToWeekendButton;
 
         private bool m_isLoading;
 
@@ -85,8 +83,18 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         public override void ExtraOnSetTarget(ushort lineID)
         {
             m_isLoading = true;  // prevent eventCheckChanged from firing
-            m_showAbsoluteCheckbox.isVisible = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineID);
-            m_showAbsoluteCheckbox.isChecked = TLMTransportLineExtension.Instance.IsDisplayAbsoluteValues(lineID);
+
+            var lineExt = TLMTransportLineExtension.Instance;
+            var cfg = TLMLineUtils.GetEffectiveConfigForLine(lineID);
+
+            m_showAbsoluteCheckbox.isVisible = lineExt.IsUsingCustomConfig(lineID);
+            m_showAbsoluteCheckbox.isChecked = lineExt.IsDisplayAbsoluteValues(lineID);
+            m_useSeparateWeekendBudgetCheckbox.isVisible = TLMController.IsRealTimeEnabled && RealTimeUtils.IsWeekendEnabled();
+            m_useSeparateWeekendBudgetCheckbox.isChecked = cfg.UseSeparateWeekendBudget;
+
+            m_budgetProfileLabel.relativePosition = new Vector3(0f, 22f);
+            m_budgetProfileDropdown?.relativePosition = new Vector3(130f, 18f);
+
             m_isLoading = false;
         }
 
@@ -138,18 +146,18 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void CreateWeekendBudgetControls(UIComponent parent)
         {
-            m_useSeparateWeekendBudget = m_uiHelper.AddCheckboxLocale("TLM_USE_SEPARATE_WEEKEND_BUDGET", false, OnUseSeparateWeekendBudgetChanged);
-            m_useSeparateWeekendBudget.name = "UseSeparateWeekendBudget";
-            m_useSeparateWeekendBudget.relativePosition = new Vector3(12f, parent.height - 52f);
+            m_useSeparateWeekendBudgetCheckbox = m_uiHelper.AddCheckboxLocale("TLM_USE_SEPARATE_WEEKEND_BUDGET", false, OnUseSeparateWeekendBudgetChanged);
+            m_useSeparateWeekendBudgetCheckbox.name = "UseSeparateWeekendBudget";
+            m_useSeparateWeekendBudgetCheckbox.relativePosition = new Vector3(12f, parent.height - 52f);
 
             MonoUtils.CreateUIElement(out m_budgetProfileLabel, parent.transform);
             m_budgetProfileLabel.name = "BudgetProfileLabel";
             m_budgetProfileLabel.text = Locale.Get("TLM_BUDGET_PROFILE");
             m_budgetProfileLabel.textScale = 0.9f;
             m_budgetProfileLabel.autoSize = false;
-            m_budgetProfileLabel.width = 90f;
+            m_budgetProfileLabel.width = 120f;
             m_budgetProfileLabel.height = 22f;
-            m_budgetProfileLabel.relativePosition = new Vector3(12f, 96f);
+            m_budgetProfileLabel.relativePosition = new Vector3(0f, 22f);
 
             var ddGo = Instantiate(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate).GetComponent<UIPanel>().Find<UIDropDown>("Dropdown").gameObject, parent.transform);
 
@@ -168,21 +176,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 Locale.Get("TLM_BUDGET_PROFILE_WEEKEND")
             ];
             m_budgetProfileDropdown.selectedIndex = 0;
-            m_budgetProfileDropdown.relativePosition = new Vector3(102f, 94f);
+            m_budgetProfileDropdown.relativePosition = new Vector3(130f, 18f);
             m_budgetProfileDropdown.eventSelectedIndexChanged += OnBudgetProfileChanged;
-
-            m_copyWeekdayToWeekendButton = parent.AddUIComponent<UIButton>();
-            m_copyWeekdayToWeekendButton.name = "CopyWeekdayToWeekendButton";
-            m_copyWeekdayToWeekendButton.text = Locale.Get("TLM_COPY_WEEKDAY_TO_WEEKEND");
-            m_copyWeekdayToWeekendButton.textScale = 0.75f;
-            m_copyWeekdayToWeekendButton.width = 145f;
-            m_copyWeekdayToWeekendButton.height = 22f;
-            m_copyWeekdayToWeekendButton.relativePosition = new Vector3(12f, 122f);
-            m_copyWeekdayToWeekendButton.normalBgSprite = "ButtonMenu";
-            m_copyWeekdayToWeekendButton.hoveredBgSprite = "ButtonMenuHovered";
-            m_copyWeekdayToWeekendButton.pressedBgSprite = "ButtonMenuPressed";
-            m_copyWeekdayToWeekendButton.tooltip = Locale.Get("TLM_COPY_WEEKDAY_TO_WEEKEND_TOOLTIP");
-            m_copyWeekdayToWeekendButton.eventClicked += (_, __) => CopyWeekdayBudgetToWeekend();
 
             UpdateWeekendBudgetUiState();
         }
@@ -205,6 +200,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 m_editingWeekendBudget = false;
                 m_budgetProfileDropdown?.selectedIndex = 0;
+                m_budgetProfileDropdown.relativePosition = new Vector3(130f, 18f);
             }
 
             UpdateWeekendBudgetUiState();
@@ -230,24 +226,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             m_budgetProfileLabel?.isVisible = enabled;
             m_budgetProfileDropdown?.isVisible = enabled;
-            m_copyWeekdayToWeekendButton?.isVisible = enabled;
-        }
 
-        private void CopyWeekdayBudgetToWeekend()
-        {
-            if (!TryGetCurrentLineConfig(out ushort _, out IBudgetStorage cfg))
-            {
-                return;
-            }
-
-            cfg.WeekendBudgetEntries = CloneBudgetEntries(cfg.BudgetEntries);
-
-            if (m_editingWeekendBudget)
-            {
-                ReloadBudgetListFromCurrentProfile();
-            }
-
-            MarkDirty();
+            m_budgetProfileLabel.relativePosition = new Vector3(0f, 22f);
+            m_budgetProfileDropdown?.relativePosition = new Vector3(130f, 18f);
         }
 
         private TimeableList<BudgetEntryXml> CloneBudgetEntries(TimeableList<BudgetEntryXml> src)
