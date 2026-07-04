@@ -179,7 +179,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_budgetProfileDropdown.relativePosition = new Vector3(130f, 18f);
             m_budgetProfileDropdown.eventSelectedIndexChanged += OnBudgetProfileChanged;
 
-            UpdateWeekendBudgetUiState();
+            UpdateWeekendBudgetUIState();
         }
 
         private void OnUseSeparateWeekendBudgetChanged(bool value)
