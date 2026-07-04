@@ -22,6 +22,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private UICheckBox m_useSeparateWeekendBudgetCheckbox;
 
+        private UIPanel m_budgetProfilePanel;
+
         private UILabel m_budgetProfileLabel;
 
         private UIDropDown m_budgetProfileDropdown;
@@ -150,7 +152,13 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_useSeparateWeekendBudgetCheckbox.name = "UseSeparateWeekendBudget";
             m_useSeparateWeekendBudgetCheckbox.relativePosition = new Vector3(12f, parent.height - 52f);
 
-            MonoUtils.CreateUIElement(out m_budgetProfileLabel, parent.transform);
+            MonoUtils.CreateUIElement(out m_budgetProfilePanel, m_uiHelper.Self.transform);
+            m_budgetProfilePanel.name = "BudgetProfilePanel";
+            m_budgetProfilePanel.width = 140f;
+            m_budgetProfilePanel.height = 40f;
+            m_budgetProfilePanel.autoLayout = false;
+
+            MonoUtils.CreateUIElement(out m_budgetProfileLabel, m_budgetProfilePanel.transform);
             m_budgetProfileLabel.name = "BudgetProfileLabel";
             m_budgetProfileLabel.text = Locale.Get("TLM_BUDGET_PROFILE");
             m_budgetProfileLabel.textScale = 0.9f;
@@ -159,7 +167,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_budgetProfileLabel.height = 22f;
             m_budgetProfileLabel.relativePosition = new Vector3(0f, 22f);
 
-            var ddGo = Instantiate(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate).GetComponent<UIPanel>().Find<UIDropDown>("Dropdown").gameObject, parent.transform);
+            var ddGo = Instantiate(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate).GetComponent<UIPanel>().Find<UIDropDown>("Dropdown").gameObject, m_budgetProfilePanel.transform);
 
             m_budgetProfileDropdown = ddGo.GetComponent<UIDropDown>();
             m_budgetProfileDropdown.name = "BudgetProfileDropdown";
@@ -213,7 +221,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             m_editingWeekendBudget = value == 1;
             ReloadBudgetListFromCurrentProfile();
-            UpdateWeekendBudgetUiState();
+            UpdateWeekendBudgetUIState();
         }
 
         private void UpdateWeekendBudgetUIState()
@@ -225,6 +233,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 enabled = cfg?.UseSeparateWeekendBudget == true;
             }
 
+            m_budgetProfilePanel?.isVisible = enabled;
             m_budgetProfileLabel?.isVisible = enabled;
             m_budgetProfileDropdown?.isVisible = enabled;
 
