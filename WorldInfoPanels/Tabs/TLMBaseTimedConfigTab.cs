@@ -61,7 +61,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             ((UIPanel)m_uiHelper.Self).autoLayoutDirection = LayoutDirection.Horizontal;
             ((UIPanel)m_uiHelper.Self).wrapLayout = true;
-            ((UIPanel)m_uiHelper.Self).autoLayout = false;
+            ((UIPanel)m_uiHelper.Self).autoLayout = true;
 
             UILabel titleLabel = m_uiHelper.AddLabel("");
             titleLabel.autoSize = true;
