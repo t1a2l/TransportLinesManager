@@ -163,7 +163,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             m_budgetProfileDropdown = ddGo.GetComponent<UIDropDown>();
             m_budgetProfileDropdown.name = "BudgetProfileDropdown";
-            m_budgetProfileDropdown.width = 110f;
+            m_budgetProfileDropdown.width = 140f;
             m_budgetProfileDropdown.height = 24f;
             m_budgetProfileDropdown.textScale = 0.85f;
             m_budgetProfileDropdown.itemHeight = 24;
