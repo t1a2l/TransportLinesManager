@@ -57,7 +57,11 @@ namespace TransportLinesManager.Overrides
                     TLMController.Instance.LineCreationToolbox.IncrementNumber(tsd);
                     if (TLMController.IsSchoolBusesEnabled)
                     {
-                        TLMController.ApplySchoolBusPresetToNewLine(lineID, tsd);
+                        var schoolBuildingId = SchoolBusUtils.GetSchoolBuilding(lineID);
+                        if(schoolBuildingId != 0)
+                        {
+                            TLMController.ApplySchoolBusPresetToNewLine(lineID, schoolBuildingId, tsd);
+                        }
                     }
                 }
             }

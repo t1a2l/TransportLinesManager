@@ -354,10 +354,13 @@ namespace TransportLinesManager.Data.Extensions
         public static List<ushort> GetAllowedDepots<T>(this T it, TransportSystemDefinition tsd, ushort lineId) where T : IDepotSelectableExtension
         {
             IDepotSelectionStorage data = it.SafeGet(it.LineToIndex(lineId));
-            var buildingId = SchoolBusUtils.GetSchoolBuilding(lineId);
-            if (buildingId != 0)
+            if(TLMController.IsSchoolBusesEnabled)
             {
-                return [buildingId];
+                var buildingId = SchoolBusUtils.GetSchoolBuilding(lineId);
+                if (buildingId != 0)
+                {
+                    return [buildingId];
+                }
             }
             List<ushort> saida = TLMDepotUtils.GetAllDepotsFromCity(tsd);
             if (data.DepotsAllowed == null)

@@ -169,7 +169,7 @@ namespace TransportLinesManager
 
         public static void AutoName(ushort m_LineID) => TLMLineUtils.SetLineName(m_LineID, TLMLineUtils.CalculateAutoName(m_LineID, false, out _));
 
-        public static void ApplySchoolBusPresetToNewLine(ushort lineId, TransportSystemDefinition tsd)
+        public static void ApplySchoolBusPresetToNewLine(ushort lineId, ushort schoolBuildingId, TransportSystemDefinition tsd)
         {
             if (lineId == 0 || tsd == null)
             {
@@ -247,9 +247,7 @@ namespace TransportLinesManager
             }
 
             lineExt.SetAssetTransportListForLine(lineId, [asset]);
-
-            ushort buildingId = SchoolBusUtils.GetSchoolBuilding(lineId);
-            lineExt.AddDepotForLine(lineId, buildingId);
+            lineExt.AddDepotForLine(lineId, schoolBuildingId);
         }
 
         //------------------------------------
