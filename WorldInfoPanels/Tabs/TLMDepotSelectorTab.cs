@@ -199,11 +199,20 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             var lineId = GetLineID(out _);
             List<ushort> cityDepotList = [];
             List<ushort> targetDepotList = [];
-            var buildingId = SchoolBusUtils.GetSchoolBuilding(lineId);
-            if (buildingId != 0)
+            bool isSchoolLine = false;
+            ushort schoolBuildingId = 0;
+            if (TLMController.IsSchoolBusesEnabled)
             {
-                cityDepotList.Add(buildingId);
-                targetDepotList.Add(buildingId);
+                schoolBuildingId = SchoolBusUtils.GetSchoolBuilding(lineId);
+                if (schoolBuildingId != 0)
+                {
+                    isSchoolLine = true;
+                }
+            }
+            if (isSchoolLine)
+            {
+                cityDepotList.Add(schoolBuildingId);
+                targetDepotList.Add(schoolBuildingId);
             }
             else
             {

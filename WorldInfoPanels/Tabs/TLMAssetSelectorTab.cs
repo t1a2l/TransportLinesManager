@@ -126,7 +126,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             MonoUtils.UiTextFieldDefaults(m_nameFilter);
             MonoUtils.InitButtonFull(m_nameFilter, false, "OptionsDropboxListbox");
             m_nameFilter.tooltip = Locale.Get("TLM_ASSET_FILTERBY");
-            m_nameFilter.relativePosition = new Vector3(5f, 50f);
+            m_nameFilter.relativePosition = new Vector3(5f, 75f);
             m_nameFilter.height = 23;
             m_nameFilter.width = 170f;
             m_nameFilter.eventKeyUp += (x, y) => UpdateAssetList(TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem));
@@ -137,17 +137,18 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             MonoUtils.CreateUIElement(out m_timeBudgetSelectLabelSprite, MainPanel.transform);
             m_timeBudgetSelectLabelSprite.spriteName = "InfoPanelIconCurrency";
-            m_timeBudgetSelectLabelSprite.size = new Vector2(40, 40);
+            m_timeBudgetSelectLabelSprite.size = new Vector2(35, 35);
             m_timeBudgetSelectLabelSprite.relativePosition = new Vector3(MainPanel.width - 140f, 20f);
             m_timeBudgetSelectLabelSprite.tooltipLocaleID = "TLM_START_HOUR";
 
             m_timeBudgetSelect = UIHelperExtension.CloneBasicDropDownNoLabel([], ChangeBudgetTime, MainPanel);
             m_timeBudgetSelect.tooltipLocaleID = "TLM_TIME_PERCENT_LABEL";
             m_timeBudgetSelect.relativePosition = new Vector3(MainPanel.width - 100f, 25f);
-            m_timeBudgetSelect.height = 30f;
-            m_timeBudgetSelect.width = 90f;
+            m_timeBudgetSelect.height = 24f;
+            m_timeBudgetSelect.width = 80f;
             m_timeBudgetSelect.horizontalAlignment = UIHorizontalAlignment.Left;
             m_timeBudgetSelect.listPosition = UIDropDown.PopupListPosition.Automatic;
+            m_timeBudgetSelect.textScale = 0.90f;
             m_timeBudgetSelect.eventSelectedIndexChanged += TimeBudgetSelect_eventSelectedIndexChanged;
 
             MonoUtils.CreateUIElement(out m_budgetProfileLabel, MainPanel.transform);
@@ -157,7 +158,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_budgetProfileLabel.autoSize = false;
             m_budgetProfileLabel.width = 120f;
             m_budgetProfileLabel.height = 22f;
-            m_budgetProfileLabel.relativePosition = new Vector3(5f, 0f);
+            m_budgetProfileLabel.relativePosition = new Vector3(5f, 30f);
 
             var ddGo = Instantiate(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate).GetComponent<UIPanel>().Find<UIDropDown>("Dropdown").gameObject, MainPanel.transform);
 
@@ -176,7 +177,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 Locale.Get("TLM_BUDGET_PROFILE_WEEKEND")
             ];
             m_budgetProfileDropdown.selectedIndex = 0;
-            m_budgetProfileDropdown.relativePosition = new Vector3(5f, 24f);
+            m_budgetProfileDropdown.relativePosition = new Vector3(125f, 26f);
             m_budgetProfileDropdown.eventSelectedIndexChanged += OnBudgetProfileChanged;
 
             CreateScrollPanel();
@@ -191,7 +192,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_capacityColumnHeader.autoSize = false;
             m_capacityColumnHeader.width = 50f;
             m_capacityColumnHeader.height = 20f;
-            m_capacityColumnHeader.relativePosition = new Vector3(MainPanel.width - 148f, 60f);
+            m_capacityColumnHeader.relativePosition = new Vector3(MainPanel.width - 148f, 85f);
             m_capacityColumnHeader.textScale = 0.65f;
             m_capacityColumnHeader.textAlignment = UIHorizontalAlignment.Center;
             m_capacityColumnHeader.localeID = "TLM_ASSET_CAPACITY_FIELD_HEADER";
@@ -200,7 +201,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_weightColumnHeader.autoSize = false;
             m_weightColumnHeader.width = 50f;
             m_weightColumnHeader.height = 20f;
-            m_weightColumnHeader.relativePosition = new Vector3(MainPanel.width - 98f, 60f);
+            m_weightColumnHeader.relativePosition = new Vector3(MainPanel.width - 98f, 85f);
             m_weightColumnHeader.textScale = 0.65f;
             m_weightColumnHeader.textAlignment = UIHorizontalAlignment.Center;
             // text set dynamically in UpdateModeIndicator()
@@ -209,7 +210,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_usedCountColumnHeader.autoSize = false;
             m_usedCountColumnHeader.width = 50f;
             m_usedCountColumnHeader.height = 20f;
-            m_usedCountColumnHeader.relativePosition = new Vector3(MainPanel.width - 57f, 60f);
+            m_usedCountColumnHeader.relativePosition = new Vector3(MainPanel.width - 60f, 85f);
             m_usedCountColumnHeader.textScale = 0.65f;
             m_usedCountColumnHeader.textAlignment = UIHorizontalAlignment.Center;
 
@@ -333,15 +334,15 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_title.autoSize = false;
             m_title.autoHeight = false;
             m_title.width = MainPanel.width - 55f;
-            m_title.height = 45f; 
-            m_title.relativePosition = new Vector3(5, 10);
+            m_title.height = 18f; 
+            m_title.relativePosition = new Vector3(5, 2);
             m_title.textScale = 0.9f;
             m_title.localeID = "TLM_ASSETS_FOR_PREFIX";
         }
 
         private void CreateScrollPanel()
         {
-            MonoUtils.CreateScrollPanel(MainPanel, out m_scrollablePanel, out _, MainPanel.width - 25f, MainPanel.height - 220f, new Vector3(5, 75));
+            MonoUtils.CreateScrollPanel(MainPanel, out m_scrollablePanel, out _, MainPanel.width - 25f, MainPanel.height - 245f, new Vector3(5, 100));
             m_scrollablePanel.backgroundSprite = "ScrollbarTrack";
             m_scrollablePanel.scrollPadding.top = 10;
             m_scrollablePanel.scrollPadding.bottom = 10;
@@ -392,13 +393,15 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
             else if (config is TLMTransportLineConfiguration)
             {
-                m_title.text = string.Format(Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE"), TLMLineUtils.GetLineStringId(GetLineID(), false));
-                
+                m_title.text = Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE") + " - ";
+                m_title.text += TLMLineUtils.GetLineStringId(GetLineID(), false);               
             }
             else
             {
                 int prefix = (int)TLMPrefixesUtils.GetPrefix(GetLineID());
-                m_title.text = string.Format(Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE_PREFIX"), prefix > 0 ? NumberingUtils.GetStringFromNumber(TLMPrefixesUtils.GetStringOptionsForPrefix(tsd), prefix + 1) : Locale.Get("TLM_UNPREFIXED"), tsd.GetTransportName());
+                m_title.text = Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE_PREFIX") + " - "; 
+                m_title.text += prefix > 0 ? NumberingUtils.GetStringFromNumber(TLMPrefixesUtils.GetStringOptionsForPrefix(tsd), prefix + 1) : Locale.Get("TLM_UNPREFIXED");
+                m_title.text += " " + tsd.GetTransportName();
             }
 
             bool enabled = false;
@@ -413,8 +416,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_budgetProfileLabel?.isVisible = enabled;
             m_budgetProfileDropdown?.isVisible = enabled;
 
-            m_budgetProfileLabel.relativePosition = new Vector3(5f, 0f);
-            m_budgetProfileDropdown?.relativePosition = new Vector3(5f, 24f);
+            m_budgetProfileLabel.relativePosition = new Vector3(5f, 30f);
+            m_budgetProfileDropdown?.relativePosition = new Vector3(125f, 26f);
         }
 
         private void UpdateAssetList(IBasicExtension config)
