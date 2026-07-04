@@ -138,12 +138,12 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             MonoUtils.CreateUIElement(out m_timeBudgetSelectLabelSprite, MainPanel.transform);
             m_timeBudgetSelectLabelSprite.spriteName = "InfoPanelIconCurrency";
             m_timeBudgetSelectLabelSprite.size = new Vector2(35, 35);
-            m_timeBudgetSelectLabelSprite.relativePosition = new Vector3(MainPanel.width - 140f, 20f);
+            m_timeBudgetSelectLabelSprite.relativePosition = new Vector3(MainPanel.width - 140f, 50f);
             m_timeBudgetSelectLabelSprite.tooltipLocaleID = "TLM_START_HOUR";
 
             m_timeBudgetSelect = UIHelperExtension.CloneBasicDropDownNoLabel([], ChangeBudgetTime, MainPanel);
             m_timeBudgetSelect.tooltipLocaleID = "TLM_TIME_PERCENT_LABEL";
-            m_timeBudgetSelect.relativePosition = new Vector3(MainPanel.width - 100f, 25f);
+            m_timeBudgetSelect.relativePosition = new Vector3(MainPanel.width - 100f, 55f);
             m_timeBudgetSelect.height = 24f;
             m_timeBudgetSelect.width = 80f;
             m_timeBudgetSelect.horizontalAlignment = UIHorizontalAlignment.Left;
@@ -177,7 +177,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 Locale.Get("TLM_BUDGET_PROFILE_WEEKEND")
             ];
             m_budgetProfileDropdown.selectedIndex = 0;
-            m_budgetProfileDropdown.relativePosition = new Vector3(125f, 26f);
+            m_budgetProfileDropdown.relativePosition = new Vector3(5f, 48f);
             m_budgetProfileDropdown.eventSelectedIndexChanged += OnBudgetProfileChanged;
 
             CreateScrollPanel();
@@ -233,6 +233,22 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
             UpdateAssetList(config);
+        }
+
+        internal void UpdateWeekendBudgetUIState()
+        {
+            bool enabled = false;
+
+            if (TryGetCurrentLineConfig(out ushort _, out IBudgetStorage cfg))
+            {
+                enabled = cfg?.UseSeparateWeekendBudget == true;
+            }
+
+            m_budgetProfileLabel?.isVisible = enabled;
+            m_budgetProfileDropdown?.isVisible = enabled;
+
+            m_budgetProfileLabel.relativePosition = new Vector3(5f, 30f);
+            m_budgetProfileDropdown?.relativePosition = new Vector3(125f, 26f);
         }
 
         private void CreateTemplateList()
@@ -333,9 +349,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_title.textAlignment = UIHorizontalAlignment.Center;
             m_title.autoSize = false;
             m_title.autoHeight = false;
+            m_title.wordWrap = false;
             m_title.width = MainPanel.width - 55f;
-            m_title.height = 18f; 
-            m_title.relativePosition = new Vector3(5, 2);
+            m_title.height = 45f; 
+            m_title.relativePosition = new Vector3(5, 10);
             m_title.textScale = 0.9f;
             m_title.localeID = "TLM_ASSETS_FOR_PREFIX";
         }
@@ -393,15 +410,12 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
             else if (config is TLMTransportLineConfiguration)
             {
-                m_title.text = Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE") + " - ";
-                m_title.text += TLMLineUtils.GetLineStringId(GetLineID(), false);               
+                m_title.text = string.Format(Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE"), TLMLineUtils.GetLineStringId(GetLineID(), false));
             }
             else
             {
                 int prefix = (int)TLMPrefixesUtils.GetPrefix(GetLineID());
-                m_title.text = Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE_PREFIX") + " - "; 
-                m_title.text += prefix > 0 ? NumberingUtils.GetStringFromNumber(TLMPrefixesUtils.GetStringOptionsForPrefix(tsd), prefix + 1) : Locale.Get("TLM_UNPREFIXED");
-                m_title.text += " " + tsd.GetTransportName();
+                m_title.text = string.Format(Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE_PREFIX"), prefix > 0 ? NumberingUtils.GetStringFromNumber(TLMPrefixesUtils.GetStringOptionsForPrefix(tsd), prefix + 1) : Locale.Get("TLM_UNPREFIXED"), tsd.GetTransportName());
             }
 
             bool enabled = false;
@@ -748,7 +762,19 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         }
 
         private void RedrawModel() => m_previewRenderer.RenderVehicle(m_lastInfo, m_lastColor == Color.clear ? Color.HSVToRGB(Math.Abs(m_previewRenderer.CameraRotation) / 360f, .5f, .5f) : m_lastColor, true);
-        
+
+        private bool TryGetCurrentLineConfig(out ushort lineId, out IBudgetStorage cfg)
+        {
+            cfg = null;
+            if (!UVMPublicTransportWorldInfoPanel.GetLineID(out lineId, out bool fromBuilding) || fromBuilding)
+            {
+                return false;
+            }
+
+            cfg = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+            return cfg != null;
+        }
+
         public void OnEnable()
         { }
 

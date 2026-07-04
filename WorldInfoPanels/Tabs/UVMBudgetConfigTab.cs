@@ -203,7 +203,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 m_budgetProfileDropdown.relativePosition = new Vector3(130f, 18f);
             }
 
-            UpdateWeekendBudgetUiState();
+            UpdateWeekendBudgetUIState();
+            TLMAssetSelectorTab.Instance.UpdateWeekendBudgetUIState();
             ReloadBudgetListFromCurrentProfile();
             MarkDirty();
         }
@@ -215,7 +216,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             UpdateWeekendBudgetUiState();
         }
 
-        private void UpdateWeekendBudgetUiState()
+        private void UpdateWeekendBudgetUIState()
         {
             bool enabled = false;
 
@@ -272,7 +273,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             cfg = TLMLineUtils.GetEffectiveConfigForLine(lineId);
             return cfg != null;
-
         }
     }
 }
