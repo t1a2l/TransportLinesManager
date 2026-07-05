@@ -38,7 +38,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public override float GetMaxSliderValue() => 500;
 
-        public BudgetTarget CurrentBudgetTarget => m_editingWeekendBudget ? BudgetTarget.Weekend : BudgetTarget.Weekday;
+        public ProfileTarget CurrentProfileTarget => m_editingWeekendBudget ? ProfileTarget.Weekend : ProfileTarget.Weekday;
 
         public override void ExtraAwake()
         {
@@ -92,7 +92,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_showAbsoluteCheckbox.isVisible = lineExt.IsUsingCustomConfig(lineID);
             m_showAbsoluteCheckbox.isChecked = lineExt.IsDisplayAbsoluteValues(lineID);
             m_useSeparateWeekendBudgetCheckbox.isVisible = TLMController.IsRealTimeEnabled && RealTimeUtils.IsWeekendEnabled();
-            m_useSeparateWeekendBudgetCheckbox.isChecked = cfg.UseSeparateWeekendBudget;
+            m_useSeparateWeekendBudgetCheckbox.isChecked = cfg.UseSeparateWeekendProfile;
 
             m_budgetProfileLabel.relativePosition = new Vector3(0f, 22f);
             m_budgetProfileDropdown?.relativePosition = new Vector3(130f, 18f);
@@ -125,7 +125,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     return null;
                 }
 
-                return CurrentBudgetTarget == BudgetTarget.Weekend ? (cfg.WeekendBudgetEntries ?? []) : cfg.BudgetEntries;
+                return CurrentProfileTarget == ProfileTarget.Weekend ? (cfg.WeekendBudgetEntries ?? []) : cfg.BudgetEntries;
             }
         }
 
@@ -180,8 +180,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_budgetProfileDropdown.normalBgSprite = "OptionsDropboxListbox";
             m_budgetProfileDropdown.items =
             [
-                Locale.Get("TLM_BUDGET_PROFILE_WEEKDAY"),
-                Locale.Get("TLM_BUDGET_PROFILE_WEEKEND")
+                Locale.Get("TLM_PROFILE_WEEKDAY"),
+                Locale.Get("TLM_PROFILE_WEEKEND")
             ];
             m_budgetProfileDropdown.selectedIndex = 0;
             m_budgetProfileDropdown.relativePosition = new Vector3(130f, 18f);
@@ -197,7 +197,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 return;
             }
 
-            cfg.UseSeparateWeekendBudget = value;
+            cfg.UseSeparateWeekendProfile = value;
 
             if (value && (cfg.WeekendBudgetEntries == null || cfg.WeekendBudgetEntries.Count == 0))
             {
@@ -230,7 +230,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             if (TryGetCurrentLineConfig(out ushort _, out IBudgetStorage cfg))
             {
-                enabled = cfg?.UseSeparateWeekendBudget == true;
+                enabled = cfg?.UseSeparateWeekendProfile == true;
             }
 
             m_budgetProfilePanel?.isVisible = enabled;

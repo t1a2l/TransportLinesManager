@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static TransportLinesManager.ModShared.TLMFacade;
+using static TransportLinesManager.Data.Extensions.ExtensionStaticExtensionMethods;
 
 namespace TransportLinesManager.Utils
 {
@@ -731,20 +732,20 @@ namespace TransportLinesManager.Utils
         
         public static float CalculateBudgetForEachVehicle(TransportInfo info, float lineLength) => info.m_defaultVehicleDistance / lineLength;
 
-        public static Tuple<TicketPriceEntryXml, int> GetTicketPriceForLine(TransportSystemDefinition tsd, ushort lineId) => GetTicketPriceForLine(tsd, lineId, ReferenceTimer);
+        public static Tuple<TicketPriceEntryXml, int> GetTicketPriceForLine(TransportSystemDefinition tsd, ushort lineId, ProfileTarget profileTarget) => GetTicketPriceForLine(tsd, lineId, profileTarget, ReferenceTimer);
 
-        public static Tuple<TicketPriceEntryXml, int> GetTicketPriceForLine(TransportSystemDefinition tsd, ushort lineId, float hour)
+        public static Tuple<TicketPriceEntryXml, int> GetTicketPriceForLine(TransportSystemDefinition tsd, ushort lineId, ProfileTarget profileTarget, float hour)
         {
             Tuple<TicketPriceEntryXml, int> ticketPrice = null;
             if (lineId > 0)
             {
                 if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
                 {
-                    ticketPrice = TLMTransportLineExtension.Instance.GetTicketPriceForHourForLine(lineId, hour);
+                    ticketPrice = TLMTransportLineExtension.Instance.GetTicketPriceForHourForLine(lineId, hour, profileTarget);
                 }
                 if (ticketPrice == null || ticketPrice.Second < 0)
                 {
-                    ticketPrice = tsd.GetTransportExtension().GetTicketPriceForHourForLine(lineId, hour);
+                    ticketPrice = tsd.GetTransportExtension().GetTicketPriceForHourForLine(lineId, hour, profileTarget);
                 }
             }
             if (ticketPrice == null || ticketPrice.Second < 0)

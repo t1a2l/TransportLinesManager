@@ -24,6 +24,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                     AssetList = [];
                     AssetTransportList = [];
                     TicketPriceEntries = [];
+                    WeekendTicketPriceEntries = [];
                     DepotsAllowed = [];
                 }
                 isCustom = value;
@@ -38,8 +39,8 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         [XmlElement("BudgetWeekend")]
         public TimeableList<BudgetEntryXml> WeekendBudgetEntries { get; set; } = [];
 
-        [XmlAttribute("useSeparateWeekendBudget")]
-        public bool UseSeparateWeekendBudget { get; set; }
+        [XmlAttribute("useSeparateWeekendProfile")]
+        public bool UseSeparateWeekendProfile { get; set; }
 
         [XmlElement("AssetsList")]
         public SimpleXmlList<string> AssetList { get; set; } = [];
@@ -49,6 +50,9 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
 
         [XmlElement("TicketPrices")]
         public TimeableList<TicketPriceEntryXml> TicketPriceEntries { get; set; } = [];
+
+        [XmlElement("TicketPricesWeekend")]
+        public TimeableList<TicketPriceEntryXml> WeekendTicketPriceEntries { get; set; } = [];
 
         [XmlElement("DepotsAllowed")]
         public SimpleXmlHashSet<ushort> DepotsAllowed { get; set; } = [];

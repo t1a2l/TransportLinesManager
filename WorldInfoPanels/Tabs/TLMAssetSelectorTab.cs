@@ -103,7 +103,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private static readonly List<BudgetEntryXml> m_budgetEntriesInUiOrder = [];
 
-        public BudgetTarget CurrentBudgetTarget => m_budgetProfileDropdown?.selectedIndex == 1 ? BudgetTarget.Weekend : BudgetTarget.Weekday;
+        public ProfileTarget CurrentProfileTarget => m_budgetProfileDropdown?.selectedIndex == 1 ? ProfileTarget.Weekend : ProfileTarget.Weekday;
 
         internal static ushort GetLineID()
         {
@@ -241,7 +241,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             if (TryGetCurrentLineConfig(out ushort _, out IBudgetStorage cfg))
             {
-                enabled = cfg?.UseSeparateWeekendBudget == true;
+                enabled = cfg?.UseSeparateWeekendProfile == true;
             }
 
             m_budgetProfileLabel?.isVisible = enabled;
@@ -424,7 +424,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             if (cfg != null)
             {
-                enabled = cfg?.UseSeparateWeekendBudget == true;
+                enabled = cfg?.UseSeparateWeekendProfile == true;
             }
 
             m_budgetProfileLabel?.isVisible = enabled;
@@ -443,7 +443,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(targetAssets.Count);
             List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
             List<string> allowedAssets = config.GetAssetListForLine(lineId);
-            var budgetEntries = config.GetBudgetsMultiplierForLine(lineId, CurrentBudgetTarget);
+            var budgetEntries = config.GetBudgetsMultiplierForLine(lineId, CurrentProfileTarget);
 
             if (lineId > 0 && budgetEntries.Count == 0)
             {
@@ -549,7 +549,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private TransportAsset InitTransportItem(string assetName, IBasicExtension currentConfig, ushort lineId)
         {
-            var budgetEntries = currentConfig.GetBudgetsMultiplierForLine(lineId, CurrentBudgetTarget);
+            var budgetEntries = currentConfig.GetBudgetsMultiplierForLine(lineId, CurrentProfileTarget);
             var item = new TransportAsset
             {
                 name = assetName,
@@ -664,7 +664,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 m_weightColumnHeader.text = Locale.Get("TLM_ASSET_COUNT_HEADER"); // e.g. "Count"
                 IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
-                var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetBudgetsMultiplierForLine(lineId, CurrentBudgetTarget);
+                var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetBudgetsMultiplierForLine(lineId, CurrentProfileTarget);
 
                 if (budgetIndex >= 0 && budgetIndex < budgetEntries.Count)
                 {
@@ -750,7 +750,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public static int GetBudgetEntryBackingIndex(ushort lineId, BudgetEntryXml target)
         {
-            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetBudgetsMultiplierForLine(lineId, Instance.CurrentBudgetTarget);
+            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetBudgetsMultiplierForLine(lineId, Instance.CurrentProfileTarget);
             for (int i = 0; i < budgetEntries.Count; i++)
             {
                 if (ReferenceEquals(budgetEntries[i], target))

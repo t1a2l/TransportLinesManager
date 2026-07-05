@@ -5,7 +5,6 @@ using Commons.Utils.UtilitiesClasses;
 using TransportLinesManager.Data.Base;
 using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Data.Extensions;
-using TransportLinesManager.UI;
 using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.Tabs;
 using UnityEngine;
@@ -19,22 +18,28 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         public override TimeableList<TicketPriceEntryXml> GetCopyTarget()
         {
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineID, out bool fromBuilding);
-            return !fromBuilding ? TLMLineUtils.GetEffectiveExtensionForLine(lineID).GetTicketPricesForLine(lineID) : null;
+            if (!fromBuilding)
+            {
+                return TLMLineUtils.GetEffectiveExtensionForLine(lineID).GetTicketPricesForLine(lineID, TLMTicketConfigTab.Instance.CurrentProfileTarget);
+            }
+            return null;
         }
+
         public override void SetPasteTarget(TimeableList<TicketPriceEntryXml> newVal)
         {
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineID, out bool fromBuilding);
             if (!fromBuilding)
             {
-                TLMLineUtils.GetEffectiveExtensionForLine(lineID).SetTicketPricesForLine(lineID, newVal);
+                TLMLineUtils.GetEffectiveExtensionForLine(lineID).SetAllTicketPricesForLine(lineID, TLMTicketConfigTab.Instance.CurrentProfileTarget, newVal);
             }
         }
+
         public override void OnDeleteTarget()
         {
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineID, out bool fromBuilding);
             if (!fromBuilding)
             {
-                TLMLineUtils.GetEffectiveExtensionForLine(lineID).ClearTicketPricesOfLine(lineID);
+                TLMLineUtils.GetEffectiveExtensionForLine(lineID).RemoveAllTicketPricesForLine(lineID, TLMTicketConfigTab.Instance.CurrentProfileTarget);
             }
         }
 
@@ -78,12 +83,11 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             if (!fromBuilding)
             {
                 var tsd = TransportSystemDefinition.FromLineId(lineID, fromBuilding);
-                Tuple<TicketPriceEntryXml, int> value = TLMLineUtils.GetTicketPriceForLine(tsd, lineID);
+                Tuple<TicketPriceEntryXml, int> value = TLMLineUtils.GetTicketPriceForLine(tsd, lineID, TLMTicketConfigTab.Instance.CurrentProfileTarget);
                 m_effectiveLabel.color = value.Second < 0 ? Color.gray : TLMTicketConfigTab.Instance.ColorOrder[value.Second % TLMTicketConfigTab.Instance.ColorOrder.Count];
                 m_effectiveLabel.text = (value.First.Value / 100f).ToString(Settings.moneyFormat, LocaleManager.cultureInfo);
             }
         }
-
 
         public override string ClockTooltip { get; } = "TLM_TICKET_PRICE_CLOCK";
 

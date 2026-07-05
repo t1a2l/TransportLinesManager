@@ -2,12 +2,13 @@
 using System.Reflection;
 using System.Reflection.Emit;
 using ColossalFramework;
-using HarmonyLib;
 using Commons.Extensions;
 using Commons.Utils;
-using TransportLinesManager.Data.Tsd;
+using HarmonyLib;
 using TransportLinesManager.Data.Managers;
+using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Utils;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 using static EconomyManager;
 
 namespace TransportLinesManager.Overrides
@@ -122,7 +123,7 @@ namespace TransportLinesManager.Overrides
                     multiplier = 1;
                 }
             }
-            uint ticketPriceDefault = TLMLineUtils.GetTicketPriceForLine(def, vehicleData.m_transportLine).First.Value;
+            uint ticketPriceDefault = TLMLineUtils.GetTicketPriceForLine(def, vehicleData.m_transportLine, TLMTicketConfigTab.Instance.CurrentProfileTarget).First.Value;
             LogUtils.DoLog($"GetTicketPriceForVehicle ({vehicleID}): multiplier = {multiplier}, ticketPriceDefault = {ticketPriceDefault}");
 
             return (int)(multiplier * ticketPriceDefault);

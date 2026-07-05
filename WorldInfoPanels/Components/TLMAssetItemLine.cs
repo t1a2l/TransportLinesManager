@@ -50,7 +50,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                     LogUtils.DoLog($"checkbox event: {x.objectUserData} => {y} at {extension}[{lineId}-{fromBuilding}]");
                     if (y)
                     {
-                        extension.AddAssetToLine(fromBuilding ? (ushort)0 : lineId, m_currentAsset, m_capacityEditor.text, m_weightEditor.text, TLMAssetSelectorTab.Instance.CurrentBudgetTarget);
+                        extension.AddAssetToLine(fromBuilding ? (ushort)0 : lineId, m_currentAsset, m_capacityEditor.text, m_weightEditor.text, TLMAssetSelectorTab.Instance.CurrentProfileTarget);
                     }
                     else
                     {
@@ -224,7 +224,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 {
                     IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
                     List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
-                    var budgetEntries = config.GetBudgetsMultiplierForLine(lineId, TLMAssetSelectorTab.Instance.CurrentBudgetTarget);
+                    var budgetEntries = config.GetBudgetsMultiplierForLine(lineId, TLMAssetSelectorTab.Instance.CurrentProfileTarget);
 
                     if (allowedTransportAssets.Any(item => item.name == m_currentAsset))
                     {

@@ -17,7 +17,6 @@ using static TransportLinesManager.WorldInfoPanels.UVMPublicTransportWorldInfoPa
 
 namespace TransportLinesManager.WorldInfoPanels
 {
-
     public class UVMTransportLineLinearMap : UICustomControl, IUVMPTWIPChild
     {
         private UIScrollablePanel m_bg;
@@ -33,9 +32,7 @@ namespace TransportLinesManager.WorldInfoPanels
 
         internal UISprite m_lineEnd;
 
-
         internal float m_uILineLength;
-
         internal float m_uILineOffset;
 
         internal bool m_vehicleCountMismatch;
@@ -57,7 +54,6 @@ namespace TransportLinesManager.WorldInfoPanels
         internal Vector2 m_kLineSSpritePositionForWalkingTours = new(175f, 20f);
 
         internal UILabel m_stopsLabel;
-
         internal UILabel m_vehiclesLabel;
 
         internal UILabel m_connectionLabel;
@@ -70,9 +66,12 @@ namespace TransportLinesManager.WorldInfoPanels
         private UIPanel m_panelModeSelector;
         private ushort[] m_cachedStopOrder;
 
+        private uint m_lastDrawTick;
+
         private static TransportSystemDefinition TransportSystem => UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
 
         #region Overridable
+
         public void Awake()
         {
             m_bg = component as UIScrollablePanel;
@@ -109,49 +108,6 @@ namespace TransportLinesManager.WorldInfoPanels
 
         }
 
-
-        private void BindComponents(PublicTransportWorldInfoPanel __instance)
-        {
-            //STOPS
-            m_stopsContainer = __instance.Find<UIPanel>("StopsPanel");
-            LinearMapStationContainer.EnsureTemplate();
-            m_stopButtons = new UITemplateList<UIPanel>(m_stopsContainer, LinearMapStationContainer.TEMPLATE_NAME);
-            m_vehicleButtons = new UITemplateList<UIButton>(m_stopsContainer, "VehicleButton");
-            m_stopsLineSprite = __instance.Find<UISprite>("StopsLineSprite");
-            m_lineEnd = __instance.Find<UISprite>("LineEnd");
-            m_stopsLabel = __instance.Find<UILabel>("StopsLabel");
-            m_vehiclesLabel = __instance.Find<UILabel>("VehiclesLabel");
-            m_labelLineIncomplete = __instance.Find<UILabel>("LabelLineIncomplete");
-            m_bgScrollbar = __instance.Find<UIScrollbar>("Scrollbar");
-
-
-            UISprite lineStart = __instance.Find<UISprite>("LineStart");
-            lineStart.relativePosition = new Vector3(4, -8);
-
-            m_vehiclesLabel.relativePosition = new Vector3(100, 12);
-
-            m_stopsLineSprite.spriteName = "PlainWhite";
-            m_stopsLineSprite.width = 25;
-
-            m_connectionLabel = Instantiate(m_vehiclesLabel);
-            m_connectionLabel.transform.SetParent(m_vehiclesLabel.transform.parent);
-            m_connectionLabel.absolutePosition = m_vehiclesLabel.absolutePosition;
-            m_connectionLabel.localeID = "TLM_CONNECTIONS";
-
-            TLMLineItemButtonControl.EnsureTemplate();
-            var lineStringButton = m_vehiclesLabel.parent.AttachUIComponent(UITemplateManager.GetAsGameObject(TLMLineItemButtonControl.LINE_ITEM_TEMPLATE)) as UIButton;
-            m_lineTitleBtnCtrl = lineStringButton.GetComponent<TLMLineItemButtonControl>();
-            m_lineTitleBtnCtrl.Resize(36);
-            lineStringButton.relativePosition = new Vector3(170, 4);
-            lineStringButton.Disable();
-        }
-
-        private void AdjustLineStopsPanel(PublicTransportWorldInfoPanel __instance)
-        {
-            m_scrollPanel = __instance.Find<UIScrollablePanel>("ScrollablePanel");
-            m_scrollPanel.eventGotFocus += OnGotFocusBind;
-        }
-
         public void OnEnable()
         {
         }
@@ -159,7 +115,7 @@ namespace TransportLinesManager.WorldInfoPanels
         public void OnDisable()
         {
         }
-        private uint m_lastDrawTick;
+
         public void UpdateBindings()
         {
             if (component.isVisible && (m_lastDrawTick + 23 < SimulationManager.instance.m_referenceFrameIndex || m_dirty))
@@ -195,7 +151,6 @@ namespace TransportLinesManager.WorldInfoPanels
             m_scrollPanel.scrollPosition = m_cachedScrollPosition;
             return false;
         }
-
 
         public void OnSetTarget(Type source)
         {
@@ -355,7 +310,66 @@ namespace TransportLinesManager.WorldInfoPanels
             }
         }
 
+        private void AdjustLineStopsPanel(PublicTransportWorldInfoPanel __instance)
+        {
+            m_scrollPanel = __instance.Find<UIScrollablePanel>("ScrollablePanel");
+            m_scrollPanel.eventGotFocus += OnGotFocusBind;
+        }
+
+        private void BindComponents(PublicTransportWorldInfoPanel __instance)
+        {
+            //STOPS
+            m_stopsContainer = __instance.Find<UIPanel>("StopsPanel");
+            LinearMapStationContainer.EnsureTemplate();
+            m_stopButtons = new UITemplateList<UIPanel>(m_stopsContainer, LinearMapStationContainer.TEMPLATE_NAME);
+            m_vehicleButtons = new UITemplateList<UIButton>(m_stopsContainer, "VehicleButton");
+            m_stopsLineSprite = __instance.Find<UISprite>("StopsLineSprite");
+            m_lineEnd = __instance.Find<UISprite>("LineEnd");
+            m_stopsLabel = __instance.Find<UILabel>("StopsLabel");
+            m_vehiclesLabel = __instance.Find<UILabel>("VehiclesLabel");
+            m_labelLineIncomplete = __instance.Find<UILabel>("LabelLineIncomplete");
+            m_bgScrollbar = __instance.Find<UIScrollbar>("Scrollbar");
+
+
+            UISprite lineStart = __instance.Find<UISprite>("LineStart");
+            lineStart.relativePosition = new Vector3(4, -8);
+
+            m_vehiclesLabel.relativePosition = new Vector3(100, 12);
+
+            m_stopsLineSprite.spriteName = "PlainWhite";
+            m_stopsLineSprite.width = 25;
+
+            m_connectionLabel = Instantiate(m_vehiclesLabel);
+            m_connectionLabel.transform.SetParent(m_vehiclesLabel.transform.parent);
+            m_connectionLabel.absolutePosition = m_vehiclesLabel.absolutePosition;
+            m_connectionLabel.localeID = "TLM_CONNECTIONS";
+
+            TLMLineItemButtonControl.EnsureTemplate();
+            var lineStringButton = m_vehiclesLabel.parent.AttachUIComponent(UITemplateManager.GetAsGameObject(TLMLineItemButtonControl.LINE_ITEM_TEMPLATE)) as UIButton;
+            m_lineTitleBtnCtrl = lineStringButton.GetComponent<TLMLineItemButtonControl>();
+            m_lineTitleBtnCtrl.Resize(36);
+            lineStringButton.relativePosition = new Vector3(170, 4);
+            lineStringButton.Disable();
+        }
+
         #endregion
+
+        public void OnGotFocus() => m_cachedScrollPosition = m_scrollPanel.scrollPosition;
+
+        public bool MayBeVisible() => UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && (fromBuilding || lineId > 0);
+
+        public void Hide()
+        {
+            m_bg.isVisible = false;
+            m_bgScrollbar.isVisible = false;
+            m_unscaledCheck.isVisible = false;
+            m_mapModeDropDown.isVisible = false;
+            m_labelLineIncomplete.isVisible = false;
+        }
+
+        internal LineType GetLineType(ushort lineID, bool fromBuilding) => UVMPublicTransportWorldInfoPanel.GetLineType(lineID, fromBuilding);
+
+        internal ushort GetLineID(out bool fromBuilding) => UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out fromBuilding) ? lineId : (ushort)0;
 
         private void UpdateVehicleButtons(ushort lineID, bool fromBuilding)
         {
@@ -491,16 +505,13 @@ namespace TransportLinesManager.WorldInfoPanels
             if (!fromBuilding)
             {
                 var tsd = TransportSystemDefinition.FromLineId(lineID, fromBuilding);
-                m_vehicleButtons.items[idx].color = Color.Lerp(Color.white, income > expense ? Color.green : Color.red, Mathf.Max(income, expense) / scale * TLMLineUtils.GetTicketPriceForLine(tsd, lineID).First.Value);
+                m_vehicleButtons.items[idx].color = Color.Lerp(Color.white, income > expense ? Color.green : Color.red, Mathf.Max(income, expense) / scale * TLMLineUtils.GetTicketPriceForLine(tsd, lineID, TLMTicketConfigTab.Instance.CurrentProfileTarget).First.Value);
                 labelVehicle.text = $"\n<color #00cc00>{(income / 100.0f).ToString(Settings.moneyFormat, LocaleManager.cultureInfo)}</color>";
                 labelVehicle.suffix = $"\n<color #ff0000>{(expense / 100.0f).ToString(Settings.moneyFormat, LocaleManager.cultureInfo)}</color>";
             }
         }
-
-        public void OnGotFocus() => m_cachedScrollPosition = m_scrollPanel.scrollPosition;
+     
         private void OnGotFocusBind(UIComponent component, UIFocusEventParameter eventParam) => m_cachedScrollPosition = m_scrollPanel.scrollPosition;
-
-        internal LineType GetLineType(ushort lineID, bool fromBuilding) => UVMPublicTransportWorldInfoPanel.GetLineType(lineID, fromBuilding);
 
         private float CalcClampedUILineLength(float initialLineLen, out float lineLenFactor)
         {
@@ -551,17 +562,6 @@ namespace TransportLinesManager.WorldInfoPanels
             }
         }
 
-        public void Hide()
-        {
-            m_bg.isVisible = false;
-            m_bgScrollbar.isVisible = false;
-            m_unscaledCheck.isVisible = false;
-            m_mapModeDropDown.isVisible = false;
-            m_labelLineIncomplete.isVisible = false;
-        }
-
-        internal ushort GetLineID(out bool fromBuilding) => UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out fromBuilding) ? lineId : (ushort)0;
-
         private void UpdateStopButtons()
         {
             foreach (UIPanel uiPanel in m_stopButtons.items)
@@ -569,11 +569,8 @@ namespace TransportLinesManager.WorldInfoPanels
                 uiPanel.GetComponent<LinearMapStationContainer>().UpdateBindings(m_currentMode);
             }
         }
-
-        public bool MayBeVisible() => UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && (fromBuilding || lineId > 0);
-
-
     }
+
     internal enum MapMode
     {
         NONE,

@@ -44,7 +44,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         protected override IEnumerable<BudgetEntryXml> GetEntriesForDuplicateCheck(ushort lineId)
         {
-            return TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetBudgetsMultiplierForLine(lineId, UVMBudgetConfigTab.Instance.CurrentBudgetTarget);
+            return TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetBudgetsMultiplierForLine(lineId, TLMTicketConfigTab.Instance.CurrentProfileTarget);
         }
     }
 

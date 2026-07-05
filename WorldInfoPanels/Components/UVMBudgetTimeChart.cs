@@ -22,7 +22,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineID, out bool fromBuilding);
             if (!fromBuilding)
             {
-                return TLMLineUtils.GetEffectiveExtensionForLine(lineID).GetBudgetsMultiplierForLine(lineID, UVMBudgetConfigTab.Instance.CurrentBudgetTarget);
+                return TLMLineUtils.GetEffectiveExtensionForLine(lineID).GetBudgetsMultiplierForLine(lineID, UVMBudgetConfigTab.Instance.CurrentProfileTarget);
             }
             return null;
         }
@@ -32,7 +32,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineID, out bool fromBuilding);
             if (!fromBuilding)
             {
-                TLMLineUtils.GetEffectiveExtensionForLine(lineID).SetAllBudgetMultipliersForLine(lineID, UVMBudgetConfigTab.Instance.CurrentBudgetTarget, newVal);
+                TLMLineUtils.GetEffectiveExtensionForLine(lineID).SetAllBudgetMultipliersForLine(lineID, UVMBudgetConfigTab.Instance.CurrentProfileTarget, newVal);
             }
         }
 
@@ -41,7 +41,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineID, out bool fromBuilding);
             if (!fromBuilding)
             {
-                TLMLineUtils.GetEffectiveExtensionForLine(lineID).RemoveAllBudgetMultipliersOfLine(lineID, UVMBudgetConfigTab.Instance.CurrentBudgetTarget);
+                TLMLineUtils.GetEffectiveExtensionForLine(lineID).RemoveAllBudgetMultipliersForLine(lineID, UVMBudgetConfigTab.Instance.CurrentProfileTarget);
             }
         }
 

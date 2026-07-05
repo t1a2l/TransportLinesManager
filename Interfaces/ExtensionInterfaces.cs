@@ -15,13 +15,16 @@ namespace TransportLinesManager.Interfaces
     {
     }
 
-    public interface IBudgetStorage
+    public interface IWeekendProfileStorage
+    {
+        bool UseSeparateWeekendProfile { get; set; }
+    }
+
+    public interface IBudgetStorage : IWeekendProfileStorage
     {
         TimeableList<BudgetEntryXml> BudgetEntries { get; set; }
 
         TimeableList<BudgetEntryXml> WeekendBudgetEntries { get; set; }
-
-        bool UseSeparateWeekendBudget { get; set; }
     }
 
     public interface INameableExtension : ISafeGettable<INameableStorage>, ILineNumberToIndexable
@@ -38,9 +41,11 @@ namespace TransportLinesManager.Interfaces
         uint GetDefaultTicketPrice(uint rel);
     }
 
-    public interface ITicketPriceStorage
+    public interface ITicketPriceStorage : IWeekendProfileStorage
     {
-         TimeableList<TicketPriceEntryXml> TicketPriceEntries { get; set; }
+        TimeableList<TicketPriceEntryXml> TicketPriceEntries { get; set; }
+
+        TimeableList<TicketPriceEntryXml> WeekendTicketPriceEntries { get; set; }
     }
 
     public interface IAssetSelectorExtension : ISafeGettable<IAssetSelectorStorage>, ILineNumberToIndexable
@@ -89,7 +94,7 @@ namespace TransportLinesManager.Interfaces
     }
 
     public interface IBasicExtensionStorage : IAssetSelectorStorage, IBudgetStorage, ITicketPriceStorage, IDepotSelectionStorage
-    { 
+    {  
     }
 
 }

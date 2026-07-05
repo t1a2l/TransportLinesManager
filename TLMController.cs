@@ -192,7 +192,7 @@ namespace TransportLinesManager
                 int start_dropoff = Mathf.Clamp(Mathf.FloorToInt(schoolEndHour - 1f), 0, 23);
                 int end_dropoff = Mathf.Clamp(Mathf.CeilToInt(schoolEndHour + 2f), 0, 23);
 
-                var fleetBudget = new TimeableList<BudgetEntryXml>
+                var budget = new TimeableList<BudgetEntryXml>
                 {
                     new() { HourOfDay = start_pickup, Value = 100 },
                     new() { HourOfDay = end_pickup, Value = 0 },
@@ -200,7 +200,7 @@ namespace TransportLinesManager
                     new() { HourOfDay = end_dropoff, Value = 0 }
                 };
 
-                var ticketBudget = new TimeableList<TicketPriceEntryXml>
+                var ticketPrice = new TimeableList<TicketPriceEntryXml>
                 {
                     new() { HourOfDay = start_pickup, Value = 0 },
                     new() { HourOfDay = end_pickup, Value = 0 },
@@ -208,23 +208,23 @@ namespace TransportLinesManager
                     new() { HourOfDay = end_dropoff, Value = 0 }
                 };
 
-                lineExt.SetAllBudgetMultipliersForLine(lineId, UVMBudgetConfigTab.Instance.CurrentBudgetTarget, fleetBudget);
-                lineExt.SetTicketPricesForLine(lineId, ticketBudget);
+                lineExt.SetAllBudgetMultipliersForLine(lineId, UVMBudgetConfigTab.Instance.CurrentProfileTarget, budget);
+                lineExt.SetAllTicketPricesForLine(lineId, TLMTicketConfigTab.Instance.CurrentProfileTarget, ticketPrice);
             }
             else
             {
-                var fleetBudget = new TimeableList<BudgetEntryXml>
+                var budget = new TimeableList<BudgetEntryXml>
                 {
                     new() { HourOfDay = 0, Value = 100 }
                 };
 
-                var ticketBudget = new TimeableList<TicketPriceEntryXml>
+                var ticketPrice = new TimeableList<TicketPriceEntryXml>
                 {
                     new() { HourOfDay = 0, Value = 0 }
                 };
 
-                lineExt.SetAllBudgetMultipliersForLine(lineId, UVMBudgetConfigTab.Instance.CurrentBudgetTarget, fleetBudget);
-                lineExt.SetTicketPricesForLine(lineId, ticketBudget);
+                lineExt.SetAllBudgetMultipliersForLine(lineId, UVMBudgetConfigTab.Instance.CurrentProfileTarget, budget);
+                lineExt.SetAllTicketPricesForLine(lineId, TLMTicketConfigTab.Instance.CurrentProfileTarget, ticketPrice);
             }
 
             lineExt.SetAssetTransportListForLine(lineId, []);

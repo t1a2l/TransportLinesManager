@@ -254,7 +254,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
             {
                 IBasicExtension extension = lineId > 0 && !fromBuilding ? TLMLineUtils.GetEffectiveExtensionForLine(lineId) : UVMPublicTransportWorldInfoPanel.GetCurrentTSD().GetTransportExtension();
-                extension.AddDefaultToNewBudgetEntry(lineId, TLMAssetSelectorTab.Instance.CurrentBudgetTarget);
+                extension.AddDefaultToNewBudgetEntry(lineId, TLMAssetSelectorTab.Instance.CurrentProfileTarget);
             }
             RebuildList();
             UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(UVMBudgetConfigTab));
