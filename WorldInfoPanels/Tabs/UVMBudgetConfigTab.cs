@@ -89,13 +89,13 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             var lineExt = TLMTransportLineExtension.Instance;
             var cfg = TLMLineUtils.GetEffectiveConfigForLine(lineID);
 
-            m_showAbsoluteCheckbox.isVisible = lineExt.IsUsingCustomConfig(lineID);
-            m_showAbsoluteCheckbox.isChecked = lineExt.IsDisplayAbsoluteValues(lineID);
-            m_useSeparateWeekendBudgetCheckbox.isVisible = TLMController.IsRealTimeEnabled && RealTimeUtils.IsWeekendEnabled();
-            m_useSeparateWeekendBudgetCheckbox.isChecked = cfg.UseSeparateWeekendProfile;
+            m_showAbsoluteCheckbox?.isVisible = lineExt.IsUsingCustomConfig(lineID);
+            m_showAbsoluteCheckbox?.isChecked = lineExt.IsDisplayAbsoluteValues(lineID);
+            m_useSeparateWeekendBudgetCheckbox?.isVisible = TLMController.IsRealTimeEnabled && RealTimeUtils.IsWeekendEnabled();
+            m_useSeparateWeekendBudgetCheckbox?.isChecked = cfg.UseSeparateWeekendProfile;
 
-            m_budgetProfileLabel.relativePosition = new Vector3(0f, 22f);
-            m_budgetProfileDropdown?.relativePosition = new Vector3(130f, 18f);
+            m_budgetProfileLabel?.relativePosition = new Vector3(0f, 0f);
+            m_budgetProfileDropdown?.relativePosition = new Vector3(90f, 0f);
 
             m_isLoading = false;
         }
@@ -165,7 +165,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_budgetProfileLabel.autoSize = false;
             m_budgetProfileLabel.width = 90f;
             m_budgetProfileLabel.height = 24f;
-            m_budgetProfileLabel.relativePosition = new Vector3(0f, 20f);
+            m_budgetProfileLabel.relativePosition = new Vector3(0f, 0f);
             m_budgetProfileLabel.verticalAlignment = UIVerticalAlignment.Middle;
 
             var ddGo = Instantiate(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate).GetComponent<UIPanel>().Find<UIDropDown>("Dropdown").gameObject, m_budgetProfilePanel.transform);
@@ -185,7 +185,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 Locale.Get("TLM_PROFILE_WEEKEND")
             ];
             m_budgetProfileDropdown.selectedIndex = 0;
-            m_budgetProfileDropdown.relativePosition = new Vector3(90f, 20f);
+            m_budgetProfileDropdown.relativePosition = new Vector3(90f, 0f);
             m_budgetProfileDropdown.eventSelectedIndexChanged += OnBudgetProfileChanged;
 
             UpdateWeekendBudgetUIState();
@@ -209,7 +209,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 m_editingWeekendBudget = false;
                 m_budgetProfileDropdown?.selectedIndex = 0;
-                m_budgetProfileDropdown.relativePosition = new Vector3(130f, 18f);
+                m_budgetProfileLabel.relativePosition = new Vector3(0f, 0f);
+                m_budgetProfileDropdown.relativePosition = new Vector3(90f, 0f);
             }
 
             UpdateWeekendBudgetUIState();
@@ -237,9 +238,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_budgetProfilePanel?.isVisible = enabled;
             m_budgetProfileLabel?.isVisible = enabled;
             m_budgetProfileDropdown?.isVisible = enabled;
+            m_budgetProfileDropdown?.isVisible = enabled;
 
-            m_budgetProfileLabel.relativePosition = new Vector3(0f, 22f);
-            m_budgetProfileDropdown?.relativePosition = new Vector3(130f, 18f);
+            m_budgetProfileLabel?.relativePosition = new Vector3(0f, 0f);
+            m_budgetProfileDropdown?.relativePosition = new Vector3(90f, 0f);
         }
 
         private TimeableList<BudgetEntryXml> CloneBudgetEntries(TimeableList<BudgetEntryXml> src)

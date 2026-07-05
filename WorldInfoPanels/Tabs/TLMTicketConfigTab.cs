@@ -36,6 +36,12 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             CreateWeekendTicketPriceControls(this.component);
         }
 
+        public override void ExtraOnSetTarget(ushort lineID)
+        {
+            m_ticketPriceProfileLabel?.relativePosition = new Vector3(0f, 0f);
+            m_ticketPriceProfileDropdown?.relativePosition = new Vector3(90f, 0f);
+        }
+
         public override float GetMaxSliderValue()
         {
             if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && !fromBuilding)
@@ -98,7 +104,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_ticketPriceProfileLabel.autoSize = false;
             m_ticketPriceProfileLabel.width = 90f;
             m_ticketPriceProfileLabel.height = 24f;
-            m_ticketPriceProfileLabel.relativePosition = new Vector3(0f, 20f);
+            m_ticketPriceProfileLabel.relativePosition = new Vector3(0f, 0f);
             m_ticketPriceProfileLabel.verticalAlignment = UIVerticalAlignment.Middle;
 
             var ddGo = Instantiate(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate).GetComponent<UIPanel>().Find<UIDropDown>("Dropdown").gameObject, m_ticketPriceProfilePanel.transform);
@@ -118,7 +124,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 Locale.Get("TLM_PROFILE_WEEKEND")
             ];
             m_ticketPriceProfileDropdown.selectedIndex = 0;
-            m_ticketPriceProfileDropdown.relativePosition = new Vector3(90f, 20f);
+            m_ticketPriceProfileDropdown.relativePosition = new Vector3(90f, 0f);
             m_ticketPriceProfileDropdown.eventSelectedIndexChanged += OnTicketPriceProfileChanged;
             UpdateWeekendTicketPriceUIState();
         }
@@ -143,8 +149,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_ticketPriceProfileLabel?.isVisible = enabled;
             m_ticketPriceProfileDropdown?.isVisible = enabled;
 
-            m_ticketPriceProfileLabel.relativePosition = new Vector3(0f, 22f);
-            m_ticketPriceProfileDropdown?.relativePosition = new Vector3(130f, 18f);
+            m_ticketPriceProfileLabel?.relativePosition = new Vector3(0f, 0f);
+            m_ticketPriceProfileDropdown?.relativePosition = new Vector3(90f, 0f);
         }
 
         private void ReloadTicketPriceListFromCurrentProfile()

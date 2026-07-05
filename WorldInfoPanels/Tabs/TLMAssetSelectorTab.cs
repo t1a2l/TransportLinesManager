@@ -166,7 +166,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_budgetProfileLabel.autoSize = false;
             m_budgetProfileLabel.width = 120f;
             m_budgetProfileLabel.height = 24f;
-            m_budgetProfileLabel.relativePosition = new Vector3(5f, 46f);
+            m_budgetProfileLabel.relativePosition = new Vector3(5f, 0f);
             m_budgetProfileLabel.verticalAlignment = UIVerticalAlignment.Middle;
 
             var ddGo = Instantiate(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate).GetComponent<UIPanel>().Find<UIDropDown>("Dropdown").gameObject, m_budgetProfilePanel.transform);
@@ -186,7 +186,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 Locale.Get("TLM_PROFILE_WEEKEND")
             ];
             m_budgetProfileDropdown.selectedIndex = 0;
-            m_budgetProfileDropdown.relativePosition = new Vector3(95f, 46f);
+            m_budgetProfileDropdown.relativePosition = new Vector3(95f, 0f);
             m_budgetProfileDropdown.eventSelectedIndexChanged += OnBudgetProfileChanged;
 
             CreateScrollPanel();
@@ -256,8 +256,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_budgetProfileLabel?.isVisible = enabled;
             m_budgetProfileDropdown?.isVisible = enabled;
 
-            m_budgetProfileLabel.relativePosition = new Vector3(5f, 30f);
-            m_budgetProfileDropdown?.relativePosition = new Vector3(125f, 26f);
+            m_budgetProfileLabel?.relativePosition = new Vector3(5f, 0f);
+            m_budgetProfileDropdown?.relativePosition = new Vector3(95f, 0f);
         }
 
         private void CreateTemplateList()
@@ -439,8 +439,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_budgetProfileLabel?.isVisible = enabled;
             m_budgetProfileDropdown?.isVisible = enabled;
 
-            m_budgetProfileLabel.relativePosition = new Vector3(5f, 30f);
-            m_budgetProfileDropdown?.relativePosition = new Vector3(125f, 26f);
+            m_budgetProfileLabel?.relativePosition = new Vector3(5f, 0f);
+            m_budgetProfileDropdown?.relativePosition = new Vector3(95f, 0f);
         }
 
         private void UpdateAssetList(IBasicExtension config)
