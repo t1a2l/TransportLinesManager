@@ -253,6 +253,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 enabled = cfg?.UseSeparateWeekendProfile == true;
             }
 
+            m_budgetProfilePanel?.isVisible = enabled;
             m_budgetProfileLabel?.isVisible = enabled;
             m_budgetProfileDropdown?.isVisible = enabled;
 

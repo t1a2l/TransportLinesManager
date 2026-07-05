@@ -38,6 +38,18 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public override void ExtraOnSetTarget(ushort lineID)
         {
+            bool enabled = false;
+
+            var cfg = TLMLineUtils.GetEffectiveConfigForLine(lineID);
+
+            if (cfg != null)
+            {
+                enabled = cfg?.UseSeparateWeekendProfile == true;
+            }
+
+            m_ticketPriceProfileLabel?.isVisible = enabled;
+            m_ticketPriceProfileDropdown?.isVisible = enabled;
+
             m_ticketPriceProfileLabel?.relativePosition = new Vector3(0f, 0f);
             m_ticketPriceProfileDropdown?.relativePosition = new Vector3(90f, 0f);
         }
