@@ -93,7 +93,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             MonoUtils.CreateUIElement(out m_ticketPriceProfileLabel, m_ticketPriceProfilePanel.transform);
             m_ticketPriceProfileLabel.name = "TicketPriceProfileLabel";
-            m_ticketPriceProfileLabel.text = Locale.Get("TLM_TICKET_PRICE_PROFILE");
+            m_ticketPriceProfileLabel.text = Locale.Get("TLM_PROFILE");
             m_ticketPriceProfileLabel.textScale = 0.9f;
             m_ticketPriceProfileLabel.autoSize = false;
             m_ticketPriceProfileLabel.width = 120f;

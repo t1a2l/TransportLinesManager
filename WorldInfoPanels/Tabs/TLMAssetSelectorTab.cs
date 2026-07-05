@@ -153,7 +153,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             MonoUtils.CreateUIElement(out m_budgetProfileLabel, MainPanel.transform);
             m_budgetProfileLabel.name = "BudgetProfileLabel";
-            m_budgetProfileLabel.text = Locale.Get("TLM_BUDGET_PROFILE");
+            m_budgetProfileLabel.text = Locale.Get("TLM_PROFILE");
             m_budgetProfileLabel.textScale = 0.9f;
             m_budgetProfileLabel.autoSize = false;
             m_budgetProfileLabel.width = 120f;
@@ -173,8 +173,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_budgetProfileDropdown.normalBgSprite = "OptionsDropboxListbox";
             m_budgetProfileDropdown.items =
             [
-                Locale.Get("TLM_BUDGET_PROFILE_WEEKDAY"),
-                Locale.Get("TLM_BUDGET_PROFILE_WEEKEND")
+                Locale.Get("TLM_PROFILE_WEEKDAY"),
+                Locale.Get("TL_PROFILE_WEEKEND")
             ];
             m_budgetProfileDropdown.selectedIndex = 0;
             m_budgetProfileDropdown.relativePosition = new Vector3(5f, 48f);

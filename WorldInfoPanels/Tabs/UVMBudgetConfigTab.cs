@@ -160,7 +160,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             MonoUtils.CreateUIElement(out m_budgetProfileLabel, m_budgetProfilePanel.transform);
             m_budgetProfileLabel.name = "BudgetProfileLabel";
-            m_budgetProfileLabel.text = Locale.Get("TLM_BUDGET_PROFILE");
+            m_budgetProfileLabel.text = Locale.Get("TLM_PROFILE");
             m_budgetProfileLabel.textScale = 0.9f;
             m_budgetProfileLabel.autoSize = false;
             m_budgetProfileLabel.width = 120f;
