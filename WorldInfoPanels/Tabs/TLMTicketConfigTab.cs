@@ -85,10 +85,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void CreateWeekendTicketPriceControls(UIComponent parent)
         {
-            MonoUtils.CreateUIElement(out m_ticketPriceProfilePanel, m_uiHelper.Self.transform);
+            MonoUtils.CreateUIElement(out m_ticketPriceProfilePanel, parent.transform);
             m_ticketPriceProfilePanel.name = "TicketPriceProfilePanel";
-            m_ticketPriceProfilePanel.width = 140f;
-            m_ticketPriceProfilePanel.height = 40f;
+            m_ticketPriceProfilePanel.width = 370f;
+            m_ticketPriceProfilePanel.height = 24f;
             m_ticketPriceProfilePanel.autoLayout = false;
 
             MonoUtils.CreateUIElement(out m_ticketPriceProfileLabel, m_ticketPriceProfilePanel.transform);
@@ -96,9 +96,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_ticketPriceProfileLabel.text = Locale.Get("TLM_PROFILE");
             m_ticketPriceProfileLabel.textScale = 0.9f;
             m_ticketPriceProfileLabel.autoSize = false;
-            m_ticketPriceProfileLabel.width = 120f;
-            m_ticketPriceProfileLabel.height = 22f;
-            m_ticketPriceProfileLabel.relativePosition = new Vector3(0f, 22f);
+            m_ticketPriceProfileLabel.width = 90f;
+            m_ticketPriceProfileLabel.height = 24f;
+            m_ticketPriceProfileLabel.relativePosition = new Vector3(0f, 20f);
+            m_ticketPriceProfileLabel.verticalAlignment = UIVerticalAlignment.Middle;
 
             var ddGo = Instantiate(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate).GetComponent<UIPanel>().Find<UIDropDown>("Dropdown").gameObject, m_ticketPriceProfilePanel.transform);
 
@@ -117,7 +118,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 Locale.Get("TLM_PROFILE_WEEKEND")
             ];
             m_ticketPriceProfileDropdown.selectedIndex = 0;
-            m_ticketPriceProfileDropdown.relativePosition = new Vector3(130f, 18f);
+            m_ticketPriceProfileDropdown.relativePosition = new Vector3(90f, 20f);
             m_ticketPriceProfileDropdown.eventSelectedIndexChanged += OnTicketPriceProfileChanged;
             UpdateWeekendTicketPriceUIState();
         }

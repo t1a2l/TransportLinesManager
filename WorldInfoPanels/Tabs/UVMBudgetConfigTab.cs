@@ -152,10 +152,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_useSeparateWeekendBudgetCheckbox.name = "UseSeparateWeekendBudget";
             m_useSeparateWeekendBudgetCheckbox.relativePosition = new Vector3(12f, parent.height - 52f);
 
-            MonoUtils.CreateUIElement(out m_budgetProfilePanel, m_uiHelper.Self.transform);
+            MonoUtils.CreateUIElement(out m_budgetProfilePanel, parent.transform);
             m_budgetProfilePanel.name = "BudgetProfilePanel";
-            m_budgetProfilePanel.width = 140f;
-            m_budgetProfilePanel.height = 40f;
+            m_budgetProfilePanel.width = 370f;
+            m_budgetProfilePanel.height = 24f;
             m_budgetProfilePanel.autoLayout = false;
 
             MonoUtils.CreateUIElement(out m_budgetProfileLabel, m_budgetProfilePanel.transform);
@@ -163,9 +163,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_budgetProfileLabel.text = Locale.Get("TLM_PROFILE");
             m_budgetProfileLabel.textScale = 0.9f;
             m_budgetProfileLabel.autoSize = false;
-            m_budgetProfileLabel.width = 120f;
-            m_budgetProfileLabel.height = 22f;
-            m_budgetProfileLabel.relativePosition = new Vector3(0f, 22f);
+            m_budgetProfileLabel.width = 90f;
+            m_budgetProfileLabel.height = 24f;
+            m_budgetProfileLabel.relativePosition = new Vector3(0f, 20f);
+            m_budgetProfileLabel.verticalAlignment = UIVerticalAlignment.Middle;
 
             var ddGo = Instantiate(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate).GetComponent<UIPanel>().Find<UIDropDown>("Dropdown").gameObject, m_budgetProfilePanel.transform);
 
@@ -184,7 +185,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 Locale.Get("TLM_PROFILE_WEEKEND")
             ];
             m_budgetProfileDropdown.selectedIndex = 0;
-            m_budgetProfileDropdown.relativePosition = new Vector3(130f, 18f);
+            m_budgetProfileDropdown.relativePosition = new Vector3(90f, 20f);
             m_budgetProfileDropdown.eventSelectedIndexChanged += OnBudgetProfileChanged;
 
             UpdateWeekendBudgetUIState();

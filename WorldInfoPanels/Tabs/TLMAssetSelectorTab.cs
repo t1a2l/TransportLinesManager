@@ -96,6 +96,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private UISprite m_timeBudgetSelectLabelSprite;
         private static UIDropDown m_timeBudgetSelect;
 
+        private UIPanel m_budgetProfilePanel;
         private UILabel m_budgetProfileLabel;
         private UIDropDown m_budgetProfileDropdown;
 
@@ -151,16 +152,24 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_timeBudgetSelect.textScale = 0.90f;
             m_timeBudgetSelect.eventSelectedIndexChanged += TimeBudgetSelect_eventSelectedIndexChanged;
 
-            MonoUtils.CreateUIElement(out m_budgetProfileLabel, MainPanel.transform);
+            MonoUtils.CreateUIElement(out m_budgetProfilePanel, MainPanel.transform);
+            m_budgetProfilePanel.name = "BudgetProfilePanel";
+            m_budgetProfilePanel.width = 140f;
+            m_budgetProfilePanel.height = 24f;
+            m_budgetProfilePanel.autoLayout = false;
+            m_budgetProfilePanel.relativePosition = new Vector3(5f, 46f);
+
+            MonoUtils.CreateUIElement(out m_budgetProfileLabel, m_budgetProfilePanel.transform);
             m_budgetProfileLabel.name = "BudgetProfileLabel";
             m_budgetProfileLabel.text = Locale.Get("TLM_PROFILE");
             m_budgetProfileLabel.textScale = 0.9f;
             m_budgetProfileLabel.autoSize = false;
             m_budgetProfileLabel.width = 120f;
-            m_budgetProfileLabel.height = 22f;
-            m_budgetProfileLabel.relativePosition = new Vector3(5f, 30f);
+            m_budgetProfileLabel.height = 24f;
+            m_budgetProfileLabel.relativePosition = new Vector3(5f, 46f);
+            m_budgetProfileLabel.verticalAlignment = UIVerticalAlignment.Middle;
 
-            var ddGo = Instantiate(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate).GetComponent<UIPanel>().Find<UIDropDown>("Dropdown").gameObject, MainPanel.transform);
+            var ddGo = Instantiate(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate).GetComponent<UIPanel>().Find<UIDropDown>("Dropdown").gameObject, m_budgetProfilePanel.transform);
 
             m_budgetProfileDropdown = ddGo.GetComponent<UIDropDown>();
             m_budgetProfileDropdown.name = "BudgetProfileDropdown";
@@ -174,10 +183,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_budgetProfileDropdown.items =
             [
                 Locale.Get("TLM_PROFILE_WEEKDAY"),
-                Locale.Get("TL_PROFILE_WEEKEND")
+                Locale.Get("TLM_PROFILE_WEEKEND")
             ];
             m_budgetProfileDropdown.selectedIndex = 0;
-            m_budgetProfileDropdown.relativePosition = new Vector3(5f, 48f);
+            m_budgetProfileDropdown.relativePosition = new Vector3(95f, 46f);
             m_budgetProfileDropdown.eventSelectedIndexChanged += OnBudgetProfileChanged;
 
             CreateScrollPanel();
