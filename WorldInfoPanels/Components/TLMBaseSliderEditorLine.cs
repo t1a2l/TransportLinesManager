@@ -32,7 +32,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         public V Entry
         {
-            get => m_entry; set
+            get => m_entry; 
+            set
             {
                 m_entry = value;
                 FillData();
@@ -192,7 +193,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_value.padding = new RectOffset(3, 3, 5, 3);
             m_value.processMarkup = true;
 
-
             MonoUtils.CreateUIElement(out UITextField m_valueField, m_container.transform, "ValueField", new Vector4(0, 0, 60, 26));
             m_valueField.numericalOnly = true;
             m_valueField.allowNegative = false;
@@ -207,11 +207,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_valueField.padding.top = 5;
             m_valueField.textScale = 1.125f;
 
-            var m_ValueSlider = UIHelperExtension.AddSlider(m_container, null, 0, 500, 5, -1,
-                 (x) =>
-                 {
-
-                 });
+            var m_ValueSlider = UIHelperExtension.AddSlider(m_container, null, 0, 500, 5, -1, (x) => {});
             Destroy(m_ValueSlider.transform.parent.GetComponentInChildren<UILabel>());
             UIPanel budgetSliderPanel = m_ValueSlider.GetComponentInParent<UIPanel>();
 
@@ -219,20 +215,16 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             budgetSliderPanel.height = 20;
             budgetSliderPanel.autoLayout = true;
 
-
-
             m_ValueSlider.size = new Vector2(200, 20);
             m_ValueSlider.scrollWheelAmount = 0;
             m_ValueSlider.clipChildren = true;
             m_ValueSlider.thumbOffset = new Vector2(-200, 0);
             m_ValueSlider.color = new Color32(128, 128, 128, 128);
-
+            m_ValueSlider.name = "ValueSlider";
             m_ValueSlider.thumbObject.width = 400;
             m_ValueSlider.thumbObject.height = 20;
             ((UISprite)m_ValueSlider.thumbObject).spriteName = "PlainWhite";
             ((UISprite)m_ValueSlider.thumbObject).color = new Color32(1, 140, 46, 255);
-
-            m_ValueSlider.name = "ValueSlider";
 
             MonoUtils.CreateUIElement(out UIButton m_die, m_container.transform, "Delete");
             m_die.textScale = 1f;

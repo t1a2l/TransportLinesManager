@@ -41,15 +41,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             UpdateWeekendTicketPriceUIState();
         }
 
-        public override float GetMaxSliderValue()
-        {
-            if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && !fromBuilding)
-            {
-                var tsd = TransportSystemDefinition.GetDefinitionForLine(ref TransportManager.instance.m_lines.m_buffer[lineId]);
-                return TLMLineUtils.GetTicketPriceForLine(tsd, 0, CurrentProfileTarget).First.Value * 5;
-            }
-            return 0;
-        }
+        public override float GetMaxSliderValue() => 100;
 
         internal override List<Color> ColorOrder { get; } =
         [

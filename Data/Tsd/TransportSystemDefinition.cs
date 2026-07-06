@@ -491,8 +491,8 @@ namespace TransportLinesManager.Data.Tsd
 
         public float GetEffectivePassengerCapacityCost()
         {
-            int settedCost = GetConfig()?.DefaultCostPerPassenger ?? 0;
-            return settedCost == 0 ? GetDefaultPassengerCapacityCostLocal() : settedCost / 100f;
+            int settedCost = GetConfig()?.DefaultCostPerPassenger ?? -1;
+            return settedCost < 0 ? GetDefaultPassengerCapacityCostLocal() : settedCost / 100f;
         }
         public float GetDefaultPassengerCapacityCostLocal() => TransportInfoDict.TryGetValue(this, out TransportInfoContainer info) && info.Local is not null ? info.Local.m_maintenanceCostPerVehicle / (float)DefaultCapacity : -1;
 
