@@ -14,6 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static Commons.Extensions.Patcher;
+using TransportLinesManager.Data.Extensions;
 
 namespace TransportLinesManager.WorldInfoPanels
 {
@@ -22,6 +23,7 @@ namespace TransportLinesManager.WorldInfoPanels
         internal static UVMPublicTransportWorldInfoPanelObject m_obj;
         private static bool m_dirty;
         private static Type m_dirtySource;
+        private static readonly Action<ushort, bool> _schoolLineChangedHandler = OnSchoolLineChanged;
 
         public void Awake()
         {
@@ -327,6 +329,20 @@ namespace TransportLinesManager.WorldInfoPanels
             }
         }
 
+        private static void OnSchoolLineChanged(ushort lineId, bool isSchoolLine)
+        {
+            if(isSchoolLine)
+            {
+                TLMController.ApplySchoolBusPresetToNewLine(lineId, SchoolBusUtils.GetSchoolBuilding(lineId), TransportSystemDefinition.FromLineId(lineId, false));
+            }
+            else
+            {
+                var lineExt = TLMTransportLineExtension.Instance;
+                lineExt.RemoveAllDepotsForLine(lineId);
+            }
+        }
+
+
         internal static bool GetLineID(out ushort lineId, out bool fromBuilding)
         {
             if (m_obj.CurrentInstanceID.Type == (InstanceType)TLMInstanceType.TransportSystemDefinition)
@@ -380,6 +396,7 @@ namespace TransportLinesManager.WorldInfoPanels
             {
                 tab.Value.OnEnable();
             }
+            SchoolBusUtils.RegisterSchoolLineChanged(_schoolLineChangedHandler);
         }
 
         public static void OnDisableOverride()
@@ -389,6 +406,7 @@ namespace TransportLinesManager.WorldInfoPanels
             {
                 tab.Value.OnDisable();
             }
+            SchoolBusUtils.UnregisterSchoolLineChanged(_schoolLineChangedHandler);
         }
 
         public static void PreOnGotFocus()

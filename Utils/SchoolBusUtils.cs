@@ -13,6 +13,8 @@ namespace TransportLinesManager.Utils
         private static Func<ushort, ushort> _getSchoolBuilding;
         private static Func<bool, bool> _setExternalSpawnControl;
         private static Func<bool, bool> _setVehicleSupplyEnabled;
+        private static Func<Action<ushort, bool>, bool> _registerSchoolLineChanged;
+        private static Func<Action<ushort, bool>, bool> _unregisterSchoolLineChanged;
 
         // True if the line is a registered school line (generated OR manually flagged).
         public static bool IsSchoolLine(ushort lineId)
@@ -48,16 +50,33 @@ namespace TransportLinesManager.Utils
             return buildingId;
         }
 
+        // Master flag. Returns the resulting state (true = engaged).
         public static bool SetExternalSpawnControl(bool engaged)
         {
             if (!_resolved) Resolve();
             return _setExternalSpawnControl != null && _setExternalSpawnControl(engaged);
         }
 
+        // Disable the SCHOOL supplying buses (school-as-depot). When false, School Buses stops
+        // spawning/despawning AND stops blocking city depots, so depots / TLM serve the line like a normal line
         public static bool SetVehicleSupplyEnabled(bool enabled)
         {
             if (!_resolved) Resolve();
             return _setVehicleSupplyEnabled != null && _setVehicleSupplyEnabled(enabled);
+        }
+
+        // Subscribe to be told when the player flags or unflags a line as a school line from the panel (the "School line" tick)
+        public static bool RegisterSchoolLineChanged(Action<ushort, bool> callback)
+        {
+            if (!_resolved) Resolve();
+            return callback != null && _registerSchoolLineChanged != null && _registerSchoolLineChanged(callback);
+        }
+
+        // Unsubscribe from being told when the player flags or unflags a line as a school line from the panel (the "School line" tick)
+        public static bool UnregisterSchoolLineChanged(Action<ushort, bool> callback)
+        {
+            if (!_resolved) Resolve();
+            return callback != null && _unregisterSchoolLineChanged != null && _unregisterSchoolLineChanged(callback);
         }
 
         private static void Resolve()
@@ -80,8 +99,11 @@ namespace TransportLinesManager.Utils
                 _getSchoolBuilding = (Func<ushort, ushort>)CreateQuery(bridge, "GetSchoolBuilding", [typeof(ushort)], typeof(ushort));
                 _setExternalSpawnControl = (Func<bool, bool>)CreateQuery(bridge, "SetExternalSpawnControl", [typeof(bool)], typeof(bool));
                 _setVehicleSupplyEnabled = (Func<bool, bool>)CreateQuery(bridge, "SetVehicleSupplyEnabled", [typeof(bool)], typeof(bool));
+                _registerSchoolLineChanged = (Func<Action<ushort, bool>, bool>)CreateQuery(bridge, "RegisterSchoolLineChanged", [typeof(Action<ushort, bool>)], typeof(bool));
+                _unregisterSchoolLineChanged = (Func<Action<ushort, bool>, bool>)CreateQuery(bridge, "UnregisterSchoolLineChanged", [typeof(Action<ushort, bool>)], typeof(bool));
                 if (_isSchoolLine != null && _isSchoolOwnedLine != null && _getSchoolBuilding != null 
-                    && _setExternalSpawnControl != null && _setVehicleSupplyEnabled != null)
+                    && _setExternalSpawnControl != null && _setVehicleSupplyEnabled != null
+                    && _registerSchoolLineChanged != null && _unregisterSchoolLineChanged != null)
                 {
                     LogUtils.DoLog("SchoolBusesUtils: School Buses bridge bound (ApiVersion >= 2) — " +
                              "school lines run as a free school service; school-owned lines hide the depot selector.");
