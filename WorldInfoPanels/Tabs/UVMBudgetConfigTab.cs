@@ -215,6 +215,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             UpdateWeekendBudgetUIState();
             TLMAssetSelectorTab.Instance.UpdateWeekendBudgetUIState();
+            TLMTicketConfigTab.Instance.UpdateWeekendTicketPriceUIState();
             ReloadBudgetListFromCurrentProfile();
             MarkDirty();
         }
