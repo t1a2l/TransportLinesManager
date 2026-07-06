@@ -197,6 +197,15 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             CreateTemplateList();
 
+            MonoUtils.CreateUIElement(out m_vehicleCountLabel, MainPanel.transform);
+            m_vehicleCountLabel.autoSize = false;
+            m_vehicleCountLabel.width = 50f;
+            m_vehicleCountLabel.height = 20f;
+            m_vehicleCountLabel.relativePosition = new Vector3(MainPanel.width - 190f, 85f);
+            m_vehicleCountLabel.textScale = 0.65f;
+            m_vehicleCountLabel.textAlignment = UIHorizontalAlignment.Center;
+            m_vehicleCountLabel.isVisible = false;
+
             MonoUtils.CreateUIElement(out m_capacityColumnHeader, MainPanel.transform);
             m_capacityColumnHeader.autoSize = false;
             m_capacityColumnHeader.width = 50f;
@@ -222,15 +231,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_usedCountColumnHeader.relativePosition = new Vector3(MainPanel.width - 60f, 85f);
             m_usedCountColumnHeader.textScale = 0.65f;
             m_usedCountColumnHeader.textAlignment = UIHorizontalAlignment.Center;
-
-            MonoUtils.CreateUIElement(out m_vehicleCountLabel, MainPanel.transform);
-            m_vehicleCountLabel.autoSize = false;
-            m_vehicleCountLabel.width = 40f;
-            m_vehicleCountLabel.height = 20f;
-            m_vehicleCountLabel.relativePosition = new Vector3(190f, 60f);
-            m_vehicleCountLabel.textScale = 0.7f;
-            m_vehicleCountLabel.textAlignment = UIHorizontalAlignment.Center;
-            m_vehicleCountLabel.isVisible = false;
         }
 
         private void TimeBudgetSelect_eventSelectedIndexChanged(UIComponent component, int value)
