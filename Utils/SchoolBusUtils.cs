@@ -8,28 +8,11 @@ namespace TransportLinesManager.Utils
     public static class SchoolBusUtils
     {
         private static bool _resolved;
-        private static Func<ushort, bool> _isSchoolLine;
-        private static Func<ushort, bool> _isSchoolOwnedLine;
         private static Func<ushort, ushort> _getSchoolBuilding;
         private static Func<bool, bool> _setExternalSpawnControl;
         private static Func<bool, bool> _setVehicleSupplyEnabled;
         private static Func<Action<ushort, bool>, bool> _registerSchoolLineChanged;
         private static Func<Action<ushort, bool>, bool> _unregisterSchoolLineChanged;
-
-        // True if the line is a registered school line (generated OR manually flagged).
-        public static bool IsSchoolLine(ushort lineId)
-        {
-            if (!_resolved) Resolve();
-            return lineId != 0 && _isSchoolLine != null && _isSchoolLine(lineId);
-        }
-
-        // True if this line's bus is supplied by its school (school-as-depot): mod-generated,
-        // feature enabled, school still standing. City depots never serve such a line.
-        public static bool IsSchoolOwnedLine(ushort lineId)
-        {
-            if (!_resolved) Resolve();
-            return lineId != 0 && _isSchoolOwnedLine != null && _isSchoolOwnedLine(lineId);
-        }
 
         // School (Education building) this line serves, or 0 if it is not a registered school line.
         // The id indexes BuildingManager.m_buildings. NOTE: it is the bound building and is not
@@ -94,15 +77,12 @@ namespace TransportLinesManager.Utils
                 { 
                     return; 
                 }
-                _isSchoolLine = (Func<ushort, bool>)CreateQuery(bridge, "IsSchoolLine", [typeof(ushort)], typeof(bool));
-                _isSchoolOwnedLine = (Func<ushort, bool>)CreateQuery(bridge, "IsSchoolOwnedLine", [typeof(ushort)], typeof(bool));
                 _getSchoolBuilding = (Func<ushort, ushort>)CreateQuery(bridge, "GetSchoolBuilding", [typeof(ushort)], typeof(ushort));
                 _setExternalSpawnControl = (Func<bool, bool>)CreateQuery(bridge, "SetExternalSpawnControl", [typeof(bool)], typeof(bool));
                 _setVehicleSupplyEnabled = (Func<bool, bool>)CreateQuery(bridge, "SetVehicleSupplyEnabled", [typeof(bool)], typeof(bool));
                 _registerSchoolLineChanged = (Func<Action<ushort, bool>, bool>)CreateQuery(bridge, "RegisterSchoolLineChanged", [typeof(Action<ushort, bool>)], typeof(bool));
                 _unregisterSchoolLineChanged = (Func<Action<ushort, bool>, bool>)CreateQuery(bridge, "UnregisterSchoolLineChanged", [typeof(Action<ushort, bool>)], typeof(bool));
-                if (_isSchoolLine != null && _isSchoolOwnedLine != null && _getSchoolBuilding != null 
-                    && _setExternalSpawnControl != null && _setVehicleSupplyEnabled != null
+                if (_getSchoolBuilding != null && _setExternalSpawnControl != null && _setVehicleSupplyEnabled != null
                     && _registerSchoolLineChanged != null && _unregisterSchoolLineChanged != null)
                 {
                     LogUtils.DoLog("SchoolBusesUtils: School Buses bridge bound (ApiVersion >= 2) — " +
@@ -111,8 +91,6 @@ namespace TransportLinesManager.Utils
             }
             catch (Exception e)
             {
-                _isSchoolLine = null;
-                _isSchoolOwnedLine = null;
                 _getSchoolBuilding = null;
                 _setExternalSpawnControl = null;
                 _setVehicleSupplyEnabled = null;
