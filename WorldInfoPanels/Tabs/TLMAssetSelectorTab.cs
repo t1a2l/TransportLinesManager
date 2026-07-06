@@ -789,7 +789,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         { }
 
         public void OnDisable()
-        { }
+        {
+            OnDestroy();
+        }
 
         public void OnGotFocus()
         { }

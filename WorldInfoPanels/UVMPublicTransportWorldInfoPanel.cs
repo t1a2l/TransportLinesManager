@@ -331,14 +331,20 @@ namespace TransportLinesManager.WorldInfoPanels
 
         private static void OnSchoolLineChanged(ushort lineId, bool isSchoolLine)
         {
-            if(isSchoolLine)
+            var schoolBuildingId = SchoolBusUtils.GetSchoolBuilding(lineId);
+            var tsd = TransportSystemDefinition.FromLineId(lineId, false);
+            if (isSchoolLine)
             {
-                TLMController.ApplySchoolBusPresetToNewLine(lineId, SchoolBusUtils.GetSchoolBuilding(lineId), TransportSystemDefinition.FromLineId(lineId, false));
+                TLMController.ApplySchoolBusPresetToNewLine(lineId, schoolBuildingId, tsd);
             }
             else
             {
-                var lineExt = TLMTransportLineExtension.Instance;
-                lineExt.RemoveAllDepotsForLine(lineId);
+                var cfg = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
+                if(cfg != null)
+                {
+                    cfg.RemoveAllDepotsForLine(lineId);
+                    TLMDepotSelectorTab.Instance.UpdateDepotList(cfg);
+                }
             }
         }
 

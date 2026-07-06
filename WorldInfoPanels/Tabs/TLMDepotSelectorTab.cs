@@ -18,16 +18,32 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
     {
         private UILabel m_title;
         private UITemplateList<UIPanel> m_checkboxTemplateList;
-        public void Awake() => CreateWindow();
+        private UIScrollablePanel m_scrollablePanel;
+        private UIScrollbar m_scrollbar;
+        private UITextField m_nameFilter;
+
+        internal static TLMDepotSelectorTab Instance { get; private set; }
+
+        public void Awake()
+        {
+            Instance = this;
+            CreateWindow();
+        }
+
+        public void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
+            }
+        }
 
         public UIPanel MainPanel { get; private set; }
 
-        private UIScrollablePanel m_scrollablePanel;
-        private UIScrollbar m_scrollbar;
-        private readonly Dictionary<string, UICheckBox> m_checkboxes = [];
         private bool m_isLoading;
-        private UITextField m_nameFilter;
+        
         private TransportSystemDefinition TransportSystem => TransportSystemDefinition.FromLineId(GetLineID(out bool fromBuilding), fromBuilding);
+
         internal static ushort GetLineID(out bool fromBuilding)
         {
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out fromBuilding);
@@ -194,7 +210,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_isLoading = false;
         }
 
-        private void UpdateDepotList(IBasicExtension config)
+        internal void UpdateDepotList(IBasicExtension config)
         {
             var lineId = GetLineID(out _);
             List<ushort> cityDepotList = [];
@@ -277,7 +293,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public void OnEnable() { }
 
-        public void OnDisable() { }
+        public void OnDisable() 
+        {
+            OnDestroy();
+        }
 
         public void OnGotFocus() { }
 
