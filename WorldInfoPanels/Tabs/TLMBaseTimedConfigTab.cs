@@ -88,7 +88,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void PopulateTitlePanel(UIPanel container)
         {
-
             container.width = transform.parent.gameObject.GetComponent<UIComponent>().width;
             container.height = 30;
             container.autoLayout = true;
@@ -223,7 +222,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     && UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding)
                     && !fromBuilding && lineId > 0)
                 {
-                    if (idx is not BudgetEntryXml budgetEntry) return;
+                    if (idx is not BudgetEntryXml budgetEntry)
+                    {
+                        ReorderLines();
+                        return;
+                    }
                     int budgetIndex = TLMAssetSelectorTab.GetBudgetEntryBackingIndex(lineId, budgetEntry);
                     if (budgetIndex == -1) return; // safety guard
                     IBasicExtension ext = TLMLineUtils.GetEffectiveExtensionForLine(lineId);

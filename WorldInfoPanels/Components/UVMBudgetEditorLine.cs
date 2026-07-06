@@ -12,7 +12,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         protected override void ExtraOnFillData(ref TransportLine t)
         {
-
             float stepsize = UVMBudgetConfigTab.IsAbsoluteValue() ? TLMLineUtils.CalculateBudgetForEachVehicle(t.Info, t.m_totalLength) * 100f : 5f;
             m_valueSlider.maxValue = UVMBudgetConfigTab.IsAbsoluteValue() ? stepsize * 50 : 500f;
             m_valueSlider.value = Entry.Value;
@@ -25,7 +24,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         {
             string text = $"{(UVMBudgetConfigTab.IsAbsoluteValue() ? TLMLineUtils.ProjectTargetVehicleCount(t.Info, t.m_totalLength, Entry.Value / 100f) : (int)Entry.Value)}";
             return UVMBudgetConfigTab.IsAbsoluteValue() ? $"<sprite IconPolicyFreePublicTransport>x{text}" : text + "%";
-
         }
 
         public override uint GetValueAsInt(ref TransportLine t) => UVMBudgetConfigTab.IsAbsoluteValue() ? (uint)TLMLineUtils.ProjectTargetVehicleCount(t.Info, t.m_totalLength, Entry.Value / 100f) : Entry.Value;
