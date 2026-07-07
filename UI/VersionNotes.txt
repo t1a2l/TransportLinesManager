@@ -24,3 +24,10 @@
 	- Support Old version Saves.
 	- Fix the linear map.
 	- Intercity bus terminals will now show regional lines.
+
+<color #9999FF>TLM 14.6 - 07/JUL/26</color>
+	- Control vehicle percentage for prefix lines or total count for custom lines for each selected asset of the line.
+	- Show actual used vehicles in the line info panel in the current budget hour.
+	- SchoolBus mod support with and without the RealTime mod, one click plug and play.
+	- Add weekend profile to support RealTime mod to have different budget and ticket prices for weekends.
+	- Add near lines to show lines near buildings. if it is a transport asset it will show how many people are waiting in each stop.
