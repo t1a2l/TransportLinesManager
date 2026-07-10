@@ -46,7 +46,7 @@ namespace TransportLinesManager.OptionsMenu
         private UITextField m_defaultCost;
         private UITextField m_defaultTicketPrice;
 
-        private void Awake()
+        internal void Awake()
         {
             Instance = this;
             MainPanel = GetComponent<UIPanel>();
@@ -110,7 +110,7 @@ namespace TransportLinesManager.OptionsMenu
                 m_uiHelper.AddSpace(5);
 
                 AddIntField(Locale.Get("TLM_COST_PER_PASSENGER_CONFIG"), out m_defaultCost, out m_defaultCostLbl, m_uiHelper, (x) => TSD.GetConfig().DefaultCostPerPassenger = x, false);
-                AddIntField(Locale.Get("TLM_DEFAULT_PRICE"), out m_defaultTicketPrice, m_uiHelper, (x) => TSD.GetConfig().DefaultTicketPrice = x, false);
+                AddIntField(Locale.Get("TLM_DEFAULT_PRICE"), out m_defaultTicketPrice, m_uiHelper, (x) => TSD.GetConfig().DefaultTicketPrice = x, true);
                 m_uiHelper.AddSpace(5);
 
                 AddButtonInEditorRow(m_vehicleNumberFormatLocal, CommonsSpriteNames.QuestionMark, Help_VehicleNumberFormat, null, true, 30);

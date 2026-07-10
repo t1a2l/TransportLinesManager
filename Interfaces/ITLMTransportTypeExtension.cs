@@ -10,12 +10,15 @@ namespace TransportLinesManager.Interfaces
         ISafeGettable<TLMPrefixConfiguration>
     {
         #region Use Color For Model
+
         bool IsUsingColorForModel(uint prefix);
 
         void SetUsingColorForModel(uint prefix, bool value);
+
         #endregion
 
         #region Custom Palette
+
         string GetCustomPalette(uint prefix);
 
         void SetCustomPalette(uint prefix, string paletteName);
@@ -23,6 +26,7 @@ namespace TransportLinesManager.Interfaces
         #endregion
 
         #region Custom Format
+
         LineIconSpriteNames GetCustomFormat(uint prefix);
 
         void SetCustomFormat(uint prefix, LineIconSpriteNames icon);
@@ -30,7 +34,9 @@ namespace TransportLinesManager.Interfaces
         #endregion
 
         void SetVehicleCapacity(string assetName, int newCapacity);
+
         bool IsCustomCapacity(string name);
+
         int GetCustomCapacity(string name);
     }
 }

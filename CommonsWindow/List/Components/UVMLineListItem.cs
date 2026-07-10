@@ -1,5 +1,4 @@
-﻿
-using ColossalFramework;
+﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Commons.Extensions.UI;
@@ -45,7 +44,11 @@ namespace TransportLinesManager.CommonsWindow.List.Components
         private UIButton m_buttonAutoName;
         private UIButton m_buttonAutoColor;
 
+        private uint m_lastUpdate;
+
         private bool m_isUpdatingVisibility = false;
+
+        public const string LINE_LIST_ITEM_TEMPLATE = "TLM_LineListItemTemplate";
 
         public ushort LineID
         {
@@ -60,238 +63,8 @@ namespace TransportLinesManager.CommonsWindow.List.Components
         public int VehicleCounts => int.Parse(m_lineVehicles.text);
 
         public int LineNumber { get; private set; }
+
         public int PassengerCountsInt { get; private set; }
-
-        private void SetLineID(ushort id)
-        {
-            m_lineID = id >= TransportManager.MAX_LINE_COUNT ? throw new System.Exception($"INVALID LINE IDX: {id}") : id;
-            m_lastUpdate = 0;
-        }
-
-        public void RefreshData(bool updateColors, bool updateVisibility)
-        {
-            if (LineID < Singleton<TransportManager>.instance.m_lines.m_buffer.Length)
-            {
-                if (LineID > 0)
-                {
-                    m_lineName.text = Singleton<TransportManager>.instance.GetLineName(LineID);
-                    LineNumber = Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_lineNumber;
-
-
-                    int averageCount = (int)Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_passengers.m_residentPassengers.m_averageCount;
-                    int averageCount2 = (int)Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_passengers.m_touristPassengers.m_averageCount;
-                    m_linePassengers.isVisible = true;
-                    m_linePassengers.text = (averageCount + averageCount2).ToString("N0");
-
-                    m_linePassengers.tooltip = LocaleFormatter.FormatGeneric("TRANSPORT_LINE_PASSENGERS",
-                    [
-                        averageCount,
-                        averageCount2
-                    ]);
-                    TLMLineUtils.SetLineNumberCircleOnRef(LineID, false, m_lineNumberFormatted, 0.8f);
-                    m_lineColor.atlas = m_linePassengers.atlas;
-                    m_lineColor.normalFgSprite = TLMLineUtils.GetIconForLine(LineID, false);
-                    m_lineColor.isVisible = true;
-                    m_deleteLine.isVisible = true;
-                    m_buttonAutoName.isVisible = true;
-                    m_buttonAutoColor.isVisible = true;
-                    m_lineStops.isVisible = true;
-
-                    PassengerCountsInt = averageCount + averageCount2;
-
-                    SetBackgroundColor(((Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags & TransportLine.Flags.Complete) == TransportLine.Flags.None));
-
-                    m_lineIsVisible.isVisible = true;
-                    var tsd = TransportSystemDefinition.FromLineId(LineID, false);
-                    if (updateColors)
-                    {
-                        m_lineColor.selectedColor = Singleton<TransportManager>.instance.GetLineColor(LineID);
-                    }
-                    if (updateVisibility)
-                    {
-                        m_isUpdatingVisibility = true;
-                        m_lineIsVisible.isChecked = ((Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags & TransportLine.Flags.Hidden) == TransportLine.Flags.None);
-                        m_isUpdatingVisibility = false;
-                    }
-
-
-                    if (tsd.HasVehicles())
-                    {
-                        m_lineVehicles.isVisible = true;
-                        TransportInfo info = Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].Info;
-                        float overallBudget = Singleton<EconomyManager>.instance.GetBudget(info.m_class) / 100f;
-
-
-                        string vehTooltip = string.Format("{0} {1}", m_lineVehicles.text, Locale.Get("PUBLICTRANSPORT_VEHICLES"));
-                        m_lineVehicles.tooltip = vehTooltip;
-                        m_lineStops.text = Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].CountStops(LineID).ToString("N0");
-                        m_lineVehicles.text = Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].CountVehicles(LineID).ToString("N0");
-
-                        TLMTransportLineStatusesManager.instance.GetLastWeekIncomeAndExpensesForLine(LineID, out long income, out long expense);
-                        long balance = (income - expense);
-                        m_lineBalance.text = (balance / 100.0f).ToString(Settings.moneyFormat, LocaleManager.cultureInfo);
-                        m_lineBalance.textColor = balance >= 0 ? ColorExtensions.FromRGB("00c000") : ColorExtensions.FromRGB("c00000");
-                        m_lineBalance.isVisible = true;
-
-                        var effectiveLineBudget = TLMLineUtils.GetEffectiveBudget(LineID);
-
-                        m_lineBudgetLabel.text = string.Format("{0:0%}", effectiveLineBudget);
-                        m_lineBudgetLabel.tooltip = string.Format(Locale.Get("TLM_LINE_BUDGET_EXPLAIN_2"),
-                            Locale.Get("TRANSPORT_LINE", Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].Info.m_transportType.ToString()),
-                            overallBudget, Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_budget / 100f, effectiveLineBudget);
-                        m_lineBudgetLabel.isVisible = true;
-
-                    }
-                    else
-                    {
-                        m_lineBudgetLabel.isVisible = false;
-                        m_lineBalance.isVisible = false;
-                        m_lineVehicles.isVisible = false;
-                    }
-                }
-                else
-                {
-                    var currentTSD = TLMPanel.Instance.m_linesPanel.TSD;
-                    m_lineName.text = string.Format(Locale.Get("TLM_OUTSIDECONNECTION_LISTNAMETEMPLATE"), currentTSD.GetTransportName());
-                    LineNumber = 0;
-                    m_linePassengers.isVisible = false;
-                    m_lineColor.isVisible = false;
-                    m_lineBudgetLabel.isVisible = false;
-                    m_lineBalance.isVisible = false;
-                    m_lineIsVisible.isVisible = false;
-                    m_deleteLine.isVisible = false;
-                    m_buttonAutoName.isVisible = false;
-                    m_buttonAutoColor.isVisible = false;
-                    m_lineVehicles.isVisible = false;
-                    m_lineStops.isVisible = false;
-                    SetBackgroundColor(false, true);
-                }
-            }
-        }
-
-        public void SetBackgroundColor(bool broken = false, bool lineZero = false)
-        {
-            Color32 backgroundColor = lineZero ? Line0BackgroundColor : !broken ? BackgroundColor : BrokenBackgroundColor;
-            backgroundColor.a = !broken ? (byte)((base.component.zOrder % 2 != 0) ? 127 : 255) : (byte)Mathf.Lerp(127, 255, Mathf.Abs((SimulationManager.instance.m_currentTickIndex % 60 / 30f) - 1));
-            if (m_mouseIsOver)
-            {
-                backgroundColor.r = (byte)Mathf.Min(255, (backgroundColor.r * 3) >> 1);
-                backgroundColor.g = (byte)Mathf.Min(255, (backgroundColor.g * 3) >> 1);
-                backgroundColor.b = (byte)Mathf.Min(255, (backgroundColor.b * 3) >> 1);
-            }
-            m_background.color = backgroundColor;
-        }
-
-        private uint m_lastUpdate;
-
-        private void LateUpdate()
-        {
-            if (component.isVisible && m_lastUpdate + 30 < SimulationManager.instance.m_referenceFrameIndex)
-            {
-                RefreshData(m_lastUpdate == 0, m_lastUpdate == 0);
-                m_lastUpdate = SimulationManager.instance.m_referenceFrameIndex;
-            }
-            else if (LineID > 0 && LineID < Singleton<TransportManager>.instance.m_lines.m_buffer.Length && ((Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags & TransportLine.Flags.Complete) == TransportLine.Flags.None))
-            {
-                SetBackgroundColor(true);
-            }
-        }
-
-
-
-
-        private static void CreateLabel(out UILabel label, Transform transform)
-        {
-            MonoUtils.CreateUIElement(out label, transform, "LineStops");
-            label.textAlignment = UIHorizontalAlignment.Center;
-            label.textColor = ForegroundColor;
-            label.minimumSize = new Vector2(80, 18);
-            label.pivot = UIPivotPoint.TopLeft;
-            label.wordWrap = false;
-            label.autoSize = true;
-        }
-
-
-        public void ChangeLineVisibility(bool r)
-        {
-            if (LineID < Singleton<TransportManager>.instance.m_lines.m_buffer.Length && LineID != 0 && !m_isUpdatingVisibility)
-            {
-                Singleton<SimulationManager>.instance.AddAction(() =>
-                {
-                    if (r)
-                    {
-                        Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags &= ~TransportLine.Flags.Hidden;
-                    }
-                    else
-                    {
-                        Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags |= TransportLine.Flags.Hidden;
-                    }
-                });
-            }
-        }
-
-        public void DoAutoColor() => TLMController.AutoColor(LineID);
-
-        public void DoAutoName() => TLMLineUtils.SetLineName(LineID, TLMLineUtils.CalculateAutoName(LineID, false, out _));
-
-        private void OnMouseEnter(UIComponent comp, UIMouseEventParameter param)
-        {
-            if (!m_mouseIsOver)
-            {
-                m_mouseIsOver = true;
-                if (LineID != 0)
-                {
-                    Singleton<SimulationManager>.instance.AddAction(delegate
-                    {
-                        if ((Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags & TransportLine.Flags.Created) != TransportLine.Flags.None)
-                        {
-                            Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags |= TransportLine.Flags.Highlighted;
-                        }
-                    });
-                }
-            }
-        }
-
-        private void OnMouseLeave(UIComponent comp, UIMouseEventParameter param)
-        {
-            if (m_mouseIsOver)
-            {
-                m_mouseIsOver = false;
-                if (LineID != 0)
-                {
-                    Singleton<SimulationManager>.instance.AddAction(delegate
-                    {
-                        if ((Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags & TransportLine.Flags.Created) != TransportLine.Flags.None)
-                        {
-                            Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags &= ~TransportLine.Flags.Highlighted;
-                        }
-                    });
-                }
-            }
-        }
-
-        private void OnEnable()
-        {
-            Singleton<TransportManager>.instance.eventLineColorChanged += new TransportManager.LineColorChangedHandler(OnLineChanged);
-            Singleton<TransportManager>.instance.eventLineNameChanged += new TransportManager.LineNameChangedHandler(OnLineChanged);
-        }
-
-        private void OnDisable()
-        {
-            Singleton<TransportManager>.instance.eventLineColorChanged -= new TransportManager.LineColorChangedHandler(OnLineChanged);
-            Singleton<TransportManager>.instance.eventLineNameChanged -= new TransportManager.LineNameChangedHandler(OnLineChanged);
-        }
-
-
-        private void OnLineChanged(ushort id)
-        {
-            if (id == LineID)
-            {
-                RefreshData(true, true);
-            }
-        }
-
-        private void OnColorChanged(UIComponent x, Color color) => TLMLineUtils.SetLineColor(this, LineID, color);
 
         public void Awake()
         {
@@ -317,22 +90,22 @@ namespace TransportLinesManager.CommonsWindow.List.Components
             m_buttonAutoColor.eventClick += (component, eventParam) => DoAutoColor();
 
             viewLine.eventClick += delegate (UIComponent c, UIMouseEventParameter r)
-             {
-                 if (LineID != 0)
-                 {
-                     Vector3 position = Singleton<NetManager>.instance.m_nodes.m_buffer[Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_stops].m_position;
-                     InstanceID iid = InstanceID.Empty;
-                     iid.TransportLine = LineID;
-                     WorldInfoPanel.Show<PublicTransportWorldInfoPanel>(position, iid);
-                 }
-                 else
-                 {
-                     Vector3 position = default;
-                     InstanceID iid = InstanceID.Empty;
-                     iid.Set(TLMInstanceType.TransportSystemDefinition, TLMPanel.Instance.m_linesPanel.TSD.Id);
-                     WorldInfoPanel.Show<PublicTransportWorldInfoPanel>(position, iid);
-                 }
-             };
+            {
+                if (LineID != 0)
+                {
+                    Vector3 position = Singleton<NetManager>.instance.m_nodes.m_buffer[Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_stops].m_position;
+                    InstanceID iid = InstanceID.Empty;
+                    iid.TransportLine = LineID;
+                    WorldInfoPanel.Show<PublicTransportWorldInfoPanel>(position, iid);
+                }
+                else
+                {
+                    Vector3 position = default;
+                    InstanceID iid = InstanceID.Empty;
+                    iid.Set(TLMInstanceType.TransportSystemDefinition, TLMPanel.Instance.m_linesPanel.TSD.Id);
+                    WorldInfoPanel.Show<PublicTransportWorldInfoPanel>(position, iid);
+                }
+            };
 
             m_deleteLine.eventClick += delegate (UIComponent c, UIMouseEventParameter r)
             {
@@ -416,9 +189,31 @@ namespace TransportLinesManager.CommonsWindow.List.Components
             };
         }
 
-        protected void Start() => m_lineColor.gameObject.AddComponent<UIColorFieldExtension>();
+        public void OnEnable()
+        {
+            Singleton<TransportManager>.instance.eventLineColorChanged += new TransportManager.LineColorChangedHandler(OnLineChanged);
+            Singleton<TransportManager>.instance.eventLineNameChanged += new TransportManager.LineNameChangedHandler(OnLineChanged);
+        }
 
-        public const string LINE_LIST_ITEM_TEMPLATE = "TLM_LineListItemTemplate";
+        public void OnDisable()
+        {
+            Singleton<TransportManager>.instance.eventLineColorChanged -= new TransportManager.LineColorChangedHandler(OnLineChanged);
+            Singleton<TransportManager>.instance.eventLineNameChanged -= new TransportManager.LineNameChangedHandler(OnLineChanged);
+        }
+
+        public void LateUpdate()
+        {
+            if (component.isVisible && m_lastUpdate + 30 < SimulationManager.instance.m_referenceFrameIndex)
+            {
+                RefreshData(m_lastUpdate == 0, m_lastUpdate == 0);
+                m_lastUpdate = SimulationManager.instance.m_referenceFrameIndex;
+            }
+            else if (LineID > 0 && LineID < Singleton<TransportManager>.instance.m_lines.m_buffer.Length && ((Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags & TransportLine.Flags.Complete) == TransportLine.Flags.None))
+            {
+                SetBackgroundColor(true);
+            }
+        }
+
         public static void EnsureTemplate()
         {
             if (UITemplateUtils.GetTemplateDict().ContainsKey(LINE_LIST_ITEM_TEMPLATE))
@@ -541,5 +336,203 @@ namespace TransportLinesManager.CommonsWindow.List.Components
             UITemplateUtils.GetTemplateDict()[LINE_LIST_ITEM_TEMPLATE] = m_uIHelper.Self;
         }
 
+        public void RefreshData(bool updateColors, bool updateVisibility)
+        {
+            if (LineID < Singleton<TransportManager>.instance.m_lines.m_buffer.Length)
+            {
+                if (LineID > 0)
+                {
+                    m_lineName.text = Singleton<TransportManager>.instance.GetLineName(LineID);
+                    LineNumber = Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_lineNumber;
+
+                    int averageCount = (int)Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_passengers.m_residentPassengers.m_averageCount;
+                    int averageCount2 = (int)Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_passengers.m_touristPassengers.m_averageCount;
+                    m_linePassengers.isVisible = true;
+                    m_linePassengers.text = (averageCount + averageCount2).ToString("N0");
+
+                    m_linePassengers.tooltip = LocaleFormatter.FormatGeneric("TRANSPORT_LINE_PASSENGERS",
+                    [
+                        averageCount,
+                        averageCount2
+                    ]);
+
+                    TLMLineUtils.SetLineNumberCircleOnRef(LineID, false, m_lineNumberFormatted, 0.8f);
+                    m_lineColor.atlas = m_linePassengers.atlas;
+                    m_lineColor.normalFgSprite = TLMLineUtils.GetIconForLine(LineID, false);
+                    m_lineColor.isVisible = true;
+                    m_deleteLine.isVisible = true;
+                    m_buttonAutoName.isVisible = true;
+                    m_buttonAutoColor.isVisible = true;
+                    m_lineStops.isVisible = true;
+
+                    PassengerCountsInt = averageCount + averageCount2;
+
+                    SetBackgroundColor(((Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags & TransportLine.Flags.Complete) == TransportLine.Flags.None));
+
+                    m_lineIsVisible.isVisible = true;
+                    var tsd = TransportSystemDefinition.FromLineId(LineID, false);
+                    if (updateColors)
+                    {
+                        m_lineColor.selectedColor = Singleton<TransportManager>.instance.GetLineColor(LineID);
+                    }
+                    if (updateVisibility)
+                    {
+                        m_isUpdatingVisibility = true;
+                        m_lineIsVisible.isChecked = (Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags & TransportLine.Flags.Hidden) == TransportLine.Flags.None;
+                        m_isUpdatingVisibility = false;
+                    }
+
+                    if (tsd.HasVehicles())
+                    {
+                        m_lineVehicles.isVisible = true;
+                        TransportInfo info = Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].Info;
+                        float overallBudget = Singleton<EconomyManager>.instance.GetBudget(info.m_class) / 100f;
+
+                        string vehTooltip = string.Format("{0} {1}", m_lineVehicles.text, Locale.Get("PUBLICTRANSPORT_VEHICLES"));
+                        m_lineVehicles.tooltip = vehTooltip;
+                        m_lineStops.text = Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].CountStops(LineID).ToString("N0");
+                        m_lineVehicles.text = Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].CountVehicles(LineID).ToString("N0");
+
+                        TLMTransportLineStatusesManager.instance.GetLastWeekIncomeAndExpensesForLine(LineID, out long income, out long expense);
+                        long balance = (income - expense);
+                        m_lineBalance.text = (balance / 100.0f).ToString(Settings.moneyFormat, LocaleManager.cultureInfo);
+                        m_lineBalance.textColor = balance >= 0 ? ColorExtensions.FromRGB("00c000") : ColorExtensions.FromRGB("c00000");
+                        m_lineBalance.isVisible = true;
+
+                        var effectiveLineBudget = TLMLineUtils.GetEffectiveBudget(LineID);
+
+                        m_lineBudgetLabel.text = string.Format("{0:0%}", effectiveLineBudget);
+                        m_lineBudgetLabel.tooltip = string.Format(Locale.Get("TLM_LINE_BUDGET_EXPLAIN_2"),
+                            Locale.Get("TRANSPORT_LINE", Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].Info.m_transportType.ToString()),
+                            overallBudget, Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_budget / 100f, effectiveLineBudget);
+                        m_lineBudgetLabel.isVisible = true;
+
+                    }
+                    else
+                    {
+                        m_lineBudgetLabel.isVisible = false;
+                        m_lineBalance.isVisible = false;
+                        m_lineVehicles.isVisible = false;
+                    }
+                }
+                else
+                {
+                    var currentTSD = TLMPanel.Instance.m_linesPanel.TSD;
+                    m_lineName.text = string.Format(Locale.Get("TLM_OUTSIDECONNECTION_LISTNAMETEMPLATE"), currentTSD.GetTransportName());
+                    LineNumber = 0;
+                    m_linePassengers.isVisible = false;
+                    m_lineColor.isVisible = false;
+                    m_lineBudgetLabel.isVisible = false;
+                    m_lineBalance.isVisible = false;
+                    m_lineIsVisible.isVisible = false;
+                    m_deleteLine.isVisible = false;
+                    m_buttonAutoName.isVisible = false;
+                    m_buttonAutoColor.isVisible = false;
+                    m_lineVehicles.isVisible = false;
+                    m_lineStops.isVisible = false;
+                    SetBackgroundColor(false, true);
+                }
+            }
+        }
+
+        public void SetBackgroundColor(bool broken = false, bool lineZero = false)
+        {
+            Color32 backgroundColor = lineZero ? Line0BackgroundColor : !broken ? BackgroundColor : BrokenBackgroundColor;
+            backgroundColor.a = !broken ? (byte)((base.component.zOrder % 2 != 0) ? 127 : 255) : (byte)Mathf.Lerp(127, 255, Mathf.Abs((SimulationManager.instance.m_currentTickIndex % 60 / 30f) - 1));
+            if (m_mouseIsOver)
+            {
+                backgroundColor.r = (byte)Mathf.Min(255, (backgroundColor.r * 3) >> 1);
+                backgroundColor.g = (byte)Mathf.Min(255, (backgroundColor.g * 3) >> 1);
+                backgroundColor.b = (byte)Mathf.Min(255, (backgroundColor.b * 3) >> 1);
+            }
+            m_background.color = backgroundColor;
+        }
+
+        public void ChangeLineVisibility(bool r)
+        {
+            if (LineID < Singleton<TransportManager>.instance.m_lines.m_buffer.Length && LineID != 0 && !m_isUpdatingVisibility)
+            {
+                Singleton<SimulationManager>.instance.AddAction(() =>
+                {
+                    if (r)
+                    {
+                        Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags &= ~TransportLine.Flags.Hidden;
+                    }
+                    else
+                    {
+                        Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags |= TransportLine.Flags.Hidden;
+                    }
+                });
+            }
+        }
+
+        public void DoAutoColor() => TLMController.AutoColor(LineID);
+
+        public void DoAutoName() => TLMLineUtils.SetLineName(LineID, TLMLineUtils.CalculateAutoName(LineID, false, out _));
+
+        protected void Start() => m_lineColor.gameObject.AddComponent<UIColorFieldExtension>();
+
+        private void SetLineID(ushort id)
+        {
+            m_lineID = id >= TransportManager.MAX_LINE_COUNT ? throw new System.Exception($"INVALID LINE IDX: {id}") : id;
+            m_lastUpdate = 0;
+        }
+
+        private static void CreateLabel(out UILabel label, Transform transform)
+        {
+            MonoUtils.CreateUIElement(out label, transform, "LineStops");
+            label.textAlignment = UIHorizontalAlignment.Center;
+            label.textColor = ForegroundColor;
+            label.minimumSize = new Vector2(80, 18);
+            label.pivot = UIPivotPoint.TopLeft;
+            label.wordWrap = false;
+            label.autoSize = true;
+        }
+
+        private void OnMouseEnter(UIComponent comp, UIMouseEventParameter param)
+        {
+            if (!m_mouseIsOver)
+            {
+                m_mouseIsOver = true;
+                if (LineID != 0)
+                {
+                    Singleton<SimulationManager>.instance.AddAction(delegate
+                    {
+                        if ((Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags & TransportLine.Flags.Created) != TransportLine.Flags.None)
+                        {
+                            Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags |= TransportLine.Flags.Highlighted;
+                        }
+                    });
+                }
+            }
+        }
+
+        private void OnMouseLeave(UIComponent comp, UIMouseEventParameter param)
+        {
+            if (m_mouseIsOver)
+            {
+                m_mouseIsOver = false;
+                if (LineID != 0)
+                {
+                    Singleton<SimulationManager>.instance.AddAction(delegate
+                    {
+                        if ((Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags & TransportLine.Flags.Created) != TransportLine.Flags.None)
+                        {
+                            Singleton<TransportManager>.instance.m_lines.m_buffer[LineID].m_flags &= ~TransportLine.Flags.Highlighted;
+                        }
+                    });
+                }
+            }
+        }
+
+        private void OnLineChanged(ushort id)
+        {
+            if (id == LineID)
+            {
+                RefreshData(true, true);
+            }
+        }
+
+        private void OnColorChanged(UIComponent x, Color color) => TLMLineUtils.SetLineColor(this, LineID, color);
     }
 }

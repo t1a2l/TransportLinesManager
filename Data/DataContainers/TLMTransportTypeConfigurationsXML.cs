@@ -34,7 +34,7 @@ namespace TransportLinesManager.Data.DataContainers
         [XmlAttribute("defaultCostPerPassenger")]
         public int DefaultCostPerPassenger { get; set; } = 0;
         [XmlAttribute("defaultTicketPrice")]
-        public int DefaultTicketPrice { get; set; } = 0;
+        public int DefaultTicketPrice { get; set; } = -1;
         [XmlAttribute("lineIcon")]
         public LineIconSpriteNames DefaultLineIcon { get; set; } = LineIconSpriteNames.NULL;
         [XmlAttribute("vehicleIdentifierLocal")]

@@ -38,7 +38,6 @@ namespace TransportLinesManager.Interfaces
 
     public interface ITicketPriceExtension : ISafeGettable<ITicketPriceStorage>, ILineNumberToIndexable
     {
-        uint GetDefaultTicketPrice(uint rel);
     }
 
     public interface ITicketPriceStorage : IWeekendProfileStorage

@@ -60,7 +60,10 @@ namespace TransportLinesManager.Data.DataContainers
 
         public bool IsDisplayAbsoluteValues(ushort lineId) => SafeGet(lineId).DisplayAbsoluteValues;
 
+        public uint LineToIndex(ushort lineId) => lineId > 0 ? lineId : throw new System.Exception("Line 0 cannot have specific configuration!");
+
         #region Asset List
+
         public List<TransportAsset> GetBasicAssetListForLine(ushort lineId)
         {
             var tsd = TransportSystemDefinition.FromLineId(lineId, false);
@@ -146,62 +149,5 @@ namespace TransportLinesManager.Data.DataContainers
         }
 
         #endregion
-
-        #region Ticket Price
-
-        public uint GetDefaultTicketPrice(uint lineId = 0)
-        {
-            var tsd = TransportSystemDefinition.FromLineId((ushort)lineId, false);
-            switch (tsd.SubService)
-            {
-                case ItemClass.SubService.PublicTransportCableCar:
-                case ItemClass.SubService.PublicTransportBus:
-                case ItemClass.SubService.PublicTransportMonorail:
-                    return 100;
-                case ItemClass.SubService.PublicTransportMetro:
-                case ItemClass.SubService.PublicTransportTaxi:
-                case ItemClass.SubService.PublicTransportTrain:
-                case ItemClass.SubService.PublicTransportTram:
-                    return 200;
-                case ItemClass.SubService.PublicTransportPlane:
-                    if (tsd.VehicleType == VehicleInfo.VehicleType.Blimp)
-                    {
-                        return 100;
-                    }
-                    else
-                    {
-                        return 1000;
-                    }
-                case ItemClass.SubService.PublicTransportShip:
-                    if (tsd.VehicleType == VehicleInfo.VehicleType.Ferry)
-                    {
-                        return 100;
-                    }
-                    else
-                    {
-                        return 500;
-                    }
-                case ItemClass.SubService.PublicTransportTours:
-                    if (tsd.VehicleType == VehicleInfo.VehicleType.Car)
-                    {
-                        return 100;
-                    }
-                    else if (tsd.VehicleType == VehicleInfo.VehicleType.None)
-                    {
-                        return 0;
-                    }
-                    return 102;
-                default:
-                    LogUtils.DoLog("subservice not found: {0}", tsd.SubService);
-                    return 103;
-            }
-
-        }
-        #endregion
-
-        #region Depot
-        public uint LineToIndex(ushort lineId) => lineId > 0 ? lineId : throw new System.Exception("Line 0 cannot have specific configuration!");
-        #endregion
-
     }
 }

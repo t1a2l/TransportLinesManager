@@ -29,6 +29,7 @@ namespace TransportLinesManager.CommonsWindow.List
                 m_isUpdated = false;
             }
         }
+
         private UICheckBox m_visibilityToggle;
         private LineSortCriterion m_lastSortCriterionLines;
         private bool m_reverseOrder = false;
@@ -42,17 +43,15 @@ namespace TransportLinesManager.CommonsWindow.List
         protected UILabel m_countLines;
         private TransportSystemDefinition m_tsd = TransportSystemDefinition.BUS;
 
-
         private bool m_isUpdated;
 
         #region Awake
+
         protected void Awake()
         {
-
             MainContainer = GetComponent<UIPanel>();
 
             CreateTitleRow(out titleLine, MainContainer);
-
 
             MonoUtils.CreateScrollPanel(MainContainer, out listPanel, out UIScrollbar scrollbar, MainContainer.width - 30, MainContainer.height - 70, new Vector3(5, 40));
             listPanel.autoLayout = true;
@@ -66,31 +65,6 @@ namespace TransportLinesManager.CommonsWindow.List
             counterContainer.relativePosition = new Vector3(0, MainContainer.height - 20);
         }
 
-        private void OnToggleVisible(UIComponent component, bool value)
-        {
-            if (value)
-            {
-                RefreshLines();
-            }
-        }
-
-        #endregion
-
-        protected void Update()
-        {
-            if (!component.isVisible)
-            {
-                return;
-            }
-            if (!m_isUpdated || m_lastLineCount != TransportManager.instance.m_lineCount)
-            {
-                m_lastLineCount = Singleton<TransportManager>.instance.m_lineCount;
-                RefreshLines();
-            }
-        }
-
-
-        #region Awake
         protected void Start()
         {
             m_lastSortCriterionLines = LineSortCriterion.LINE_NUMBER;
@@ -133,9 +107,32 @@ namespace TransportLinesManager.CommonsWindow.List
             };
 
         }
+
+        private void OnToggleVisible(UIComponent component, bool value)
+        {
+            if (value)
+            {
+                RefreshLines();
+            }
+        }
+
         #endregion
 
+        protected void Update()
+        {
+            if (!component.isVisible)
+            {
+                return;
+            }
+            if (!m_isUpdated || m_lastLineCount != TransportManager.instance.m_lineCount)
+            {
+                m_lastLineCount = Singleton<TransportManager>.instance.m_lineCount;
+                RefreshLines();
+            }
+        }
+
         #region title row
+
         protected void CreateTitleRow(out UIPanel titleLine, UIComponent parent)
         {
             LogUtils.DoLog("Creating Title Row ");
@@ -217,7 +214,6 @@ namespace TransportLinesManager.CommonsWindow.List
             m_visibilityToggle.eventCheckChanged += ToggleAllLinesVisibility;
         }
 
-
         private void LineName_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
         {
             m_reverseOrder = m_lastSortCriterionLines == LineSortCriterion.NAME && !m_reverseOrder;
@@ -269,9 +265,8 @@ namespace TransportLinesManager.CommonsWindow.List
                 }
                 m_isUpdated = false;
             });
+
         #endregion
-
-
 
         public void RefreshLines()
         {
@@ -332,6 +327,7 @@ namespace TransportLinesManager.CommonsWindow.List
             PROFIT,
             LINE_NUMBER
         }
+
         private static int Compare<T>(Tuple<ushort, T> left, Tuple<ushort, T> right) where T : IComparable =>
              left.First == right.First
                  ? 0
@@ -342,6 +338,7 @@ namespace TransportLinesManager.CommonsWindow.List
              : left.Second is string leftStr && right.Second is string rightStr
                  ? string.Compare(leftStr, rightStr, StringComparison.InvariantCulture)
                  : left.Second.CompareTo(right.Second);
+
         private List<ushort> ApplySort<T>(List<ushort> lines, Func<ushort, T> mapper) where T : IComparable
             => [.. SortingUtils.QuicksortList(
                 [.. lines.Select(x => Tuple.New(GetEffectiveSortingLineId(x), mapper(x)))],
@@ -350,10 +347,15 @@ namespace TransportLinesManager.CommonsWindow.List
             ).Select(x => x.First == ushort.MaxValue ? (ushort)0 : x.First)];
 
         private ushort GetEffectiveSortingLineId(ushort x) => x == 0 && m_reverseOrder ? ushort.MaxValue : x;
+
         private string NameTupleMapper(ushort x) => x == 0 ? default : Singleton<TransportManager>.instance.GetLineName(x);
+
         private int StopTupleMapper(ushort x) => x == 0 ? default : Singleton<TransportManager>.instance.m_lines.m_buffer[x].CountStops(x);
+
         private int VehicleTupleMapper(ushort x) => x == 0 ? default : Singleton<TransportManager>.instance.m_lines.m_buffer[x].CountVehicles(x);
+
         private string LineNumberMapper(ushort x) => x == 0 ? default : TLMLineUtils.GetLineStringId(x, false);
+
         private int PassengerTupleMapper(ushort x)
         {
             if (x == 0)
@@ -364,6 +366,7 @@ namespace TransportLinesManager.CommonsWindow.List
             int averageCount2 = (int)Singleton<TransportManager>.instance.m_lines.m_buffer[x].m_passengers.m_touristPassengers.m_averageCount;
             return averageCount + averageCount2;
         }
+
         private long ProfitTupleMapper(ushort x)
         {
             if (x == 0)
@@ -373,10 +376,6 @@ namespace TransportLinesManager.CommonsWindow.List
             TLMTransportLineStatusesManager.instance.GetLastWeekIncomeAndExpensesForLine(x, out long income, out long expense);
             return income - expense;
         }
-
-
-
-
 
         #endregion
 

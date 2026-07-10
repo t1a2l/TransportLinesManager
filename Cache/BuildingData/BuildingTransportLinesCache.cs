@@ -23,12 +23,13 @@ namespace TransportLinesManager.Cache.BuildingData
             NetManagerOverrides.EventNodeChanged += ResetAllBuilding;
             NetManagerOverrides.EventSegmentChanged += ResetAllBuildingSegment;
         }
+
         public void OnDisable()
         {
             BuildingManager.instance.EventBuildingReleased -= ResetBuilding;
             BuildingManager.instance.EventBuildingRelocated -= ResetBuilding;
             NetManagerOverrides.EventNodeChanged -= ResetAllBuilding;
-            NetManagerOverrides.EventNodeChanged -= ResetAllBuildingSegment;
+            NetManagerOverrides.EventSegmentChanged -= ResetAllBuildingSegment;
         }
 
         internal void ResetBuilding(ushort buildingId)
@@ -48,6 +49,7 @@ namespace TransportLinesManager.Cache.BuildingData
                 InnerBuildingLinesIndex = null;
             }
         }
+
         private void ResetAllBuildingSegment(ushort segmentId)
         {
             var nm = NetManager.instance;

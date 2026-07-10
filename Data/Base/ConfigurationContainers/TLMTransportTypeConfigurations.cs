@@ -72,6 +72,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
             }
             return Configurations[prefix];
         }
+
         private TLMAssetConfiguration SafeGetAsset(string assetName)
         {
             if (!AssetConfigurations.ContainsKey(assetName))
@@ -94,12 +95,6 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         IDepotSelectionStorage ISafeGettable<IDepotSelectionStorage>.SafeGet(uint index) => SafeGet(index);
 
         IBasicExtensionStorage ISafeGettable<IBasicExtensionStorage>.SafeGet(uint index) => SafeGet(index);
-
-        public uint GetDefaultTicketPrice(uint x = 0)
-        {
-            int savedVal = Definition.GetConfig().DefaultTicketPrice;
-            return savedVal > 0 ? (uint)savedVal : (uint)TransportManager.instance.GetTransportInfo(TransportType).m_ticketPrice;
-        }
 
         #region Asset properties
 
@@ -369,12 +364,15 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         #endregion
 
         #region Use Color For Model
+
         public bool IsUsingColorForModel(uint prefix) => SafeGet(prefix).UseColorForModel;
 
         public void SetUsingColorForModel(uint prefix, bool value) => SafeGet(prefix).UseColorForModel = value;
+
         #endregion
 
         #region Custom Palette
+
         public string GetCustomPalette(uint prefix) => SafeGet(prefix).CustomPalette ?? string.Empty;
 
         public void SetCustomPalette(uint prefix, string paletteName)
@@ -386,6 +384,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
         #endregion
 
         #region Custom Format
+
         public LineIconSpriteNames GetCustomFormat(uint prefix) => SafeGet(prefix).CustomIcon;
 
         public void SetCustomFormat(uint prefix, LineIconSpriteNames icon)
