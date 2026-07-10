@@ -14,6 +14,7 @@ using UnityEngine;
 using TransportLinesManager.Utils;
 using TransportLinesManager.Interfaces;
 using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Data.DataContainers;
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
@@ -273,13 +274,17 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 if (entry is BudgetEntryXml)
                 {
                     var ext = TLMTransportLineExtension.Instance;
-                    Config[entryIndex].Value = (uint)(ext.IsUsingCustomConfig(lineId) && ext.IsDisplayAbsoluteValues(lineId) ? 0 : 100);
+                    uint multiplier = (uint)(ext.IsUsingCustomConfig(lineId) && ext.IsDisplayAbsoluteValues(lineId) ? 0 : 100);
+                    Config[entryIndex].Value = multiplier;
                     UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(UVMBudgetConfigTab));
                 }
                 else if (entry is TicketPriceEntryXml)
                 {
-                    Config[entryIndex].Value = TLMLineUtils.GetDefaultTicketPrice(lineId);
+                    uint price = TLMLineUtils.GetDefaultTicketPrice(lineId);
+                    Debug.Log($"[TLM] Resetting ticket price for line {lineId} to default {price}");
+                    Config[entryIndex].Value = price;
                     UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMTicketConfigTab));
+                    TLMTicketConfigTab.Instance.MarkDirty();
                 }
                 m_isDirty = true;
             } 

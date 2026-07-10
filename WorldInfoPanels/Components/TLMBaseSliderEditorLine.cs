@@ -211,8 +211,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_ValueSlider.thumbOffset = new Vector2(-200, 0);
             m_ValueSlider.color = new Color32(128, 128, 128, 128);
             m_ValueSlider.name = "ValueSlider";
-            m_ValueSlider.thumbObject.width = m_ValueSlider.width;
-            m_ValueSlider.thumbObject.height = m_ValueSlider.height;
+            m_ValueSlider.thumbObject.width = 400;
+            m_ValueSlider.thumbObject.height = 20;
             ((UISprite)m_ValueSlider.thumbObject).spriteName = "PlainWhite";
             ((UISprite)m_ValueSlider.thumbObject).color = new Color32(1, 140, 46, 255);
 

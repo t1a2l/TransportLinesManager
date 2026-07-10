@@ -753,50 +753,27 @@ namespace TransportLinesManager.Utils
         public static uint GetDefaultTicketPrice(uint lineId = 0)
         {
             var tsd = TransportSystemDefinition.FromLineId((ushort)lineId, false);
-            switch (tsd.SubService)
+            return tsd.SubService switch
             {
-                case ItemClass.SubService.PublicTransportCableCar:
-                case ItemClass.SubService.PublicTransportBus:
-                case ItemClass.SubService.PublicTransportMonorail:
-                case ItemClass.SubService.PublicTransportTrolleybus:
-                    return 100;
-                case ItemClass.SubService.PublicTransportMetro:
-                case ItemClass.SubService.PublicTransportTaxi:
-                case ItemClass.SubService.PublicTransportTrain:
-                case ItemClass.SubService.PublicTransportTram:
-                    return 200;
-                case ItemClass.SubService.PublicTransportPlane:
-                    if (tsd.VehicleType == VehicleInfo.VehicleType.Blimp)
-                    {
-                        return 100;
-                    }
-                    else
-                    {
-                        return 1000;
-                    }
-                case ItemClass.SubService.PublicTransportShip:
-                    if (tsd.VehicleType == VehicleInfo.VehicleType.Ferry)
-                    {
-                        return 100;
-                    }
-                    else
-                    {
-                        return 500;
-                    }
-                case ItemClass.SubService.PublicTransportTours:
-                    if (tsd.VehicleType == VehicleInfo.VehicleType.Car)
-                    {
-                        return 100;
-                    }
-                    else if (tsd.VehicleType == VehicleInfo.VehicleType.None)
-                    {
-                        return 0;
-                    }
-                    return 102;
-                default:
-                    LogUtils.DoLog("subservice not found: {0}", tsd.SubService);
-                    return 103;
-            }
+                ItemClass.SubService.PublicTransportBus => 100,
+                ItemClass.SubService.PublicTransportMetro => 200,
+                ItemClass.SubService.PublicTransportTrain => 200,
+                ItemClass.SubService.PublicTransportMonorail => 200,
+                ItemClass.SubService.PublicTransportCableCar => 120,
+                ItemClass.SubService.PublicTransportTram => 800,
+                ItemClass.SubService.PublicTransportTaxi => 1000,
+
+                ItemClass.SubService.PublicTransportPlane =>
+                    tsd.VehicleType == VehicleInfo.VehicleType.Blimp ? 115u : 1000u,
+
+                ItemClass.SubService.PublicTransportShip =>
+                    tsd.VehicleType == VehicleInfo.VehicleType.Ferry ? 100u : 500u,
+
+                ItemClass.SubService.PublicTransportTours =>
+                    tsd.VehicleType == VehicleInfo.VehicleType.Car ? 3000u : 0u,
+
+                _ => 100
+            };
         }
 
         public static int GetRuntimeUsedCount(ushort lineId, int slotIndex, string assetName)

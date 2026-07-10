@@ -40,7 +40,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             UpdateWeekendTicketPriceUIState();
         }
 
-        public override float GetMaxSliderValue() => 10000;
+        public override float GetMaxSliderValue() => 40000;
 
         public override string GetComponentName() => "TicketPriceConfigTabLabel";
 
