@@ -11,9 +11,7 @@ using UnityEngine;
 
 namespace TransportLinesManager.WorldInfoPanels.Components
 {
-    public abstract class TLMBaseSliderEditorLine<L, V> : UICustomControl
-        where L : TLMBaseSliderEditorLine<L, V>
-        where V : UintValueHourEntryXml<V>
+    public abstract class TLMBaseSliderEditorLine<L, V> : UICustomControl where L : TLMBaseSliderEditorLine<L, V> where V : UintValueHourEntryXml<V>
     {
         protected UIPanel m_container;
         protected UITextField m_timeInput;
@@ -21,6 +19,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         private UITextField m_valueField;
         protected UIButton m_die;
         protected UISlider m_valueSlider;
+        protected UIButton m_default;
 
         private bool m_loading = false;
 
@@ -41,6 +40,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         }
 
         private Action<V> m_onDie;
+        private Action<V> m_onDefault;
 
         public Action<V> OnDie
         {
@@ -50,8 +50,22 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 m_onDie = value;
                 if (m_die != null)
                 {
-                    m_die.isVisible = value != null;
+                    m_die.isEnabled = value != null;
                     m_die.isInteractive = value != null;
+                }
+            }
+        }
+
+        public Action<V> OnDefault
+        {
+            get => m_onDefault;
+            set
+            {
+                m_onDefault = value;
+                if (m_default != null)
+                {
+                    m_default.isEnabled = value != null;
+                    m_default.isInteractive = value != null;
                 }
             }
         }
@@ -60,47 +74,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         public Action<V, float> OnBudgetChanged;
         private V m_entry;
 
-        public void SetSliderParams(Color c, float maxValue)
-        {
-            ((UISprite)m_valueSlider.thumbObject).color = c;
-            m_valueSlider.maxValue = maxValue;
-        }
-
-        private void FillData()
-        {
-            m_loading = true;
-            try
-            {
-                UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding);
-                if (!fromBuilding)
-                {
-                    ref TransportLine t = ref TransportManager.instance.m_lines.m_buffer[lineId];
-                    m_timeInput.text = Entry.HourOfDay.ToString();
-                    ExtraOnFillData(ref t);
-                    m_valueSlider.value = Entry.Value;
-                    m_value.text = GetValueFormat(ref t);
-                }
-            }
-            finally
-            {
-                m_loading = false;
-            }
-        }
-
-        public string GetCurrentVal() => m_timeInput.text;
-
-        protected virtual void ExtraOnFillData(ref TransportLine t) { }
-
-        public abstract string GetValueFormat(ref TransportLine t);
-
-        public abstract uint GetValueAsInt(ref TransportLine t);
-
-        public abstract void SetValueFromTyping(ref TransportLine t, uint value);
-
-        protected virtual IEnumerable<V> GetEntriesForDuplicateCheck(ushort lineId)
-        {
-            return null;
-        }
+        private bool alreadyCalling = false;
 
         public void Awake()
         {
@@ -115,7 +89,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 SetValue(val);
             };
             m_die = Find<UIButton>("Delete");
-            m_die.eventClick += (component, eventParam) => m_onDie?.Invoke(Entry);
+            m_die?.eventClick += (component, eventParam) => m_onDie?.Invoke(Entry);
+            m_default = Find<UIButton>("Default");
+            m_default?.eventClick += (component, eventParam) => m_onDefault?.Invoke(Entry);
             MonoUtils.LimitWidthAndBox(m_value, 60, out UIPanel container, true);
 
             container.AttachUIComponent(m_valueField.gameObject);
@@ -155,6 +131,20 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             };
 
         }
+
+        public void SetSliderParams(Color c, float maxValue)
+        {
+            ((UISprite)m_valueSlider.thumbObject).color = c;
+            m_valueSlider.maxValue = maxValue;
+        }
+
+        public string GetCurrentVal() => m_timeInput.text;
+
+        public abstract string GetValueFormat(ref TransportLine t);
+
+        public abstract uint GetValueAsInt(ref TransportLine t);
+
+        public abstract void SetValueFromTyping(ref TransportLine t, uint value);
 
         protected static void EnsureTemplate(string templateName)
         {
@@ -207,24 +197,34 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_valueField.padding.top = 5;
             m_valueField.textScale = 1.125f;
 
-            var m_ValueSlider = UIHelperExtension.AddSlider(m_container, null, 0, 500, 5, -1, (x) => {});
+            var m_ValueSlider = UIHelperExtension.AddSlider(m_container, null, 0, 500, 5, -1, (x) => { });
             Destroy(m_ValueSlider.transform.parent.GetComponentInChildren<UILabel>());
             UIPanel budgetSliderPanel = m_ValueSlider.GetComponentInParent<UIPanel>();
 
-            budgetSliderPanel.width = 205;
+            budgetSliderPanel.width = 170;
             budgetSliderPanel.height = 20;
             budgetSliderPanel.autoLayout = true;
 
-            m_ValueSlider.size = new Vector2(200, 20);
+            m_ValueSlider.size = new Vector2(170, 20);
             m_ValueSlider.scrollWheelAmount = 0;
             m_ValueSlider.clipChildren = true;
             m_ValueSlider.thumbOffset = new Vector2(-200, 0);
             m_ValueSlider.color = new Color32(128, 128, 128, 128);
             m_ValueSlider.name = "ValueSlider";
-            m_ValueSlider.thumbObject.width = 400;
-            m_ValueSlider.thumbObject.height = 20;
+            m_ValueSlider.thumbObject.width = m_ValueSlider.width;
+            m_ValueSlider.thumbObject.height = m_ValueSlider.height;
             ((UISprite)m_ValueSlider.thumbObject).spriteName = "PlainWhite";
             ((UISprite)m_ValueSlider.thumbObject).color = new Color32(1, 140, 46, 255);
+
+            MonoUtils.CreateUIElement(out UIButton m_default, m_container.transform, "Default");
+            m_default.textScale = 1f;
+            m_default.width = 25;
+            m_default.height = 25;
+            m_default.tooltip = Locale.Get("TLM_SET_TO_DEFAULT_STOP_TICKET_PRICE_LIST");
+            MonoUtils.InitButton(m_default, true, "OptionBase");
+            m_default.isVisible = true;
+            m_default.foregroundSpriteMode = UIForegroundSpriteMode.Scale;
+            m_default.normalFgSprite = ResourceLoader.GetDefaultSpriteNameFor(CommonsSpriteNames.Reload);
 
             MonoUtils.CreateUIElement(out UIButton m_die, m_container.transform, "Delete");
             m_die.textScale = 1f;
@@ -241,6 +241,13 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             UITemplateUtils.GetTemplateDict()[templateName] = m_container;
         }
 
+        protected virtual IEnumerable<V> GetEntriesForDuplicateCheck(ushort lineId)
+        {
+            return null;
+        }
+
+        protected virtual void ExtraOnFillData(ref TransportLine t) { }
+
         protected void SetValue(float val)
         {
             if (m_loading)
@@ -253,7 +260,26 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             TLMAssetSelectorTab.MarkDirty();
         }
 
-        private bool alreadyCalling = false;
+        private void FillData()
+        {
+            m_loading = true;
+            try
+            {
+                UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding);
+                if (!fromBuilding)
+                {
+                    ref TransportLine t = ref TransportManager.instance.m_lines.m_buffer[lineId];
+                    m_timeInput.text = Entry.HourOfDay.ToString();
+                    ExtraOnFillData(ref t);
+                    m_valueSlider.value = Entry.Value;
+                    m_value.text = GetValueFormat(ref t);
+                }
+            }
+            finally
+            {
+                m_loading = false;
+            }
+        }
 
         private void SendText(UIComponent x, string y)
         {

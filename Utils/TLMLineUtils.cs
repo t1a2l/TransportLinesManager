@@ -228,12 +228,9 @@ namespace TransportLinesManager.Utils
             IBasicExtensionStorage currentConfig = GetEffectiveConfigForLine(lineId);
             TimeableList<BudgetEntryXml> budgetConfig = ext.GetActiveBudgetEntries(lineId);
 
-            if (budgetConfig == null || budgetConfig.Count == 0)
+            if (budgetConfig.Count == 0)
             {
                 ext.SetActiveBudgetMultiplierForLine(lineId, Singleton<TransportManager>.instance.m_lines.m_buffer[lineId].m_budget, 0);
-
-                currentConfig = GetEffectiveConfigForLine(lineId);
-                budgetConfig = ext.GetActiveBudgetEntries(lineId);
             }
 
             var currentBudget = budgetConfig.GetAtHour(ReferenceTimer);
@@ -736,31 +733,70 @@ namespace TransportLinesManager.Utils
 
         public static Tuple<TicketPriceEntryXml, int> GetTicketPriceForLine(TransportSystemDefinition tsd, ushort lineId, ProfileTarget profileTarget, float hour)
         {
-            Tuple<TicketPriceEntryXml, int> ticketPrice = null;
-            if (lineId > 0)
-            {
-                if (TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineId))
-                {
-                    ticketPrice = TLMTransportLineExtension.Instance.GetTicketPriceForHourForLine(lineId, hour, profileTarget);
-                }
-                if (ticketPrice == null || ticketPrice.Second < 0)
-                {
-                    ticketPrice = tsd.GetTransportExtension().GetTicketPriceForHourForLine(lineId, hour, profileTarget);
-                }
-            }
-            if (ticketPrice == null || ticketPrice.Second < 0)
-            {
-                uint defaultPrice = (uint)tsd.GetConfig().DefaultTicketPrice;
+            IBasicExtension ext = GetEffectiveExtensionForLine(lineId, tsd);
+            TimeableList<TicketPriceEntryXml> ticketPriceConfig = ext.GetActiveTicketPriceEntries(lineId);
 
-                ticketPrice = Tuple.New(new TicketPriceEntryXml() { Value = defaultPrice }, -1);
-            }
-            if (ticketPrice?.First == null)
+            int defaultPrice = tsd.GetConfig().DefaultTicketPrice;
+            uint price = defaultPrice >= 0 ? (uint)defaultPrice : GetDefaultTicketPrice(lineId);
+
+            if (ticketPriceConfig.Count == 0)
             {
-                uint gameDefault = (uint)TransportManager.instance.m_lines.m_buffer[lineId].Info.m_ticketPrice;
-                ticketPrice = Tuple.New(new TicketPriceEntryXml { Value = gameDefault }, -1);
+                ext.SetActiveTicketPriceForLine(lineId, price, 0);
             }
 
+            Tuple<TicketPriceEntryXml, int> ticketPrice = ext.GetTicketPriceForHourForLine(lineId, hour, profileTarget);
+            ticketPrice.First.Value = price;
+           
             return ticketPrice;
+        }
+
+        public static uint GetDefaultTicketPrice(uint lineId = 0)
+        {
+            var tsd = TransportSystemDefinition.FromLineId((ushort)lineId, false);
+            switch (tsd.SubService)
+            {
+                case ItemClass.SubService.PublicTransportCableCar:
+                case ItemClass.SubService.PublicTransportBus:
+                case ItemClass.SubService.PublicTransportMonorail:
+                case ItemClass.SubService.PublicTransportTrolleybus:
+                    return 100;
+                case ItemClass.SubService.PublicTransportMetro:
+                case ItemClass.SubService.PublicTransportTaxi:
+                case ItemClass.SubService.PublicTransportTrain:
+                case ItemClass.SubService.PublicTransportTram:
+                    return 200;
+                case ItemClass.SubService.PublicTransportPlane:
+                    if (tsd.VehicleType == VehicleInfo.VehicleType.Blimp)
+                    {
+                        return 100;
+                    }
+                    else
+                    {
+                        return 1000;
+                    }
+                case ItemClass.SubService.PublicTransportShip:
+                    if (tsd.VehicleType == VehicleInfo.VehicleType.Ferry)
+                    {
+                        return 100;
+                    }
+                    else
+                    {
+                        return 500;
+                    }
+                case ItemClass.SubService.PublicTransportTours:
+                    if (tsd.VehicleType == VehicleInfo.VehicleType.Car)
+                    {
+                        return 100;
+                    }
+                    else if (tsd.VehicleType == VehicleInfo.VehicleType.None)
+                    {
+                        return 0;
+                    }
+                    return 102;
+                default:
+                    LogUtils.DoLog("subservice not found: {0}", tsd.SubService);
+                    return 103;
+            }
         }
 
         public static int GetRuntimeUsedCount(ushort lineId, int slotIndex, string assetName)

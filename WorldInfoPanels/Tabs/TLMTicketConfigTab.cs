@@ -1,6 +1,5 @@
 ﻿using Commons.Utils.UtilitiesClasses;
 using TransportLinesManager.Data.Base;
-using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.Components;
 using System.Collections.Generic;
@@ -41,7 +40,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             UpdateWeekendTicketPriceUIState();
         }
 
-        public override float GetMaxSliderValue() => 100;
+        public override float GetMaxSliderValue() => 10000;
+
+        public override string GetComponentName() => "TicketPriceConfigTabLabel";
 
         internal override List<Color> ColorOrder { get; } =
         [

@@ -36,6 +36,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public override string GetValueColumnLocale() => "TLM_BUDGET";
 
+        public override string GetComponentName() => "UVMBudgetConfigTabLabel";
+
         public override float GetMaxSliderValue() => 500;
 
         public ProfileTarget CurrentProfileTarget => m_editingWeekendBudget ? ProfileTarget.Weekend : ProfileTarget.Weekday;
@@ -78,7 +80,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     TLMAssetSelectorTab.MarkDirty();
                 }
             });
-            MonoUtils.LimitWidthAndBox(m_showAbsoluteCheckbox.label, m_uiHelper.Self.width - 40f);
+            m_showAbsoluteCheckbox.name = "ShowAbsoluteCheckbox";
+            MonoUtils.LimitWidthAndBox(m_showAbsoluteCheckbox.label, 370f);
+            m_showAbsoluteCheckbox.width = 370f;
+            m_showAbsoluteCheckbox.label.width = 370f;
             CreateWeekendBudgetControls(this.component);
         }
 
@@ -151,6 +156,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_useSeparateWeekendBudgetCheckbox = m_uiHelper.AddCheckboxLocale("TLM_USE_SEPARATE_WEEKEND_BUDGET", false, OnUseSeparateWeekendBudgetChanged);
             m_useSeparateWeekendBudgetCheckbox.name = "UseSeparateWeekendBudget";
             m_useSeparateWeekendBudgetCheckbox.relativePosition = new Vector3(12f, parent.height - 52f);
+            m_useSeparateWeekendBudgetCheckbox.width = 370f;
 
             MonoUtils.CreateUIElement(out m_budgetProfilePanel, parent.transform);
             m_budgetProfilePanel.name = "BudgetProfilePanel";

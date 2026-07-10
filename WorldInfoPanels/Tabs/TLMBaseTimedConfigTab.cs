@@ -29,6 +29,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public abstract float GetMaxSliderValue();
 
+        public abstract string GetComponentName();
+
         public virtual void ExtraAwake() { }
 
         public virtual void ExtraOnSetTarget(ushort lineID) { }
@@ -69,6 +71,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             titleLabel.wordWrap = false;
             titleLabel.minimumSize = new Vector2(MainContainer.width - 10, 0); ;
             titleLabel.localeID = GetTitleLocale();
+            titleLabel.name = GetComponentName();
 
             m_uiHelper.AddSpace(5);
             MonoUtils.CreateElement(out m_clockChart, m_uiHelper.Self.transform, "DailyClock");
@@ -144,6 +147,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 controller.SetSliderParams(GetColorForNumber(i), GetMaxSliderValue());
                 controller.Entry = Config[i];
                 controller.OnTimeChanged = SetTime;
+                controller.OnDefault = SetToDefault;
                 controller.OnDie = rulesCount > 1 ? RemoveTime : null;
                 controller.OnBudgetChanged = SetValue;
             }
@@ -248,6 +252,37 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 ReorderLines();
                 TLMAssetSelectorTab.MarkDirty();
             }
+        }
+
+        private void SetToDefault(V entry)
+        {
+            if (Config == default) return;
+            int entryIndex = -1;
+            for (int i = 0; i < Config.Count; i++)
+            {
+                if (Config[i].HourOfDay == entry.HourOfDay)
+                {
+                    entryIndex = i;
+                    break;
+                }
+            }
+            if (entryIndex < 0) return;
+
+            if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool _))
+            {
+                if (entry is BudgetEntryXml)
+                {
+                    var ext = TLMTransportLineExtension.Instance;
+                    Config[entryIndex].Value = (uint)(ext.IsUsingCustomConfig(lineId) && ext.IsDisplayAbsoluteValues(lineId) ? 0 : 100);
+                    UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(UVMBudgetConfigTab));
+                }
+                else if (entry is TicketPriceEntryXml)
+                {
+                    Config[entryIndex].Value = TLMLineUtils.GetDefaultTicketPrice(lineId);
+                    UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMTicketConfigTab));
+                }
+                m_isDirty = true;
+            } 
         }
 
         private void AddEntry()
