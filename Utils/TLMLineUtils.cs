@@ -743,11 +743,8 @@ namespace TransportLinesManager.Utils
             {
                 ext.SetActiveTicketPriceForLine(lineId, price, 0);
             }
-
-            Tuple<TicketPriceEntryXml, int> ticketPrice = ext.GetTicketPriceForHourForLine(lineId, hour, profileTarget);
-            ticketPrice.First.Value = price;
            
-            return ticketPrice;
+            return ext.GetTicketPriceForHourForLine(lineId, hour, profileTarget);
         }
 
         public static uint GetDefaultTicketPrice(uint lineId = 0)
