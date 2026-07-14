@@ -271,12 +271,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 else if (entry is TicketPriceEntryXml)
                 {
                     uint price = TLMLineUtils.GetDefaultTicketPrice(lineId);
-                    var target = Config.GetAtHourExact((float)entry.HourOfDay);
-                    target?.First.Value = price;
-                    if(target != null && target.First != null)
-                    {
-                        Debug.Log($"SetToDefault -  ticket price for line {lineId} is set to default {price}, entry Value is {target.First.Value}");
-                    }
+                    entry.Value = price; 
                     ReorderLines();
                     UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMTicketConfigTab));
                 }

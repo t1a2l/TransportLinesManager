@@ -270,11 +270,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 if (!fromBuilding)
                 {
                     ref TransportLine t = ref TransportManager.instance.m_lines.m_buffer[lineId];
-                    if(Entry is TicketPriceEntryXml)
-                    {
-                        Debug.Log("FillData - Entry.HourOfDay: " + Entry.HourOfDay.ToString() + ", and Entry value is " + Entry.Value);
-                        Debug.Log(Environment.StackTrace);
-                    }
                     m_timeInput.text = Entry.HourOfDay.ToString();
                     ExtraOnFillData(ref t);
                     m_valueSlider.value = Entry.Value;
