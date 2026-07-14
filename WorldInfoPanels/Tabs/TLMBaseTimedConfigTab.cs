@@ -258,35 +258,28 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private void SetToDefault(V entry)
         {
             if (Config == default) return;
-            int entryIndex = -1;
-            for (int i = 0; i < Config.Count; i++)
-            {
-                if (Config[i].HourOfDay == entry.HourOfDay)
-                {
-                    entryIndex = i;
-                    break;
-                }
-            }
-            if (entryIndex < 0) return;
-
             if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool _))
             {
                 if (entry is BudgetEntryXml)
                 {
                     var ext = TLMTransportLineExtension.Instance;
                     uint multiplier = (uint)(ext.IsUsingCustomConfig(lineId) && ext.IsDisplayAbsoluteValues(lineId) ? 0 : 100);
-                    Config[entryIndex].Value = multiplier;
-                    UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(UVMBudgetConfigTab));
+                    entry.Value = multiplier;
+                    ReorderLines();
+                    TLMAssetSelectorTab.MarkDirty();
                 }
                 else if (entry is TicketPriceEntryXml)
                 {
                     uint price = TLMLineUtils.GetDefaultTicketPrice(lineId);
-                    Debug.Log($"[TLM] Resetting ticket price for line {lineId} to default {price}");
-                    Config[entryIndex].Value = price;
+                    var target = Config.GetAtHourExact((float)entry.HourOfDay);
+                    target?.First.Value = price;
+                    if(target != null && target.First != null)
+                    {
+                        Debug.Log($"SetToDefault -  ticket price for line {lineId} is set to default {price}, entry Value is {target.First.Value}");
+                    }
+                    ReorderLines();
                     UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMTicketConfigTab));
-                    TLMTicketConfigTab.Instance.MarkDirty();
                 }
-                m_isDirty = true;
             } 
         }
 
