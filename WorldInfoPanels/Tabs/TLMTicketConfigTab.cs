@@ -115,8 +115,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             m_ticketPriceProfileLabel?.relativePosition = new Vector3(0f, 0f);
             m_ticketPriceProfileDropdown?.relativePosition = new Vector3(90f, 0f);
-            ReloadTicketPriceListFromCurrentProfile();
-            MarkDirty();
         }
 
         public TimeableList<TicketPriceEntryXml> CloneTicketPriceEntries(TimeableList<TicketPriceEntryXml> src, ushort lineId)
@@ -182,6 +180,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_ticketPriceProfileDropdown.selectedIndex = 0;
             m_ticketPriceProfileDropdown.relativePosition = new Vector3(90f, 0f);
             m_ticketPriceProfileDropdown.eventSelectedIndexChanged += OnTicketPriceProfileChanged;
+
             UpdateWeekendTicketPriceUIState();
         }
 
