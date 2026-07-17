@@ -10,6 +10,7 @@ using Commons.Utils;
 using ColossalFramework.Globalization;
 using Commons.Extensions.UI;
 using static TransportLinesManager.Data.Extensions.ExtensionStaticExtensionMethods;
+using System.Linq;
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
@@ -71,11 +72,18 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
         }
 
-        protected override TicketPriceEntryXml DefaultEntry() => new()
+        protected override TicketPriceEntryXml DefaultEntry(ushort lineId)
         {
-            HourOfDay = 0,
-            Value = 0
-        };
+            // find first hour not already used
+            var usedHours = new HashSet<int>(Config.Select(x => x.HourOfDay ?? -1));
+            int availableHour = Enumerable.Range(0, 24).FirstOrDefault(h => !usedHours.Contains(h));
+
+            return new()
+            {
+                HourOfDay = availableHour >= 0 ? availableHour : 0,
+                Value = TLMLineUtils.GetDefaultTicketPrice(lineId)
+            };
+        }
 
         public override string GetTemplateName() => TLMTicketPriceEditorLine.TICKET_PRICE_LINE_TEMPLATE;
 

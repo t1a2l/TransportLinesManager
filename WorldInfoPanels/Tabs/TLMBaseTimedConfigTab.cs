@@ -40,7 +40,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         protected abstract TimeableList<V> Config { get; }
 
-        protected abstract V DefaultEntry();
+        protected abstract V DefaultEntry(ushort lineId);
 
         public UIComponent MainContainer { get; private set; }
 
@@ -198,21 +198,29 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
             {
-                IBasicExtension extension = lineId > 0 && !fromBuilding ? TLMLineUtils.GetEffectiveExtensionForLine(lineId) : UVMPublicTransportWorldInfoPanel.GetCurrentTSD().GetTransportExtension();
-                // FIX: pass index directly, remove assets BEFORE removing from Config
-                extension.RemoveBudgetEntryByIndex(lineId, entryIndex);
+                var tsd = TransportSystemDefinition.FromLineId(lineId, fromBuilding);
+                IBasicExtension extension = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
+                if (Config is TimeableList<BudgetEntryXml>)
+                {
+                    // FIX: pass index directly, remove assets BEFORE removing from Config
+                    extension.RemoveBudgetEntryByIndex(lineId, entryIndex);
+                    UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(UVMBudgetConfigTab));
+                    TLMAssetSelectorTab.MarkDirty();
+                }
+                else if (Config is TimeableList<TicketPriceEntryXml>)
+                {
+                    UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMTicketConfigTab));
+                }
             }
             Config.RemoveAtHour(entry.HourOfDay ?? -1); // remove AFTER assets are fixed
             m_isDirty = true;
-            UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(UVMBudgetConfigTab));
-            TLMAssetSelectorTab.MarkDirty();
         }
 
         private void SetTime(V idx, int val)
         {
             idx.HourOfDay = val;
             ReorderLines();
-            TLMAssetSelectorTab.MarkDirty();
+            if (idx is BudgetEntryXml) TLMAssetSelectorTab.MarkDirty();
         }
 
         private void SetValue(V idx, float val)
@@ -222,36 +230,33 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 idx.Value = (uint)val;
 
-                // Hook: if in count mode, reconcile counts for this budget index
-                if (UVMBudgetConfigTab.IsAbsoluteValue()
-                    && UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding)
-                    && !fromBuilding && lineId > 0)
+                if(idx is BudgetEntryXml budgetEntry)
                 {
-                    if (idx is not BudgetEntryXml budgetEntry)
+                    // Hook: if in count mode, reconcile counts for this budget index
+                    if (UVMBudgetConfigTab.IsAbsoluteValue()
+                        && UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding)
+                        && !fromBuilding && lineId > 0)
                     {
-                        ReorderLines();
-                        return;
+                        int budgetIndex = TLMAssetSelectorTab.GetBudgetEntryBackingIndex(lineId, budgetEntry);
+                        if (budgetIndex == -1) return; // safety guard
+                        IBasicExtension ext = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
+
+                        int projected = TLMLineUtils.ProjectTargetVehicleCount(
+                            TransportManager.instance.m_lines.m_buffer[lineId].Info,
+                            TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength,
+                            idx.Value / 100f);
+
+                        int oldProjected = TLMLineUtils.ProjectTargetVehicleCount(
+                            TransportManager.instance.m_lines.m_buffer[lineId].Info,
+                            TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength,
+                            oldVal / 100f);
+
+                        TLMCountModeUtils.OnBudgetChangedInCountMode(lineId, ext, budgetIndex, projected, oldProjected);
+                        TLMAssetSelectorTab.RefreshIndicatorForBudgetIndex(lineId, budgetIndex);
                     }
-                    int budgetIndex = TLMAssetSelectorTab.GetBudgetEntryBackingIndex(lineId, budgetEntry);
-                    if (budgetIndex == -1) return; // safety guard
-                    IBasicExtension ext = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
-
-                    int projected = TLMLineUtils.ProjectTargetVehicleCount(
-                        TransportManager.instance.m_lines.m_buffer[lineId].Info,
-                        TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength,
-                        idx.Value / 100f);
-
-                    int oldProjected = TLMLineUtils.ProjectTargetVehicleCount(
-                        TransportManager.instance.m_lines.m_buffer[lineId].Info,
-                        TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength,
-                        oldVal / 100f);
-
-                    TLMCountModeUtils.OnBudgetChangedInCountMode(lineId, ext, budgetIndex, projected, oldProjected);
-                    TLMAssetSelectorTab.RefreshIndicatorForBudgetIndex(lineId, budgetIndex);
+                    TLMAssetSelectorTab.MarkDirty();
                 }
-
                 ReorderLines();
-                TLMAssetSelectorTab.MarkDirty();
             }
         }
 
@@ -265,31 +270,41 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     var ext = TLMTransportLineExtension.Instance;
                     uint multiplier = (uint)(ext.IsUsingCustomConfig(lineId) && ext.IsDisplayAbsoluteValues(lineId) ? 0 : 100);
                     entry.Value = multiplier;
-                    ReorderLines();
                     TLMAssetSelectorTab.MarkDirty();
                 }
                 else if (entry is TicketPriceEntryXml)
                 {
                     uint price = TLMLineUtils.GetDefaultTicketPrice(lineId);
                     entry.Value = price; 
-                    ReorderLines();
                     UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMTicketConfigTab));
                 }
-            } 
+                ReorderLines();
+                m_isDirty = true;
+            }
         }
 
         private void AddEntry()
         {
-            Config.Add(DefaultEntry());
             if (Config.Count >= 24) return;
             if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
             {
-                IBasicExtension extension = lineId > 0 && !fromBuilding ? TLMLineUtils.GetEffectiveExtensionForLine(lineId) : UVMPublicTransportWorldInfoPanel.GetCurrentTSD().GetTransportExtension();
-                extension.AddDefaultToNewBudgetEntry(lineId, TLMAssetSelectorTab.Instance.CurrentProfileTarget);
+                var tsd = TransportSystemDefinition.FromLineId(lineId, fromBuilding);
+                IBasicExtension extension = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
+                if(Config is TimeableList<BudgetEntryXml>)
+                {
+                    Config.Add(DefaultEntry(lineId));
+                    extension.AddDefaultToNewBudgetEntry(lineId, TLMAssetSelectorTab.Instance.CurrentProfileTarget);
+                    RebuildList();
+                    UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(UVMBudgetConfigTab));
+                    TLMAssetSelectorTab.MarkDirty();
+                }
+                else if (Config is TimeableList<TicketPriceEntryXml>)
+                {
+                    Config.Add(DefaultEntry(lineId));
+                    RebuildList();
+                    UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(TLMTicketConfigTab));
+                }
             }
-            RebuildList();
-            UVMPublicTransportWorldInfoPanel.MarkDirty(typeof(UVMBudgetConfigTab));
-            TLMAssetSelectorTab.MarkDirty();
         }
 
         protected Color GetColorForNumber(int num)

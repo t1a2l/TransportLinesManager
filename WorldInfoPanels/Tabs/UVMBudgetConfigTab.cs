@@ -134,7 +134,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
         }
 
-        protected override BudgetEntryXml DefaultEntry()
+        protected override BudgetEntryXml DefaultEntry(ushort lineId)
         {
             // find first hour not already used
             var usedHours = new HashSet<int>(Config.Select(x => x.HourOfDay ?? -1));
