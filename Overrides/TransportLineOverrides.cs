@@ -169,9 +169,7 @@ namespace TransportLinesManager.Overrides
         
         [HarmonyPatch(typeof(TransportLine), "AddVehicle")]
         [HarmonyPostfix]
-#pragma warning disable IDE0060 // Remove unused parameter
         public static void BusUnbuncher(ushort vehicleID, ref Vehicle data, bool findTargetStop)
-#pragma warning restore IDE0060 // Remove unused parameter
         {
             if (findTargetStop && (data.Info.GetAI() is BusAI || data.Info.GetAI() is TramAI || data.Info.GetAI() is TrolleybusAI) && data.m_transportLine > 0)
             {
@@ -224,7 +222,7 @@ namespace TransportLinesManager.Overrides
 	        return num <= 0 || waitTime >= 4;
 		}
 
-        private static void DoTransportLineEconomyManagement(ushort lineId)
+        public static void DoTransportLineEconomyManagement(ushort lineId)
         {
             LogUtils.DoLog($"DoTransportLineEconomyManagement : line {lineId}");
             ref TransportLine tl = ref TransportManager.instance.m_lines.m_buffer[lineId];
@@ -252,8 +250,6 @@ namespace TransportLinesManager.Overrides
                 TLMTransportLineStatusesManager.instance.AddToVehicle(entry.Key, 0, cost, ref refNull);
                 amount += cost;
             }
-
-
             LogUtils.DoLog($"DoTransportLineEconomyManagement : line {lineId} ({tsd} {tl.m_lineNumber}) ;amount = {amount}");
             TLMTransportLineStatusesManager.instance.AddToLine(lineId, 0, amount, ref refNull, 0);
             EconomyManager.instance.FetchResource(Resource.Maintenance, amount, tl.Info.m_class);
