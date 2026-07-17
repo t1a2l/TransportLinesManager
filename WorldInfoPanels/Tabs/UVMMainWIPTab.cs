@@ -641,8 +641,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             m_useSeparateWeekendProfileCheckbox = UIHelperExtension.AddCheckboxLocale(m_bg, "TLM_USE_SEPARATE_WEEKEND_PROFILE", false, OnUseSeparateWeekendProfileChanged);
             m_useSeparateWeekendProfileCheckbox.name = "UseSeparateWeekendProfile";
-            m_useSeparateWeekendProfileCheckbox.relativePosition = new Vector3(12f, m_bg.height - 52f);
+            m_useSeparateWeekendProfileCheckbox.relativePosition = new Vector3(8f, 250f);
             m_useSeparateWeekendProfileCheckbox.width = 370f;
+            m_useSeparateWeekendProfileCheckbox.label.font = m_tripSaved.font;
+            m_useSeparateWeekendProfileCheckbox.label.textColor = m_tripSaved.textColor;
+            m_useSeparateWeekendProfileCheckbox.label.textScale = m_tripSaved.textScale;
         }
 
         private void OnUseSeparateWeekendProfileChanged(bool value)
