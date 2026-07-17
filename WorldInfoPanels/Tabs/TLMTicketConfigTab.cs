@@ -89,6 +89,51 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public override void EnsureTemplate() => TLMTicketPriceEditorLine.EnsureTemplate();
 
+        public void UpdateWeekendTicketPriceUIState()
+        {
+            bool enabled = false;
+
+            if (TryGetCurrentLineConfig(out ushort _, out ITicketPriceStorage cfg))
+            {
+                enabled = cfg?.UseSeparateWeekendProfile == true;
+            }
+
+            m_ticketPriceProfilePanel?.isVisible = enabled;
+            m_ticketPriceProfileLabel?.isVisible = enabled;
+            m_ticketPriceProfileDropdown?.isVisible = enabled;
+
+            m_ticketPriceProfileLabel?.relativePosition = new Vector3(0f, 0f);
+            m_ticketPriceProfileDropdown?.relativePosition = new Vector3(90f, 0f);
+            ReloadTicketPriceListFromCurrentProfile();
+            MarkDirty();
+        }
+
+        public TimeableList<TicketPriceEntryXml> CloneTicketPriceEntries(TimeableList<TicketPriceEntryXml> src)
+        {
+            var result = new TimeableList<TicketPriceEntryXml>();
+
+            if (src == null || src.Count == 0)
+            {
+                result.Add(new TicketPriceEntryXml
+                {
+                    HourOfDay = 0,
+                    Value = 100
+                });
+                return result;
+            }
+
+            for (int i = 0; i < src.Count; i++)
+            {
+                result.Add(new TicketPriceEntryXml
+                {
+                    HourOfDay = src[i].HourOfDay,
+                    Value = src[i].Value
+                });
+            }
+
+            return result;
+        }
+
         private void CreateWeekendTicketPriceControls(UIComponent parent)
         {
             MonoUtils.CreateUIElement(out m_ticketPriceProfilePanel, parent.transform);
@@ -134,23 +179,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_editingWeekendTicketPrice = value == 1;
             ReloadTicketPriceListFromCurrentProfile();
             UpdateWeekendTicketPriceUIState();
-        }
-
-        internal void UpdateWeekendTicketPriceUIState()
-        {
-            bool enabled = false;
-
-            if (TryGetCurrentLineConfig(out ushort _, out ITicketPriceStorage cfg))
-            {
-                enabled = cfg?.UseSeparateWeekendProfile == true;
-            }
-
-            m_ticketPriceProfilePanel?.isVisible = enabled;
-            m_ticketPriceProfileLabel?.isVisible = enabled;
-            m_ticketPriceProfileDropdown?.isVisible = enabled;
-
-            m_ticketPriceProfileLabel?.relativePosition = new Vector3(0f, 0f);
-            m_ticketPriceProfileDropdown?.relativePosition = new Vector3(90f, 0f);
         }
 
         private void ReloadTicketPriceListFromCurrentProfile()

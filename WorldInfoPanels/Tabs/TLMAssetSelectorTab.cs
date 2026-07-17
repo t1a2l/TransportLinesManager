@@ -248,7 +248,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             bool enabled = false;
 
-            if (TryGetCurrentLineConfig(out ushort _, out IBudgetStorage cfg))
+            if (TryGetCurrentLineConfig(out ushort lineId, out IBudgetStorage cfg))
             {
                 enabled = cfg?.UseSeparateWeekendProfile == true;
             }
@@ -259,6 +259,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             m_budgetProfileLabel?.relativePosition = new Vector3(5f, 0f);
             m_budgetProfileDropdown?.relativePosition = new Vector3(95f, 0f);
+
+            IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem);
+            UpdateAssetList(config);
         }
 
         private void CreateTemplateList()

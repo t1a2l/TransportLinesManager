@@ -20,8 +20,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
     {
         private UICheckBox m_showAbsoluteCheckbox;
 
-        private UICheckBox m_useSeparateWeekendBudgetCheckbox;
-
         private UIPanel m_budgetProfilePanel;
 
         private UILabel m_budgetProfileLabel;
@@ -92,12 +90,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_isLoading = true;  // prevent eventCheckChanged from firing
 
             var lineExt = TLMTransportLineExtension.Instance;
-            var cfg = TLMLineUtils.GetEffectiveConfigForLine(lineID);
 
             m_showAbsoluteCheckbox?.isVisible = lineExt.IsUsingCustomConfig(lineID);
             m_showAbsoluteCheckbox?.isChecked = lineExt.IsDisplayAbsoluteValues(lineID);
-            m_useSeparateWeekendBudgetCheckbox?.isVisible = TLMController.IsRealTimeEnabled && RealTimeUtils.IsWeekendEnabled();
-            m_useSeparateWeekendBudgetCheckbox?.isChecked = cfg.UseSeparateWeekendProfile;
 
             m_budgetProfileLabel?.relativePosition = new Vector3(0f, 0f);
             m_budgetProfileDropdown?.relativePosition = new Vector3(90f, 0f);
@@ -151,13 +146,52 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public override void EnsureTemplate() => UVMBudgetEditorLine.EnsureTemplate();
 
+        public void UpdateWeekendBudgetUIState()
+        {
+            bool enabled = false;
+
+            if (TryGetCurrentLineConfig(out ushort _, out IBudgetStorage cfg))
+            {
+                enabled = cfg?.UseSeparateWeekendProfile == true;
+            }
+
+            m_budgetProfilePanel?.isVisible = enabled;
+            m_budgetProfileLabel?.isVisible = enabled;
+            m_budgetProfileDropdown?.isVisible = enabled;
+            m_budgetProfileDropdown?.isVisible = enabled;
+
+            m_budgetProfileLabel?.relativePosition = new Vector3(0f, 0f);
+            m_budgetProfileDropdown?.relativePosition = new Vector3(90f, 0f);
+        }
+
+        public TimeableList<BudgetEntryXml> CloneBudgetEntries(TimeableList<BudgetEntryXml> src)
+        {
+            var result = new TimeableList<BudgetEntryXml>();
+
+            if (src == null || src.Count == 0)
+            {
+                result.Add(new BudgetEntryXml
+                {
+                    HourOfDay = 0,
+                    Value = 100
+                });
+                return result;
+            }
+
+            for (int i = 0; i < src.Count; i++)
+            {
+                result.Add(new BudgetEntryXml
+                {
+                    HourOfDay = src[i].HourOfDay,
+                    Value = src[i].Value
+                });
+            }
+
+            return result;
+        }
+
         private void CreateWeekendBudgetControls(UIComponent parent)
         {
-            m_useSeparateWeekendBudgetCheckbox = m_uiHelper.AddCheckboxLocale("TLM_USE_SEPARATE_WEEKEND_BUDGET", false, OnUseSeparateWeekendBudgetChanged);
-            m_useSeparateWeekendBudgetCheckbox.name = "UseSeparateWeekendBudget";
-            m_useSeparateWeekendBudgetCheckbox.relativePosition = new Vector3(12f, parent.height - 52f);
-            m_useSeparateWeekendBudgetCheckbox.width = 370f;
-
             MonoUtils.CreateUIElement(out m_budgetProfilePanel, parent.transform);
             m_budgetProfilePanel.name = "BudgetProfilePanel";
             m_budgetProfilePanel.width = 370f;
@@ -197,84 +231,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             UpdateWeekendBudgetUIState();
         }
 
-        private void OnUseSeparateWeekendBudgetChanged(bool value)
-        {
-            if (!TryGetCurrentLineConfig(out ushort _, out IBudgetStorage cfg))
-            {
-                return;
-            }
-
-            cfg.UseSeparateWeekendProfile = value;
-
-            if (value && (cfg.WeekendBudgetEntries == null || cfg.WeekendBudgetEntries.Count == 0))
-            {
-                cfg.WeekendBudgetEntries = CloneBudgetEntries(cfg.BudgetEntries);
-            }
-
-            if (!value)
-            {
-                m_editingWeekendBudget = false;
-                m_budgetProfileDropdown?.selectedIndex = 0;
-                m_budgetProfileLabel.relativePosition = new Vector3(0f, 0f);
-                m_budgetProfileDropdown.relativePosition = new Vector3(90f, 0f);
-            }
-
-            UpdateWeekendBudgetUIState();
-            TLMAssetSelectorTab.Instance.UpdateWeekendBudgetUIState();
-            TLMTicketConfigTab.Instance.UpdateWeekendTicketPriceUIState();
-            ReloadBudgetListFromCurrentProfile();
-            MarkDirty();
-        }
-
         private void OnBudgetProfileChanged(UIComponent component, int value)
         {
             m_editingWeekendBudget = value == 1;
             ReloadBudgetListFromCurrentProfile();
             UpdateWeekendBudgetUIState();
-        }
-
-        private void UpdateWeekendBudgetUIState()
-        {
-            bool enabled = false;
-
-            if (TryGetCurrentLineConfig(out ushort _, out IBudgetStorage cfg))
-            {
-                enabled = cfg?.UseSeparateWeekendProfile == true;
-            }
-
-            m_budgetProfilePanel?.isVisible = enabled;
-            m_budgetProfileLabel?.isVisible = enabled;
-            m_budgetProfileDropdown?.isVisible = enabled;
-            m_budgetProfileDropdown?.isVisible = enabled;
-
-            m_budgetProfileLabel?.relativePosition = new Vector3(0f, 0f);
-            m_budgetProfileDropdown?.relativePosition = new Vector3(90f, 0f);
-        }
-
-        private TimeableList<BudgetEntryXml> CloneBudgetEntries(TimeableList<BudgetEntryXml> src)
-        {
-            var result = new TimeableList<BudgetEntryXml>();
-
-            if (src == null || src.Count == 0)
-            {
-                result.Add(new BudgetEntryXml
-                {
-                    HourOfDay = 0,
-                    Value = 100
-                });
-                return result;
-            }
-
-            for (int i = 0; i < src.Count; i++)
-            {
-                result.Add(new BudgetEntryXml
-                {
-                    HourOfDay = src[i].HourOfDay,
-                    Value = src[i].Value
-                });
-            }
-
-            return result;
         }
 
         private void ReloadBudgetListFromCurrentProfile()

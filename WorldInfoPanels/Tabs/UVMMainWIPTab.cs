@@ -16,13 +16,49 @@ using static TransportLinesManager.WorldInfoPanels.UVMPublicTransportWorldInfoPa
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
-
     public class UVMMainWIPTab : UICustomControl, IUVMPTWIPChild
     {
-
         private UIPanel m_bg;
 
+        private UIRadialChart m_ageChart;
+        private UILabel m_childLegend;
+        private UILabel m_teenLegend;
+        private UILabel m_youngLegend;
+        private UILabel m_adultLegend;
+        private UILabel m_seniorLegend;
+        private UIComponent m_ageChartContainer;
+        private UIComponent m_lineColorContainer;
+        private UIColorField m_colorField;
+
+        private UIButton m_colorFieldButton;
+
+        private UILabel m_passengers;
+        private UIComponent m_passengersContainer;
+        private UILabel m_type;
+        private UIComponent m_typeContainer;
+        private UILabel m_tripSaved;
+        private UIComponent m_tripSavedContainer;
+        private UILabel m_lineLengthLabel;
+        private UIPanel m_pullValuePanel;
+
+        private UILabel m_pullValue;
+
+        private UILabel m_warningTooLongText;
+
+        private UISprite m_warningTooLongIcon;
+
+        private string m_weeklyPassengersString;
+        private UIDropDown m_linePrefixDropDown;
+        private UITextField m_lineNumberLabel;
+        private UITextField m_customLineCodeInput;
+        private UIDropDown m_firstStopSelect;
+
+        private UICheckBox m_useSeparateWeekendProfileCheckbox;
+
         #region Overridable
+
+        private int colorChangeCooldown = 0;
+        private uint m_lastDrawTick;
 
         public void Awake()
         {
@@ -49,144 +85,13 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             CreateFirstStopSelector();
             CreateActionButtonsRow();
             CreateCustomLineCodeEditor();
-        }
-
-        private void BindFields(PublicTransportWorldInfoPanel ptwip)
-        {
-            LogUtils.DoLog("COLOR");
-            UIComponent parentToDestroy = ptwip.Find<UILabel>("Color").parent.parent;
-            m_lineColorContainer = RebindUI(ptwip.Find<UILabel>("Color").parent);
-            m_colorField = component.Find<UIColorField>("ColorField");
-            m_colorField.gameObject.AddComponent<UIColorFieldExtension>();
-            m_colorFieldButton = m_colorField.Find<UIButton>("Button");
-
-            LogUtils.DoLog("CHART");
-            m_ageChart = (ptwip.Find<UIRadialChart>("AgeChart"));
-            m_childLegend = (ptwip.Find<UILabel>("ChildAmount"));
-            m_teenLegend = (ptwip.Find<UILabel>("TeenAmount"));
-            m_youngLegend = (ptwip.Find<UILabel>("YoungAmount"));
-            m_adultLegend = (ptwip.Find<UILabel>("AdultAmount"));
-            m_seniorLegend = (ptwip.Find<UILabel>("SeniorAmount"));
-            UIComponent parentToDestroy2 = m_ageChart.parent.parent;
-            m_ageChartContainer = RebindUI(m_ageChart.parent);
-
-            LogUtils.DoLog("TRIP");
-            m_tripSaved = (ptwip.Find<UILabel>("TripSaved"));
-            m_tripSavedContainer = RebindUI(m_tripSaved.parent);
-
-
-            LogUtils.DoLog("TYPE");
-            m_type = (ptwip.Find<UILabel>("Type"));
-            m_typeContainer = RebindUI(m_type.parent);
-
-            LogUtils.DoLog("PASSENGERS");
-            m_passengers = (ptwip.Find<UILabel>("Passengers"));
-            m_passengersContainer = RebindUI(m_passengers.parent);
-
-            LogUtils.DoLog("LENGTH");
-            m_lineLengthLabel = RebindUI(ptwip.Find<UILabel>("LineLengthLabel"));
-
-            LogUtils.DoLog("WALKING");
-            m_pullValuePanel = RebindUI(ptwip.Find<UIPanel>("WalkingTourPullValuePanel"));
-            m_pullValue = (component.Find<UILabel>("PullValue"));
-            m_warningTooLongText = (component.Find<UILabel>("WarningTooLongText"));
-            m_warningTooLongIcon = (component.Find<UISprite>("WarningTooLongIcon"));
-
-            LogUtils.DoLog("DESTROY");
-            UVMPublicTransportWorldInfoPanel.FakeDestroy(parentToDestroy);
-            UVMPublicTransportWorldInfoPanel.FakeDestroy(parentToDestroy2);
-        }
-
-        private T RebindUI<T>(T component) where T : UIComponent
-        {
-            Vector3 relPos = component.relativePosition;
-            component.transform.SetParent(this.component.transform);
-            component.relativePosition = relPos;
-            return component;
-        }
-
-        private void SetColorButtonEvents()
-        {
-            m_colorField.eventColorPickerOpen += delegate (UIColorField field, UIColorPicker picker, ref bool overridden)
-            {
-                m_colorFieldButton.isInteractive = false;
-            };
-            m_colorField.eventColorPickerClose += delegate (UIColorField field, UIColorPicker picker, ref bool overridden)
-            {
-                m_colorFieldButton.isInteractive = true;
-            };
-        }
-        private void SetColorPickerEvents() => m_colorField.eventSelectedColorChanged += OnColorChanged;
-        private void SetLegendColors(PublicTransportWorldInfoPanel __instance)
-        {
-            m_childLegend.color = __instance.m_ChildColor;
-            m_teenLegend.color = __instance.m_TeenColor;
-            m_youngLegend.color = __instance.m_YoungColor;
-            m_adultLegend.color = __instance.m_AdultColor;
-            m_seniorLegend.color = __instance.m_SeniorColor;
-        }
-
-        private void SetDemographicGraphicColors(PublicTransportWorldInfoPanel __instance)
-        {
-            UIRadialChart.SliceSettings slice = m_ageChart.GetSlice(0);
-            Color32 color = __instance.m_ChildColor;
-            m_ageChart.GetSlice(0).outterColor = color;
-            slice.innerColor = color;
-            UIRadialChart.SliceSettings slice2 = m_ageChart.GetSlice(1);
-            color = __instance.m_TeenColor;
-            m_ageChart.GetSlice(1).outterColor = color;
-            slice2.innerColor = color;
-            UIRadialChart.SliceSettings slice3 = m_ageChart.GetSlice(2);
-            color = __instance.m_YoungColor;
-            m_ageChart.GetSlice(2).outterColor = color;
-            slice3.innerColor = color;
-            UIRadialChart.SliceSettings slice4 = m_ageChart.GetSlice(3);
-            color = __instance.m_AdultColor;
-            m_ageChart.GetSlice(3).outterColor = color;
-            slice4.innerColor = color;
-            UIRadialChart.SliceSettings slice5 = m_ageChart.GetSlice(4);
-            color = __instance.m_SeniorColor;
-            m_ageChart.GetSlice(4).outterColor = color;
-            slice5.innerColor = color;
+            CreateWeekendProfileCheckbox();
         }
 
         public void OnEnable() => Singleton<TransportManager>.instance.eventLineColorChanged += OnLineColorChanged;
 
         public void OnDisable() => Singleton<TransportManager>.instance.eventLineColorChanged -= OnLineColorChanged;
 
-        private int colorChangeCooldown = 0;
-        internal void OnColorChanged(UIComponent comp, Color color)
-        {
-            if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && lineId > 0 && !fromBuilding)
-            {
-                UVMPublicTransportWorldInfoPanel.m_obj.origInstance.StartCoroutine(ChangeColorCoroutine(lineId, color));
-            }
-        }
-
-        private IEnumerator ChangeColorCoroutine(ushort id, Color color)
-        {
-            if (colorChangeCooldown > 0)
-            {
-                yield break;
-            }
-            colorChangeCooldown = 3;
-            do
-            {
-                colorChangeCooldown--;
-                yield return 0;
-            } while (colorChangeCooldown > 0);
-
-            if (Singleton<SimulationManager>.exists)
-            {
-                AsyncTask<bool> task = Singleton<SimulationManager>.instance.AddAction(Singleton<TransportManager>.instance.SetLineColor(id, color));
-                yield return task.WaitTaskCompleted(this);
-                if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && lineId == id && !fromBuilding)
-                {
-                    m_colorField.selectedColor = Singleton<TransportManager>.instance.GetLineColor(id);
-                }
-            }
-            yield break;
-        }
         public void OnSetTarget(Type source)
         {
             if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineID, out bool fromBuilding))
@@ -211,6 +116,10 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     m_linePrefixDropDown.eventSelectedIndexChanged -= SaveLineNumber;
                     m_lineNumberLabel.eventLostFocus -= SaveLineNumber;
                     m_customLineCodeInput.eventTextSubmitted -= SaveLineCode;
+
+                    var cfg = TLMLineUtils.GetEffectiveConfigForLine(lineID);
+                    m_useSeparateWeekendProfileCheckbox?.isVisible = TLMController.IsRealTimeEnabled && RealTimeUtils.IsWeekendEnabled();
+                    m_useSeparateWeekendProfileCheckbox?.isChecked = cfg.UseSeparateWeekendProfile;
 
                     ref TransportLine t = ref TransportManager.instance.m_lines.m_buffer[lineID];
                     ushort lineNumber = t.m_lineNumber;
@@ -246,11 +155,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                         m_linePrefixDropDown.enabled = false;
                     }
 
-
-
                     m_lineNumberLabel.color = TransportManager.instance.GetLineColor(lineID);
                     m_customLineCodeInput.text = TLMTransportLineExtension.Instance.SafeGet(lineID).CustomCode ?? "";
-
 
                     m_linePrefixDropDown.eventSelectedIndexChanged += SaveLineNumber;
                     m_lineNumberLabel.eventLostFocus += SaveLineNumber;
@@ -259,7 +165,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
         }
 
-        private uint m_lastDrawTick;
         public void UpdateBindings()
         {
             if (component.isVisible && m_lastDrawTick + 31 < SimulationManager.instance.m_currentTickIndex)
@@ -349,7 +254,148 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 m_lastDrawTick = SimulationManager.instance.m_currentTickIndex;
             }
         }
+
+        private void BindFields(PublicTransportWorldInfoPanel ptwip)
+        {
+            LogUtils.DoLog("COLOR");
+            UIComponent parentToDestroy = ptwip.Find<UILabel>("Color").parent.parent;
+            m_lineColorContainer = RebindUI(ptwip.Find<UILabel>("Color").parent);
+            m_colorField = component.Find<UIColorField>("ColorField");
+            m_colorField.gameObject.AddComponent<UIColorFieldExtension>();
+            m_colorFieldButton = m_colorField.Find<UIButton>("Button");
+
+            LogUtils.DoLog("CHART");
+            m_ageChart = (ptwip.Find<UIRadialChart>("AgeChart"));
+            m_childLegend = (ptwip.Find<UILabel>("ChildAmount"));
+            m_teenLegend = (ptwip.Find<UILabel>("TeenAmount"));
+            m_youngLegend = (ptwip.Find<UILabel>("YoungAmount"));
+            m_adultLegend = (ptwip.Find<UILabel>("AdultAmount"));
+            m_seniorLegend = (ptwip.Find<UILabel>("SeniorAmount"));
+            UIComponent parentToDestroy2 = m_ageChart.parent.parent;
+            m_ageChartContainer = RebindUI(m_ageChart.parent);
+
+            LogUtils.DoLog("TRIP");
+            m_tripSaved = (ptwip.Find<UILabel>("TripSaved"));
+            m_tripSavedContainer = RebindUI(m_tripSaved.parent);
+
+
+            LogUtils.DoLog("TYPE");
+            m_type = (ptwip.Find<UILabel>("Type"));
+            m_typeContainer = RebindUI(m_type.parent);
+
+            LogUtils.DoLog("PASSENGERS");
+            m_passengers = (ptwip.Find<UILabel>("Passengers"));
+            m_passengersContainer = RebindUI(m_passengers.parent);
+
+            LogUtils.DoLog("LENGTH");
+            m_lineLengthLabel = RebindUI(ptwip.Find<UILabel>("LineLengthLabel"));
+
+            LogUtils.DoLog("WALKING");
+            m_pullValuePanel = RebindUI(ptwip.Find<UIPanel>("WalkingTourPullValuePanel"));
+            m_pullValue = (component.Find<UILabel>("PullValue"));
+            m_warningTooLongText = (component.Find<UILabel>("WarningTooLongText"));
+            m_warningTooLongIcon = (component.Find<UISprite>("WarningTooLongIcon"));
+
+            LogUtils.DoLog("DESTROY");
+            UVMPublicTransportWorldInfoPanel.FakeDestroy(parentToDestroy);
+            UVMPublicTransportWorldInfoPanel.FakeDestroy(parentToDestroy2);
+        }
+
+        private T RebindUI<T>(T component) where T : UIComponent
+        {
+            Vector3 relPos = component.relativePosition;
+            component.transform.SetParent(this.component.transform);
+            component.relativePosition = relPos;
+            return component;
+        }
+
+        private void SetColorButtonEvents()
+        {
+            m_colorField.eventColorPickerOpen += delegate (UIColorField field, UIColorPicker picker, ref bool overridden)
+            {
+                m_colorFieldButton.isInteractive = false;
+            };
+            m_colorField.eventColorPickerClose += delegate (UIColorField field, UIColorPicker picker, ref bool overridden)
+            {
+                m_colorFieldButton.isInteractive = true;
+            };
+        }
+
+        private void SetColorPickerEvents() => m_colorField.eventSelectedColorChanged += OnColorChanged;
+
+        private void SetLegendColors(PublicTransportWorldInfoPanel __instance)
+        {
+            m_childLegend.color = __instance.m_ChildColor;
+            m_teenLegend.color = __instance.m_TeenColor;
+            m_youngLegend.color = __instance.m_YoungColor;
+            m_adultLegend.color = __instance.m_AdultColor;
+            m_seniorLegend.color = __instance.m_SeniorColor;
+        }
+
+        private void SetDemographicGraphicColors(PublicTransportWorldInfoPanel __instance)
+        {
+            UIRadialChart.SliceSettings slice = m_ageChart.GetSlice(0);
+            Color32 color = __instance.m_ChildColor;
+            m_ageChart.GetSlice(0).outterColor = color;
+            slice.innerColor = color;
+            UIRadialChart.SliceSettings slice2 = m_ageChart.GetSlice(1);
+            color = __instance.m_TeenColor;
+            m_ageChart.GetSlice(1).outterColor = color;
+            slice2.innerColor = color;
+            UIRadialChart.SliceSettings slice3 = m_ageChart.GetSlice(2);
+            color = __instance.m_YoungColor;
+            m_ageChart.GetSlice(2).outterColor = color;
+            slice3.innerColor = color;
+            UIRadialChart.SliceSettings slice4 = m_ageChart.GetSlice(3);
+            color = __instance.m_AdultColor;
+            m_ageChart.GetSlice(3).outterColor = color;
+            slice4.innerColor = color;
+            UIRadialChart.SliceSettings slice5 = m_ageChart.GetSlice(4);
+            color = __instance.m_SeniorColor;
+            m_ageChart.GetSlice(4).outterColor = color;
+            slice5.innerColor = color;
+        }
+
+        private void OnColorChanged(UIComponent comp, Color color)
+        {
+            if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && lineId > 0 && !fromBuilding)
+            {
+                UVMPublicTransportWorldInfoPanel.m_obj.origInstance.StartCoroutine(ChangeColorCoroutine(lineId, color));
+            }
+        }
+
+        private IEnumerator ChangeColorCoroutine(ushort id, Color color)
+        {
+            if (colorChangeCooldown > 0)
+            {
+                yield break;
+            }
+            colorChangeCooldown = 3;
+            do
+            {
+                colorChangeCooldown--;
+                yield return 0;
+            } while (colorChangeCooldown > 0);
+
+            if (Singleton<SimulationManager>.exists)
+            {
+                AsyncTask<bool> task = Singleton<SimulationManager>.instance.AddAction(Singleton<TransportManager>.instance.SetLineColor(id, color));
+                yield return task.WaitTaskCompleted(this);
+                if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && lineId == id && !fromBuilding)
+                {
+                    m_colorField.selectedColor = Singleton<TransportManager>.instance.GetLineColor(id);
+                }
+            }
+            yield break;
+        }
+
         #endregion
+
+        public void Hide() => m_bg.isVisible = false;
+
+        public void OnGotFocus() { }
+
+        public bool MayBeVisible() => UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && lineId > 0 && !fromBuilding;
 
         private void OnLineColorChanged(ushort id)
         {
@@ -364,10 +410,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             float num = value / (float)total;
             return Mathf.Clamp(Mathf.FloorToInt(num * 100f), 0, 100);
         }
-
-        public void Hide() => m_bg.isVisible = false;
-        public void OnGotFocus() { }
-        public bool MayBeVisible() => UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && lineId > 0 && !fromBuilding;
 
         #region Number & Prefix edit
 
@@ -414,7 +456,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             container.autoLayout = true;
             container.relativePosition = new Vector3(0, 375);
         }
-
 
         private void SaveLineNumber<T>(UIComponent c, T v) => StartCoroutine(SaveLineNumber());
 
@@ -465,6 +506,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         }
 
         private bool IsLineNumberAlredyInUse(int numLinha, ushort lineIdx) => TLMLineUtils.IsLineNumberAlredyInUse(numLinha, TransportSystemDefinition.GetDefinitionForLine(lineIdx, false), lineIdx);
+        
         #endregion
 
         #region Custom line code
@@ -496,9 +538,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 UVMPublicTransportWorldInfoPanel.MarkDirty(GetType());
             }
         }
+
         #endregion
 
         #region First stop
+
         private void CreateFirstStopSelector()
         {
             m_firstStopSelect = UIHelperExtension.CloneBasicDropDownLocalized("TLM_FIRST_STOP_DD_LABEL", new string[1], ChangeFirstStop, 0, m_bg, out UILabel label, out UIPanel container);
@@ -519,6 +563,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             container.autoLayout = true;
             container.ResetLayout(false, true);
         }
+
         private void ChangeFirstStop(int idxSel)
         {
             if (idxSel <= 0 || idxSel >= m_firstStopSelect.items.Length)
@@ -542,9 +587,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 TransportLinesManagerMod.Controller.SharedInstance.OnAutoNameParameterChanged();
             }
         }
+
         #endregion
 
         #region Action buttons row
+
         private void CreateActionButtonsRow()
         {
             MonoUtils.CreateUIElement(out UIButton buttonAutoName, transform);
@@ -585,45 +632,48 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             };
             buttonAutoColor.normalFgSprite = ResourceLoader.GetDefaultSpriteNameFor(CommonsSpriteNames.AutoColorIcon);
         }
+
         #endregion
 
-        internal UIRadialChart m_ageChart;
+        #region Weekend profile checkbox
 
-        internal UILabel m_childLegend;
+        private void CreateWeekendProfileCheckbox()
+        {
+            m_useSeparateWeekendProfileCheckbox = UIHelperExtension.AddCheckboxLocale(m_bg, "TLM_USE_SEPARATE_WEEKEND_PROFILE", false, OnUseSeparateWeekendProfileChanged);
+            m_useSeparateWeekendProfileCheckbox.name = "UseSeparateWeekendProfile";
+            m_useSeparateWeekendProfileCheckbox.relativePosition = new Vector3(12f, m_bg.height - 52f);
+            m_useSeparateWeekendProfileCheckbox.width = 370f;
+        }
 
-        internal UILabel m_teenLegend;
+        private void OnUseSeparateWeekendProfileChanged(bool value)
+        {
+            if (!UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) || fromBuilding)
+            {
+                return;
+            }
 
-        internal UILabel m_youngLegend;
+            var cfg = TLMLineUtils.GetEffectiveConfigForLine(lineId);
 
-        internal UILabel m_adultLegend;
+            cfg.UseSeparateWeekendProfile = value;
 
-        internal UILabel m_seniorLegend;
-        private UIComponent m_ageChartContainer;
-        private UIComponent m_lineColorContainer;
-        internal UIColorField m_colorField;
+            if (value)
+            {
+                if(cfg.WeekendBudgetEntries == null || cfg.WeekendBudgetEntries.Count == 0)
+                {
+                    cfg.WeekendBudgetEntries = UVMBudgetConfigTab.Instance.CloneBudgetEntries(cfg.BudgetEntries);
+                }
 
-        internal UIButton m_colorFieldButton;
+                if (cfg.WeekendTicketPriceEntries == null || cfg.WeekendTicketPriceEntries.Count == 0)
+                {
+                    cfg.WeekendTicketPriceEntries = TLMTicketConfigTab.Instance.CloneTicketPriceEntries(cfg.TicketPriceEntries);
+                }
+            }
 
-        internal UILabel m_passengers;
-        private UIComponent m_passengersContainer;
-        internal UILabel m_type;
-        private UIComponent m_typeContainer;
-        internal UILabel m_tripSaved;
-        private UIComponent m_tripSavedContainer;
-        internal UILabel m_lineLengthLabel;
-        internal UIPanel m_pullValuePanel;
+            UVMBudgetConfigTab.Instance.UpdateWeekendBudgetUIState();
+            TLMAssetSelectorTab.Instance.UpdateWeekendBudgetUIState();
+            TLMTicketConfigTab.Instance.UpdateWeekendTicketPriceUIState();
+        }
 
-        internal UILabel m_pullValue;
-
-        internal UILabel m_warningTooLongText;
-
-        internal UISprite m_warningTooLongIcon;
-
-        internal string m_weeklyPassengersString;
-
-        private UIDropDown m_linePrefixDropDown;
-        private UITextField m_lineNumberLabel;
-        private UITextField m_customLineCodeInput;
-        private UIDropDown m_firstStopSelect;
+        #endregion
     }
 }
