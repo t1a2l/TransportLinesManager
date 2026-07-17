@@ -39,7 +39,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public override void ExtraOnSetTarget(ushort lineID)
         {
-            UpdateWeekendTicketPriceUIState();
+            m_ticketPriceProfileLabel?.relativePosition = new Vector3(0f, 0f);
+            m_ticketPriceProfileDropdown?.relativePosition = new Vector3(90f, 0f);
         }
 
         public override float GetMaxSliderValue()
@@ -47,7 +48,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && !fromBuilding)
             {
                 var tsd = TransportSystemDefinition.GetDefinitionForLine(ref TransportManager.instance.m_lines.m_buffer[lineId]);
-                return TLMLineUtils.GetTicketPriceForLine(tsd, 0, CurrentProfileTarget).First.Value * 5;
+                Tuple<TicketPriceEntryXml, int> value = TLMLineUtils.GetTicketPriceForLine(tsd, 0, CurrentProfileTarget);
+                return (float)(value.First?.Value * 5);
             }
             return 0;
         }
