@@ -47,9 +47,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && !fromBuilding)
             {
-                var tsd = TransportSystemDefinition.GetDefinitionForLine(ref TransportManager.instance.m_lines.m_buffer[lineId]);
-                Tuple<TicketPriceEntryXml, int> value = TLMLineUtils.GetTicketPriceForLine(tsd, 0, CurrentProfileTarget);
-                return (float)(value.First?.Value * 5);
+                return TLMLineUtils.GetDefaultTicketPrice(lineId) * 5;
             }
             return 0;
         }
