@@ -10,7 +10,6 @@ using Commons.Utils;
 using ColossalFramework.Globalization;
 using Commons.Extensions.UI;
 using System.Linq;
-using TransportLinesManager.Data.Tsd;
 using static TransportLinesManager.Data.Extensions.ExtensionStaticExtensionMethods;
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs

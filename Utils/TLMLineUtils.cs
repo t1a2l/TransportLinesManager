@@ -735,7 +735,7 @@ namespace TransportLinesManager.Utils
         {
             IBasicExtension ext = GetEffectiveExtensionForLine(lineId, tsd);
             TimeableList<TicketPriceEntryXml> ticketPriceConfig = ext.GetActiveTicketPriceEntries(lineId);
-
+            
             int defaultPrice = tsd.GetConfig().DefaultTicketPrice;
             uint price = defaultPrice >= 0 ? (uint)defaultPrice : GetDefaultTicketPrice(lineId);
 
