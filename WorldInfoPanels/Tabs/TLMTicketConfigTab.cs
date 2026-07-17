@@ -9,8 +9,9 @@ using TransportLinesManager.Interfaces;
 using Commons.Utils;
 using ColossalFramework.Globalization;
 using Commons.Extensions.UI;
-using static TransportLinesManager.Data.Extensions.ExtensionStaticExtensionMethods;
 using System.Linq;
+using TransportLinesManager.Data.Tsd;
+using static TransportLinesManager.Data.Extensions.ExtensionStaticExtensionMethods;
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs
 {
@@ -41,7 +42,15 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             UpdateWeekendTicketPriceUIState();
         }
 
-        public override float GetMaxSliderValue() => 40000;
+        public override float GetMaxSliderValue()
+        {
+            if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && !fromBuilding)
+            {
+                var tsd = TransportSystemDefinition.GetDefinitionForLine(ref TransportManager.instance.m_lines.m_buffer[lineId]);
+                return TLMLineUtils.GetTicketPriceForLine(tsd, 0, CurrentProfileTarget).First.Value * 5;
+            }
+            return 0;
+        }
 
         public override string GetComponentName() => "TicketPriceConfigTabLabel";
 
