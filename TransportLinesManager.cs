@@ -26,7 +26,7 @@ namespace TransportLinesManager
         protected override Dictionary<ulong, string> IncompatibleModList { get; } = [];
 
         private static readonly SavedInt m_dataVersion = new("TLM_DataVersion", Settings.gameSettingsFile, 0, true);
-        private const int DATA_VERSION_14_6 = 1460;
+        private const int DATA_VERSION_14_6 = 1461;
 
         private static readonly SavedBool m_savedShowNearLinesInCityServicesWorldInfoPanel = new("TLM_showNearLinesInCityServicesWorldInfoPanel", Settings.gameSettingsFile, true, true);
         private static readonly SavedBool m_savedShowNearLinesInZonedBuildingWorldInfoPanel = new("TLM_showNearLinesInZonedBuildingWorldInfoPanel", Settings.gameSettingsFile, false, true);
