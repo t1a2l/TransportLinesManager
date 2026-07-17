@@ -43,19 +43,54 @@ namespace TransportLinesManager
         public const ulong IPT2_MOD_ID = 928128676;
         public const ulong IPT2_ESSENTIALS_MOD_ID = 3714961481;
         public const ulong IPT3_MOD_ID = 3690061052;
-
-
         public const ulong RETURN_VEHICLE_MOD_ID = 2101977903UL;
+
+        public static readonly Color[] COLOR_ORDER =
+        [
+            Color.red,
+            Color.Lerp(Color.red, Color.yellow,0.5f),
+            Color.yellow,
+            Color.green,
+            Color.cyan,
+            Color.blue,
+            Color.Lerp(Color.blue, Color.magenta,0.5f),
+            Color.magenta,
+            Color.white,
+            Color.black,
+            Color.Lerp( Color.red, Color.black,0.5f),
+            Color.Lerp( Color.Lerp(Color.red, Color.yellow,0.5f), Color.black,0.5f),
+            Color.Lerp( Color.yellow, Color.black,0.5f),
+            Color.Lerp( Color.green, Color.black,0.5f),
+            Color.Lerp( Color.cyan, Color.black,0.5f),
+            Color.Lerp( Color.blue, Color.black,0.5f),
+            Color.Lerp( Color.Lerp(Color.blue, Color.magenta,0.5f), Color.black,0.5f),
+            Color.Lerp( Color.magenta, Color.black,0.5f),
+            Color.Lerp( Color.white, Color.black,0.25f),
+            Color.Lerp( Color.white, Color.black,0.75f)
+        ];
+
+        private bool m_dirtyRegionalLines;
+        private bool? m_isRealTimeEnabled = null;
+        private bool? m_isSchoolBusesEnabled = null;
+        private static readonly string GlobalBaseConfigFileName = "TLM_GlobalData.xml";
 
         public BuildingTransportLinesCache BuildingLines { get; private set; }
 
-        private bool? m_isRealTimeEnabled = null;
-
-        private bool? m_isSchoolBusesEnabled = null;
-
-        protected static string GlobalBaseConfigFileName { get; } = "TLM_GlobalData.xml";
+        public ushort CurrentSelectedId { get; private set; }
 
         public static string GlobalBaseConfigPath { get; } = Path.Combine(FOLDER_PATH, GlobalBaseConfigFileName);
+
+        public static string PalettesFolder { get; } = FOLDER_PATH + Path.DirectorySeparatorChar + PALETTE_SUBFOLDER_NAME;
+
+        public static string ExportedMapsFolder { get; } = FOLDER_PATH + Path.DirectorySeparatorChar + EXPORTED_MAPS_SUBFOLDER_NAME;
+
+        public TLMFacade SharedInstance { get; internal set; }
+
+        internal TLMLineCreationToolbox LineCreationToolbox => PublicTransportInfoViewPanelOverrides.Toolbox;
+
+        internal IBridgeADR ConnectorADR { get; private set; }
+
+        internal IBridgeWTS ConnectorWTS { get; private set; }
 
         public static bool IsRealTimeEnabled
         {
@@ -81,6 +116,49 @@ namespace TransportLinesManager
             }
         }
 
+        public void Awake()
+        {
+            SharedInstance = gameObject.AddComponent<TLMFacade>();
+            ConnectorADR = PluginUtils.GetImplementationTypeForMod<BridgeADRFallback, IBridgeADR>(gameObject, "Addresses", "2.99.99.0", "TransportLinesManager.ModShared.BridgeADR");
+            ConnectorWTS = PluginUtils.GetImplementationTypeForMod<BridgeWTSFallback, IBridgeWTS>(gameObject, "WriteTheSigns", "0.3.0.0", "TransportLinesManager.ModShared.BridgeWTS");
+        }
+
+        protected override void StartActions()
+        {
+            BuildingLines = gameObject.AddComponent<BuildingTransportLinesCache>();
+
+            TLMTransportTypeDataContainer.Instance.RefreshCapacities();
+            StartCoroutine(VehicleUtils.UpdateCapacityUnits());
+            InitWipSidePanels();
+
+            m_dirtyRegionalLines = true;
+        }
+
+        public void Update()
+        {
+            if (m_dirtyRegionalLines)
+            {
+                foreach (var item in TLMBuildingDataContainer.Instance.GetAvailableEntries())
+                {
+                    if (item.TlmManagedRegionalLines)
+                    {
+                        TransportLinesManagerMod.Controller.BuildingLines.SafeGet((ushort)(item.Id ?? 0));
+                        if (TLMFacade.Instance != null)
+                        {
+                            foreach (var plats in item.PlatformMappings.Values)
+                            {
+                                foreach (var regLine in plats.TargetOutsideConnections)
+                                {
+                                    TLMFacade.Instance.OnRegionalLineParameterChanged(regLine.Value.m_nodeStation);
+                                }
+                            }
+                        }
+                    }
+                }
+                m_dirtyRegionalLines = false;
+            }
+        }
+
         public static void VerifyIfRealTimeIsEnabled()
         {
             Instance?.m_isRealTimeEnabled = VerifyWorkshopModEnabled(REALTIME_MOD_ID) || VerifyLocalModActive("Real Time");
@@ -90,52 +168,6 @@ namespace TransportLinesManager
         {
             Instance?.m_isSchoolBusesEnabled = VerifyWorkshopModEnabled(SCHOOLBUSES_MOD_ID);
         }
-
-        private static bool VerifyWorkshopModEnabled(ulong modId)
-        {
-            PluginManager.PluginInfo pluginInfo = Singleton<PluginManager>.instance.GetPluginsInfo().FirstOrDefault(pi => pi.publishedFileID.AsUInt64 == modId);
-            return !(pluginInfo == null || !pluginInfo.isEnabled);
-        }
-
-        private static bool VerifyLocalModActive(string modNamePart)
-        {
-            try
-            {
-                var plugins = PluginManager.instance.GetPluginsInfo();
-                return (from plugin in plugins.Where(p => p.isEnabled)
-                        select plugin.GetInstances<IUserMod>()
-                    into instances
-                        where instances.Any()
-                        select instances[0].Name
-                    into name
-                        where name != null && name.Contains(modNamePart)
-                        select name).Any();
-            }
-            catch (Exception e)
-            {
-                LogUtils.DoErrorLog($"Failed to detect if mod with name containing {modNamePart} is active");
-                LogUtils.DoErrorLog(e.ToString());
-                return false;
-            }
-        }
-
-        public static string PalettesFolder { get; } = FOLDER_PATH + Path.DirectorySeparatorChar + PALETTE_SUBFOLDER_NAME;
-
-        public static string ExportedMapsFolder { get; } = FOLDER_PATH + Path.DirectorySeparatorChar + EXPORTED_MAPS_SUBFOLDER_NAME;
-
-        public ushort CurrentSelectedId { get; private set; }
-
-        public void SetCurrentSelectedId(ushort line) => CurrentSelectedId = line;
-
-        internal TLMLineCreationToolbox LineCreationToolbox => PublicTransportInfoViewPanelOverrides.Toolbox;
-
-        public TLMFacade SharedInstance { get; internal set; }
-
-        internal IBridgeADR ConnectorADR { get; private set; }
-
-        internal IBridgeWTS ConnectorWTS { get; private set; }
-
-        private bool m_dirtyRegionalLines;
 
         public static Color AutoColor(ushort i, bool ignoreRandomIfSet = true, bool ignoreAnyIfSet = false)
         {
@@ -250,20 +282,13 @@ namespace TransportLinesManager
             lineExt.AddDepotForLine(lineId, schoolBuildingId);
         }
 
-        //------------------------------------
-
-        protected override void StartActions()
+        public static void RepositionSidePanel(UIComponent parent, UIPanel parent2)
         {
-            BuildingLines = gameObject.AddComponent<BuildingTransportLinesCache>();
-
-            TLMTransportTypeDataContainer.Instance.RefreshCapacities();
-            StartCoroutine(VehicleUtils.UpdateCapacityUnits());
-            InitWipSidePanels();
-
-            m_dirtyRegionalLines = true;
+            if (parent2 == null || parent == null) return;
+            parent2.relativePosition = new Vector3(parent.width + 15f, 50f);
         }
 
-        internal static bool UpdateRegionalLinesFromBuilding(ushort buildingId)
+        public static bool UpdateRegionalLinesFromBuilding(ushort buildingId)
         {
             if (BuildingManager.instance.m_buildings.m_buffer[buildingId].Info.m_buildingAI is TransportStationAI)
             {
@@ -273,7 +298,7 @@ namespace TransportLinesManager
             return false;
         }
 
-        internal static bool UpdateRegionalLinesFromNode(ushort nodeId)
+        public static bool UpdateRegionalLinesFromNode(ushort nodeId)
         {
             if (NetManager.instance.m_nodes.m_buffer[nodeId].Info.m_netAI is TransportLineAI && NetManager.instance.m_nodes.m_buffer[nodeId].m_transportLine == 0)
             {
@@ -283,78 +308,7 @@ namespace TransportLinesManager
             return false;
         }
 
-        public void Update()
-        {
-            if (m_dirtyRegionalLines)
-            {
-                foreach (var item in TLMBuildingDataContainer.Instance.GetAvailableEntries())
-                {
-                    if (item.TlmManagedRegionalLines)
-                    {
-                        TransportLinesManagerMod.Controller.BuildingLines.SafeGet((ushort)(item.Id ?? 0));
-                        if (TLMFacade.Instance != null)
-                        {
-                            foreach (var plats in item.PlatformMappings.Values)
-                            {
-                                foreach (var regLine in plats.TargetOutsideConnections)
-                                {
-                                    TLMFacade.Instance.OnRegionalLineParameterChanged(regLine.Value.m_nodeStation);
-                                }
-                            }
-                        }
-                    }
-                }
-                m_dirtyRegionalLines = false;
-            }
-        }
-
-        private static void InitWipSidePanels()
-        {
-            BuildingWorldInfoPanel[] panelList = UIView.GetAView().GetComponentsInChildren<BuildingWorldInfoPanel>();
-            LogUtils.DoLog("WIP LIST: [{0}]", string.Join(", ", [.. panelList.Select(x => x.name)]));
-            TLMLineItemButtonControl.EnsureTemplate();
-            foreach (BuildingWorldInfoPanel wip in panelList)
-            {
-                LogUtils.DoLog("LOADING WIP HOOK FOR: {0}", wip.name);
-                UIComponent parent = wip.GetComponent<UIComponent>();
-                if (parent is null)
-                {
-                    continue;
-                }
-                MonoUtils.CreateUIElement(out UIPanel parent2, parent.transform, "TLMSidePanels", new Vector4(parent.width + 15, 50, 300, 0));
-                parent2.autoLayout = true;
-                parent2.autoLayoutPadding.bottom = 5;
-                parent2.autoFitChildrenVertically = true;
-                parent2.autoLayoutDirection = LayoutDirection.Vertical;
-                var isGrow = wip is ZonedBuildingWorldInfoPanel;
-                var controller = TLMNearLinesController.InitPanelNearLinesOnWorldInfoPanel(parent2);
-                parent.eventVisibilityChanged += (x, y) => controller?.EventWIPChanged(isGrow);
-                parent.eventPositionChanged += (x, y) => controller?.EventWIPChanged(isGrow);
-                parent.eventSizeChanged += (x, y) => controller?.EventWIPChanged(isGrow);
-                parent.eventPositionChanged += (x, y) => RepositionSidePanel(parent, parent2);
-                parent.eventSizeChanged += (x, y) => RepositionSidePanel(parent, parent2);
-                if (wip is CityServiceWorldInfoPanel)
-                {
-                    var controllerP = TLMRegionalPlatformSelection.Init(parent2);
-                    parent.eventVisibilityChanged += (x, y) => controllerP?.EventWIPChanged();
-                    parent.eventPositionChanged += (x, y) => controllerP?.EventWIPChanged();
-                    parent.eventSizeChanged += (x, y) => controllerP?.EventWIPChanged();
-                    NetManagerOverrides.EventNodeChanged += (x) =>
-                    {
-                        controllerP?.EventWIPChanged();
-                        controller?.EventWIPChanged(isGrow);
-                    };
-                }
-
-            }
-
-        }
-
-        public static void RepositionSidePanel(UIComponent parent, UIPanel parent2)
-        {
-            if (parent2 == null || parent == null) return;
-            parent2.relativePosition = new Vector3(parent.width + 15f, 50f);
-        }
+        public void SetCurrentSelectedId(ushort line) => CurrentSelectedId = line;
 
         public void OpenTLMPanel() => TransportLinesManagerMod.Instance.OpenPanelAtModTab();
 
@@ -374,37 +328,6 @@ namespace TransportLinesManager
             }
             yield break;
         }
-
-        internal void Awake()
-        {
-            SharedInstance = gameObject.AddComponent<TLMFacade>();
-            ConnectorADR = PluginUtils.GetImplementationTypeForMod<BridgeADRFallback, IBridgeADR>(gameObject, "Addresses", "2.99.99.0", "TransportLinesManager.ModShared.BridgeADR");
-            ConnectorWTS = PluginUtils.GetImplementationTypeForMod<BridgeWTSFallback, IBridgeWTS>(gameObject, "WriteTheSigns", "0.3.0.0", "TransportLinesManager.ModShared.BridgeWTS");
-        }
-
-        internal static readonly Color[] COLOR_ORDER =
-        [
-            Color.red,
-            Color.Lerp(Color.red, Color.yellow,0.5f),
-            Color.yellow,
-            Color.green,
-            Color.cyan,
-            Color.blue,
-            Color.Lerp(Color.blue, Color.magenta,0.5f),
-            Color.magenta,
-            Color.white,
-            Color.black,
-            Color.Lerp( Color.red, Color.black,0.5f),
-            Color.Lerp( Color.Lerp(Color.red, Color.yellow,0.5f), Color.black,0.5f),
-            Color.Lerp( Color.yellow, Color.black,0.5f),
-            Color.Lerp( Color.green, Color.black,0.5f),
-            Color.Lerp( Color.cyan, Color.black,0.5f),
-            Color.Lerp( Color.blue, Color.black,0.5f),
-            Color.Lerp( Color.Lerp(Color.blue, Color.magenta,0.5f), Color.black,0.5f),
-            Color.Lerp( Color.magenta, Color.black,0.5f),
-            Color.Lerp( Color.white, Color.black,0.25f),
-            Color.Lerp( Color.white, Color.black,0.75f)
-        ];
 
         public static void MigrateOldVehicleCountData()
         {
@@ -509,32 +432,90 @@ namespace TransportLinesManager
 
         public static void MigrateLegacyDefaultTicketPrice()
         {
-            var migrated = new HashSet<TransportSystemDefinition>();
-            var tm = TransportManager.instance;
-
-            for (ushort lineId = 1; lineId < tm.m_lines.m_size; lineId++)
+            var cfg = TLMBaseConfigXML.CurrentContextConfig;
+            if (cfg == null)
             {
-                ref var line = ref tm.m_lines.m_buffer[lineId];
-                if ((line.m_flags & TransportLine.Flags.Created) == 0)
-                {
-                    continue;
-                }
+                return;
+            }
 
-                var tsd = TransportSystemDefinition.GetDefinitionForLine(lineId, false);
-                if (tsd == null || migrated.Contains(tsd))
+            foreach (var tsd in TransportSystemDefinition.TransportInfoDict.Keys)
+            {
+                var transportCfg = cfg.GetTransportData(tsd);
+                if (transportCfg.DefaultTicketPrice == 0)
                 {
-                    continue;
-                }
-
-                migrated.Add(tsd);
-
-                var config = tsd.GetConfig();
-                if (config != null && config.DefaultTicketPrice == 0)
-                {
-                    config.DefaultTicketPrice = -1;
+                    transportCfg.DefaultTicketPrice = -1;
                 }
             }
         }
-    }
 
+        private static bool VerifyWorkshopModEnabled(ulong modId)
+        {
+            PluginManager.PluginInfo pluginInfo = Singleton<PluginManager>.instance.GetPluginsInfo().FirstOrDefault(pi => pi.publishedFileID.AsUInt64 == modId);
+            return !(pluginInfo == null || !pluginInfo.isEnabled);
+        }
+
+        private static bool VerifyLocalModActive(string modNamePart)
+        {
+            try
+            {
+                var plugins = PluginManager.instance.GetPluginsInfo();
+                return (from plugin in plugins.Where(p => p.isEnabled)
+                        select plugin.GetInstances<IUserMod>()
+                    into instances
+                        where instances.Any()
+                        select instances[0].Name
+                    into name
+                        where name != null && name.Contains(modNamePart)
+                        select name).Any();
+            }
+            catch (Exception e)
+            {
+                LogUtils.DoErrorLog($"Failed to detect if mod with name containing {modNamePart} is active");
+                LogUtils.DoErrorLog(e.ToString());
+                return false;
+            }
+        }
+
+        private static void InitWipSidePanels()
+        {
+            BuildingWorldInfoPanel[] panelList = UIView.GetAView().GetComponentsInChildren<BuildingWorldInfoPanel>();
+            LogUtils.DoLog("WIP LIST: [{0}]", string.Join(", ", [.. panelList.Select(x => x.name)]));
+            TLMLineItemButtonControl.EnsureTemplate();
+            foreach (BuildingWorldInfoPanel wip in panelList)
+            {
+                LogUtils.DoLog("LOADING WIP HOOK FOR: {0}", wip.name);
+                UIComponent parent = wip.GetComponent<UIComponent>();
+                if (parent is null)
+                {
+                    continue;
+                }
+                MonoUtils.CreateUIElement(out UIPanel parent2, parent.transform, "TLMSidePanels", new Vector4(parent.width + 15, 50, 300, 0));
+                parent2.autoLayout = true;
+                parent2.autoLayoutPadding.bottom = 5;
+                parent2.autoFitChildrenVertically = true;
+                parent2.autoLayoutDirection = LayoutDirection.Vertical;
+                var isGrow = wip is ZonedBuildingWorldInfoPanel;
+                var controller = TLMNearLinesController.InitPanelNearLinesOnWorldInfoPanel(parent2);
+                parent.eventVisibilityChanged += (x, y) => controller?.EventWIPChanged(isGrow);
+                parent.eventPositionChanged += (x, y) => controller?.EventWIPChanged(isGrow);
+                parent.eventSizeChanged += (x, y) => controller?.EventWIPChanged(isGrow);
+                parent.eventPositionChanged += (x, y) => RepositionSidePanel(parent, parent2);
+                parent.eventSizeChanged += (x, y) => RepositionSidePanel(parent, parent2);
+                if (wip is CityServiceWorldInfoPanel)
+                {
+                    var controllerP = TLMRegionalPlatformSelection.Init(parent2);
+                    parent.eventVisibilityChanged += (x, y) => controllerP?.EventWIPChanged();
+                    parent.eventPositionChanged += (x, y) => controllerP?.EventWIPChanged();
+                    parent.eventSizeChanged += (x, y) => controllerP?.EventWIPChanged();
+                    NetManagerOverrides.EventNodeChanged += (x) =>
+                    {
+                        controllerP?.EventWIPChanged();
+                        controller?.EventWIPChanged(isGrow);
+                    };
+                }
+
+            }
+
+        }
+    }
 }
