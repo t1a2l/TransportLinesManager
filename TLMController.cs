@@ -416,6 +416,12 @@ namespace TransportLinesManager
 
             for (ushort lineId = 1; lineId < tm.m_lines.m_size; lineId++)
             {
+                ref var line = ref tm.m_lines.m_buffer[lineId];
+                if ((line.m_flags & TransportLine.Flags.Created) == 0)
+                {
+                    continue;
+                }
+
                 var currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
 
                 if (currentConfig.AssetTransportList == null || currentConfig.AssetTransportList.Count == 0)
@@ -498,6 +504,35 @@ namespace TransportLinesManager
 
                 var currentSlot = budgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
                 TLMLineUtils.EnsureUsedCountSlotSynchronized(lineId, currentSlot);
+            }
+        }
+
+        public static void MigrateLegacyDefaultTicketPrice()
+        {
+            var migrated = new HashSet<TransportSystemDefinition>();
+            var tm = TransportManager.instance;
+
+            for (ushort lineId = 1; lineId < tm.m_lines.m_size; lineId++)
+            {
+                ref var line = ref tm.m_lines.m_buffer[lineId];
+                if ((line.m_flags & TransportLine.Flags.Created) == 0)
+                {
+                    continue;
+                }
+
+                var tsd = TransportSystemDefinition.GetDefinitionForLine(lineId, false);
+                if (tsd == null || migrated.Contains(tsd))
+                {
+                    continue;
+                }
+
+                migrated.Add(tsd);
+
+                var config = tsd.GetConfig();
+                if (config != null && config.DefaultTicketPrice == 0)
+                {
+                    config.DefaultTicketPrice = -1;
+                }
             }
         }
     }
