@@ -62,11 +62,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             set
             {
                 m_onDefault = value;
-                if (m_default != null)
-                {
-                    m_default.isEnabled = value != null;
-                    m_default.isInteractive = value != null;
-                }
             }
         }
 
