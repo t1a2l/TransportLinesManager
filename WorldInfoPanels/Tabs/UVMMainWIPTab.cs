@@ -665,7 +665,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
                 if (cfg.WeekendTicketPriceEntries == null || cfg.WeekendTicketPriceEntries.Count == 0)
                 {
-                    cfg.WeekendTicketPriceEntries = TLMTicketConfigTab.Instance.CloneTicketPriceEntries(cfg.TicketPriceEntries);
+                    cfg.WeekendTicketPriceEntries = TLMTicketConfigTab.Instance.CloneTicketPriceEntries(cfg.TicketPriceEntries, lineId);
                 }
             }
 

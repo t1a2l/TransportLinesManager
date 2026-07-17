@@ -326,14 +326,14 @@ namespace TransportLinesManager.Data.Extensions
             {
                 ticketPriceStorage.WeekendTicketPriceEntries =
                 [
-                    new() { HourOfDay = 0, Value = 0 }
+                    new() { HourOfDay = 0, Value = TLMLineUtils.GetDefaultTicketPrice(lineId) }
                 ];
             }
             else
             {
                 ticketPriceStorage.TicketPriceEntries =
                 [
-                    new() { HourOfDay = 0, Value = 0 }
+                    new() { HourOfDay = 0, Value = TLMLineUtils.GetDefaultTicketPrice(lineId) }
                 ];
             }
         }
@@ -352,7 +352,7 @@ namespace TransportLinesManager.Data.Extensions
             }
         }
 
-        public static void SetActiveTicketPriceForLine<T>(this T it, ushort lineId, uint multiplier, int hour) where T : ITicketPriceExtension
+        public static void SetActiveTicketPriceForLine<T>(this T it, ushort lineId, uint price, int hour) where T : ITicketPriceExtension
         {
             var ticketPriceStorage = it.SafeGet(it.LineToIndex(lineId));
             bool useWeekend = IsWeekendProfileActive(ticketPriceStorage);
@@ -370,7 +370,7 @@ namespace TransportLinesManager.Data.Extensions
             targetList.Add(new TicketPriceEntryXml
             {
                 HourOfDay = hour,
-                Value = multiplier
+                Value = price
             });
         }
 

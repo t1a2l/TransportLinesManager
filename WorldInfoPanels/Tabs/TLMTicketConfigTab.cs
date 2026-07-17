@@ -108,7 +108,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             MarkDirty();
         }
 
-        public TimeableList<TicketPriceEntryXml> CloneTicketPriceEntries(TimeableList<TicketPriceEntryXml> src)
+        public TimeableList<TicketPriceEntryXml> CloneTicketPriceEntries(TimeableList<TicketPriceEntryXml> src, ushort lineId)
         {
             var result = new TimeableList<TicketPriceEntryXml>();
 
@@ -117,7 +117,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 result.Add(new TicketPriceEntryXml
                 {
                     HourOfDay = 0,
-                    Value = 100
+                    Value = TLMLineUtils.GetDefaultTicketPrice(lineId)
                 });
                 return result;
             }
