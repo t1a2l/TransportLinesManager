@@ -147,10 +147,11 @@ namespace TransportLinesManager.Overrides
 
             var extension = TLMLineUtils.GetEffectiveExtensionForLine(vehicleData.m_transportLine);
             var lineExt = TLMTransportLineExtension.Instance;
-
             bool isAbsoluteMode = lineExt.IsUsingCustomConfig(vehicleData.m_transportLine) && lineExt.IsDisplayAbsoluteValues(lineId);
 
-            if(isAbsoluteMode)
+            string actualModel = vehicleData.Info?.name;
+
+            if (isAbsoluteMode)
             {
                 int slotIndex = extension.GetActiveBudgetEntries(lineId).GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
 
@@ -161,29 +162,26 @@ namespace TransportLinesManager.Overrides
 
                 TLMLineUtils.EnsureUsedCountSlotSynchronized(lineId, slotIndex);
 
-                string modelName = vehicleData.Info?.name;
-                if (!string.IsNullOrEmpty(modelName))
+                if (!string.IsNullOrEmpty(actualModel))
                 {
                     List<TransportAsset> assetTransportList = extension.GetAssetTransportListForLine(lineId);
-                    int assetIndex = assetTransportList.FindIndex(x => x.name == modelName);
+                    string key = slotIndex.ToString();
+
+                    int assetIndex = assetTransportList?.FindIndex(x => x.name == actualModel) ?? -1;
+                    int configuredTotal = 0;
 
                     if (assetIndex >= 0)
                     {
                         TransportAsset asset = assetTransportList[assetIndex];
-                        string key = slotIndex.ToString();
 
-                        int configuredTotal = 0;
-                        if (asset.count != null && asset.count.ContainsKey(key))
+                        if (asset.count != null && asset.count.TryGetValue(key, out var countEntry))
                         {
-                            configuredTotal = asset.count[key].TotalCount;
+                            configuredTotal = countEntry?.TotalCount ?? 0;
                         }
 
-                        int runtimeUsed = TLMLineUtils.GetRuntimeUsedCount(lineId, slotIndex, modelName);
-
-                        if (runtimeUsed > configuredTotal)
+                        if (configuredTotal <= 0 || TLMLineUtils.GetRuntimeUsedCount(lineId, slotIndex, actualModel) > configuredTotal)
                         {
-                            extension.EditVehicleUsedCount(lineId, modelName, "Remove");
-
+                            extension.EditVehicleUsedCount(lineId, actualModel, "Remove");
                             if (isEmpty)
                             {
                                 vehicleData.Info.m_vehicleAI.SetTransportLine(vehicleID, ref vehicleData, 0);
@@ -206,7 +204,6 @@ namespace TransportLinesManager.Overrides
                 return false;
             }
 
-            string actualModel = vehicleData.Info?.name;
             if (!string.IsNullOrEmpty(actualModel))
             {
                 extension.EditVehicleUsedCount(lineId, actualModel, "Remove");
