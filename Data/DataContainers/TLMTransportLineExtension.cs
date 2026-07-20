@@ -96,10 +96,12 @@ namespace TransportLinesManager.Data.DataContainers
                 string modelName = null;
                 if (lineId != 0)
                 {
+                    LogUtils.DoLog("Calling GetModelByPercentageOrCount");
                     info = VehicleUtils.GetModelByPercentageOrCount(assetTransportList, lineId, out modelName);
                 }
                 else
                 {
+                    LogUtils.DoLog("Calling GetRandomModel");
                     // Regional lines (lineId == 0) use the basic randomizer
                     var simpleStringList = assetTransportList.Select(a => a.name).ToList();
                     info = VehicleUtils.GetRandomModel(simpleStringList, out modelName);
@@ -108,7 +110,7 @@ namespace TransportLinesManager.Data.DataContainers
                 {
                     if (string.IsNullOrEmpty(modelName))
                     {
-                        LogUtils.DoErrorLog($"GetAModel: GetModelByPercentageOrCount returned null model name for line {lineId} — breaking to avoid infinite loop");
+                        LogUtils.DoErrorLog($"Null model name for line {lineId} — breaking to avoid infinite loop");
                         break;
                     }
                     ExtensionStaticExtensionMethods.RemoveAssetFromLine(this, lineId, modelName);
