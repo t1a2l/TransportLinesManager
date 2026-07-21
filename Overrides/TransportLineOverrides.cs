@@ -205,6 +205,19 @@ namespace TransportLinesManager.Overrides
             return false;
         }
 
+        [HarmonyPatch(typeof(TransportLine), "RemoveVehicle")]
+        [HarmonyPrefix]
+        public static void RemoveVehicle(ushort vehicleID, ref Vehicle data)
+        {
+            if (data.m_transportLine == 0 || data.Info == null)
+            {
+                return;
+            }
+            var extension = TLMLineUtils.GetEffectiveExtensionForLine(data.m_transportLine);
+            extension.EditVehicleUsedCount(data.m_transportLine, data.Info.name, "Remove");
+        }
+
+
         private static bool CanLeaveStop(TransportLine __instance, ushort nextStop, int waitTime)
 		{
             if (nextStop == 0)
