@@ -151,26 +151,28 @@ namespace TransportLinesManager.Overrides
 
             string actualModel = vehicleData.Info?.name;
 
-            if (isAbsoluteMode)
+            int slotIndex = extension.GetActiveBudgetEntries(lineId).GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+
+            if (slotIndex < 0)
             {
-                int slotIndex = extension.GetActiveBudgetEntries(lineId).GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+                slotIndex = 0;
+            }
 
-                if (slotIndex < 0)
+            TLMLineUtils.EnsureUsedCountSlotSynchronized(lineId, slotIndex);
+
+            bool removeVehicle = false;
+
+            if (!string.IsNullOrEmpty(actualModel))
+            {
+                List<TransportAsset> assetTransportList = extension.GetAssetTransportListForLine(lineId);
+                string key = slotIndex.ToString();
+
+                int assetIndex = assetTransportList?.FindIndex(x => x.name == actualModel) ?? -1;
+                int configuredTotal = 0;
+
+                if (assetIndex >= 0)
                 {
-                    slotIndex = 0;
-                }
-
-                TLMLineUtils.EnsureUsedCountSlotSynchronized(lineId, slotIndex);
-
-                if (!string.IsNullOrEmpty(actualModel))
-                {
-                    List<TransportAsset> assetTransportList = extension.GetAssetTransportListForLine(lineId);
-                    string key = slotIndex.ToString();
-
-                    int assetIndex = assetTransportList?.FindIndex(x => x.name == actualModel) ?? -1;
-                    int configuredTotal = 0;
-
-                    if (assetIndex >= 0)
+                    if(isAbsoluteMode)
                     {
                         TransportAsset asset = assetTransportList[assetIndex];
 
@@ -181,21 +183,30 @@ namespace TransportLinesManager.Overrides
 
                         if (configuredTotal <= 0 || TLMLineUtils.GetRuntimeUsedCount(lineId, slotIndex, actualModel) > configuredTotal)
                         {
-                            extension.EditVehicleUsedCount(lineId, actualModel, "Remove");
-                            if (isEmpty)
-                            {
-                                vehicleData.Info.m_vehicleAI.SetTransportLine(vehicleID, ref vehicleData, 0);
-                            }
-                            else
-                            {
-                                TLMVehicleUtils.DoSoftDespawn(vehicleID, ref vehicleData);
-                            }
-                            return true;
+                            removeVehicle = true;
                         }
                     }
                 }
-            }
+                else
+                {
+                    removeVehicle = true;
+                }
 
+                if (removeVehicle)
+                {
+                    extension.EditVehicleUsedCount(lineId, actualModel, "Remove");
+                    if (isEmpty)
+                    {
+                        vehicleData.Info.m_vehicleAI.SetTransportLine(vehicleID, ref vehicleData, 0);
+                    }
+                    else
+                    {
+                        TLMVehicleUtils.DoSoftDespawn(vehicleID, ref vehicleData);
+                    }
+                    return true;
+                }
+            }
+            
             int currentVehicleCount = TransportManager.instance.m_lines.m_buffer[lineId].CountVehicles(lineId);
             int targetVehicleCount = TransportLineOverrides.NewCalculateTargetVehicleCount(lineId);
 
