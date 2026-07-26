@@ -333,7 +333,14 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
             int assetindex = assetTransportList?.FindIndex(item => item.name == selectedModel) ?? -1;
             if (assetindex == -1)
             {
-                LogUtils.DoErrorLog($"EditVehicleUsedCount: Could not find asset {selectedModel} in line {lineID} asset list");
+                if (status == "Add")
+                {
+                    LogUtils.DoErrorLog($"EditVehicleUsedCount: Could not find asset {selectedModel} in line {lineID} asset list while adding.");
+                }
+                else if (CommonProperties.DebugMode)
+                {
+                    LogUtils.DoLog($"EditVehicleUsedCount: Asset {selectedModel} not found in line {lineID} asset list while removing; ignoring.");
+                }
                 return;
             }
 

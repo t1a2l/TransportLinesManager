@@ -1,16 +1,17 @@
-﻿using ColossalFramework.Globalization;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Serialization;
+using ColossalFramework.Globalization;
+using Commons;
 using Commons.Interfaces.Warehouse;
 using Commons.Utils;
 using Commons.Utils.UtilitiesClasses;
-using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Data.Base.ConfigurationContainers;
 using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Interfaces;
 using TransportLinesManager.ModShared;
 using TransportLinesManager.Utils;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Serialization;
 
 namespace TransportLinesManager.Data.DataContainers
 {
@@ -134,7 +135,14 @@ namespace TransportLinesManager.Data.DataContainers
             int assetindex = assetTransportList?.FindIndex(item => item.name == selectedModel) ?? -1;
             if (assetindex == -1)
             {
-                LogUtils.DoErrorLog($"EditVehicleUsedCount: Could not find asset {selectedModel} in line {lineID} asset list");
+                if (status == "Add")
+                {
+                    LogUtils.DoErrorLog($"EditVehicleUsedCount: Could not find asset {selectedModel} in line {lineID} asset list while adding.");
+                }
+                else if (CommonProperties.DebugMode)
+                {
+                    LogUtils.DoLog($"EditVehicleUsedCount: Asset {selectedModel} not found in line {lineID} asset list while removing; ignoring.");
+                }
                 return;
             }
 
