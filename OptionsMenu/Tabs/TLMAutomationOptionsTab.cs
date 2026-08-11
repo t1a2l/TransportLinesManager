@@ -9,6 +9,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
     internal class TLMAutomationOptionsTab : UICustomControl, ITLMConfigOptionsTab
     {
         private UIComponent parent;
+        private UICheckBox m_allowAutoSpawnAllVehicles;
         private UICheckBox m_autoColor;
         private UICheckBox m_autoName;
         private UICheckBox m_circular;
@@ -18,12 +19,14 @@ namespace TransportLinesManager.OptionsMenu.Tabs
         private UICheckBox m_expressBuses;
         private UICheckBox m_expressTrolleys;
         private UICheckBox m_clockSwap;
+
         public void ReloadData()
         {
             if (TLMBaseConfigXML.Instance is null)
             {
                 return;
             }
+            m_allowAutoSpawnAllVehicles.isChecked = TLMBaseConfigXML.CurrentContextConfig.AllowAutoSpawnAllVehicles;
             m_autoColor.isChecked = TLMBaseConfigXML.CurrentContextConfig.UseAutoColor;
             m_autoName.isChecked = TLMBaseConfigXML.CurrentContextConfig.UseAutoName;
             m_circular.isChecked = TLMBaseConfigXML.CurrentContextConfig.CircularIfSingleDistrictLine;
@@ -35,7 +38,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             m_clockSwap.isChecked = TransportLinesManagerMod.UseGameClockAsReferenceIfNoDayNight;
         }
 
-        private void Awake()
+        public void Awake()
         {
             parent = GetComponentInParent<UIComponent>();
             UIHelperExtension group7 = new(parent.GetComponentInChildren<UIScrollablePanel>());
@@ -51,6 +54,8 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             AddCheckboxLocale("TLM_USE_CIRCULAR_AUTO_NAME", out m_circular, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.CircularIfSingleDistrictLine = x);
             AddCheckboxLocale("TLM_ADD_LINE_NUMBER_AUTO_NAME", out m_addLineCode, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.AddLineCodeInAutoname = x);
             AddCheckboxLocale("TLM_BUS_LINES_USE_SOFT_DESPAWN", out m_busLinesUseSoftDespawn, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.BusLinesUseSoftDespawn = x);
+            AddCheckboxLocale("TLM_ALLOW_AUTO_SPAWN_ALL_VEHICLES", out m_allowAutoSpawnAllVehicles, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.AllowAutoSpawnAllVehicles = x);
+
             group7.AddSpace(15);
 
             AddCheckboxLocale("TLM_ENABLE_EXPRESS_BUSES", out m_expressBuses, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.ExpressBusesEnabled = x);

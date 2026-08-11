@@ -114,7 +114,6 @@ namespace TransportLinesManager.Overrides
         [HarmonyPatch(typeof(VehicleAI), "GetColor", [typeof(ushort), typeof(Vehicle), typeof(InfoManager.InfoMode), typeof(InfoManager.SubInfoMode)], [ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Normal, ArgumentType.Normal])]
         [HarmonyPrefix]
         public static bool PreGetColor(VehicleAI __instance, ushort vehicleID, ref Vehicle data, InfoManager.InfoMode infoMode, InfoManager.SubInfoMode subInfoMode, ref Color __result)
-#pragma warning restore IDE0060 // Remove unused parameter
         {
             if (data.m_transportLine != 0 && infoMode == InfoManager.InfoMode.None)
             {

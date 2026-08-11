@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
+using TransportLinesManager.Data.DataContainers;
 
 namespace TransportLinesManager.Data.Base.ConfigurationContainers
 {
@@ -288,32 +289,54 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
             return m_basicAssetsList;
         }
 
-        public VehicleInfo GetAModel(ushort lineID)
+        public VehicleInfo GetAModel(ushort lineId)
         {
             VehicleInfo info = null;
-            List<TransportAsset> assetList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
-            while (info == null && assetList.Count > 0)
+            List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineId);
+
+            // If no configured assets and auto-spawn is allowed, use vanilla random behavior.
+            if (assetTransportList == null || assetTransportList.Count == 0)
+            {
+                if (TLMBaseConfigXML.CurrentContextConfig.AllowAutoSpawnAllVehicles)
+                {
+                    var tsd = TransportSystemDefinition.FromLineId(lineId, false);
+                    // Use your existing logic for “basic” assets or fall back to vanilla:
+                    var basicList = GetBasicAssetListForLine(lineId);
+                    if (basicList != null && basicList.Count > 0)
+                    {
+                        info = VehicleUtils.GetRandomModel([.. basicList.Select(a => a.name)], out string _);
+                    }
+
+                    // Note: no EditVehicleUsedCount here if the asset isn’t in your list.
+                    return info;
+                }
+
+                // If auto-spawn is disabled, keep your current “no asset” behavior.
+                return null;
+            }
+
+            while (info == null && assetTransportList.Count > 0)
             {
                 string modelName = null;
-                if (lineID != 0)
+                if (lineId != 0)
                 {
-                    info = VehicleUtils.GetModelByPercentageOrCount(assetList, lineID, out modelName);
+                    info = VehicleUtils.GetModelByPercentageOrCount(assetTransportList, lineId, out modelName);
                 }
                 else
                 {
                     // Regional lines (lineId == 0) use the basic randomizer
-                    var simpleStringList = assetList.Select(a => a.name).ToList();
+                    var simpleStringList = assetTransportList.Select(a => a.name).ToList();
                     info = VehicleUtils.GetRandomModel(simpleStringList, out modelName);
                 }
                 if (info == null)
                 {
                     if (string.IsNullOrEmpty(modelName))
                     {
-                        LogUtils.DoErrorLog($"GetAModel: GetModelByPercentageOrCount returned null model name for line {lineID} — breaking to avoid infinite loop");
+                        LogUtils.DoErrorLog($"GetAModel: GetModelByPercentageOrCount returned null model name for line {lineId} — breaking to avoid infinite loop");
                         break;
                     }
-                    ExtensionStaticExtensionMethods.RemoveAssetFromLine(this, lineID, modelName);
-                    assetList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
+                    ExtensionStaticExtensionMethods.RemoveAssetFromLine(this, lineId, modelName);
+                    assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineId);
                 }
             }
             return info;

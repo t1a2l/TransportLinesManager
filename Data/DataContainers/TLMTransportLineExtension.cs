@@ -92,6 +92,28 @@ namespace TransportLinesManager.Data.DataContainers
         {
             VehicleInfo info = null;
             List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineId);
+
+            // If no configured assets and auto-spawn is allowed, use vanilla random behavior.
+            if (assetTransportList == null || assetTransportList.Count == 0)
+            {
+                if (TLMBaseConfigXML.CurrentContextConfig.AllowAutoSpawnAllVehicles)
+                {
+                    var tsd = TransportSystemDefinition.FromLineId(lineId, false);
+                    // Use your existing logic for “basic” assets or fall back to vanilla:
+                    var basicList = GetBasicAssetListForLine(lineId);
+                    if (basicList != null && basicList.Count > 0)
+                    {
+                        info = VehicleUtils.GetRandomModel([.. basicList.Select(a => a.name)], out string _);
+                    }
+
+                    // Note: no EditVehicleUsedCount here if the asset isn’t in your list.
+                    return info;
+                }
+
+                // If auto-spawn is disabled, keep your current “no asset” behavior.
+                return null;
+            }
+
             while (info == null && assetTransportList.Count > 0)
             {
                 string modelName = null;

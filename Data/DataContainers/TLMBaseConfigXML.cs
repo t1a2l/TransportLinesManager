@@ -91,6 +91,9 @@ namespace TransportLinesManager.Data.DataContainers
         [XmlAttribute("BusLinesUseSoftDespawn")]
         public bool AddLineCodeInAutoname { get; set; }
 
+        [XmlAttribute("allowAutoSpawnAllVehicles")]
+        public bool AllowAutoSpawnAllVehicles { get; set; } = false;
+
         [Obsolete("XML Export only!", true)]
         public NonSequentialList<TLMTransportTypeConfigurationsXML> PublicTransportConfigurations { get => PublicTransportConfigurations_internal; set => PublicTransportConfigurations_internal = value; }
         
