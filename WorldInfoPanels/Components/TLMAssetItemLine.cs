@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using ColossalFramework;
 using TransportLinesManager.WorldInfoPanels.Tabs;
 using System.Linq;
+using static TransportLinesManager.Data.Extensions.ExtensionStaticExtensionMethods;
 
 namespace TransportLinesManager.WorldInfoPanels.Components
 {
@@ -46,11 +47,16 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                 if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
                 {
                     IBasicExtension extension = lineId > 0 && !fromBuilding ? TLMLineUtils.GetEffectiveExtensionForLine(lineId) : UVMPublicTransportWorldInfoPanel.GetCurrentTSD().GetTransportExtension();
+                    IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
 
                     LogUtils.DoLog($"checkbox event: {x.objectUserData} => {y} at {extension}[{lineId}-{fromBuilding}]");
                     if (y)
                     {
-                        extension.AddAssetToLine(fromBuilding ? (ushort)0 : lineId, m_currentAsset, m_capacityEditor.text, m_weightEditor.text, TLMAssetSelectorTab.Instance.CurrentProfileTarget);
+                        extension.AddAssetToLine(fromBuilding ? (ushort)0 : lineId, m_currentAsset, m_capacityEditor.text, m_weightEditor.text, ProfileTarget.Weekday);
+                        if(currentConfig != null && currentConfig.UseSeparateWeekendProfile)
+                        {
+                            extension.AddAssetToLine(fromBuilding ? (ushort)0 : lineId, m_currentAsset, m_capacityEditor.text, m_weightEditor.text, ProfileTarget.Weekend);
+                        }
                     }
                     else
                     {

@@ -52,7 +52,6 @@ namespace TransportLinesManager.Data.Extensions
         public static void AddAssetToLine<T>(this T it, ushort lineId, string assetId, string capacity, string weight, ProfileTarget profileTarget) where T : IAssetSelectorExtension
         {
             List<TransportAsset> list = it.GetAssetTransportListForLine(lineId);
-            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
             var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetBudgetsMultiplierForLine(lineId, profileTarget);
             var ext = TLMTransportLineExtension.Instance;
 
@@ -119,6 +118,7 @@ namespace TransportLinesManager.Data.Extensions
             }
             list.Add(item);
             SetAssetTransportListForLine(it, lineId, list);
+            TLMCountModeUtils.RebalanceAbsoluteCountsForLine(lineId, profileTarget);
         }
 
         public static void AddDefaultToNewBudgetEntry<T>(this T it, ushort lineId, ProfileTarget profileTarget) where T : IAssetSelectorExtension
@@ -182,6 +182,14 @@ namespace TransportLinesManager.Data.Extensions
                 return;
             }
             list.RemoveAll(x => x.name == assetId);
+            SetAssetTransportListForLine(it, lineId, list);
+
+            TLMCountModeUtils.RebalanceAbsoluteCountsForLine(lineId, ProfileTarget.Weekday);
+            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+            if (currentConfig != null && currentConfig.UseSeparateWeekendProfile)
+            {
+                TLMCountModeUtils.RebalanceAbsoluteCountsForLine(lineId, ProfileTarget.Weekend);
+            }
         }
 
         public static void UseDefaultAssetsAtLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.GetAssetListForLine(lineId).Clear();

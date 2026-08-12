@@ -246,12 +246,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                             TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength,
                             idx.Value / 100f);
 
-                        int oldProjected = TLMLineUtils.ProjectTargetVehicleCount(
-                            TransportManager.instance.m_lines.m_buffer[lineId].Info,
-                            TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength,
-                            oldVal / 100f);
-
-                        TLMCountModeUtils.OnBudgetChangedInCountMode(lineId, ext, budgetIndex, projected, oldProjected);
+                        TLMCountModeUtils.OnBudgetChangedInCountMode(lineId, ext, budgetIndex, projected, TLMAssetSelectorTab.Instance.CurrentProfileTarget);
                         TLMAssetSelectorTab.RefreshIndicatorForBudgetIndex(lineId, budgetIndex);
                     }
                     TLMAssetSelectorTab.MarkDirty();

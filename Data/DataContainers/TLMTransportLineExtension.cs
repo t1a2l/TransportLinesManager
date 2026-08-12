@@ -11,6 +11,7 @@ using TransportLinesManager.Data.Extensions;
 using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Interfaces;
 using TransportLinesManager.ModShared;
+using TransportLinesManager.Overrides;
 using TransportLinesManager.Utils;
 
 namespace TransportLinesManager.Data.DataContainers
@@ -60,6 +61,10 @@ namespace TransportLinesManager.Data.DataContainers
         public void SetDisplayAbsoluteValues(ushort lineId, bool value) => SafeGet(lineId).DisplayAbsoluteValues = value;
 
         public bool IsDisplayAbsoluteValues(ushort lineId) => SafeGet(lineId).DisplayAbsoluteValues;
+
+        public bool IsAutoAdjustAbsoluteCountsEnabled(ushort lineId) => SafeGet(lineId).AutoAdjustAbsoluteCounts;
+
+        public void SetAutoAdjustAbsoluteCounts(ushort lineId, bool value) => SafeGet(lineId).AutoAdjustAbsoluteCounts = value;
 
         public uint LineToIndex(ushort lineId) => lineId > 0 ? lineId : throw new System.Exception("Line 0 cannot have specific configuration!");
 

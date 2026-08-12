@@ -30,8 +30,12 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 isCustom = value;
             }
         }
+
         [XmlAttribute("displayAbsoluteValues")]
         public bool DisplayAbsoluteValues { get; set; } = false;
+
+        [XmlAttribute("autoAdjustAbsoluteCounts")]
+        public bool AutoAdjustAbsoluteCounts { get; set; } = false;
 
         [XmlElement("Budget")]
         public TimeableList<BudgetEntryXml> BudgetEntries { get; set; } = [];

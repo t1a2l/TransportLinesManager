@@ -55,6 +55,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private UICheckBox m_useSeparateWeekendProfileCheckbox;
 
+        private UICheckBox m_autoAdjustAbsoluteCounts;
+
         #region Overridable
 
         private int colorChangeCooldown = 0;
@@ -86,6 +88,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             CreateActionButtonsRow();
             CreateCustomLineCodeEditor();
             CreateWeekendProfileCheckbox();
+            CreateAutoAdjustAbsoluteCountsCheckbox();
         }
 
         public void OnEnable() => Singleton<TransportManager>.instance.eventLineColorChanged += OnLineColorChanged;
@@ -120,6 +123,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     var cfg = TLMLineUtils.GetEffectiveConfigForLine(lineID);
                     m_useSeparateWeekendProfileCheckbox?.isVisible = TLMController.IsRealTimeEnabled && RealTimeUtils.IsWeekendEnabled();
                     m_useSeparateWeekendProfileCheckbox?.isChecked = cfg.UseSeparateWeekendProfile;
+
+                    var lineExt = TLMTransportLineExtension.Instance;
+                    bool isAbsolute = lineExt.IsUsingCustomConfig(lineID) && lineExt.IsDisplayAbsoluteValues(lineID);
+                    m_autoAdjustAbsoluteCounts?.isVisible = isAbsolute;
+                    m_autoAdjustAbsoluteCounts?.isChecked = lineExt.IsAutoAdjustAbsoluteCountsEnabled(lineID);
 
                     ref TransportLine t = ref TransportManager.instance.m_lines.m_buffer[lineID];
                     ushort lineNumber = t.m_lineNumber;
@@ -641,6 +649,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             m_useSeparateWeekendProfileCheckbox = UIHelperExtension.AddCheckboxLocale(m_bg, "TLM_USE_SEPARATE_WEEKEND_PROFILE", false, OnUseSeparateWeekendProfileChanged);
             m_useSeparateWeekendProfileCheckbox.name = "UseSeparateWeekendProfile";
+            m_useSeparateWeekendProfileCheckbox.tooltip = Locale.Get("TLM_USE_SEPARATE_WEEKEND_PROFILE_TOOLTIP");
             m_useSeparateWeekendProfileCheckbox.relativePosition = new Vector3(8f, 250f);
             m_useSeparateWeekendProfileCheckbox.width = 370f;
             m_useSeparateWeekendProfileCheckbox.label.font = m_tripSaved.font;
@@ -675,6 +684,27 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             UVMBudgetConfigTab.Instance.UpdateWeekendBudgetUIState();
             TLMAssetSelectorTab.Instance.UpdateWeekendBudgetUIState();
             TLMTicketConfigTab.Instance.UpdateWeekendTicketPriceUIState();
+        }
+
+        #endregion
+
+        #region Auto Adjust Absolute Counts checkbox
+
+        private void CreateAutoAdjustAbsoluteCountsCheckbox()
+        {
+            m_autoAdjustAbsoluteCounts = UIHelperExtension.AddCheckboxLocale(m_bg, "TLM_AUTO_ADJUST_ABSOLUTE_COUNTS", false, OnAutoAdjustAbsoluteCountsChanged);
+            m_autoAdjustAbsoluteCounts.name = "AutoAdjustAbsoluteCounts";
+            m_autoAdjustAbsoluteCounts.tooltip = Locale.Get("TLM_AUTO_ADJUST_ABSOLUTE_COUNTS_TOOLTIP");
+            m_autoAdjustAbsoluteCounts.relativePosition = new Vector3(8f, 260f);
+            m_autoAdjustAbsoluteCounts.width = 370f;
+            m_autoAdjustAbsoluteCounts.label.font = m_tripSaved.font;
+            m_autoAdjustAbsoluteCounts.label.textColor = m_tripSaved.textColor;
+            m_autoAdjustAbsoluteCounts.label.textScale = m_tripSaved.textScale;
+        }
+
+        private void OnAutoAdjustAbsoluteCountsChanged(bool value)
+        {
+            m_autoAdjustAbsoluteCounts?.isChecked = value;
         }
 
         #endregion
