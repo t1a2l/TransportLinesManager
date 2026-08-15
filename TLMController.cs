@@ -44,6 +44,7 @@ namespace TransportLinesManager
         public const ulong IPT2_ESSENTIALS_MOD_ID = 3714961481;
         public const ulong IPT3_MOD_ID = 3690061052;
         public const ulong RETURN_VEHICLE_MOD_ID = 2101977903UL;
+        public const ulong TRANSIT_VEHICLE_SPAWN_DELAY_MOD_ID = 2654110611L;
 
         public static readonly Color[] COLOR_ORDER =
         [
@@ -72,6 +73,7 @@ namespace TransportLinesManager
         private bool m_dirtyRegionalLines;
         private bool? m_isRealTimeEnabled = null;
         private bool? m_isSchoolBusesEnabled = null;
+        private bool? m_isTransitVehicleSpawnDelayEnabled = null;
         private static readonly string GlobalBaseConfigFileName = "TLM_GlobalData.xml";
 
         public BuildingTransportLinesCache BuildingLines { get; private set; }
@@ -113,6 +115,18 @@ namespace TransportLinesManager
                     VerifyIfSchoolBusesIsEnabled();
                 }
                 return Instance?.m_isSchoolBusesEnabled == true;
+            }
+        }
+
+        public static bool IsTransitVehicleSpawnDelayEnabled
+        {
+            get
+            {
+                if (Instance?.m_isTransitVehicleSpawnDelayEnabled == null)
+                {
+                    VerifyIfTransitVehicleSpawnDelayIsEnabled();
+                }
+                return Instance?.m_isTransitVehicleSpawnDelayEnabled == true;
             }
         }
 
@@ -167,6 +181,11 @@ namespace TransportLinesManager
         public static void VerifyIfSchoolBusesIsEnabled()
         {
             Instance?.m_isSchoolBusesEnabled = VerifyWorkshopModEnabled(SCHOOLBUSES_MOD_ID);
+        }
+
+        public static void VerifyIfTransitVehicleSpawnDelayIsEnabled()
+        {
+            Instance?.m_isTransitVehicleSpawnDelayEnabled = VerifyWorkshopModEnabled(TRANSIT_VEHICLE_SPAWN_DELAY_MOD_ID);
         }
 
         public static Color AutoColor(ushort i, bool ignoreRandomIfSet = true, bool ignoreAnyIfSet = false)

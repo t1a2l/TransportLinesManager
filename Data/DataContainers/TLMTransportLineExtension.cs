@@ -25,6 +25,7 @@ namespace TransportLinesManager.Data.DataContainers
         {
             Configurations[lineID] = new TLMTransportLineConfiguration();
             TLMLineUtils.ClearRuntimeUsedCountForLine(lineID);
+            TLMDepotAIOverrides.ClearLineSpawnDelay(lineID);
         }
         
         public TLMTransportLineConfiguration SafeGet(uint lineId)
