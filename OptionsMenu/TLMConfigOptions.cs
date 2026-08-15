@@ -142,7 +142,8 @@ namespace TransportLinesManager.OptionsMenu
             AutoName_BD = 3,
             AutoName_PA = 4,
             Palettes = 5,
-            About = 6
+            SpawnDelay = 6,
+            About = 7
         }
     }
 
@@ -158,6 +159,7 @@ namespace TransportLinesManager.OptionsMenu
                 ConfigTabs.AutoName_BD => Locale.Get("TLM_AUTO_NAME_SETTINGS_OTHER"),
                 ConfigTabs.AutoName_PA => Locale.Get("TLM_AUTO_NAME_SETTINGS_PUBLIC_AREAS"),
                 ConfigTabs.Palettes => Locale.Get("TLM_CUSTOM_PALETTE_CONFIG"),
+                ConfigTabs.SpawnDelay => Locale.Get("TLM_SPAWN_DELAY_CONFIG"),
                 ConfigTabs.About => Locale.Get("TLM_BETAS_EXTRA_INFO"),
                 _ => throw new Exception($"Not supported: {tab}"),
             };
@@ -173,6 +175,7 @@ namespace TransportLinesManager.OptionsMenu
                 ConfigTabs.AutoName_BD => "ToolbarIconMonuments",
                 ConfigTabs.AutoName_PA => "ToolbarIconDistrict",
                 ConfigTabs.Palettes => "ZoningOptionFill",
+                ConfigTabs.SpawnDelay => "SpawnDelay",
                 ConfigTabs.About => "CityInfo",
                 _ => throw new Exception($"Not supported: {tab}"),
             };
@@ -189,6 +192,7 @@ namespace TransportLinesManager.OptionsMenu
                 ConfigTabs.AutoName_BD => typeof(TLMAutoNameBuildingsTab),
                 ConfigTabs.AutoName_PA => typeof(TLMAutoNamePublicAreasTab),
                 ConfigTabs.Palettes => typeof(TLMPaletteOptionsTab),
+                ConfigTabs.SpawnDelay => typeof(TLMSpawnDelayOptionsTab),
                 ConfigTabs.About => typeof(TLMModInfoTab),
                 _ => null,
             };

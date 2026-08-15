@@ -11,6 +11,6 @@ namespace TransportLinesManager.Data.Base.Enums
 
     public static class SpawnDelayScopeExtensions
     {
-        public static string GetName(this SpawnDelayScope spawnDelayScope) => Locale.Get("TLM_SPAWN_DELAY_" + spawnDelayScope.ToString());
+        public static string GetName(this SpawnDelayScope spawnDelayScope) => Locale.Get("TLM_SPAWN_DELAY_" + spawnDelayScope.ToString().ToUpper());
     }
 }
