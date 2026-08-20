@@ -175,12 +175,14 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             MonoUtils.CreateUIElement(out m_budgetProfilePanel, parent.transform);
             m_budgetProfilePanel.name = "BudgetProfilePanel";
+            MonoUtils.LimitWidthAndBox(m_budgetProfilePanel, 370f);
             m_budgetProfilePanel.width = 370f;
             m_budgetProfilePanel.height = 24f;
             m_budgetProfilePanel.autoLayout = false;
 
             MonoUtils.CreateUIElement(out m_budgetProfileLabel, m_budgetProfilePanel.transform);
             m_budgetProfileLabel.name = "BudgetProfileLabel";
+            MonoUtils.LimitWidthAndBox(m_budgetProfileLabel, 370f);
             m_budgetProfileLabel.text = Locale.Get("TLM_PROFILE");
             m_budgetProfileLabel.textScale = 0.9f;
             m_budgetProfileLabel.autoSize = false;
@@ -193,6 +195,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             m_budgetProfileDropdown = ddGo.GetComponent<UIDropDown>();
             m_budgetProfileDropdown.name = "BudgetProfileDropdown";
+            MonoUtils.LimitWidthAndBox(m_budgetProfileDropdown, 370f);
             m_budgetProfileDropdown.width = 140f;
             m_budgetProfileDropdown.height = 24f;
             m_budgetProfileDropdown.textScale = 0.85f;
@@ -208,8 +211,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_budgetProfileDropdown.selectedIndex = 0;
             m_budgetProfileDropdown.relativePosition = new Vector3(90f, 0f);
             m_budgetProfileDropdown.eventSelectedIndexChanged += OnBudgetProfileChanged;
-
-            MonoUtils.LimitWidthAndBox(m_budgetProfilePanel, 370f);
 
             UpdateWeekendBudgetUIState();
         }
@@ -304,9 +305,18 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             lineExt.SetAutoAdjustAbsoluteCounts(lineId, value);
 
-            if (!value) return;
+            if (value)
+            {
+                TLMCountModeUtils.RebalanceAbsoluteCountsForLine(lineId, ProfileTarget.Weekday);
 
-            TLMCountModeUtils.RebalanceAbsoluteCountsForLine(lineId, CurrentProfileTarget);
+                // Initialize weekend too if the line has a separate profile.
+                var config = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+
+                if (config.UseSeparateWeekendProfile)
+                {
+                    TLMCountModeUtils.RebalanceAbsoluteCountsForLine(lineId, ProfileTarget.Weekend);
+                }
+            }
 
             RebuildList();
             TLMAssetSelectorTab.MarkDirty();
