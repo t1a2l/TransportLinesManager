@@ -598,6 +598,8 @@ namespace TransportLinesManager
         {
             var metadata = TLMSaveMetadata.Instance;
 
+            Debug.Log("TLM version: " + metadata.DataVersion.ToString());
+
             if (metadata.DataVersion < DATA_VERSION_14_6)
             {
                 MigrateOldVehicleCountData();
