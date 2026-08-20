@@ -89,7 +89,12 @@ namespace TransportLinesManager.Utils
             // For each budget index, redistribute counts
             for (int budgetIndex = 0; budgetIndex < budgetEntries.Count; budgetIndex++)
             {
-                int maxVehicles = (int)budgetEntries[budgetIndex].Value;
+                float budgetMultiplier = budgetEntries[budgetIndex].Value / 100f;
+
+                ref TransportLine line = ref TransportManager.instance.m_lines.m_buffer[lineId];
+
+                int maxVehicles = TLMLineUtils.ProjectTargetVehicleCount(line.Info, line.m_totalLength, budgetMultiplier);
+
                 if (maxVehicles <= 0)
                 {
                     continue;
