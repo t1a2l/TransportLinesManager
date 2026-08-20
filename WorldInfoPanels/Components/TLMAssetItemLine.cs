@@ -103,6 +103,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             var lineExt = TLMTransportLineExtension.Instance;
             bool isCustomConfig = !isIntercity && lineExt.IsUsingCustomConfig(lineId);
             bool isAbsolute = isCustomConfig && lineExt.IsDisplayAbsoluteValues(lineId);
+            bool autoAdjustEnabled = lineExt.IsAutoAdjustAbsoluteCountsEnabled(lineId);
 
             if (isAllowed)
             {
@@ -133,7 +134,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
                 if (isAbsolute)
                 {
-                    m_weightEditor.text = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()].TotalCount.ToString() : "0"; 
+                    m_weightEditor.text = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()].TotalCount.ToString() : "0";
+                    m_weightEditor.isInteractive = !autoAdjustEnabled;
+                    m_weightEditor.opacity = autoAdjustEnabled ? 0.7f : 1f;
                 }
                 else
                 {
