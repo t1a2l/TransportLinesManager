@@ -12,7 +12,7 @@ using TransportLinesManager.MapDrawer;
 using TransportLinesManager.OptionsMenu;
 using TransportLinesManager.Utils;
 
-[assembly: AssemblyVersion("14.6.0.*")]
+[assembly: AssemblyVersion("14.7.0.*")]
 namespace TransportLinesManager
 {
     public class TransportLinesManagerMod : BasicIUserMod<TransportLinesManagerMod, TLMController, TLMPanel>
@@ -24,9 +24,6 @@ namespace TransportLinesManager
         public override bool UseGroup9 => false;
 
         protected override Dictionary<ulong, string> IncompatibleModList { get; } = [];
-
-        private static readonly SavedInt m_dataVersion = new("TLM_DataVersion", Settings.gameSettingsFile, 0, true);
-        private const int DATA_VERSION_14_6 = 1461;
 
         private static readonly SavedBool m_savedShowNearLinesInCityServicesWorldInfoPanel = new("TLM_showNearLinesInCityServicesWorldInfoPanel", Settings.gameSettingsFile, true, true);
         private static readonly SavedBool m_savedShowNearLinesInZonedBuildingWorldInfoPanel = new("TLM_showNearLinesInZonedBuildingWorldInfoPanel", Settings.gameSettingsFile, false, true);
@@ -118,13 +115,6 @@ namespace TransportLinesManager
 
             TLMController.VerifyIfRealTimeIsEnabled();
             TransportSystemDefinition.TransportInfoDict.ToString();
-
-            if (m_dataVersion.value < DATA_VERSION_14_6)
-            {
-                TLMController.MigrateOldVehicleCountData();
-                TLMController.MigrateLegacyDefaultTicketPrice();
-                m_dataVersion.value = DATA_VERSION_14_6;
-            }
 
             if (TLMController.IsSchoolBusesEnabled)
             {

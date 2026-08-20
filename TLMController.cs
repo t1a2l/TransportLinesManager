@@ -7,6 +7,7 @@ using ColossalFramework;
 using ColossalFramework.Plugins;
 using ColossalFramework.UI;
 using Commons.Interfaces;
+using Commons.Interfaces.Warehouse;
 using Commons.Utils;
 using Commons.Utils.StructExtensions;
 using Commons.Utils.UtilitiesClasses;
@@ -76,6 +77,11 @@ namespace TransportLinesManager
         private bool? m_isTransitVehicleSpawnDelayEnabled = null;
         private static readonly string GlobalBaseConfigFileName = "TLM_GlobalData.xml";
 
+        private const int DATA_VERSION_14_6 = 1461;
+        private const int DATA_VERSION_14_7 = 1470;
+
+        private bool m_saveMigrationCompleted;
+
         public BuildingTransportLinesCache BuildingLines { get; private set; }
 
         public ushort CurrentSelectedId { get; private set; }
@@ -132,9 +138,21 @@ namespace TransportLinesManager
 
         public void Awake()
         {
+            DataContainer.OnDataLoaded += OnTlmSaveDataLoaded;
+
+            if (DataContainer.HasLoadedData)
+            {
+                OnTlmSaveDataLoaded();
+            }
+
             SharedInstance = gameObject.AddComponent<TLMFacade>();
             ConnectorADR = PluginUtils.GetImplementationTypeForMod<BridgeADRFallback, IBridgeADR>(gameObject, "Addresses", "2.99.99.0", "TransportLinesManager.ModShared.BridgeADR");
             ConnectorWTS = PluginUtils.GetImplementationTypeForMod<BridgeWTSFallback, IBridgeWTS>(gameObject, "WriteTheSigns", "0.3.0.0", "TransportLinesManager.ModShared.BridgeWTS");
+        }
+
+        private void OnDestroy()
+        {
+            DataContainer.OnDataLoaded -= OnTlmSaveDataLoaded;
         }
 
         protected override void StartActions()
@@ -468,6 +486,34 @@ namespace TransportLinesManager
             }
         }
 
+        public static void MigrateWeekendProfileVisibilitySetting()
+        {
+            var globalConfig = TLMBaseConfigXML.CurrentContextConfig;
+
+            if (globalConfig.AllowRealTimeWeekendProfile) return;
+
+            var transportManager = TransportManager.instance;
+
+            for (ushort lineId = 1; lineId < transportManager.m_lines.m_size; lineId++)
+            {
+                ref TransportLine line = ref transportManager.m_lines.m_buffer[lineId];
+
+                if ((line.m_flags & TransportLine.Flags.Created) == 0)
+                    continue;
+
+                var config = TLMLineUtils.GetEffectiveConfigForLine(lineId);
+
+                if (config?.UseSeparateWeekendProfile != true)
+                    continue;
+
+                globalConfig.AllowRealTimeWeekendProfile = true;
+
+                LogUtils.DoLog("Enabled Real Time weekend-profile UI because line {0} already uses a separate weekend profile.", lineId);
+
+                break;
+            }
+        }
+
         private static bool VerifyWorkshopModEnabled(ulong modId)
         {
             PluginManager.PluginInfo pluginInfo = Singleton<PluginManager>.instance.GetPluginsInfo().FirstOrDefault(pi => pi.publishedFileID.AsUInt64 == modId);
@@ -536,6 +582,35 @@ namespace TransportLinesManager
 
             }
 
+        }
+
+        private void OnTlmSaveDataLoaded()
+        {
+            if (m_saveMigrationCompleted) return;
+
+            m_saveMigrationCompleted = true;
+
+            MigrateCurrentSaveData();
+        }
+
+        private static void MigrateCurrentSaveData()
+        {
+            var metadata = TLMSaveMetadata.Instance;
+
+            if (metadata.DataVersion < DATA_VERSION_14_6)
+            {
+                MigrateOldVehicleCountData();
+                MigrateLegacyDefaultTicketPrice();
+
+                metadata.DataVersion = DATA_VERSION_14_6;
+            }
+
+            if (metadata.DataVersion < DATA_VERSION_14_7)
+            {
+                MigrateWeekendProfileVisibilitySetting();
+
+                metadata.DataVersion = DATA_VERSION_14_7;
+            }
         }
     }
 }
