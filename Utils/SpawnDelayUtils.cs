@@ -47,7 +47,43 @@ namespace TransportLinesManager.Utils
 
         public static bool IsSimpleGlobalMode() => TLMBaseConfigXML.CurrentContextConfig.SpawnDelayScope == SpawnDelayScope.Global;
 
-        public static bool CanSpawn(ushort buildingID, ushort lineId, TransferManager.TransferReason reason, uint currentFrame)
+        public static uint GetSpawnTime(ushort depotId, TransferManager.TransferReason reason)
+        {
+            uint delay = GetSpawnDelay(reason);
+
+            if (delay == 0)
+            { 
+                return 0; 
+            }
+
+            uint currentFrame = Singleton<SimulationManager>.instance.m_currentFrameIndex;
+
+            uint lastFrame;
+
+            if (IsFairLineMode())
+            {
+                lastFrame = FairDepotFrames.TryGetValue(depotId, out uint frame) ? frame : 0;
+            }
+            else if (IsSimpleDepotMode())
+            {
+                lastFrame = DepotFrames.TryGetValue(depotId, out uint frame) ? frame : 0;
+            }
+            else // Global mode
+            {
+                lastFrame = GetGlobalFrame(reason);
+            }
+
+            uint elapsed = currentFrame - lastFrame;
+
+            if (elapsed >= delay)
+            { 
+                return 0; 
+            }
+
+            return delay - elapsed;
+        }
+
+        public static bool CanSpawn(ushort buildingID, ushort lineId, TransferManager.TransferReason reason)
         {
             // Global mode
             if (IsSimpleGlobalMode())

@@ -1,8 +1,7 @@
 ﻿using System.Text;
-using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using TransportLinesManager.Overrides;
+using TransportLinesManager.Utils;
 using UnityEngine;
 
 namespace TransportLinesManager.UI
@@ -18,18 +17,12 @@ namespace TransportLinesManager.UI
 
         // Target field.
         private ushort _buildingID;
-        private ushort _lineId;
         private TransferManager.TransferReason _reason;
 
         /// <summary>
         /// Sets the target building ID.
         /// </summary>
         public ushort BuildingID { set => _buildingID = value; }
-
-        /// <summary>
-        /// Sets the target line ID.
-        /// </summary>
-        public ushort TransportLineID { set => _lineId = value; }
 
         /// <summary>
         /// Sets the countdown transfer reason.
@@ -46,21 +39,20 @@ namespace TransportLinesManager.UI
             if (m_IsVisible)
             {
                 // Calculate time delta.
-                int timerValue = (int)(TLMDepotAIOverrides.GetSpawnTime(_buildingID, _lineId, _reason) - Singleton<SimulationManager>.instance.m_currentFrameIndex);
+                uint framesRemaining = SpawnDelayUtils.GetSpawnTime(_buildingID, _reason);
 
                 // If time delta is less than zero, then clear display text.
-                if (timerValue < 0)
+                if (framesRemaining == 0)
                 {
-                    timerValue = 0;
-                    this.text = string.Empty;
+                    text = string.Empty;
                 }
                 else
                 {
                     // Set timer display text.
-                    this.text = SetTimerLabel(timerValue);
+                    text = SetTimerLabel((int)framesRemaining);
 
                     // Set label positon based on current label dimensions.
-                    this.relativePosition = new Vector2(this.parent.width - this.width, (this.parent.height - this.height) / 2f);
+                    relativePosition = new Vector2(parent.width - width, (parent.height - height) / 2f);
                 }
             }
 

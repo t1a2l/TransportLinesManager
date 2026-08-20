@@ -65,7 +65,7 @@ namespace TransportLinesManager.Overrides
                 SetRandomBuilding(tsd, offer.TransportLine, ref buildingID);
 
                 // If the Transit Vehicle Spawn Delay mod is not enabled, we enforce our own spawn limits
-                if (!TLMController.IsTransitVehicleSpawnDelayEnabled && !SpawnDelayUtils.CanSpawn(buildingID, offer.TransportLine, reason, currentFrame))
+                if (!TLMController.IsTransitVehicleSpawnDelayEnabled && !SpawnDelayUtils.CanSpawn(buildingID, offer.TransportLine, reason))
                 {
                     return false;
                 }
