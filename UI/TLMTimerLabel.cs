@@ -9,11 +9,11 @@ namespace TransportLinesManager.UI
     public sealed class TimerLabel : UILabel
     {
         // Private string references.
-        private readonly string blockedString = Locale.Get("VSD_TIM_BLK");
-        private readonly string hourString = Locale.Get("VSD_TIM_HR");
-        private readonly string hoursString = Locale.Get("VSD_TIM_HRS");
-        private readonly string minuteString = Locale.Get("VSD_TIM_MN");
-        private readonly string minutesString = Locale.Get("VSD_TIM_MNS");
+        private readonly string blockedString = Locale.Get("TLM_TIME_BLK");
+        private readonly string hourString = Locale.Get("TLM_TIME_HOUR");
+        private readonly string hoursString = Locale.Get("TLM_TIME_HOURS");
+        private readonly string minuteString = Locale.Get("TLM_TIME_MINUTE");
+        private readonly string minutesString = Locale.Get("TLM_TIME_MINUTES");
 
         // Target field.
         private ushort _buildingID;
