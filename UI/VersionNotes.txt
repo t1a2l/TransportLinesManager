@@ -31,3 +31,11 @@
 	- SchoolBus mod support with and without the RealTime mod, one click plug and play.
 	- Add weekend profile to support RealTime mod to have different budget and ticket prices for weekends.
 	- Add near lines to show lines near buildings. if it is a transport asset it will show how many people are waiting in each stop.
+
+<color #9999FF>TLM 14.7 - 21/AUG/26</color>
+	- Add weekend profile global option to hide info bar checkbox for people not using the real time mod.
+	- Auto spawn all vehicles types randomly when none is selected - global option.
+	- Per save version check support to migrate only from old versions.
+	- Auto adjust absolute lines option.
+	- TLM internal spawn delay mod - must disable algernon's mod, with new fairness per depot and line option.
+
