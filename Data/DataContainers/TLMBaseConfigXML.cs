@@ -95,28 +95,28 @@ namespace TransportLinesManager.Data.DataContainers
         public bool AllowAutoSpawnAllVehicles { get; set; } = false;
 
         [XmlElement("spawnDelayScope")]
-        public SpawnDelayScope SpawnDelayScope { get; set; } = SpawnDelayScope.Global;
+        public SpawnDelayScope SpawnDelayScope { get; set; } = SpawnDelayScope.Depot;
 
         [XmlElement("tramDelay")]
-        public uint TramDelay { get; set; }
+        public uint TramDelay { get; set; } = 1024;
 
         [XmlElement("blimpDelay")]
-        public uint BlimpDelay { get; set; }
+        public uint BlimpDelay { get; set; } = 1024;
 
         [XmlElement("busDelay")]
-        public uint BusDelay { get; set; }
+        public uint BusDelay { get; set; } = 1024;
 
         [XmlElement("ferryDelay")]
-        public uint FerryDelay { get; set; }
+        public uint FerryDelay { get; set; } = 1024;
 
         [XmlElement("trolleybusDelay")]
-        public uint TrolleybusDelay { get; set; }
+        public uint TrolleybusDelay { get; set; } = 1024;
 
         [XmlElement("passengerHelicopterDelay")]
-        public uint PassengerHelicopterDelay { get; set; }
+        public uint PassengerHelicopterDelay { get; set; } = 1024;
 
         [XmlElement("touristBusDelay")]
-        public uint TouristBusDelay { get; set; }
+        public uint TouristBusDelay { get; set; } = 1024;
 
         [Obsolete("XML Export only!", true)]
         public NonSequentialList<TLMTransportTypeConfigurationsXML> PublicTransportConfigurations { get => PublicTransportConfigurations_internal; set => PublicTransportConfigurations_internal = value; }

@@ -7,8 +7,6 @@ using System.Linq;
 using UnityEngine;
 using HarmonyLib;
 using TransportLinesManager.Data.Tsd;
-using TransportLinesManager.Data.DataContainers;
-using TransportLinesManager.Data.Base.Enums;
 using TransportLinesManager.Data.Extensions;
 
 namespace TransportLinesManager.Overrides
@@ -16,17 +14,6 @@ namespace TransportLinesManager.Overrides
     [HarmonyPatch(typeof(DepotAI))]
     public static class TLMDepotAIOverrides
     {
-        private static readonly Dictionary<ushort, uint> DepotFrames = [];
-        private static readonly Dictionary<ushort, uint> LineFrames = [];
-
-        private static uint busFrame;
-        private static uint tramFrame;
-        private static uint trolleybusFrame;
-        private static uint ferryFrame;
-        private static uint blimpFrame;
-        private static uint passengerHelicopterFrame;
-        private static uint touristBusFrame;
-
         private static readonly TransferManager.TransferReason[] m_managedReasons = [
             TransferManager.TransferReason.Tram,
             TransferManager.TransferReason.PassengerTrain,
@@ -67,10 +54,18 @@ namespace TransportLinesManager.Overrides
                     return true;
                 }
 
+                uint currentFrame = Singleton<SimulationManager>.instance.m_currentFrameIndex;
+
+                if (!TLMController.IsTransitVehicleSpawnDelayEnabled && SpawnDelayUtils.IsFairLineMode())
+                {
+                    SpawnDelayUtils.RegisterPendingRequest(buildingID, offer.TransportLine, reason, offer, currentFrame);
+                    return false;
+                }
+
                 SetRandomBuilding(tsd, offer.TransportLine, ref buildingID);
 
                 // If the Transit Vehicle Spawn Delay mod is not enabled, we enforce our own spawn limits
-                if (!TLMController.IsTransitVehicleSpawnDelayEnabled && !CanSpawn(buildingID, offer.TransportLine, reason))
+                if (!TLMController.IsTransitVehicleSpawnDelayEnabled && !SpawnDelayUtils.CanSpawn(buildingID, offer.TransportLine, reason, currentFrame))
                 {
                     return false;
                 }
@@ -88,7 +83,7 @@ namespace TransportLinesManager.Overrides
                         TLMLineUtils.GetEffectiveExtensionForLine(offer.TransportLine).EditVehicleUsedCount(offer.TransportLine, randomVehicleInfo.name, "Add");
                         if (!TLMController.IsTransitVehicleSpawnDelayEnabled)
                         {
-                            SetLastSpawnFrame(buildingID, offer.TransportLine, reason, Singleton<SimulationManager>.instance.m_currentFrameIndex);
+                            SpawnDelayUtils.MarkSpawn(buildingID, offer.TransportLine, reason, currentFrame);
                         }
                         randomVehicleInfo.m_vehicleAI.SetSource(vehicleID, ref vehicles.m_buffer[vehicleID], buildingID);
                         randomVehicleInfo.m_vehicleAI.StartTransfer(vehicleID, ref vehicles.m_buffer[vehicleID], reason, offer);
@@ -102,19 +97,6 @@ namespace TransportLinesManager.Overrides
                 }
             }
             return true;
-        }
-
-        public static uint GetSpawnTime(ushort depotId, ushort lineId, TransferManager.TransferReason reason)
-        {
-            uint delay = GetSpawnDelay(reason);
-            uint lastFrame = GetLastSpawnFrame(depotId, lineId, reason);
-
-            return lastFrame + delay;
-        }
-
-        public static void ClearLineSpawnDelay(ushort lineId)
-        {
-            LineFrames.Remove(lineId);
         }
 
         private static VehicleInfo DoModelDraw(ushort lineId)
@@ -147,117 +129,5 @@ namespace TransportLinesManager.Overrides
             }
         }
 
-        private static uint GetSpawnDelay(TransferManager.TransferReason reason)
-        {
-            var config = TLMBaseConfigXML.CurrentContextConfig;
-
-            return reason switch
-            {
-                TransferManager.TransferReason.Bus => config.BusDelay,
-                TransferManager.TransferReason.Tram => config.TramDelay,
-                TransferManager.TransferReason.Trolleybus => config.TrolleybusDelay,
-                TransferManager.TransferReason.Ferry => config.FerryDelay,
-                TransferManager.TransferReason.Blimp => config.BlimpDelay,
-                TransferManager.TransferReason.PassengerHelicopter => config.PassengerHelicopterDelay,
-                TransferManager.TransferReason.TouristBus => config.TouristBusDelay,
-                _ => 0,
-            };
-        }
-
-        private static uint GetLastSpawnFrame(ushort depotId, ushort lineId, TransferManager.TransferReason reason)
-        {
-            switch (TLMBaseConfigXML.CurrentContextConfig.SpawnDelayScope)
-            {
-                case SpawnDelayScope.Line:
-                    return LineFrames.TryGetValue(lineId, out uint lineFrame) ? lineFrame : 0;
-
-                case SpawnDelayScope.Depot:
-                    return DepotFrames.TryGetValue(depotId, out uint depotFrame) ? depotFrame : 0;
-
-                default:
-                    return GetGlobalFrame(reason);
-            }
-        }
-
-        private static void SetLastSpawnFrame(ushort depotId, ushort lineId, TransferManager.TransferReason reason, uint frame)
-        {
-            switch (TLMBaseConfigXML.CurrentContextConfig.SpawnDelayScope)
-            {
-                case SpawnDelayScope.Line:
-                    LineFrames[lineId] = frame;
-                    return;
-
-                case SpawnDelayScope.Depot:
-                    DepotFrames[depotId] = frame;
-                    return;
-
-                default:
-                    SetGlobalFrame(reason, frame);
-                    return;
-            }
-        }
-
-        private static bool CanSpawn(ushort depotId, ushort lineId, TransferManager.TransferReason reason)
-        {
-            uint delay = GetSpawnDelay(reason);
-            if (delay == 0)
-            {
-                return true;
-            }
-
-            uint lastFrame = GetLastSpawnFrame(depotId, lineId, reason);
-            uint currentFrame = Singleton<SimulationManager>.instance.m_currentFrameIndex;
-
-            return currentFrame - lastFrame >= delay;
-        }
-
-        private static uint GetGlobalFrame(TransferManager.TransferReason reason)
-        {
-            return reason switch
-            {
-                TransferManager.TransferReason.Bus => busFrame,
-                TransferManager.TransferReason.Tram => tramFrame,
-                TransferManager.TransferReason.Trolleybus => trolleybusFrame,
-                TransferManager.TransferReason.Ferry => ferryFrame,
-                TransferManager.TransferReason.Blimp => blimpFrame,
-                TransferManager.TransferReason.PassengerHelicopter => passengerHelicopterFrame,
-                TransferManager.TransferReason.TouristBus => touristBusFrame,
-                _ => 0,
-            };
-        }
-
-        private static void SetGlobalFrame(TransferManager.TransferReason reason, uint frame)
-        {
-            switch (reason)
-            {
-                case TransferManager.TransferReason.Bus:
-                    busFrame = frame;
-                    break;
-
-                case TransferManager.TransferReason.Tram:
-                    tramFrame = frame;
-                    break;
-
-                case TransferManager.TransferReason.Trolleybus:
-                    trolleybusFrame = frame;
-                    break;
-
-                case TransferManager.TransferReason.Ferry:
-                    ferryFrame = frame;
-                    break;
-
-                case TransferManager.TransferReason.Blimp:
-                    blimpFrame = frame;
-                    break;
-
-                case TransferManager.TransferReason.PassengerHelicopter:
-                    passengerHelicopterFrame = frame;
-                    break;
-
-                case TransferManager.TransferReason.TouristBus:
-                    touristBusFrame = frame;
-                    break;
-            }
-        }
     }
 }

@@ -140,6 +140,7 @@ namespace TransportLinesManager
         protected override void StartActions()
         {
             BuildingLines = gameObject.AddComponent<BuildingTransportLinesCache>();
+            gameObject.AddComponent<SpawnDelayTicker>();
 
             TLMTransportTypeDataContainer.Instance.RefreshCapacities();
             StartCoroutine(VehicleUtils.UpdateCapacityUnits());

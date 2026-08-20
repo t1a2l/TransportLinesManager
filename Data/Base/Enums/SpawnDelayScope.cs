@@ -6,7 +6,7 @@ namespace TransportLinesManager.Data.Base.Enums
     {
         Global = 0,
         Depot = 1,
-        Line = 2,
+        DepotFairLine = 2
     }
 
     public static class SpawnDelayScopeExtensions
