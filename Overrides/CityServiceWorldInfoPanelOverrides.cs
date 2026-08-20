@@ -96,7 +96,7 @@ namespace TransportLinesManager.Overrides
                     s_timerLabel = parkButtons.AddUIComponent<TimerLabel>();
                     s_timerLabel.textScale = 0.75f;
                     s_timerLabel.textColor = new Color32(185, 221, 254, 255);
-                    s_timerLabel.font = Resources.FindObjectsOfTypeAll<UIFont>().FirstOrDefault((UIFont f) => f.name == "OpenSans-Regular");
+                    s_timerLabel.font = Resources.FindObjectsOfTypeAll<UIFont>().FirstOrDefault(f => f.name == "OpenSans-Regular");
                 }
                 else
                 {
