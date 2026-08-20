@@ -20,6 +20,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
     {
         private UICheckBox m_showAbsoluteCheckbox;
 
+        private UICheckBox m_autoAdjustAbsoluteCounts;
+
         private UIPanel m_budgetProfilePanel;
 
         private UILabel m_budgetProfileLabel;
@@ -42,46 +44,19 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public override void ExtraAwake()
         {
-            m_showAbsoluteCheckbox = m_uiHelper.AddCheckboxLocale("TLM_SHOW_ABSOLUTE_VALUE", false, (isAbsolute) =>
-            {
-                if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) && !fromBuilding)
-                {
-                    TLMTransportLineExtension.Instance.SetDisplayAbsoluteValues(lineId, isAbsolute);
-
-                    IBasicExtension ext = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
-                    List<TransportAsset> assets = ext.GetAssetTransportListForLine(lineId);
-
-                    var budgetEntries = ext.GetActiveBudgetEntries(lineId);
-
-                    for (int i = 0; i < budgetEntries.Count; i++)
-                    {
-                        string key = i.ToString();
-                        float pct = budgetEntries[i].Value / 100f;
-                        int budget = TLMLineUtils.ProjectTargetVehicleCount(
-                            TransportManager.instance.m_lines.m_buffer[lineId].Info,
-                            TransportManager.instance.m_lines.m_buffer[lineId].m_totalLength, pct);
-
-                        if (m_isLoading) return;
-
-                        if (isAbsolute) // percent → count
-                        {
-                            TLMCountModeUtils.ConvertPercentToCount(assets, key, budget);
-                        }
-                        else // count → percent
-                        {
-                            TLMCountModeUtils.ConvertCountToPercent(assets, key, budget);
-                        }
-                    }
-
-                    ext.SetAssetTransportListForLine(lineId, assets);
-                    RebuildList();
-                    TLMAssetSelectorTab.MarkDirty();
-                }
-            });
+            m_showAbsoluteCheckbox = m_uiHelper.AddCheckboxLocale("TLM_SHOW_ABSOLUTE_VALUE", false, OnAbsoluteCheckboxChanged);
             m_showAbsoluteCheckbox.name = "ShowAbsoluteCheckbox";
             MonoUtils.LimitWidthAndBox(m_showAbsoluteCheckbox.label, 370f);
             m_showAbsoluteCheckbox.width = 370f;
             m_showAbsoluteCheckbox.label.width = 370f;
+
+            m_autoAdjustAbsoluteCounts = m_uiHelper.AddCheckboxLocale("TLM_AUTO_ADJUST_ABSOLUTE_COUNTS", false, OnAutoAdjustAbsoluteCountsChanged);
+            m_autoAdjustAbsoluteCounts.name = "AutoAdjustAbsoluteCounts";
+            MonoUtils.LimitWidthAndBox(m_autoAdjustAbsoluteCounts.label, 370f);
+            m_autoAdjustAbsoluteCounts.tooltip = Locale.Get("TLM_AUTO_ADJUST_ABSOLUTE_COUNTS_TOOLTIP");
+            m_autoAdjustAbsoluteCounts.width = 370f;
+            m_autoAdjustAbsoluteCounts.label.width = 370f;
+
             CreateWeekendBudgetControls(this.component);
         }
 
@@ -91,8 +66,14 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             var lineExt = TLMTransportLineExtension.Instance;
 
-            m_showAbsoluteCheckbox?.isVisible = lineExt.IsUsingCustomConfig(lineID);
-            m_showAbsoluteCheckbox?.isChecked = lineExt.IsDisplayAbsoluteValues(lineID);
+            bool hasCustomConfig = lineExt.IsUsingCustomConfig(lineID);
+            bool isAbsolute = hasCustomConfig && lineExt.IsDisplayAbsoluteValues(lineID);
+
+            m_showAbsoluteCheckbox?.isVisible = hasCustomConfig;
+            m_showAbsoluteCheckbox?.isChecked = isAbsolute;
+
+            m_autoAdjustAbsoluteCounts.isVisible = isAbsolute;
+            m_autoAdjustAbsoluteCounts.isChecked = isAbsolute && lineExt.IsAutoAdjustAbsoluteCountsEnabled(lineID);
 
             m_budgetProfileLabel?.relativePosition = new Vector3(0f, 0f);
             m_budgetProfileDropdown?.relativePosition = new Vector3(90f, 0f);
@@ -228,6 +209,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_budgetProfileDropdown.relativePosition = new Vector3(90f, 0f);
             m_budgetProfileDropdown.eventSelectedIndexChanged += OnBudgetProfileChanged;
 
+            MonoUtils.LimitWidthAndBox(m_budgetProfilePanel, 370f);
+
             UpdateWeekendBudgetUIState();
         }
 
@@ -253,6 +236,80 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             cfg = TLMLineUtils.GetEffectiveConfigForLine(lineId);
             return cfg != null;
+        }
+
+        private void OnAbsoluteCheckboxChanged(bool value)
+        {
+            if (m_isLoading) return;
+
+            if (!UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) || fromBuilding)
+            {
+                return;
+            }
+
+            var lineExt = TLMTransportLineExtension.Instance;
+
+            lineExt.SetDisplayAbsoluteValues(lineId, value);
+
+            IBasicExtension ext = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
+            List<TransportAsset> assets = ext.GetAssetTransportListForLine(lineId);
+
+            var budgetEntries = ext.GetActiveBudgetEntries(lineId);
+
+            var line = TransportManager.instance.m_lines.m_buffer[lineId];
+
+            if(line.Info == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < budgetEntries.Count; i++)
+            {
+                string key = i.ToString();
+                float pct = budgetEntries[i].Value / 100f;
+                int budget = TLMLineUtils.ProjectTargetVehicleCount(line.Info, line.m_totalLength, pct);
+
+                if (value) // percent → count
+                {
+                    TLMCountModeUtils.ConvertPercentToCount(assets, key, budget);
+                }
+                else // count → percent
+                {
+                    TLMCountModeUtils.ConvertCountToPercent(assets, key, budget);
+                }
+            }
+
+            m_autoAdjustAbsoluteCounts?.isVisible = value;
+
+            if (value)
+            {
+                m_autoAdjustAbsoluteCounts.isChecked = lineExt.IsAutoAdjustAbsoluteCountsEnabled(lineId);
+            }
+
+            ext.SetAssetTransportListForLine(lineId, assets);
+            RebuildList();
+            TLMAssetSelectorTab.MarkDirty();
+        }
+
+        private void OnAutoAdjustAbsoluteCountsChanged(bool value)
+        {
+            if (m_isLoading) return;
+
+            if (!UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) || fromBuilding)
+            {
+                return;
+            }
+
+            var lineExt = TLMTransportLineExtension.Instance;
+
+            lineExt.SetAutoAdjustAbsoluteCounts(lineId, value);
+
+            if (!value) return;
+
+            TLMCountModeUtils.RebalanceAbsoluteCountsForLine(lineId, CurrentProfileTarget);
+
+            RebuildList();
+            TLMAssetSelectorTab.MarkDirty();
         }
     }
 }
