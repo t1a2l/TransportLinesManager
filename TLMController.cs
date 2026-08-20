@@ -44,6 +44,7 @@ namespace TransportLinesManager
         public const ulong IPT2_MOD_ID = 928128676;
         public const ulong IPT2_ESSENTIALS_MOD_ID = 3714961481;
         public const ulong IPT3_MOD_ID = 3690061052;
+        public const ulong IPT4_MOD_ID = 3773802930;
         public const ulong RETURN_VEHICLE_MOD_ID = 2101977903UL;
         public const ulong TRANSIT_VEHICLE_SPAWN_DELAY_MOD_ID = 2654110611L;
 

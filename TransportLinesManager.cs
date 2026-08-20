@@ -35,6 +35,7 @@ namespace TransportLinesManager
             IncompatibleModList[TLMController.IPT2_MOD_ID] = "IPT2 is incompatible since TLM changes the same code behavior. Isn't recommended to use both together.";
             IncompatibleModList[TLMController.IPT2_ESSENTIALS_MOD_ID] = "IPT2 Essentials is incompatible since TLM changes the same code behavior. Isn't recommended to use both together.";
             IncompatibleModList[TLMController.IPT3_MOD_ID] = "IPT3 is incompatible since TLM changes the same code behavior. Isn't recommended to use both together.";
+            IncompatibleModList[TLMController.IPT4_MOD_ID] = "IPT4 is incompatible since TLM changes the same code behavior. Isn't recommended to use both together.";
             IncompatibleModList[TLMController.RETURN_VEHICLE_MOD_ID] = "Transport Vehicle Return Patch is not necessary to use along the TLM since version 14." +
             " With the introduction of the Express Buses system, now the vehicles are emptied in the next terminal stop before get to the depot.";
         }
