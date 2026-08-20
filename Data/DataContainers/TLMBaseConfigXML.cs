@@ -94,6 +94,9 @@ namespace TransportLinesManager.Data.DataContainers
         [XmlAttribute("allowAutoSpawnAllVehicles")]
         public bool AllowAutoSpawnAllVehicles { get; set; } = false;
 
+        [XmlAttribute("allowRealTimeWeekendProfile")]
+        public bool AllowRealTimeWeekendProfile { get; set; } = false;
+
         [XmlElement("spawnDelayScope")]
         public SpawnDelayScope SpawnDelayScope { get; set; } = SpawnDelayScope.Depot;
 

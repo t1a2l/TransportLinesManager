@@ -19,6 +19,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
         private UICheckBox m_expressBuses;
         private UICheckBox m_expressTrolleys;
         private UICheckBox m_clockSwap;
+        private UICheckBox m_allowRealTimeWeekendProfile;
 
         public void ReloadData()
         {
@@ -36,6 +37,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             m_expressTrams.isChecked = TLMBaseConfigXML.CurrentContextConfig.ExpressTramsEnabled;
             m_expressTrolleys.isChecked = TLMBaseConfigXML.CurrentContextConfig.ExpressTrolleybusesEnabled;
             m_clockSwap.isChecked = TransportLinesManagerMod.UseGameClockAsReferenceIfNoDayNight;
+            m_allowRealTimeWeekendProfile.isChecked = TLMBaseConfigXML.CurrentContextConfig.AllowRealTimeWeekendProfile;
         }
 
         public void Awake()
@@ -55,6 +57,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             AddCheckboxLocale("TLM_ADD_LINE_NUMBER_AUTO_NAME", out m_addLineCode, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.AddLineCodeInAutoname = x);
             AddCheckboxLocale("TLM_BUS_LINES_USE_SOFT_DESPAWN", out m_busLinesUseSoftDespawn, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.BusLinesUseSoftDespawn = x);
             AddCheckboxLocale("TLM_ALLOW_AUTO_SPAWN_ALL_VEHICLES", out m_allowAutoSpawnAllVehicles, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.AllowAutoSpawnAllVehicles = x);
+            AddCheckboxLocale("TLM_ALLOW_REAL_TIME_WEEKEND_PROFILE", out m_allowRealTimeWeekendProfile, group7, (x) => TLMBaseConfigXML.CurrentContextConfig.AllowRealTimeWeekendProfile = x);
 
             group7.AddSpace(15);
 
