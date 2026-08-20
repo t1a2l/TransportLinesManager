@@ -154,11 +154,28 @@ namespace TransportLinesManager.Data.DataContainers
                 return;
             }
 
+            List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
+
+            bool isAutomaticAssetMode = TLMBaseConfigXML.CurrentContextConfig.AllowAutoSpawnAllVehicles && (assetTransportList == null || assetTransportList.Count == 0);
+
+            // No selected vehicle assets means automatic selection.
+            // There are no per-model quotas or runtime used counts to track.
+            if (isAutomaticAssetMode)
+            {
+                return;
+            }
+
             int index = TLMLineUtils.GetEffectiveExtensionForLine(lineID).GetActiveBudgetEntries(lineID).GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
+
+            if (index < 0)
+            {
+                index = 0;
+            }
+
             TLMLineUtils.EnsureUsedCountSlotSynchronized(lineID, index);
 
-            List<TransportAsset> assetTransportList = ExtensionStaticExtensionMethods.GetAssetTransportListForLine(this, lineID);
             int assetindex = assetTransportList?.FindIndex(item => item.name == selectedModel) ?? -1;
+
             if (assetindex == -1)
             {
                 if (status == "Add")

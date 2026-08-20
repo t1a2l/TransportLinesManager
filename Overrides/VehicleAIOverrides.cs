@@ -147,6 +147,9 @@ namespace TransportLinesManager.Overrides
             var extension = TLMLineUtils.GetEffectiveExtensionForLine(vehicleData.m_transportLine);
             var lineExt = TLMTransportLineExtension.Instance;
             bool isAbsoluteMode = lineExt.IsUsingCustomConfig(vehicleData.m_transportLine) && lineExt.IsDisplayAbsoluteValues(lineId);
+            List<TransportAsset> assetTransportList = extension.GetAssetTransportListForLine(lineId);
+
+            bool isAutomaticAssetMode = TLMBaseConfigXML.CurrentContextConfig.AllowAutoSpawnAllVehicles &&  (assetTransportList == null || assetTransportList.Count == 0);
 
             string actualModel = vehicleData.Info?.name;
 
@@ -161,9 +164,8 @@ namespace TransportLinesManager.Overrides
 
             bool removeVehicle = false;
 
-            if (!string.IsNullOrEmpty(actualModel))
+            if (!isAutomaticAssetMode && !string.IsNullOrEmpty(actualModel))
             {
-                List<TransportAsset> assetTransportList = extension.GetAssetTransportListForLine(lineId);
                 string key = slotIndex.ToString();
 
                 int assetIndex = assetTransportList?.FindIndex(x => x.name == actualModel) ?? -1;
@@ -214,7 +216,7 @@ namespace TransportLinesManager.Overrides
                 return false;
             }
 
-            if (!string.IsNullOrEmpty(actualModel))
+            if (!isAutomaticAssetMode && !string.IsNullOrEmpty(actualModel))
             {
                 extension.EditVehicleUsedCount(lineId, actualModel, "Remove");
             }
