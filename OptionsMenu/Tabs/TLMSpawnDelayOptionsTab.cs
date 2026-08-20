@@ -71,7 +71,7 @@ namespace TransportLinesManager.OptionsMenu.Tabs
             group7.AddSpace(1);
             group7.AddLabel(Locale.Get("TLM_SPAWN_DELAY_DEPOT_DESC"));
             group7.AddSpace(1);
-            group7.AddLabel(Locale.Get("TLM_SPAWN_DELAY_LINE_DESC"));
+            group7.AddLabel(Locale.Get("TLM_SPAWN_DELAY_DEPOTFAIRLINE_DESC"));
 
             group7.AddSpace(15);
             
