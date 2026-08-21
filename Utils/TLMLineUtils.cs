@@ -15,7 +15,6 @@ using TransportLinesManager.Data.DataContainers;
 using TransportLinesManager.Data.Extensions;
 using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Interfaces;
-using TransportLinesManager.Overrides;
 using TransportLinesManager.WorldInfoPanels;
 using UnityEngine;
 using static TransportLinesManager.Data.Extensions.ExtensionStaticExtensionMethods;
@@ -925,29 +924,50 @@ namespace TransportLinesManager.Utils
             ref TransportLine tl = ref tm.m_lines.m_buffer[lineID];
 
             Dictionary<string, int> vehicleCountPerAsset = [];
-            int vehicleCount = tl.CountVehicles(lineID);
 
-            for (int v = 0; v < vehicleCount; v++)
+            ushort vehicleId = tl.m_vehicles;
+            int safety = 0;
+
+            while (vehicleId != 0)
             {
-                ushort vehicleId = tl.GetVehicle(v);
-                if (vehicleId == 0)
+                ref Vehicle vehicle = ref vm.m_vehicles.m_buffer[vehicleId];
+
+                VehicleInfo info = vehicle.Info;
+                if (info != null && !string.IsNullOrEmpty(info.name))
                 {
-                    continue;
+                    vehicleCountPerAsset.TryGetValue(info.name, out int count);
+                    vehicleCountPerAsset[info.name] = count + 1;
                 }
 
-                VehicleInfo info = vm.m_vehicles.m_buffer[vehicleId].Info;
-                if (info == null || string.IsNullOrEmpty(info.name))
-                {
-                    continue;
-                }
+                vehicleId = vehicle.m_nextLineVehicle;
 
-                if (!vehicleCountPerAsset.ContainsKey(info.name))
+                if (++safety >= vm.m_vehicles.m_size)
                 {
-                    vehicleCountPerAsset[info.name] = 0;
+                    LogUtils.DoErrorLog("Invalid line vehicle list while rebuilding used counts for line {0}.", lineID);
+                    break;
                 }
-
-                vehicleCountPerAsset[info.name]++;
             }
+
+            int countedVehicles = vehicleCountPerAsset.Values.Sum();
+
+            int gameVehicleCount = tl.CountVehicles(lineID);
+
+            string models_list_str = "";
+            string space = ", ";
+            int j = 0;
+
+            foreach(var item in vehicleCountPerAsset)
+            {
+                if(j == vehicleCountPerAsset.Count - 1)
+                {
+                    space = "";
+                }
+
+                models_list_str += item.Key + "=" + item.Value.ToString() + space;
+                j++;
+            }
+
+            Debug.Log("Used-count rebuild: line=" + lineID + ", slot=" + slotIndex + ", game=" + gameVehicleCount + ", counted=" + countedVehicles + ", models=" + models_list_str);
 
             var slotAssets = EnsureRuntimeUsedCountSlot(lineID, slotIndex);
             slotAssets.Clear();
