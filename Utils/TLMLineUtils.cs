@@ -49,15 +49,17 @@ namespace TransportLinesManager.Utils
 
         public static event Action<ushort, int> EventAssetUsedCountChanged;
 
-        public static readonly Dictionary<ushort, int> m_lastUsedCountSlotByLine = [];
-
         private static int colorChangeCooldown = 0;
 
         private static readonly Dictionary<ushort, Color> colorChangeTarget = [];
 
+        private static readonly TransportInfo.TransportType[] m_roadTransportTypes = [TransportInfo.TransportType.Bus, TransportInfo.TransportType.Tram, TransportInfo.TransportType.Trolleybus];
+
         private static readonly Dictionary<ushort, Dictionary<int, Dictionary<string, int>>> m_runtimeUsedCountByLine = [];
 
-        private static readonly TransportInfo.TransportType[] m_roadTransportTypes = [TransportInfo.TransportType.Bus, TransportInfo.TransportType.Tram, TransportInfo.TransportType.Trolleybus];
+        public static readonly Dictionary<ushort, int> m_lastUsedCountSlotByLine = [];
+
+        private static readonly Dictionary<ushort, int> m_dirtyUsedCountSlotByLine = [];
 
         public static void GetQuantityPassengerWaiting(ushort currentStop, out int residents, out int tourists, out int timeTilBored)
         {
@@ -842,25 +844,46 @@ namespace TransportLinesManager.Utils
 
             m_runtimeUsedCountByLine.Remove(lineId);
             m_lastUsedCountSlotByLine.Remove(lineId);
+            m_dirtyUsedCountSlotByLine.Remove(lineId);
         }
 
-        public static void EnsureUsedCountSlotSynchronized(ushort lineID, int currentSlot)
+        public static void EnsureUsedCountSlotSynchronized(ushort lineId, int currentSlot)
         {
-            if (lineID == 0)
+            if (lineId == 0 || currentSlot < 0)
             {
                 return;
             }
 
-            if (!m_lastUsedCountSlotByLine.TryGetValue(lineID, out int lastSlot) || lastSlot != currentSlot)
+            bool slotChanged = !m_lastUsedCountSlotByLine.TryGetValue(lineId, out int lastSlot) || lastSlot != currentSlot;
+
+            bool isDirty = m_dirtyUsedCountSlotByLine.TryGetValue(lineId, out int dirtySlot) && dirtySlot == currentSlot;
+
+            if (!slotChanged && !isDirty)
             {
-                RebuildUsedCountForCurrentSlot(lineID, currentSlot);
-                m_lastUsedCountSlotByLine[lineID] = currentSlot;
+                return;
+            }
+
+            RebuildUsedCountForCurrentSlot(lineId, currentSlot);
+
+            m_lastUsedCountSlotByLine[lineId] = currentSlot;
+
+            if (isDirty)
+            {
+                m_dirtyUsedCountSlotByLine.Remove(lineId); 
             }
         }
 
-        public static void NotifyAssetUsedCountChanged(ushort lineID, int slotIndex)
+        public static void NotifyAssetUsedCountChanged(ushort lineId, int slotIndex)
         {
-            EventAssetUsedCountChanged?.Invoke(lineID, slotIndex);
+            EventAssetUsedCountChanged?.Invoke(lineId, slotIndex);
+        }
+
+        public static void MarkUsedCountSlotDirty(ushort lineId, int slotIndex)
+        {
+            if (lineId == 0 || slotIndex < 0) return;
+
+            m_dirtyUsedCountSlotByLine[lineId] = slotIndex;
+            EventAssetUsedCountChanged?.Invoke(lineId, slotIndex);
         }
 
         private static Dictionary<string, int> EnsureRuntimeUsedCountSlot(ushort lineId, int slotIndex)
@@ -904,24 +927,24 @@ namespace TransportLinesManager.Utils
             yield break;
         }
 
-        private static void RebuildUsedCountForCurrentSlot(ushort lineID, int slotIndex)
+        private static void RebuildUsedCountForCurrentSlot(ushort lineId, int slotIndex)
         {
-            if (lineID == 0 || slotIndex < 0)
+            if (lineId == 0 || slotIndex < 0)
             {
                 return;
             }
 
-            List<TransportAsset> assetTransportList = GetEffectiveExtensionForLine(lineID).GetAssetTransportListForLine(lineID);
+            List<TransportAsset> assetTransportList = GetEffectiveExtensionForLine(lineId).GetAssetTransportListForLine(lineId);
             if (assetTransportList == null || assetTransportList.Count == 0)
             {
-                ClearRuntimeUsedCountForSlot(lineID, slotIndex);
-                NotifyAssetUsedCountChanged(lineID, slotIndex);
+                ClearRuntimeUsedCountForSlot(lineId, slotIndex);
+                NotifyAssetUsedCountChanged(lineId, slotIndex);
                 return;
             }
 
             var tm = TransportManager.instance;
             var vm = VehicleManager.instance;
-            ref TransportLine tl = ref tm.m_lines.m_buffer[lineID];
+            ref TransportLine tl = ref tm.m_lines.m_buffer[lineId];
 
             Dictionary<string, int> vehicleCountPerAsset = [];
 
@@ -943,14 +966,14 @@ namespace TransportLinesManager.Utils
 
                 if (++safety >= vm.m_vehicles.m_size)
                 {
-                    LogUtils.DoErrorLog("Invalid line vehicle list while rebuilding used counts for line {0}.", lineID);
+                    LogUtils.DoErrorLog("Invalid line vehicle list while rebuilding used counts for line {0}.", lineId);
                     break;
                 }
             }
 
             int countedVehicles = vehicleCountPerAsset.Values.Sum();
 
-            int gameVehicleCount = tl.CountVehicles(lineID);
+            int gameVehicleCount = tl.CountVehicles(lineId);
 
             string models_list_str = "";
             string space = ", ";
@@ -967,9 +990,9 @@ namespace TransportLinesManager.Utils
                 j++;
             }
 
-            Debug.Log("Used-count rebuild: line=" + lineID + ", slot=" + slotIndex + ", game=" + gameVehicleCount + ", counted=" + countedVehicles + ", models=" + models_list_str);
+            LogUtils.DoLog("Used-count rebuild: line=" + lineId + ", slot=" + slotIndex + ", game=" + gameVehicleCount + ", counted=" + countedVehicles + ", models=" + models_list_str);
 
-            var slotAssets = EnsureRuntimeUsedCountSlot(lineID, slotIndex);
+            var slotAssets = EnsureRuntimeUsedCountSlot(lineId, slotIndex);
             slotAssets.Clear();
 
             for (int i = 0; i < assetTransportList.Count; i++)
@@ -978,7 +1001,7 @@ namespace TransportLinesManager.Utils
                 slotAssets[asset.name] = vehicleCountPerAsset.TryGetValue(asset.name, out int used) ? used : 0;
             }
 
-            NotifyAssetUsedCountChanged(lineID, slotIndex);
+            NotifyAssetUsedCountChanged(lineId, slotIndex);
         }
 
         private static IEnumerator MakePassengersBored(ushort transportLine, uint simulationFrameStart)

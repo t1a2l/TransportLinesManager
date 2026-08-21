@@ -198,7 +198,7 @@ namespace TransportLinesManager.Data.DataContainers
                 TLMLineUtils.ChangeRuntimeUsedCount(lineID, index, selectedModel, -1);
             }
 
-            TLMLineUtils.NotifyAssetUsedCountChanged(lineID, index);
+            TLMLineUtils.MarkUsedCountSlotDirty(lineID, index);
         }
 
         #endregion

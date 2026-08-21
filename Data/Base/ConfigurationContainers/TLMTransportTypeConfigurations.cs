@@ -393,7 +393,7 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers
                 TLMLineUtils.ChangeRuntimeUsedCount(lineID, index, selectedModel, -1);
             }
 
-            TLMLineUtils.NotifyAssetUsedCountChanged(lineID, index);
+            TLMLineUtils.MarkUsedCountSlotDirty(lineID, index);
         }
 
         private void LoadBasicAssets()
