@@ -20,7 +20,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         private const float AreaLabel1Y = TitleHeight + NameLabelHeight;
         private const float AreaLabel2Y = AreaLabel1Y + AreaLabelHeight;
         private const float ListY = AreaLabel2Y + AreaLabelHeight + Margin;
-        private const float VehicleSelectionHeight = VehicleSelection.PanelHeight + Margin;
         private const float NoPanelHeight = ListY + Margin;
         private const float IconButtonSize = 40f;
         private const float IconButtonY = ListY - IconButtonSize - Margin;
