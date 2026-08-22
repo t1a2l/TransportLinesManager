@@ -102,9 +102,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 m_vehicleSelection = AddUIComponent<VehicleSelection>();
                 m_vehicleSelection.ParentPanel = this;
                 m_vehicleSelection.relativePosition = new Vector2(Margin, ListY);
-
-                // Enable events.
-                m_panelReady = true;
             }
             catch (Exception e)
             {
