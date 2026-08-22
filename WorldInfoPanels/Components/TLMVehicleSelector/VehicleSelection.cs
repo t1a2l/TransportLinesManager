@@ -353,8 +353,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         {
             MonoUtils.CreateUIElement(out m_previewPanel, this.transform);
             m_previewPanel.backgroundSprite = "GenericPanel";
-            m_previewPanel.width = this.width - 15;
-            m_previewPanel.height = 140;
+            m_previewPanel.width = 150;
+            m_previewPanel.height = 150;
             m_previewPanel.relativePosition = new Vector3(MidControlX, VehicleListY + ArrowSize + Margin);
             MonoUtils.CreateUIElement(out m_preview, m_previewPanel.transform);
             m_preview.size = m_previewPanel.size;
