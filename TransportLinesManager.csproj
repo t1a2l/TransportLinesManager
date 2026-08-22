@@ -37,6 +37,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Commons\UI\i18n\*.properties" />
     <EmbeddedResource Include="Commons\UI\Images\*.png" />
+	<EmbeddedResource Include="Commons\UI\Images\AtlasImages\*.png" />
     <EmbeddedResource Include="Commons\UI\Images\*.txt" />
     <EmbeddedResource Include="UI\i18n\*.properties" />
     <EmbeddedResource Include="UI\Images\*.png" />
