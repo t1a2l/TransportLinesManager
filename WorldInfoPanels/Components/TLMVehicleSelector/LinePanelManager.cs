@@ -79,22 +79,18 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         /// </summary>
         internal static void TargetChanged()
         {
-            ushort buildingID = WorldInfoPanel.GetCurrentInstanceID().Building;
-            bool supportedBuilding = Transfers.BuildingEligibility(buildingID);
-
-            // Don't do anything else if panel isn't open.
-            if (s_panel != null)
+            if (s_panel == null)
             {
-                // Panel is open - update target, or close if it's an unsupported building.
-                if (supportedBuilding)
-                {
-                    SetTarget(buildingID);
-                }
-                else
-                {
-                    Close();
-                }
+                return;
             }
+
+            if (!UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) || fromBuilding || lineId == 0)
+            {
+                Close();
+                return;
+            }
+
+            SetTarget(lineId);
         }
     }
 }

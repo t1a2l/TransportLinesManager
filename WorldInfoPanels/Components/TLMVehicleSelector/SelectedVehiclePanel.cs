@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Commons.Utils;
 using Commons.UI.Components;
+using Commons.Utils;
+using TransportLinesManager.Data.DataContainers;
+using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Utils;
 using UnityEngine;
 
 namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
@@ -12,8 +14,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
     internal class SelectedVehiclePanel : VehicleSelectionPanel
     {
         // Panel to display when no item is selected.
-        private UIPanel _randomPanel;
-        private UILabel _randomLabel;
+        private UIPanel m_randomPanel;
+        private UILabel m_randomLabel;
 
         /// <summary>
         /// Gets or sets a value indicating whether the Transport Lines Manager mod is active.
@@ -34,23 +36,23 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             base.Awake();
 
             // Panel setup.
-            _randomPanel = VehicleList.AddUIComponent<UIPanel>();
-            _randomPanel.width = VehicleList.width;
-            _randomPanel.height = VehicleList.height;
-            _randomPanel.relativePosition = new Vector2(0f, 0f);
+            m_randomPanel = VehicleList.AddUIComponent<UIPanel>();
+            m_randomPanel.width = VehicleList.width;
+            m_randomPanel.height = VehicleList.height;
+            m_randomPanel.relativePosition = new Vector2(0f, 0f);
 
             // Random sprite.
-            UISprite randomSprite = _randomPanel.AddUIComponent<UISprite>();
+            UISprite randomSprite = m_randomPanel.AddUIComponent<UISprite>();
             randomSprite.atlas = TextureAtlasUtils.DefaultTextureAtlas;
             randomSprite.spriteName = "Random";
 
             // Label.
-            _randomLabel = UILabels.AddLabel(_randomPanel, 0f, 0f, Locale.Get("ANY_VEHICLE"), VehicleList.width, 0.8f);
+            m_randomLabel = UILabels.AddLabel(m_randomPanel, 0f, 0f, Locale.Get("ANY_VEHICLE"), VehicleList.width, 0.8f);
 
             // Size is 56x33, so offset -8 from left and 3.5 from top to match normal row sizing.
             randomSprite.size = new Vector2(56f, 33f);
             randomSprite.relativePosition = new Vector2(-8, (40f - randomSprite.height) / 2f);
-            _randomLabel.relativePosition = new Vector2(48f, (randomSprite.height - _randomLabel.height) / 2f);
+            m_randomLabel.relativePosition = new Vector2(48f, (randomSprite.height - m_randomLabel.height) / 2f);
         }
 
         /// <summary>
@@ -58,44 +60,67 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         /// </summary>
         protected override void PopulateList()
         {
-            List<VehicleItem> items = [];
-            List<VehicleInfo> buildingVehicles = VehicleControl.GetVehicles(ParentPanel.CurrentBuilding, ParentPanel.TransferReason);
+            var items = new List<VehicleItem>();
+
+            ushort lineId = ParentPanel.CurrentLine;
+
+            var allowAutoSpawnAllVehicles = TLMBaseConfigXML.CurrentContextConfig.AllowAutoSpawnAllVehicles;
+
+            if (lineId == 0)
+            {
+                m_randomPanel.Show();
+                m_randomLabel.text = allowAutoSpawnAllVehicles? Locale.Get("TLM_ANY_COMPATIBLE_VEHICLE") : Locale.Get("TLM_NO_SELECTED_VEHICLES");
+
+                VehicleList.Data = new FastList<object>
+                {
+                    m_buffer = [.. items],
+                    m_size = items.Count,
+                };
+
+                return;
+            }
+
+            var extension = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
+
+            var selectedAssets = extension.GetAssetTransportListForLine(lineId);
 
             // Any selected vehicles?
-            if (buildingVehicles != null && buildingVehicles.Count > 0)
+            if (selectedAssets != null && selectedAssets.Count > 0)
             {
                 // Yes - hide random panel.
-                _randomPanel.Hide();
+                m_randomPanel.Hide();
 
                 // Generate filtered display list.
-                foreach (VehicleInfo vehicle in buildingVehicles)
+                foreach (var asset in selectedAssets)
                 {
-                    // Generate vehicle record for name filtering.
-                    VehicleItem thisItem = new VehicleItem(vehicle);
+                    VehicleInfo vehicle = PrefabCollection<VehicleInfo>.FindLoaded(asset.name);
 
-                    // Apply name filter.
-                    if (!NameFilter(thisItem.Name))
+                    if (vehicle == null)
                     {
                         continue;
                     }
 
-                    // Name filter passed - add to available list.
-                    items.Add(thisItem);
+                    var item = new VehicleItem(vehicle);
+
+                    if (!NameFilter(item.Name))
+                    {
+                        continue;
+                    }
+
+                    items.Add(item);
                 }
             }
             else
             {
                 // No selected vehicles available - show random item panel.
-                _randomPanel.Show();
-
-                // Check for TLM override.
-                _randomLabel.text = Locale.Get(TLMActive && Singleton<BuildingManager>.instance.m_buildings.m_buffer[ParentPanel.ParentPanel.CurrentBuilding].Info.m_buildingAI is TransportStationAI ? "TLM_VEHICLE" : "ANY_VEHICLE");
+                m_randomPanel.Show();
+                m_randomLabel.text = allowAutoSpawnAllVehicles ? Locale.Get("TLM_ANY_COMPATIBLE_VEHICLE") : Locale.Get("TLM_NO_SELECTED_VEHICLES");
             }
 
             // Set display list items, without changing the display.
             VehicleList.Data = new FastList<object>
             {
-                m_buffer = items.OrderBy(x => x.Name).ToArray(),
+                m_buffer = [.. items.OrderBy(x => x.Name)],
                 m_size = items.Count,
             };
         }

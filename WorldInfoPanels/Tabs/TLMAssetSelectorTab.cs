@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Commons.Extensions.UI;
@@ -109,18 +110,134 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         public ProfileTarget CurrentProfileTarget => m_budgetProfileDropdown?.selectedIndex == 1 ? ProfileTarget.Weekend : ProfileTarget.Weekday;
 
-        internal static ushort GetLineID()
+        internal static bool HasAssetClipboard => Instance != null && Instance.m_clipboard.ContainsKey(Instance.TransportSystem);
+
+        public static ushort GetLineID()
         {
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding);
             return !fromBuilding ? lineId : (ushort)0;
         }
 
-        internal static void RefreshIndicatorForBudgetIndex(ushort lineId, int budgetIndex)
+        public static void RefreshIndicatorForBudgetIndex(ushort lineId, int budgetIndex)
         {
             Instance?.UpdateModeIndicator(lineId, budgetIndex);
         }
 
         public static void MarkDirty() => m_isDirty = true;
+
+        public void OnEnable()
+        { }
+
+        public void OnDisable()
+        {
+            OnDestroy();
+        }
+
+        public void OnGotFocus()
+        { }
+
+        public bool MayBeVisible() => TransportSystem?.HasVehicles() ?? false;
+
+        public void Hide() => MainPanel.isVisible = false;
+
+        public void RefreshSelectedAssetRows()
+        {
+            var config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
+            UpdateAssetList(config);
+        }
+
+        public static int GetBudgetSelectedIndex()
+        {
+            if (!UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) || fromBuilding || lineId == 0)
+            {
+                return 0;
+            }
+
+            int uiIndex = m_timeBudgetSelect.selectedIndex;
+            if (uiIndex < 0 || uiIndex >= m_budgetEntriesInUiOrder.Count)
+            {
+                return 0;
+            }
+
+            return GetBudgetEntryBackingIndex(lineId, m_budgetEntriesInUiOrder[uiIndex]);
+        }
+
+        public static int GetBudgetEntryBackingIndex(ushort lineId, BudgetEntryXml target)
+        {
+            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetBudgetsMultiplierForLine(lineId, Instance.CurrentProfileTarget);
+            for (int i = 0; i < budgetEntries.Count; i++)
+            {
+                if (ReferenceEquals(budgetEntries[i], target))
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        internal void UpdateWeekendBudgetUIState()
+        {
+            bool enabled = false;
+
+            if (TryGetCurrentLineConfig(out ushort lineId, out IBudgetStorage cfg))
+            {
+                enabled = cfg?.UseSeparateWeekendProfile == true;
+            }
+
+            m_budgetProfilePanel?.isVisible = enabled;
+            m_budgetProfileLabel?.isVisible = enabled;
+            m_budgetProfileDropdown?.isVisible = enabled;
+
+            m_budgetProfileLabel?.relativePosition = new Vector3(5f, 0f);
+            m_budgetProfileDropdown?.relativePosition = new Vector3(95f, 0f);
+
+            IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem);
+            UpdateAssetList(config);
+        }
+
+        internal static void CopyAssetConfiguration(ushort sourceLineId)
+        {
+            if (Instance == null || sourceLineId == 0)
+            {
+                return;
+            }
+
+            var sourceTsd = TransportSystemDefinition.FromLineId(sourceLineId, false);
+
+            var config = TLMLineUtils.GetEffectiveExtensionForLine(sourceLineId, sourceTsd);
+
+            Instance.m_clipboard[sourceTsd] = XmlUtils.DefaultXmlSerialize(config.GetAssetTransportListForLine(sourceLineId));
+        }
+
+        internal static bool PasteAssetConfiguration(ushort targetLineId)
+        {
+            if (Instance == null || targetLineId == 0)
+            {
+                return false;
+            }
+
+            var targetTsd = TransportSystemDefinition.FromLineId(targetLineId, false);
+
+            if (!Instance.m_clipboard.TryGetValue(targetTsd, out string data))
+            {
+                return false;
+            }
+
+            var copiedAssets = XmlUtils.DefaultXmlDeserialize<List<TransportAsset>>(data);
+
+            if (copiedAssets == null)
+            {
+                return false;
+            }
+
+            var targetConfig = TLMLineUtils.GetEffectiveExtensionForLine(targetLineId, targetTsd);
+
+            targetConfig.SetAssetTransportListForLine(targetLineId, copiedAssets);
+
+            MarkDirty();
+
+            return true;
+        }
 
         private void CreateWindow()
         {
@@ -247,26 +364,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             UpdateAssetList(config);
         }
 
-        internal void UpdateWeekendBudgetUIState()
-        {
-            bool enabled = false;
-
-            if (TryGetCurrentLineConfig(out ushort lineId, out IBudgetStorage cfg))
-            {
-                enabled = cfg?.UseSeparateWeekendProfile == true;
-            }
-
-            m_budgetProfilePanel?.isVisible = enabled;
-            m_budgetProfileLabel?.isVisible = enabled;
-            m_budgetProfileDropdown?.isVisible = enabled;
-
-            m_budgetProfileLabel?.relativePosition = new Vector3(5f, 0f);
-            m_budgetProfileDropdown?.relativePosition = new Vector3(95f, 0f);
-
-            IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem);
-            UpdateAssetList(config);
-        }
-
         private void CreateTemplateList()
         {
             TLMAssetItemLine.EnsureTemplate();
@@ -287,7 +384,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_eraseButton.color = Color.red;
 
             m_vehicleManagementButton = ConfigureActionButton(MainPanel, CommonsSpriteNames.VehicleManagement);
-            m_copyButton.eventClick += (x, y) => ActionOpenManagementPanel();
+            m_vehicleManagementButton.eventClick += (x, y) => ActionOpenManagementPanel();
 
             removeUndesired.tooltip = Locale.Get("TLM_REMOVE_UNWANTED_TOOLTIP");
             m_copyButton.tooltip = Locale.Get("TLM_COPY_CURRENT_LIST_CLIPBOARD");
@@ -309,30 +406,34 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             var lineId = GetLineID();
             IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem);
-            var dataClipboard = XmlUtils.DefaultXmlSerialize(config.GetAssetListForLine(lineId).ToList());
-            m_clipboard[TransportSystem] = dataClipboard;
-            // m_pasteButton.isVisible = true;
-            UpdateAssetList(config);
+            m_clipboard[TransportSystem] = XmlUtils.DefaultXmlSerialize(config.GetAssetTransportListForLine(lineId));
+            m_pasteButton.isVisible = m_clipboard.ContainsKey(TransportSystem);
         }
 
         private void ActionPaste()
         {
-            if (!m_clipboard.ContainsKey(TransportSystem))
+            if (!m_clipboard.TryGetValue(TransportSystem, out string data))
             {
                 return;
             }
+
             var lineId = GetLineID();
+
             IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem);
-            config.SetAssetTransportListForLine(lineId, XmlUtils.DefaultXmlDeserialize<List<TransportAsset>>(m_clipboard[TransportSystem]));
-            UpdateAssetList(config);
+
+            var assets = XmlUtils.DefaultXmlDeserialize<List<TransportAsset>>(data);
+
+            config.SetAssetTransportListForLine(lineId, assets);
+
+            RefreshSelectedAssetRows();
         }
 
         private void ActionDelete()
         {
             var lineId = GetLineID();
             IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem);
-            config.SetAssetListForLine(lineId, []);
-            UpdateAssetList(config);
+            config.SetAssetTransportListForLine(lineId, []);
+            RefreshSelectedAssetRows();
         }
 
         private void ActionOpenManagementPanel()
@@ -462,141 +563,47 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private void UpdateAssetList(IBasicExtension config)
         {
             var lineId = GetLineID();
+
+            if (lineId == 0)
+            {
+                return;
+            }
+
+            var selectedAssets = config.GetAssetTransportListForLine(lineId) ?? [];
+
             m_lastInfo = default;
-            // m_pasteButton.isVisible = m_clipboard.ContainsKey(TransportSystem);
-            var targetAssets = TransportSystem.GetTransportExtension().GetAllBasicAssetsForLine(lineId).Where(x => x.Value.ToLower().Contains(m_nameFilter.text.ToLower())).ToList();
-            UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(targetAssets.Count);
-            List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
-            List<string> allowedAssets = config.GetAssetListForLine(lineId);
+
+
             var budgetEntries = config.GetBudgetsMultiplierForLine(lineId, CurrentProfileTarget);
 
-            if (lineId > 0 && budgetEntries.Count == 0)
+            if (lineId != 0 && (budgetEntries == null || budgetEntries.Count == 0))
             {
                 TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineId); // triggers lazy init
-                config = TLMLineUtils.GetEffectiveExtensionForLine(lineId); // re-fetch
-            }
-            if (allowedAssets.Count > 0)
-            {
-                foreach (var asset in allowedAssets)
-                {
-                    var item = InitTransportItem(asset, config, lineId);
-                    allowedTransportAssets.Add(item);
-                }
-                config.SetAssetListForLine(lineId, []);
-                config.SetAssetTransportListForLine(lineId, allowedTransportAssets);
+                config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem); // re-fetch
+
+                selectedAssets = config.GetAssetTransportListForLine(lineId) ?? [];
+
+                budgetEntries = config.GetBudgetsMultiplierForLine(lineId, CurrentProfileTarget);
             }
 
-            UVMPublicTransportWorldInfoPanel.GetLineID(out _, out bool fromBuilding);
-            if (!fromBuilding)
-            {
-                BudgetEntryXml previouslySelectedEntry = null;
-                if (lineId > 0 && m_timeBudgetSelect != null)
-                {
-                    int oldUiIndex = m_timeBudgetSelect.selectedIndex;
-                    if (oldUiIndex >= 0 && oldUiIndex < m_budgetEntriesInUiOrder.Count)
-                    {
-                        previouslySelectedEntry = m_budgetEntriesInUiOrder[oldUiIndex];
-                    }
-                }
+            var slotIndex = GetBudgetSelectedIndex();
 
-                m_budgetEntriesInUiOrder.Clear();
 
-                var entriesInUiOrder = budgetEntries.Cast<BudgetEntryXml>().OrderBy(x => x.HourOfDay).ToList();
-
-                m_budgetEntriesInUiOrder.AddRange(entriesInUiOrder);
-                m_timeBudgetSelect.items = [.. entriesInUiOrder.Select(x => x.HourOfDay.ToString())];
-
-                int selectedUiIndex = -1;
-
-                if (previouslySelectedEntry != null)
-                {
-                    selectedUiIndex = m_budgetEntriesInUiOrder.FindIndex(x => ReferenceEquals(x, previouslySelectedEntry));
-                }
-
-                if (selectedUiIndex < 0)
-                {
-                    var currentExact = budgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer);
-                    int backingIndex = currentExact.Second;
-
-                    if (backingIndex >= 0 && currentExact.First is BudgetEntryXml currentEntry)
-                    {
-                        selectedUiIndex = m_budgetEntriesInUiOrder.FindIndex(x => ReferenceEquals(x, currentEntry));
-                    }
-                }
-
-                if (selectedUiIndex < 0)
-                {
-                    selectedUiIndex = 0;
-                }
-
-                m_timeBudgetSelect.selectedIndex = selectedUiIndex;
-                UpdateModeIndicator(lineId, GetBudgetSelectedIndex());
-            }
-
-            if (TransportLinesManagerMod.DebugMode)
-            {
-                var length = allowedTransportAssets.Count;
-                var arr = new string[length];
-                var i = 0;
-                foreach (var asset in allowedTransportAssets)
-                {
-                    if(i >= length)
-                    {
-                        break;
-                    }
-                    arr[i] = asset.name;
-                    i++;
-                }
-                LogUtils.DoLog($"selectedAssets Size = {allowedTransportAssets?.Count} ({string.Join(",", arr ?? [])}) {config?.GetType()}");
-
-            }
-
-            int selectedBudgetIndex = GetBudgetSelectedIndex();
+            UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(selectedAssets.Count);
 
             for (int i = 0; i < assetsCheck.Length; i++)
             {
-                var asset = targetAssets[i].Key;
+                var asset = selectedAssets[i];
                 var controller = assetsCheck[i].GetComponent<TLMAssetItemLine>();
-                var isAllowed = allowedTransportAssets.Any(item => item.name == asset.name);
-                if (isAllowed)
-                {
-                    asset = allowedTransportAssets.Find(item => item.name == asset.name);
-                }
-
-                controller.SetAsset(asset, isAllowed, lineId, selectedBudgetIndex);
+                controller.SetAsset(asset, lineId, slotIndex);
                 controller.OnMouseEnter = () =>
                 {
                     m_lastInfo = PrefabCollection<VehicleInfo>.FindLoaded(asset.name);
                     RedrawModel();
                 };
             }
-        }
 
-        private TransportAsset InitTransportItem(string assetName, IBasicExtension currentConfig, ushort lineId)
-        {
-            var budgetEntries = currentConfig.GetBudgetsMultiplierForLine(lineId, CurrentProfileTarget);
-            var item = new TransportAsset
-            {
-                name = assetName,
-                capacity = VehicleUtils.GetCapacity(PrefabCollection<VehicleInfo>.FindLoaded(assetName)),
-                count = [],
-                spawn_percent = []
-            };
-            for (int i = 0; i < budgetEntries.Count; i++)
-            {
-                var item_count = new CountEntry
-                {
-                    TotalCount = 0
-                };
-                item.count.Add(i.ToString(), item_count);
-
-                var item_spawn = new SpawnPercentEntry
-                {
-                    Value = 100
-                };
-                item.spawn_percent.Add(i.ToString(), item_spawn);
-            }
-            return item;
+            UpdateModeIndicator(lineId, slotIndex);
         }
 
         private void ChangeBudgetTime(int idxSel)
@@ -605,33 +612,30 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             {
                 return;
             }
-            m_timeBudgetSelect.selectedIndex = idxSel; 
-            UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding);
+            m_timeBudgetSelect.selectedIndex = idxSel;
+
+            var lineId = GetLineID();
+
             int selectedBudgetIndex = GetBudgetSelectedIndex();
-            UpdateModeIndicator(lineId, selectedBudgetIndex);
-            if (!fromBuilding)
+
+            IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem);
+            List<TransportAsset> selectedAssets = config.GetAssetTransportListForLine(lineId);
+
+            UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(selectedAssets.Count);
+                  
+            for (int i = 0; i < assetsCheck.Length; i++)
             {
-                var targetAssets = TransportSystem.GetTransportExtension().GetAllBasicAssetsForLine(lineId).Where(x => x.Value.Contains(m_nameFilter.text)).ToList();
-                UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(targetAssets.Count);
-                IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
-                List<TransportAsset> allowedTransportAssets = config.GetAssetTransportListForLine(lineId);
-                for (int i = 0; i < assetsCheck.Length; i++)
+                var asset = selectedAssets[i];
+                var controller = assetsCheck[i].GetComponent<TLMAssetItemLine>();
+                controller.SetAsset(asset, lineId, selectedBudgetIndex);
+                controller.OnMouseEnter = () =>
                 {
-                    var asset = targetAssets[i].Key;
-                    var controller = assetsCheck[i].GetComponent<TLMAssetItemLine>();
-                    var isAllowed = allowedTransportAssets.Any(item => item.name == asset.name);
-                    if (isAllowed)
-                    {
-                        asset = allowedTransportAssets.Find(item => item.name == asset.name);
-                    }
-                    controller.SetAsset(asset, isAllowed, lineId, selectedBudgetIndex);
-                    controller.OnMouseEnter = () =>
-                    {
-                        m_lastInfo = PrefabCollection<VehicleInfo>.FindLoaded(asset.name);
-                        RedrawModel();
-                    };
-                }
+                    m_lastInfo = PrefabCollection<VehicleInfo>.FindLoaded(asset.name);
+                    RedrawModel();
+                };
             }
+
+            UpdateModeIndicator(lineId, selectedBudgetIndex);
         }
 
         private void SetPreviewWindow()
@@ -757,35 +761,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
         }
 
-        public static int GetBudgetSelectedIndex()
-        {
-            if (!UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) || fromBuilding || lineId == 0)
-            {
-                return 0;
-            }
-
-            int uiIndex = m_timeBudgetSelect.selectedIndex;
-            if (uiIndex < 0 || uiIndex >= m_budgetEntriesInUiOrder.Count)
-            {
-                return 0;
-            }
-
-            return GetBudgetEntryBackingIndex(lineId, m_budgetEntriesInUiOrder[uiIndex]);
-        }
-
-        public static int GetBudgetEntryBackingIndex(ushort lineId, BudgetEntryXml target)
-        {
-            var budgetEntries = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetBudgetsMultiplierForLine(lineId, Instance.CurrentProfileTarget);
-            for (int i = 0; i < budgetEntries.Count; i++)
-            {
-                if (ReferenceEquals(budgetEntries[i], target))
-                {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
         private void RedrawModel() => m_previewRenderer.RenderVehicle(m_lastInfo, m_lastColor == Color.clear ? Color.HSVToRGB(Math.Abs(m_previewRenderer.CameraRotation) / 360f, .5f, .5f) : m_lastColor, true);
 
         private bool TryGetCurrentLineConfig(out ushort lineId, out IBudgetStorage cfg)
@@ -798,21 +773,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             cfg = TLMLineUtils.GetEffectiveConfigForLine(lineId);
             return cfg != null;
-        }
-
-        public void OnEnable()
-        { }
-
-        public void OnDisable()
-        {
-            OnDestroy();
-        }
-
-        public void OnGotFocus()
-        { }
-
-        public bool MayBeVisible() => TransportSystem?.HasVehicles() ?? false;
-
-        public void Hide() => MainPanel.isVisible = false;
+        } 
     }
 }

@@ -5,8 +5,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
     public class VehicleItem
     {
         // Vehicle prefab.
-        private VehicleInfo _vehicleInfo;
-        private string _vehicleName;
+        private VehicleInfo m_vehicleInfo;
+        private string m_vehicleName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VehicleItem"/> class.
@@ -20,21 +20,21 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         /// <summary>
         /// Gets the vehicles's name (empty string if none).
         /// </summary>
-        public string Name => _vehicleName;
+        public string Name => m_vehicleName;
 
         /// <summary>
         /// Gets or sets the vehicle prefab for this record.
         /// </summary>
         public VehicleInfo Info
         {
-            get => _vehicleInfo;
+            get => m_vehicleInfo;
 
             set
             {
-                _vehicleInfo = value;
+                m_vehicleInfo = value;
 
                 // Set display name.
-                _vehicleName = PrefabUtils.GetDisplayName(value);
+                m_vehicleName = PrefabUtils.GetDisplayName(value);
             }
         }
     }

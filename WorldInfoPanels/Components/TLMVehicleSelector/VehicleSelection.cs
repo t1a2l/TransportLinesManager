@@ -1,11 +1,12 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Commons.UI;
 using Commons.UI.Components;
 using Commons.Utils;
-using TransportLinesManager.Interfaces;
 using TransportLinesManager.Utils;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 using UnityEngine;
 using static TransportLinesManager.Data.Extensions.ExtensionStaticExtensionMethods;
 
@@ -62,9 +63,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         private VehicleInfo m_selectedBuildingVehicle;
         private VehicleInfo m_selectedListVehicle;
 
-        /// <summary>
-        /// Sets the currently selected vehicle from the list of currently selected vehicles.
-        /// </summary>
         internal VehicleInfo SelectedBuildingVehicle
         {
             set
@@ -88,9 +86,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             }
         }
 
-        /// <summary>
-        /// Sets the currently selected vehicle from the list of all currently unselected vehicles.
-        /// </summary>
         internal VehicleInfo SelectedListVehicle
         {
             set
@@ -114,25 +109,10 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             }
         }
 
-        /// <summary>
-        /// Gets or sets the parent tab reference.
-        /// </summary>
         internal LinePanel ParentPanel { get; set; }
 
-        /// <summary>
-        /// Gets the current transfer reason.
-        /// </summary>
-        internal TransferManager.TransferReason TransferReason { get; private set; }
-
-        /// <summary>
-        /// Gets the currently selected line.
-        /// </summary>
         internal ushort CurrentLine { get; private set; }
 
-        /// <summary>
-        /// Called by Unity when the object is created.
-        /// Used to perform setup.
-        /// </summary>
         public override void Awake()
         {
             base.Awake();
@@ -158,7 +138,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 TextureAtlasUtils.LoadQuadSpriteAtlas("__Add"),
                 Locale.Get("ADD_VEHICLE_TIP"));
             m_addButton.isEnabled = false;
-            m_addButton.eventClicked += (c, p) => AddVehicle(m_selectedListVehicle);
+            m_addButton.eventClicked += (c, p) => AddVehicle(m_selectedListVehicle.name);
 
             // 'Add all vehicles' button.
             m_addAllButton = UIButtons.AddIconButton(
@@ -180,7 +160,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 TextureAtlasUtils.LoadQuadSpriteAtlas("__Remove"),
                 Locale.Get("REMOVE_VEHICLE_TIP"));
             m_removeButton.isEnabled = false;
-            m_removeButton.eventClicked += (c, p) => RemoveVehicle();
+            m_removeButton.eventClicked += (c, p) => RemoveVehicle(m_selectedListVehicle.name);
 
             // 'Remove all vehicles' button.
             m_removeAllButton = UIButtons.AddIconButton(
@@ -208,31 +188,24 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             SetPreviewWindow();
         }
 
-        /// <summary>
-        /// Sets/changes the currently selected building.
-        /// </summary>
-        /// <param name="lineID">New building ID.</param>
-        /// <param name="title">Selection list title string.</param>
-        /// <param name="reason">Transfer reason for this vehicle selection.</param>
-        internal void SetTarget(ushort lineID, string title, TransferManager.TransferReason reason)
+        public void SetTarget(ushort lineID)
         {
             // Ensure valid building.
             if (lineID != 0)
             {
                 CurrentLine = lineID;
-                TransferReason = reason;
-                m_titleLabel.text = title;
+                m_titleLabel.text = Locale.Get("TLM_VEHICLE_MANAGEMENT_TITLE");
 
                 // Regenerate lists and set button states..
                 Refresh();
             }
         }
 
-        /// <summary>
-        /// Refreshes list contents, clears the preview display, and updates button states.
-        /// </summary>
-        internal void Refresh()
+        public void Refresh()
         {
+            m_selectedBuildingVehicle = null;
+            m_selectedListVehicle = null;
+
             // Clear preview.
             m_previewRenderer.RenderVehicle(null);
 
@@ -242,10 +215,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             UpdateButtonStates();
         }
 
-        /// <summary>
-        /// Updates button states according to the current state.
-        /// </summary>
-        internal void UpdateButtonStates()
+        public void UpdateButtonStates()
         {
             // Null check.
             if (m_addAllButton != null)
@@ -260,70 +230,123 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             }
         }
 
-        /// <summary>
-        /// Adds a vehicle to the list for this transfer.
-        /// </summary>
-        /// <param name="vehicle">Vehicle prefab to add.</param>
-        private void AddVehicle(VehicleInfo vehicle)
+        private void AddVehicle(string assetName)
         {
-            // Add vehicle to building.
-            IBasicExtension extension = TLMLineUtils.GetEffectiveExtensionForLine(CurrentLine);
-            IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(CurrentLine);
-
-            extension.AddAssetToLine(CurrentLine, m_currentAsset, m_capacityEditor.text, m_weightEditor.text, ProfileTarget.Weekday);
-            if (currentConfig != null && currentConfig.UseSeparateWeekendProfile)
+            var lineId = CurrentLine;
+            if (lineId == 0)
             {
-                extension.AddAssetToLine(fromBuilding ? (ushort)0 : lineId, m_currentAsset, m_capacityEditor.text, m_weightEditor.text, ProfileTarget.Weekend);
+                return;
             }
 
+            var tsd = UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
 
+            var config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
 
+            var currentConfig = TLMLineUtils.GetEffectiveConfigForLine(CurrentLine);
 
+            if (config.GetAssetTransportListForLine(lineId).Any(x => x.name == assetName))
+            {
+                return;
+            }
 
-            // Update lists.
+            var info = PrefabCollection<VehicleInfo>.FindLoaded(assetName);
+
+            if (info == null)
+            {
+                return;
+            }
+
+            int capacity = VehicleUtils.GetCapacity(info);
+
+            ProfileTarget profile = TLMAssetSelectorTab.Instance.CurrentProfileTarget;
+
+            config.AddAssetToLine(lineId, assetName, capacity.ToString(), "100", ProfileTarget.Weekday);
+
+            if (currentConfig?.UseSeparateWeekendProfile == true)
+            {
+                config.AddAssetToLine(lineId, assetName, capacity.ToString(), "100", ProfileTarget.Weekend);
+            }
+
             Refresh();
+            TLMAssetSelectorTab.MarkDirty();
         }
 
-        /// <summary>
-        /// Removes the currently selected vehicle from the list for this building.
-        /// </summary>
-        private void RemoveVehicle()
+        private void RemoveVehicle(string assetName)
         {
-            // Remove selected vehicle from building.
-            VehicleControl.RemoveVehicle(CurrentBuilding, TransferReason, _selectedBuildingVehicle);
+            var lineId = CurrentLine;
+            if (lineId == 0)
+            {
+                return;
+            }
 
-            // Update lists.
+            var tsd = UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
+
+            var config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
+
+            config.RemoveAssetFromLine(lineId, assetName);
+
             Refresh();
+            TLMAssetSelectorTab.MarkDirty();
         }
 
-        /// <summary>
-        /// Adds all vehicles in the available vehicle list to this building.
-        /// </summary>
         private void AddAllVehicles()
         {
-            // Add all vehicles in target list to bulding.
-            foreach (VehicleItem item in _vehicleSelectionPanel.VehicleList.Data)
+            if (CurrentLine == 0)
             {
-                VehicleControl.AddVehicle(CurrentBuilding, TransferReason, item.Info);
+                return;
             }
 
-            // Update lists.
+            var extension = TLMLineUtils.GetEffectiveExtensionForLine(CurrentLine);
+
+            var currentConfig = TLMLineUtils.GetEffectiveConfigForLine(CurrentLine);
+
+            foreach (object entry in m_vehicleSelectionPanel.VehicleList.Data)
+            {
+                if (entry is not VehicleItem item || item.Info == null)
+                {
+                    continue;
+                }
+
+                int capacity = VehicleUtils.GetCapacity(item.Info);
+
+                extension.AddAssetToLine(CurrentLine, item.Info.name, capacity.ToString(), "100", ProfileTarget.Weekday);
+
+                if (currentConfig?.UseSeparateWeekendProfile == true)
+                {
+                    extension.AddAssetToLine(CurrentLine, item.Info.name, capacity.ToString(), "100", ProfileTarget.Weekend);
+                }
+            }
+
             Refresh();
+            TLMAssetSelectorTab.MarkDirty();
         }
 
-        /// <summary>
-        /// Adds all vehicles in the available vehicle list to this building.
-        /// </summary>
         private void RemoveAllVehicles()
         {
-            // Add all vehicles in target list to bulding.
-            foreach (VehicleItem item in _selectedVehiclePanel.VehicleList.Data)
+            if (CurrentLine == 0)
             {
-                VehicleControl.RemoveVehicle(CurrentBuilding, TransferReason, item.Info);
+                return;
             }
 
-            // Update lists.
+            var extension = TLMLineUtils.GetEffectiveExtensionForLine(CurrentLine);
+
+            var vehiclesToRemove = new List<VehicleInfo>();
+
+            foreach (object entry in m_selectedVehiclePanel.VehicleList.Data)
+            {
+                if (entry is VehicleItem item && item.Info != null)
+                {
+                    vehiclesToRemove.Add(item.Info);
+                }
+            }
+
+            foreach (VehicleInfo vehicle in vehiclesToRemove)
+            {
+                extension.RemoveAssetFromLine(CurrentLine, vehicle.name);
+            }
+
             Refresh();
+            TLMAssetSelectorTab.MarkDirty();
         }
 
         private void SetPreviewWindow()

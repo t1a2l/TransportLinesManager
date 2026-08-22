@@ -1,22 +1,18 @@
 ﻿using System;
-using System.Text;
 using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Commons.Utils;
 using Commons.UI.Components;
 using UnityEngine;
+using TransportLinesManager.WorldInfoPanels.Tabs;
 
 namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
 {
     internal class LinePanel : UIPanel
     {
-        /// <summary>
-        /// Layout margin.
-        /// </summary>
         protected const float Margin = 5f;
 
-        // Layout constants - private.
         private const float TitleHeight = 40f;
         private const float NameLabelY = TitleHeight + Margin;
         private const float NameLabelHeight = 30f;
@@ -30,49 +26,23 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         private const float IconButtonY = ListY - IconButtonSize - Margin;
         private const float PasteButtonX = PanelWidth - IconButtonSize - Margin;
         private const float CopyButtonX = PasteButtonX - IconButtonSize - Margin;
-        private const float CopyBuildingButtonX = CopyButtonX - IconButtonSize - Margin;
-        private const float CopyDistrictButtonX = CopyBuildingButtonX - IconButtonSize - Margin;
+
         private const float PanelWidth = VehicleSelection.PanelWidth + Margin + Margin;
 
-        // Panel components.
         private UILabel m_lineLabel;
         private UIButton m_copyButton;
         private UIButton m_pasteButton;
-        private UIButton m_copyLineButton;
 
-        // Sub-panels.
         private VehicleSelection m_vehicleSelection = new();
 
-        // Status flag.
-        private bool m_panelReady = false;
-
-        // Current selections.
         private ushort m_currentLine;
-        private TransportInfo m_thisLineInfo;
 
-        // Event handling.
-        private bool m_copyProcessing = false;
-        private bool m_pasteProcessing = false;
-
-        /// <summary>
-        /// Gets the current line ID.
-        /// </summary>
         internal ushort CurrentLine => m_currentLine;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether this is an incoming (true) or outgoing (false) transfer.
-        /// </summary>
         internal bool IsIncoming { get; set; }
 
-        /// <summary>
-        /// Gets or sets the current transfer reason.
-        /// </summary>
         internal TransferManager.TransferReason TransferReason { get; set; }
 
-        /// <summary>
-        /// Called by Unity when the object is created.
-        /// Used to perform setup.
-        /// </summary>
         public override void Awake()
         {
             base.Awake();
@@ -95,7 +65,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 UILabel titleLabel = UILabels.AddLabel(this, 0f, 10f, Locale.Get("MOD_NAME"), PanelWidth, 1.2f);
                 titleLabel.textAlignment = UIHorizontalAlignment.Center;
 
-                // Building label.
+                // Line label.
                 m_lineLabel = UILabels.AddLabel(this, 0f, NameLabelY, string.Empty, PanelWidth);
                 m_lineLabel.textAlignment = UIHorizontalAlignment.Center;
 
@@ -121,7 +91,11 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
 
                 // Copy/paste buttons.
                 m_copyButton = UIButtons.AddIconButton(this, CopyButtonX, IconButtonY, IconButtonSize, TextureAtlasUtils.LoadQuadSpriteAtlas("__Copy"), Locale.Get("COPY_TIP"));
-                m_copyButton.eventClicked += (c, p) => CopyPaste.Instance.Copy(m_currentLine);
+                m_copyButton.eventClicked += (c, p) =>
+                {
+                    TLMAssetSelectorTab.CopyAssetConfiguration(m_currentLine);
+                    m_pasteButton.isEnabled = TLMAssetSelectorTab.HasAssetClipboard;
+                };
                 m_pasteButton = UIButtons.AddIconButton(this, PasteButtonX, IconButtonY, IconButtonSize, TextureAtlasUtils.LoadQuadSpriteAtlas("__Paste"), Locale.Get("PASTE_TIP"));
                 m_pasteButton.eventClicked += (c, p) => Paste();
 
@@ -138,29 +112,19 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             }
         }
 
-        /// <summary>
-        /// Sets/changes the currently selected line.
-        /// </summary>
-        /// <param name="lineId">New line ID.</param>
         internal virtual void SetTarget(ushort lineId)
         {
-            // Local references.
-            TransportManager transportManager = Singleton<TransportManager>.instance;
-
             // Update selected line ID.
             m_currentLine = lineId;
-            m_thisLineInfo = transportManager.m_lines.m_buffer[m_currentLine].Info;
 
-            m_vehicleSelection.SetTarget(lineId, _transfers[i].Title, _transfers[i].Reason);
+            m_vehicleSelection.SetTarget(lineId);
             m_vehicleSelection.Show();
-
 
             // Set panel height.
             height = NoPanelHeight;
 
             // Set name.
             m_lineLabel.text = Singleton<TransportManager>.instance.GetLineName(lineId);
-
 
             // Make sure we're fully visible on-screen.
             if (absolutePosition.y + height > Screen.height - 120)
@@ -184,22 +148,23 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             }
 
             // Update button states.
-            m_pasteButton.isEnabled = CopyPaste.Instance.IsValidTarget(CurrentLine);
+            m_pasteButton.isEnabled = TLMAssetSelectorTab.HasAssetClipboard;
 
             // Make sure we're visible if we're not already.
             Show();
         }
 
-        /// <summary>
-        /// Paste data action.
-        /// </summary>
         private void Paste()
         {
-            // Paste data.
-            CopyPaste.Instance.Paste(CurrentLine);
+            if (!TLMAssetSelectorTab.PasteAssetConfiguration(m_currentLine))
+            {
+                return;
+            }
 
-            // Update list.
             m_vehicleSelection.Refresh();
+            TLMAssetSelectorTab.MarkDirty();
+
+            m_pasteButton.isEnabled = TLMAssetSelectorTab.HasAssetClipboard;
         }
     }
 }

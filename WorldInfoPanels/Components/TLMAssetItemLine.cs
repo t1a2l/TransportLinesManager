@@ -1,6 +1,5 @@
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Commons.Extensions.UI;
 using Commons.Utils;
 using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Data.Extensions;
@@ -21,7 +20,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
     {
         public const string TEMPLATE_NAME = "TLM_AssetSelectionTabLineTemplate";
         private bool m_isLoading;
-        private UICheckBox m_checkbox;
+        private UILabel m_assetNameLabel;
         private UITextField m_capacityEditor;
         private UITextField m_weightEditor;
         private UILabel m_usedCount;
@@ -31,57 +30,16 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         public void Awake()
         {
             var panel = GetComponent<UIPanel>();
-            m_checkbox = panel.GetComponentInChildren<UICheckBox>();
+            m_assetNameLabel = panel.Find<UILabel>("AssetName");
 
             m_capacityEditor = panel.Find<UITextField>("Cap");
             m_weightEditor = panel.Find<UITextField>("Weg");
             m_usedCount = panel.Find<UILabel>("UsedCount");
 
-            m_checkbox.eventCheckChanged += (x, y) =>
-            {
-                if (m_isLoading)
-                {
-                    return;
-                }
-
-                if (UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding))
-                {
-                    IBasicExtension extension = lineId > 0 && !fromBuilding ? TLMLineUtils.GetEffectiveExtensionForLine(lineId) : UVMPublicTransportWorldInfoPanel.GetCurrentTSD().GetTransportExtension();
-                    IBasicExtensionStorage currentConfig = TLMLineUtils.GetEffectiveConfigForLine(lineId);
-
-                    LogUtils.DoLog($"checkbox event: {x.objectUserData} => {y} at {extension}[{lineId}-{fromBuilding}]");
-                    if (y)
-                    {
-                        extension.AddAssetToLine(fromBuilding ? (ushort)0 : lineId, m_currentAsset, m_capacityEditor.text, m_weightEditor.text, ProfileTarget.Weekday);
-                        if(currentConfig != null && currentConfig.UseSeparateWeekendProfile)
-                        {
-                            extension.AddAssetToLine(fromBuilding ? (ushort)0 : lineId, m_currentAsset, m_capacityEditor.text, m_weightEditor.text, ProfileTarget.Weekend);
-                        }
-                    }
-                    else
-                    {
-                        extension.RemoveAssetFromLine(fromBuilding ? (ushort)0 : lineId, m_currentAsset);
-                    }
-
-                    List<TransportAsset> allowedTransportAssets = extension.GetAssetTransportListForLine(fromBuilding ? (ushort)0 : lineId);
-                    var index = TLMAssetSelectorTab.GetBudgetSelectedIndex();
-                    if (index == -1)
-                    {
-                        var hourIndex = TLMLineUtils.GetEffectiveExtensionForLine(lineId).GetActiveBudgetEntries(lineId).GetAtHourExact(TLMLineUtils.ReferenceTimer).Second;
-                        index = hourIndex != -1 ? hourIndex : 0;
-                    }
-                    bool isAllowed = allowedTransportAssets.Any(item => item.name == m_currentAsset);
-                    TransportAsset asset = isAllowed ? allowedTransportAssets.Find(item => item.name == m_currentAsset) : new TransportAsset { name = m_currentAsset };
-                    SetAsset(asset, fromBuilding ? (ushort)0 : lineId, index);
-                }
-            };
-            MonoUtils.LimitWidthAndBox(m_checkbox.label, 225, out UIPanel container);
-            container.relativePosition = new Vector3(container.relativePosition.x, 0);
             m_capacityEditor.eventTextSubmitted += CapacityEditor_eventTextSubmitted;
             m_weightEditor.eventTextSubmitted += WeightEditor_eventTextSubmitted;
             m_usedCount.text = "0";
 
-            m_checkbox.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
             m_capacityEditor.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
             m_weightEditor.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
         }
@@ -92,6 +50,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_currentAsset = asset.name;
 
             var info = PrefabCollection<VehicleInfo>.FindLoaded(m_currentAsset);
+
+            m_assetNameLabel.text = info != null ? PrefabUtils.GetDisplayName(info) : m_currentAsset;
+
             var tsd = TransportSystemDefinition.From(info);
             UpdateMaintenanceCost(info, tsd);
 
@@ -296,8 +257,23 @@ namespace TransportLinesManager.WorldInfoPanels.Components
 
         private void UpdateMaintenanceCost(VehicleInfo info, TransportSystemDefinition tsd)
         {
+            if (m_assetNameLabel == null)
+            {
+                return;
+            }
+
             UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding);
-            m_checkbox.label.suffix = lineId == 0 || fromBuilding ? "" : $"\n<color #aaaaaa>{LocaleFormatter.FormatUpkeep(Mathf.RoundToInt(VehicleUtils.GetCapacity(info) * tsd.GetEffectivePassengerCapacityCost() * 100), false)}</color>";
+
+            if (lineId == 0 || fromBuilding || info == null || tsd == null)
+            {
+                m_assetNameLabel.suffix = string.Empty;
+                return;
+            }
+
+            int upkeep = Mathf.RoundToInt(VehicleUtils.GetCapacity(info) * tsd.GetEffectivePassengerCapacityCost() * 100);
+
+            m_assetNameLabel.processMarkup = true;
+            m_assetNameLabel.suffix = $"\n<color #aaaaaa>{LocaleFormatter.FormatUpkeep(upkeep, false)}</color>";
         }
 
         public static void EnsureTemplate()
@@ -309,14 +285,15 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             panel.wrapLayout = false;
             panel.autoLayoutDirection = LayoutDirection.Horizontal;
 
-            UICheckBox uiCheckbox = UIHelperExtension.AddCheckbox(panel, "AAAAAA", false);
-            uiCheckbox.name = "AssetCheckbox";
-            uiCheckbox.height = 32;
-            uiCheckbox.width = 220f;
-            uiCheckbox.label.processMarkup = true;
-            uiCheckbox.label.textScale = 0.8f;
-            uiCheckbox.label.verticalAlignment = UIVerticalAlignment.Middle;
-            uiCheckbox.label.minimumSize = new Vector2(0, 24);
+            MonoUtils.CreateUIElement(out UILabel assetNameLabel, panel.transform, "AssetName", new Vector4(0, 0, 220, 32));
+            assetNameLabel.autoSize = false;
+            assetNameLabel.height = 32f;
+            assetNameLabel.width = 220f;
+            assetNameLabel.textScale = 0.8f;
+            assetNameLabel.processMarkup = true;
+            assetNameLabel.verticalAlignment = UIVerticalAlignment.Middle;
+            assetNameLabel.wordWrap = true;
+            assetNameLabel.padding = new RectOffset(4, 4, 1, 1);
 
             MonoUtils.CreateUIElement(out UITextField capEditField, panel.transform, "Cap", new Vector4(0, 0, 50, 32));
             MonoUtils.UiTextFieldDefaults(capEditField);

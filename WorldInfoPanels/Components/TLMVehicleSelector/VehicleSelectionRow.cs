@@ -22,18 +22,18 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         private const float ScrollMargin = 10f;
 
         // Vehicle name label.
-        private UILabel _vehicleNameLabel;
+        private UILabel m_vehicleNameLabel;
 
         // Preview image.
-        private UISprite _vehicleSprite;
+        private UISprite m_vehicleSprite;
 
         // Steam icon.
-        private UISprite _steamSprite;
+        private UISprite m_steamSprite;
 
         /// <summary>
         /// Vehicle prefab.
         /// </summary>
-        private VehicleInfo _info;
+        private VehicleInfo m_info;
 
         /// <summary>
         /// Gets the height for this row.
@@ -48,41 +48,41 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         public override void Display(object data, int rowIndex)
         {
             // Perform initial setup for new rows.
-            if (_vehicleNameLabel == null)
+            if (m_vehicleNameLabel == null)
             {
                 // Add object name label.
-                _vehicleNameLabel = AddLabel(VehicleSpriteSize + Margin, width - Margin - VehicleSpriteSize - Margin - SteamSpriteWidth - ScrollMargin - Margin, wordWrap: true);
+                m_vehicleNameLabel = AddLabel(VehicleSpriteSize + Margin, width - Margin - VehicleSpriteSize - Margin - SteamSpriteWidth - ScrollMargin - Margin, wordWrap: true);
 
                 // Add preview sprite image.
-                _vehicleSprite = AddUIComponent<UISprite>();
-                _vehicleSprite.height = VehicleSpriteSize;
-                _vehicleSprite.width = VehicleSpriteSize;
-                _vehicleSprite.relativePosition = Vector2.zero;
+                m_vehicleSprite = AddUIComponent<UISprite>();
+                m_vehicleSprite.height = VehicleSpriteSize;
+                m_vehicleSprite.width = VehicleSpriteSize;
+                m_vehicleSprite.relativePosition = Vector2.zero;
 
                 // Add setam sprite.
-                _steamSprite = AddUIComponent<UISprite>();
-                _steamSprite.width = SteamSpriteWidth;
-                _steamSprite.height = SteamSpriteHeight;
-                _steamSprite.atlas = TextureAtlasUtils.DefaultTextureAtlas;
-                _steamSprite.spriteName = "SteamWorkshop";
-                _steamSprite.relativePosition = new Vector2(width - Margin - ScrollMargin - SteamSpriteWidth, (height - SteamSpriteHeight) / 2f);
+                m_steamSprite = AddUIComponent<UISprite>();
+                m_steamSprite.width = SteamSpriteWidth;
+                m_steamSprite.height = SteamSpriteHeight;
+                m_steamSprite.atlas = TextureAtlasUtils.DefaultTextureAtlas;
+                m_steamSprite.spriteName = "SteamWorkshop";
+                m_steamSprite.relativePosition = new Vector2(width - Margin - ScrollMargin - SteamSpriteWidth, (height - SteamSpriteHeight) / 2f);
             }
 
             // Get building ID and set name label.
             if (data is VehicleItem thisItem)
             {
-                _info = thisItem.Info;
-                _vehicleNameLabel.text = thisItem.Name;
+                m_info = thisItem.Info;
+                m_vehicleNameLabel.text = thisItem.Name;
 
-                _vehicleSprite.atlas = _info?.m_Atlas;
-                _vehicleSprite.spriteName = _info?.m_Thumbnail;
+                m_vehicleSprite.atlas = m_info?.m_Atlas;
+                m_vehicleSprite.spriteName = m_info?.m_Thumbnail;
 
-                _steamSprite.isVisible = PrefabUtils.IsWorkshopAsset(_info);
+                m_steamSprite.isVisible = PrefabUtils.IsWorkshopAsset(m_info);
             }
             else
             {
                 // Just in case (no valid vehicle record).
-                _vehicleNameLabel.text = string.Empty;
+                m_vehicleNameLabel.text = string.Empty;
             }
 
             // Set initial background as deselected state.

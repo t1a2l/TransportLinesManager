@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using ColossalFramework;
 using ColossalFramework.UI;
-using Commons.Utils;
 using Commons.UI.Components;
+using Commons.Utils;
+using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Utils;
 using UnityEngine;
 
 namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
@@ -17,10 +19,10 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         protected const float Margin = 5f;
 
         // Vehicle selection list.
-        private UIList _vehicleList;
+        private UIList m_vehicleList;
 
         // Search panel.
-        private UITextField _nameSearch;
+        private UITextField m_nameSearch;
 
         /// <summary>
         /// Gets or sets the parent reference.
@@ -30,7 +32,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         /// <summary>
         /// Gets the vehicle selection list.
         /// </summary>
-        internal UIList VehicleList => _vehicleList;
+        internal UIList VehicleList => m_vehicleList;
 
         /// <summary>
         /// Sets the currently selected vehicle.
@@ -57,19 +59,19 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 height = VehicleSelection.VehicleListHeight;
 
                 // Vehicle selection list.
-                _vehicleList = UIList.AddUIList<VehicleSelectionRow>(
+                m_vehicleList = UIList.AddUIList<VehicleSelectionRow>(
                     this,
                     0f,
                     0f,
                     VehicleSelection.ListWidth,
                     VehicleSelection.VehicleListHeight,
                     VehicleSelectionRow.VehicleRowHeight);
-                _vehicleList.EventSelectionChanged += (c, selectedItem) => SelectedVehicle = (selectedItem as VehicleItem)?.Info;
+                m_vehicleList.EventSelectionChanged += (c, selectedItem) => SelectedVehicle = (selectedItem as VehicleItem)?.Info;
 
                 // Search field.
-                _nameSearch = UITextFields.AddSmallTextField(_vehicleList, 25f, -23f, VehicleSelection.ListWidth - 25f);
-                _nameSearch.eventTextChanged += (c, text) => PopulateList();
-                UISprite searchSprite = _nameSearch.AddUIComponent<UISprite>();
+                m_nameSearch = UITextFields.AddSmallTextField(m_vehicleList, 25f, -23f, VehicleSelection.ListWidth - 25f);
+                m_nameSearch.eventTextChanged += (c, text) => PopulateList();
+                UISprite searchSprite = m_nameSearch.AddUIComponent<UISprite>();
                 searchSprite.atlas = TextureAtlasUtils.DefaultTextureAtlas;
                 searchSprite.spriteName = "LineDetailButtonHovered";
                 searchSprite.relativePosition = new Vector2(-25f, 0f);
@@ -83,7 +85,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         /// <summary>
         /// Clears the current selection.
         /// </summary>
-        internal void ClearSelection() => _vehicleList.SelectedIndex = -1;
+        internal void ClearSelection() => m_vehicleList.SelectedIndex = -1;
 
         /// <summary>
         /// Refreshes the list with current information.
@@ -91,7 +93,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         internal void RefreshList()
         {
             // Clear selected index.
-            _vehicleList.SelectedIndex = -1;
+            m_vehicleList.SelectedIndex = -1;
 
             // Repopulate the list.
             PopulateList();
@@ -102,128 +104,60 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         /// </summary>
         protected virtual void PopulateList()
         {
-            // Ensure valid building selection.
-            ushort currentBuilding = ParentPanel.CurrentBuilding;
-            if (currentBuilding == 0)
+            ushort lineId = ParentPanel.CurrentLine;
+
+            if (lineId == 0)
             {
+                VehicleList.Data = new FastList<object>
+                {
+                    m_buffer = [],
+                    m_size = 0,
+                };
+
                 return;
             }
 
-            // Local reference.
-            Building[] buildingBuffer = Singleton<BuildingManager>.instance.m_buildings.m_buffer;
+            var extension = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
 
-            // Generated lists.
-            List<VehicleItem> items = [];
-            List<VehicleInfo> trailers = [];
-            List<VehicleInfo> locomotives = [];
+            var selectedAssets =  extension.GetAssetTransportListForLine(lineId) ?? [];
 
-            // Determine effective building class for vehicle matching.
-            VehicleControl.GetEffectiveClass(currentBuilding, buildingBuffer, ParentPanel.TransferReason, out ItemClass.Service buildingService, out ItemClass.SubService buildingSubService, out ItemClass.Level buildingLevel);
+            var selectedNames =  new HashSet<string>(selectedAssets.Where(x => !string.IsNullOrEmpty(x.name)).Select(x => x.name));
 
-            // Get list of already-selected vehicles.
-            List<VehicleInfo> selectedList = VehicleControl.GetVehicles(currentBuilding, ParentPanel.TransferReason);
+            var allAssets = extension.GetAllBasicAssetsForLine(lineId);
 
-            // Iterate through all loaded vehicles.
-            for (uint i = 0; i < PrefabCollection<VehicleInfo>.LoadedCount(); ++i)
+            var items = new List<VehicleItem>();
+
+            foreach (var entry in allAssets)
             {
-                if (PrefabCollection<VehicleInfo>.GetLoaded(i) is VehicleInfo vehicle)
+                TransportAsset asset = entry.Key;
+                string assetName = asset.name;
+
+                if (string.IsNullOrEmpty(assetName) || selectedNames.Contains(assetName))
                 {
-                    // Looking for service, sub-service and level match.
-                    // Level match is ignored if the service is PlayerIndustry, to let general Industries DLC cargo vehicles (level 0) also transfer luxury products (level 1),
-                    // Level match is also ignored for zoned industry due to builing level-up.
-                    // Ignore any trailer vehicles.
-                    // Ignore any procedural vehicles (e.g. fire helicopter buckets).
-                    if (vehicle.m_class.m_service == buildingService &&
-                        vehicle.m_class.m_subService == buildingSubService &&
-                        (vehicle.m_class.m_level == buildingLevel || buildingService == ItemClass.Service.Industrial || buildingService == ItemClass.Service.PlayerIndustry) &&
-                        !(vehicle.m_vehicleAI is CarTrailerAI) &&
-                        !(vehicle.m_placementStyle == ItemClass.Placement.Procedural) &&
-                        (selectedList == null || !selectedList.Contains(vehicle)))
-                    {
-                        // Special check for fishing boats, to stop fishing boats being included in fish truck lists (and vice-versa).
-                        if (buildingService == ItemClass.Service.Fishing)
-                        {
-                            bool isFishingBoat = vehicle.m_vehicleAI is FishingBoatAI;
-                            bool isFishingBoatService = ParentPanel.TransferReason == TransferManager.TransferReason.None;
-                            if (isFishingBoat != isFishingBoatService)
-                            {
-                                continue;
-                            }
-                        }
-
-                        // Check vehicle type, if applicable.
-                        if (buildingBuffer[currentBuilding].Info.m_buildingAI is PlayerBuildingAI playerBuildingAI)
-                        {
-                            VehicleInfo.VehicleType vehicleType = playerBuildingAI.GetVehicleType();
-
-                            // Additional check for passenger planes.
-                            if (buildingSubService == ItemClass.SubService.PublicTransportPlane && playerBuildingAI.m_info.m_class.m_level != ItemClass.Level.Level5)
-                            {
-                                vehicleType = VehicleInfo.VehicleType.Plane;
-                            }
-
-                            // Check to separate disaster helicopters and trucks.
-                            else if (ParentPanel.TransferReason == TransferManager.TransferReason.Collapsed)
-                            {
-                                vehicleType = VehicleInfo.VehicleType.Car;
-                            }
-                            else if (ParentPanel.TransferReason == TransferManager.TransferReason.Collapsed2)
-                            {
-                                vehicleType = VehicleInfo.VehicleType.Helicopter;
-                            }
-
-                            // Check to include fishing boats.
-                            else if (buildingService == ItemClass.Service.Fishing && ParentPanel.TransferReason == TransferManager.TransferReason.None)
-                            {
-                                vehicleType = VehicleInfo.VehicleType.Ship;
-                            }
-
-                            // Check vehicle type.
-                            if (vehicleType != VehicleInfo.VehicleType.None && vehicleType != vehicle.m_vehicleType)
-                            {
-                                continue;
-                            }
-                        }
-
-                        // Record any trailers.
-                        if (vehicle.m_trailers != null && vehicle.m_trailers.Length > 0)
-                        {
-                            // Any vehicle that has trailers is a locomotive - record it to ensure that we don't accidentally remove it later (trailing driving vehicles).
-                            locomotives.Add(vehicle);
-
-                            // Record all trailers.
-                            foreach (VehicleInfo.VehicleTrailer trailer in vehicle.m_trailers)
-                            {
-                                trailers.Add(trailer.m_info);
-                            }
-                        }
-
-                        // All filters passed so far - generate vehicle record for name filtering.
-                        VehicleItem thisItem = new VehicleItem(vehicle);
-
-                        // Apply name filter.
-                        if (!NameFilter(thisItem.Name))
-                        {
-                            continue;
-                        }
-
-                        // Name filter passed - add to available list.
-                        items.Add(thisItem);
-                    }
+                    continue;
                 }
-            }
 
-            // Remove any trailers from list.
-            foreach (VehicleInfo trailer in trailers)
-            {
-                // Exempt any recorded locomotives from removal.
-                items.Remove(items.Find(x => x.Info == trailer && !locomotives.Contains(trailer)));
+                VehicleInfo vehicle = PrefabCollection<VehicleInfo>.FindLoaded(assetName);
+
+                if (vehicle == null)
+                {
+                    continue;
+                }
+
+                var item = new VehicleItem(vehicle);
+
+                if (!NameFilter(item.Name))
+                {
+                    continue;
+                }
+
+                items.Add(item);
             }
 
             // Set display list items, without changing the display.
-            _vehicleList.Data = new FastList<object>
+            m_vehicleList.Data = new FastList<object>
             {
-                m_buffer = items.OrderBy(x => x.Name).ToArray(),
+                m_buffer = [.. items.OrderBy(x => x.Name)],
                 m_size = items.Count,
             };
         }
@@ -233,6 +167,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         /// </summary>
         /// <param name="displayName">Vehicle display name.</param>
         /// <returns>True if the item should be displayed (empty or matching search result), false otherwise.</returns>
-        protected bool NameFilter(string displayName) => _nameSearch.text.IsNullOrWhiteSpace() || displayName.ToLower().Contains(_nameSearch.text.ToLower());
+        protected bool NameFilter(string displayName) => m_nameSearch.text.IsNullOrWhiteSpace() || displayName.ToLower().Contains(m_nameSearch.text.ToLower());
     }
 }
