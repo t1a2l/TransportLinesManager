@@ -199,16 +199,16 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     }
                     m_ageChart.SetValues(
                     [
-                percentageValue,
-                percentageValue2,
-                percentageValue3,
-                num3,
-                percentageValue4
+                        percentageValue,
+                        percentageValue2,
+                        percentageValue3,
+                        num3,
+                        percentageValue4
                     ]);
                     m_passengers.text = LocaleFormatter.FormatGeneric(m_weeklyPassengersString,
                     [
-                averageCount2,
-                averageCount
+                        averageCount2,
+                        averageCount
                     ]);
                     int num5 = 0;
                     int num6 = 0;
@@ -227,7 +227,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     }
                     m_tripSaved.text = LocaleFormatter.FormatGeneric("TRANSPORT_LINE_TRIPSAVED",
                     [
-                num5
+                        num5
                     ]);
                     if (m_pullValuePanel.isVisible)
                     {
