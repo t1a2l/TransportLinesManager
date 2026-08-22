@@ -72,7 +72,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
                     }
                     bool isAllowed = allowedTransportAssets.Any(item => item.name == m_currentAsset);
                     TransportAsset asset = isAllowed ? allowedTransportAssets.Find(item => item.name == m_currentAsset) : new TransportAsset { name = m_currentAsset };
-                    SetAsset(asset, isAllowed, fromBuilding ? (ushort)0 : lineId, index);
+                    SetAsset(asset, fromBuilding ? (ushort)0 : lineId, index);
                 }
             };
             MonoUtils.LimitWidthAndBox(m_checkbox.label, 225, out UIPanel container);
@@ -86,12 +86,10 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_weightEditor.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
         }
 
-        public void SetAsset(TransportAsset asset, bool isAllowed, ushort lineId, int index)
+        public void SetAsset(TransportAsset asset, ushort lineId, int index)
         {
             m_isLoading = true;
             m_currentAsset = asset.name;
-            m_checkbox.label.text = Locale.GetUnchecked("VEHICLE_TITLE", asset.name);
-            m_checkbox.isChecked = isAllowed;
 
             var info = PrefabCollection<VehicleInfo>.FindLoaded(m_currentAsset);
             var tsd = TransportSystemDefinition.From(info);
@@ -105,50 +103,40 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             bool isAbsolute = isCustomConfig && lineExt.IsDisplayAbsoluteValues(lineId);
             bool autoAdjustEnabled = lineExt.IsAutoAdjustAbsoluteCountsEnabled(lineId);
 
-            if (isAllowed)
+            m_weightEditor.isInteractive = true;
+            m_weightEditor.opacity = 1f;
+            m_usedCount.isVisible = true;
+
+            bool isActiveSlot = false;
+            if (!isIntercity)
             {
-                m_weightEditor.isInteractive = true;
-                m_weightEditor.opacity = 1f;
-                m_usedCount.isVisible = true;
+                int activeSlot = GetRuntimeActiveSlotIndex(lineId);
+                isActiveSlot = index == activeSlot;
+            }
 
-                bool isActiveSlot = false;
-                if (!isIntercity)
-                {
-                    int activeSlot = GetRuntimeActiveSlotIndex(lineId);
-                    isActiveSlot = index == activeSlot;
-                }
-
-                if (isActiveSlot)
-                {
-                    TLMLineUtils.EnsureUsedCountSlotSynchronized(lineId, index);
-                    m_usedCount.opacity = 1f;
-                    m_usedCount.text = TLMLineUtils.GetRuntimeUsedCount(lineId, index, asset.name).ToString();
-                    m_usedCount.tooltip = Locale.Get("TLM_ASSET_USED_LABEL_DESCRIPTION");
-                }
-                else
-                {
-                    m_usedCount.opacity = 0.3f;
-                    m_usedCount.text = "-";
-                    m_usedCount.tooltip = null;
-                }
-
-                if (isAbsolute)
-                {
-                    m_weightEditor.text = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()].TotalCount.ToString() : "0";
-                    m_weightEditor.isInteractive = !autoAdjustEnabled;
-                    m_weightEditor.opacity = autoAdjustEnabled ? 0.7f : 1f;
-                }
-                else
-                {
-                    m_weightEditor.text = asset.spawn_percent.ContainsKey(index.ToString()) ? asset.spawn_percent[index.ToString()].Value.ToString() : "100";
-                }
+            if (isActiveSlot)
+            {
+                TLMLineUtils.EnsureUsedCountSlotSynchronized(lineId, index);
+                m_usedCount.opacity = 1f;
+                m_usedCount.text = TLMLineUtils.GetRuntimeUsedCount(lineId, index, asset.name).ToString();
+                m_usedCount.tooltip = Locale.Get("TLM_ASSET_USED_LABEL_DESCRIPTION");
             }
             else
             {
-                m_weightEditor.isInteractive = false;
-                m_weightEditor.opacity = 0.3f;
-                m_weightEditor.text = "0";
-                m_usedCount.isVisible = false;
+                m_usedCount.opacity = 0.3f;
+                m_usedCount.text = "-";
+                m_usedCount.tooltip = null;
+            }
+
+            if (isAbsolute)
+            {
+                m_weightEditor.text = asset.count.ContainsKey(index.ToString()) ? asset.count[index.ToString()].TotalCount.ToString() : "0";
+                m_weightEditor.isInteractive = !autoAdjustEnabled;
+                m_weightEditor.opacity = autoAdjustEnabled ? 0.7f : 1f;
+            }
+            else
+            {
+                m_weightEditor.text = asset.spawn_percent.ContainsKey(index.ToString()) ? asset.spawn_percent[index.ToString()].Value.ToString() : "100";
             }
 
             m_capacityEditor.text = asset.capacity != 0 ? asset.capacity.ToString() : VehicleUtils.GetCapacity(info).ToString("0");

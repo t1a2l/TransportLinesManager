@@ -1,21 +1,22 @@
-﻿using ColossalFramework.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using ColossalFramework.Globalization;
 using ColossalFramework.UI;
+using Commons.Extensions.UI;
 using Commons.UI;
 using Commons.UI.SpriteNames;
 using Commons.Utils;
-using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Data.Base;
 using TransportLinesManager.Data.Base.ConfigurationContainers;
+using TransportLinesManager.Data.DataContainers;
 using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Interfaces;
 using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector;
 using UnityEngine;
-using Commons.Extensions.UI;
-using TransportLinesManager.Data.DataContainers;
-using TransportLinesManager.Data.Base;
 using static TransportLinesManager.Data.Extensions.ExtensionStaticExtensionMethods;
 
 namespace TransportLinesManager.WorldInfoPanels.Tabs
@@ -86,6 +87,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private UIButton m_copyButton;
         private UIButton m_pasteButton;
         private UIButton m_eraseButton;
+
+        private UIButton m_vehicleManagementButton;
 
         private UILabel m_capacityColumnHeader;
         private UILabel m_weightColumnHeader;
@@ -283,6 +286,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_eraseButton.eventClick += (x, y) => ActionDelete();
             m_eraseButton.color = Color.red;
 
+            m_vehicleManagementButton = ConfigureActionButton(MainPanel, CommonsSpriteNames.VehicleManagement);
+            m_copyButton.eventClick += (x, y) => ActionOpenManagementPanel();
+
             removeUndesired.tooltip = Locale.Get("TLM_REMOVE_UNWANTED_TOOLTIP");
             m_copyButton.tooltip = Locale.Get("TLM_COPY_CURRENT_LIST_CLIPBOARD");
             m_pasteButton.tooltip = Locale.Get("TLM_PASTE_CLIPBOARD_TO_CURRENT_LIST");
@@ -302,7 +308,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private void ActionCopy()
         {
             var lineId = GetLineID();
-            IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
+            IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem);
             var dataClipboard = XmlUtils.DefaultXmlSerialize(config.GetAssetListForLine(lineId).ToList());
             m_clipboard[TransportSystem] = dataClipboard;
             // m_pasteButton.isVisible = true;
@@ -316,7 +322,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 return;
             }
             var lineId = GetLineID();
-            IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
+            IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem);
             config.SetAssetTransportListForLine(lineId, XmlUtils.DefaultXmlDeserialize<List<TransportAsset>>(m_clipboard[TransportSystem]));
             UpdateAssetList(config);
         }
@@ -324,9 +330,15 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         private void ActionDelete()
         {
             var lineId = GetLineID();
-            IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem);
+            IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem);
             config.SetAssetListForLine(lineId, []);
             UpdateAssetList(config);
+        }
+
+        private void ActionOpenManagementPanel()
+        {
+            var lineId = GetLineID();
+            LinePanelManager.SetTarget(lineId);
         }
 
         protected static UIButton ConfigureActionButton(UIComponent parent, CommonsSpriteNames spriteName)
