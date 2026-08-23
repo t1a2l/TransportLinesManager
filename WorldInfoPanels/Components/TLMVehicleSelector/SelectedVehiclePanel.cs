@@ -26,7 +26,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         /// <summary>
         /// Sets the currently selected vehicle.
         /// </summary>
-        protected override VehicleInfo SelectedVehicle { set => ParentPanel.SelectedBuildingVehicle = value; }
+        protected override VehicleInfo SelectedVehicle { set => ParentPanel.SelectedLineVehicle = value; }
 
         /// <summary>
         /// Called by Unity when the object is created.
