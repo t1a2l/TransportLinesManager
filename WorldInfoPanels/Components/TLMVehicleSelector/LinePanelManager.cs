@@ -27,7 +27,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 if (s_gameObject == null)
                 {
                     // Give it a unique name for easy finding with ModTools.
-                    s_gameObject = new GameObject("TCBuildingInfoPanel");
+                    s_gameObject = new GameObject("TLMLinePanel");
                     s_gameObject.transform.parent = UIView.GetAView().transform;
 
                     // Add panel and set parent transform.
@@ -39,7 +39,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             }
             catch (Exception e)
             {
-                LogUtils.DoErrorLog("exception creating TCBuildingInfoPanel " + e.Message);
+                LogUtils.DoErrorLog("exception creating TLMLinePanel " + e.Message);
             }
         }
 

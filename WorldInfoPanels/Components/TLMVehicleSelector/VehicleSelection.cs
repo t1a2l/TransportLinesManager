@@ -5,6 +5,7 @@ using ColossalFramework.UI;
 using Commons.UI;
 using Commons.UI.Components;
 using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.Tabs;
 using UnityEngine;
@@ -60,14 +61,16 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         private AVOPreviewRenderer m_previewRenderer;
 
         // Currently selected vehicles.
-        private VehicleInfo m_selectedBuildingVehicle;
+        private VehicleInfo m_selectedLineVehicle;
         private VehicleInfo m_selectedListVehicle;
 
-        internal VehicleInfo SelectedBuildingVehicle
+        private VehicleInfo m_lastInfo;
+
+        internal VehicleInfo SelectedLineVehicle
         {
             set
             {
-                m_selectedBuildingVehicle = value;
+                m_selectedLineVehicle = value;
 
                 if (value != null)
                 {
@@ -203,7 +206,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
 
         public void Refresh()
         {
-            m_selectedBuildingVehicle = null;
+            m_selectedLineVehicle = null;
             m_selectedListVehicle = null;
 
             // Clear preview.
@@ -225,7 +228,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
 
                 m_addButton.isEnabled = m_selectedListVehicle != null;
                 m_addAllButton.isEnabled = selectionList != null && selectionList.m_size > 0;
-                m_removeButton.isEnabled = m_selectedBuildingVehicle != null;
+                m_removeButton.isEnabled = m_selectedLineVehicle != null;
                 m_removeAllButton.isEnabled = selectedList != null && selectedList.m_size > 0;
             }
         }
@@ -358,7 +361,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             m_previewPanel.relativePosition = new Vector3(MidControlX, VehicleListY + ArrowSize + Margin);
             MonoUtils.CreateUIElement(out m_preview, m_previewPanel.transform);
             m_preview.size = m_previewPanel.size;
-            m_preview.relativePosition = Vector3.zero;
+            m_preview.relativePosition = new Vector3(10, 0);
             MonoUtils.CreateElement(out m_previewRenderer, this.transform);
             m_previewRenderer.Size = m_preview.size * 2f;
             m_preview.texture = m_previewRenderer.Texture;

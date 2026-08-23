@@ -30,8 +30,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components
         public void Awake()
         {
             var panel = GetComponent<UIPanel>();
-            m_assetNameLabel = panel.Find<UILabel>("AssetName");
 
+            m_assetNameLabel = panel.Find<UILabel>("AssetName");
             m_capacityEditor = panel.Find<UITextField>("Cap");
             m_weightEditor = panel.Find<UITextField>("Weg");
             m_usedCount = panel.Find<UILabel>("UsedCount");
@@ -40,6 +40,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             m_weightEditor.eventTextSubmitted += WeightEditor_eventTextSubmitted;
             m_usedCount.text = "0";
 
+            m_assetNameLabel.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
             m_capacityEditor.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
             m_weightEditor.eventMouseEnter += (x, y) => OnMouseEnter?.Invoke();
         }

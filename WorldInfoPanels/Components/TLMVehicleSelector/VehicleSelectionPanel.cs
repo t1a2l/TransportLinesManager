@@ -117,13 +117,15 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 return;
             }
 
+            var tsd = UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
+
             var extension = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
 
-            var selectedAssets =  extension.GetAssetTransportListForLine(lineId) ?? [];
+            var selectedAssets = extension.GetAssetTransportListForLine(lineId) ?? [];
 
             var selectedNames =  new HashSet<string>(selectedAssets.Where(x => !string.IsNullOrEmpty(x.name)).Select(x => x.name));
 
-            var allAssets = extension.GetAllBasicAssetsForLine(lineId);
+            var allAssets = tsd.GetTransportExtension().GetAllBasicAssetsForLine(lineId).ToList();
 
             var items = new List<VehicleItem>();
 

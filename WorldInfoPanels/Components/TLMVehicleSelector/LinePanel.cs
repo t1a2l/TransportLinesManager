@@ -2,10 +2,12 @@
 using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Commons.Utils;
 using Commons.UI.Components;
-using UnityEngine;
+using Commons.Utils;
+using TransportLinesManager.Data.Base.ConfigurationContainers;
+using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.Tabs;
+using UnityEngine;
 
 namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
 {
@@ -28,6 +30,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
 
         private const float PanelWidth = VehicleSelection.PanelWidth + Margin + Margin;
 
+        private UILabel m_titleLabel;
         private UILabel m_lineLabel;
         private UIButton m_copyButton;
         private UIButton m_pasteButton;
@@ -35,12 +38,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         private VehicleSelection m_vehicleSelection = new();
 
         private ushort m_currentLine;
-
-        internal ushort CurrentLine => m_currentLine;
-
-        internal bool IsIncoming { get; set; }
-
-        internal TransferManager.TransferReason TransferReason { get; set; }
 
         public override void Awake()
         {
@@ -55,14 +52,14 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 canFocus = true;
                 isInteractive = true;
                 width = PanelWidth;
-                height = NoPanelHeight;
+                height = 400;
 
                 // Default position - centre in screen.
                 relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - PanelWidth) / 2), (GetUIView().fixedHeight - NoPanelHeight) / 2);
 
                 // Title label.
-                UILabel titleLabel = UILabels.AddLabel(this, 0f, 10f, Locale.Get("MOD_NAME"), PanelWidth, 1.2f);
-                titleLabel.textAlignment = UIHorizontalAlignment.Center;
+                m_titleLabel = UILabels.AddLabel(this, 0f, 10f, "temp", PanelWidth, 1.2f);
+                m_titleLabel.textAlignment = UIHorizontalAlignment.Center;
 
                 // Line label.
                 m_lineLabel = UILabels.AddLabel(this, 0f, NameLabelY, string.Empty, PanelWidth);
@@ -87,15 +84,14 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                     LinePanelManager.Close();
                 };
 
-
                 // Copy/paste buttons.
-                m_copyButton = UIButtons.AddIconButton(this, CopyButtonX, IconButtonY, IconButtonSize, TextureAtlasUtils.LoadQuadSpriteAtlas("__Copy"), Locale.Get("COPY_TIP"));
+                m_copyButton = UIButtons.AddIconButton(this, CopyButtonX, IconButtonY, IconButtonSize, TextureAtlasUtils.LoadQuadSpriteAtlas("__Copy"), Locale.Get("TLM_COPY_CURRENT_LIST_CLIPBOARD"));
                 m_copyButton.eventClicked += (c, p) =>
                 {
                     TLMAssetSelectorTab.CopyAssetConfiguration(m_currentLine);
                     m_pasteButton.isEnabled = TLMAssetSelectorTab.HasAssetClipboard;
                 };
-                m_pasteButton = UIButtons.AddIconButton(this, PasteButtonX, IconButtonY, IconButtonSize, TextureAtlasUtils.LoadQuadSpriteAtlas("__Paste"), Locale.Get("PASTE_TIP"));
+                m_pasteButton = UIButtons.AddIconButton(this, PasteButtonX, IconButtonY, IconButtonSize, TextureAtlasUtils.LoadQuadSpriteAtlas("__Paste"), Locale.Get("TLM_PASTE_CLIPBOARD_TO_CURRENT_LIST"));
                 m_pasteButton.eventClicked += (c, p) => Paste();
 
                 m_vehicleSelection = AddUIComponent<VehicleSelection>();
@@ -141,6 +137,23 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             if (absolutePosition.x < 20f)
             {
                 absolutePosition = new Vector2(20f, absolutePosition.y);
+            }
+
+            var tsd = UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
+            var config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
+
+            if (lineId == 0)
+            {
+                m_titleLabel.text = Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE_OUTSIDECONNECTION");
+            }
+            else if (config is TLMTransportLineConfiguration)
+            {
+                m_titleLabel.text = string.Format(Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE"), TLMLineUtils.GetLineStringId(lineId, false));
+            }
+            else
+            {
+                int prefix = (int)TLMPrefixesUtils.GetPrefix(lineId);
+                m_titleLabel.text = string.Format(Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE_PREFIX"), prefix > 0 ? NumberingUtils.GetStringFromNumber(TLMPrefixesUtils.GetStringOptionsForPrefix(tsd), prefix + 1) : Locale.Get("TLM_UNPREFIXED"), tsd.GetTransportName());
             }
 
             // Update button states.

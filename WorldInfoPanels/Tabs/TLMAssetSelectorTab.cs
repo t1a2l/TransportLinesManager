@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Commons.Extensions.UI;
@@ -385,6 +384,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             m_vehicleManagementButton = ConfigureActionButton(MainPanel, CommonsSpriteNames.VehicleManagement);
             m_vehicleManagementButton.eventClick += (x, y) => ActionOpenManagementPanel();
+            m_vehicleManagementButton.width = 40;
+            m_vehicleManagementButton.height = 40;
 
             removeUndesired.tooltip = Locale.Get("TLM_REMOVE_UNWANTED_TOOLTIP");
             m_copyButton.tooltip = Locale.Get("TLM_COPY_CURRENT_LIST_CLIPBOARD");
@@ -395,7 +396,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_copyButton.relativePosition = new Vector3(MainPanel.width - 75f, 0f);
             m_pasteButton.relativePosition = new Vector3(MainPanel.width - 100f, 0f);
             m_eraseButton.relativePosition = new Vector3(MainPanel.width - 25f, 0f);
-            // MainPanel.width - 380f
+            m_vehicleManagementButton.relativePosition = new Vector3(5f, 5f);
 
             m_copyButton.Hide();
             m_pasteButton.Hide();
@@ -573,7 +574,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             m_lastInfo = default;
 
-
             var budgetEntries = config.GetBudgetsMultiplierForLine(lineId, CurrentProfileTarget);
 
             if (lineId != 0 && (budgetEntries == null || budgetEntries.Count == 0))
@@ -676,7 +676,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                     m_preview.isVisible = true;
                     m_previewRenderer.CameraRotation -= 1;
                     RedrawModel();
-
                 }
             }
         }

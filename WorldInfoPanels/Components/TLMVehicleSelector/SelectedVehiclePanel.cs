@@ -16,6 +16,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         // Panel to display when no item is selected.
         private UIPanel m_randomPanel;
         private UILabel m_randomLabel;
+        private UISprite m_randomSprite;
 
         /// <summary>
         /// Gets or sets a value indicating whether the Transport Lines Manager mod is active.
@@ -42,17 +43,17 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             m_randomPanel.relativePosition = new Vector2(0f, 0f);
 
             // Random sprite.
-            UISprite randomSprite = m_randomPanel.AddUIComponent<UISprite>();
-            randomSprite.atlas = TextureAtlasUtils.DefaultTextureAtlas;
-            randomSprite.spriteName = "Random";
+            m_randomSprite = m_randomPanel.AddUIComponent<UISprite>();
+            m_randomSprite.atlas = TextureAtlasUtils.DefaultTextureAtlas;
+            m_randomSprite.spriteName = "Random";
 
             // Label.
             m_randomLabel = UILabels.AddLabel(m_randomPanel, 0f, 0f, Locale.Get("ANY_VEHICLE"), VehicleList.width, 0.8f);
 
             // Size is 56x33, so offset -8 from left and 3.5 from top to match normal row sizing.
-            randomSprite.size = new Vector2(56f, 33f);
-            randomSprite.relativePosition = new Vector2(-8, (40f - randomSprite.height) / 2f);
-            m_randomLabel.relativePosition = new Vector2(48f, (randomSprite.height - m_randomLabel.height) / 2f);
+            m_randomSprite.size = new Vector2(56f, 33f);
+            m_randomSprite.relativePosition = new Vector2(-8, (40f - m_randomSprite.height) / 2f);
+            m_randomLabel.relativePosition = new Vector2(48f, (m_randomSprite.height - m_randomLabel.height) / 2f);
         }
 
         /// <summary>
@@ -70,6 +71,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             {
                 m_randomPanel.Show();
                 m_randomLabel.text = allowAutoSpawnAllVehicles? Locale.Get("TLM_ANY_COMPATIBLE_VEHICLE") : Locale.Get("TLM_NO_SELECTED_VEHICLES");
+                m_randomSprite.name = allowAutoSpawnAllVehicles ? "Random" : "";
 
                 VehicleList.Data = new FastList<object>
                 {
