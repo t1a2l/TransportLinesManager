@@ -16,7 +16,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         protected const float Margin = 5f;
 
         private const float TitleHeight = 40f;
-        private const float NameLabelY = TitleHeight + Margin;
+        private const float NameLabelY = TitleHeight + Margin + 10f;
         private const float NameLabelHeight = 30f;
         private const float AreaLabelHeight = 20f;
         private const float AreaLabel1Y = TitleHeight + NameLabelHeight;
@@ -113,7 +113,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             m_vehicleSelection.Show();
 
             // Set panel height.
-            height = NoPanelHeight;
+            height = 400;
 
             // Set name.
             m_lineLabel.text = Singleton<TransportManager>.instance.GetLineName(lineId);

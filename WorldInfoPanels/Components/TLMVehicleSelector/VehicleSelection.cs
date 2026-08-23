@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Commons.UI;
 using Commons.UI.Components;
 using Commons.Utils;
-using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.Tabs;
 using UnityEngine;
@@ -63,8 +63,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         // Currently selected vehicles.
         private VehicleInfo m_selectedLineVehicle;
         private VehicleInfo m_selectedListVehicle;
-
-        private VehicleInfo m_lastInfo;
 
         internal VehicleInfo SelectedLineVehicle
         {
@@ -130,7 +128,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             color = new Color32(160, 160, 160, 255);
 
             // Title.
-            m_titleLabel = UILabels.AddLabel(this, 0f, 10f, "Select vehicle", PanelWidth, 1f, UIHorizontalAlignment.Center);
+            m_titleLabel = UILabels.AddLabel(this, 0f, 10f, "", PanelWidth, 1f, UIHorizontalAlignment.Center);
 
             // 'Add vehicle' button.
             m_addButton = UIButtons.AddIconButton(
@@ -139,7 +137,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 VehicleListY,
                 ArrowSize,
                 TextureAtlasUtils.LoadQuadSpriteAtlas("__Add"),
-                Locale.Get("ADD_VEHICLE_TIP"));
+                Locale.Get("TLM_ADD_VEHICLE_TIP"));
             m_addButton.isEnabled = false;
             m_addButton.eventClicked += (c, p) => AddVehicle(m_selectedListVehicle.name);
 
@@ -150,7 +148,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 VehicleListY,
                 ArrowSize,
                 TextureAtlasUtils.LoadQuadSpriteAtlas("__AddAll"),
-                Locale.Get("ADD_ALL_TIP"));
+                Locale.Get("TLM_ADD_ALL_TIP"));
             m_addAllButton.isEnabled = false;
             m_addAllButton.eventClicked += (c, p) => AddAllVehicles();
 
@@ -161,7 +159,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 VehicleListY,
                 ArrowSize,
                 TextureAtlasUtils.LoadQuadSpriteAtlas("__Remove"),
-                Locale.Get("REMOVE_VEHICLE_TIP"));
+                Locale.Get("TLM_REMOVE_VEHICLE_TIP"));
             m_removeButton.isEnabled = false;
             m_removeButton.eventClicked += (c, p) => RemoveVehicle(m_selectedListVehicle.name);
 
@@ -172,7 +170,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 VehicleListY,
                 ArrowSize,
                 TextureAtlasUtils.LoadQuadSpriteAtlas("__RemoveAll"),
-                Locale.Get("REMOVE_ALL_TIP"));
+                Locale.Get("TLM_REMOVE_ALL_TIP"));
             m_removeAllButton.isEnabled = false;
             m_removeAllButton.eventClicked += (c, p) => RemoveAllVehicles();
 
@@ -185,8 +183,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             m_vehicleSelectionPanel.relativePosition = new Vector2(RightColumnX, VehicleListY);
 
             // Vehicle selection list labels.
-            UILabels.AddLabel(m_vehicleSelectionPanel.VehicleList, 0f, -TitleOffsetY, Locale.Get("AVAILABLE_VEHICLES"), ListWidth, 0.8f, UIHorizontalAlignment.Center);
-            UILabels.AddLabel(m_selectedVehiclePanel.VehicleList, 0f, -TitleOffsetY, Locale.Get("SELECTED_VEHICLES"), ListWidth, 0.8f, UIHorizontalAlignment.Center);
+            UILabels.AddLabel(m_vehicleSelectionPanel.VehicleList, 0f, -TitleOffsetY, Locale.Get("TLM_AVAILABLE_VEHICLES"), ListWidth, 0.8f, UIHorizontalAlignment.Center);
+            UILabels.AddLabel(m_selectedVehiclePanel.VehicleList, 0f, -TitleOffsetY, Locale.Get("TLM_SELECTED_VEHICLES"), ListWidth, 0.8f, UIHorizontalAlignment.Center);
 
             SetPreviewWindow();
         }
@@ -199,6 +197,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 CurrentLine = lineID;
                 m_titleLabel.text = Locale.Get("TLM_VEHICLE_MANAGEMENT_TITLE");
 
+                Debug.Log("VehicleSelection - SetTarget CurrentLine: " + CurrentLine);
                 // Regenerate lists and set button states..
                 Refresh();
             }
@@ -208,9 +207,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         {
             m_selectedLineVehicle = null;
             m_selectedListVehicle = null;
-
-            // Clear preview.
-            m_previewRenderer.RenderVehicle(null);
 
             m_selectedVehiclePanel.RefreshList();
             m_vehicleSelectionPanel.RefreshList();

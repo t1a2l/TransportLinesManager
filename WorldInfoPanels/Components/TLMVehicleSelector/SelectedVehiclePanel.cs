@@ -46,14 +46,15 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             m_randomSprite = m_randomPanel.AddUIComponent<UISprite>();
             m_randomSprite.atlas = TextureAtlasUtils.DefaultTextureAtlas;
             m_randomSprite.spriteName = "Random";
+            // __RemoveIcon
 
             // Label.
-            m_randomLabel = UILabels.AddLabel(m_randomPanel, 0f, 0f, Locale.Get("ANY_VEHICLE"), VehicleList.width, 0.8f);
+            m_randomLabel = UILabels.AddLabel(m_randomPanel, 0f, 0f, Locale.Get("TLM_ANY_VEHICLE"), VehicleList.width, 0.8f);
 
             // Size is 56x33, so offset -8 from left and 3.5 from top to match normal row sizing.
             m_randomSprite.size = new Vector2(56f, 33f);
             m_randomSprite.relativePosition = new Vector2(-8, (40f - m_randomSprite.height) / 2f);
-            m_randomLabel.relativePosition = new Vector2(48f, (m_randomSprite.height - m_randomLabel.height) / 2f);
+            m_randomLabel.relativePosition = new Vector2(48f, 12f);
         }
 
         /// <summary>
@@ -71,7 +72,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             {
                 m_randomPanel.Show();
                 m_randomLabel.text = allowAutoSpawnAllVehicles? Locale.Get("TLM_ANY_COMPATIBLE_VEHICLE") : Locale.Get("TLM_NO_SELECTED_VEHICLES");
-                m_randomSprite.name = allowAutoSpawnAllVehicles ? "Random" : "";
+                m_randomSprite.name = allowAutoSpawnAllVehicles ? "Random" : "__RemoveIcon";
 
                 VehicleList.Data = new FastList<object>
                 {
