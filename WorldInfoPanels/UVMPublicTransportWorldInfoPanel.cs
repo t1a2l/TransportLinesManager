@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Commons.Extensions.Patcher;
 using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector;
 
 namespace TransportLinesManager.WorldInfoPanels
 {
@@ -178,6 +179,7 @@ namespace TransportLinesManager.WorldInfoPanels
                     m_obj.m_specificConfig.isChecked = TLMTransportLineExtension.Instance.IsUsingCustomConfig(lineID);
                     m_obj.m_cachedLength = Singleton<TransportManager>.instance.m_lines.m_buffer[lineID].m_totalLength;
                     m_obj.m_deleteButton.isVisible = true;
+                    LinePanelManager.TargetChanged();
                 }
                 else
                 {
