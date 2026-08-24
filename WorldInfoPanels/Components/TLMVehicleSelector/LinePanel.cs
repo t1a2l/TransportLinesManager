@@ -171,8 +171,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             }
 
             m_vehicleSelection.Refresh();
-            TLMAssetSelectorTab.MarkDirty();
-
             m_pasteButton.isEnabled = TLMAssetSelectorTab.HasAssetClipboard;
         }
     }
