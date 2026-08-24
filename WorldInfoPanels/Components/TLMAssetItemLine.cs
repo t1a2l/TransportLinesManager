@@ -282,7 +282,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             var go = new GameObject();
             UIPanel panel = go.AddComponent<UIPanel>();
             panel.size = new Vector2(290, 32);
-            panel.autoLayout = true;
+            panel.autoLayout = false;
             panel.wrapLayout = false;
             panel.autoLayoutDirection = LayoutDirection.Horizontal;
 
@@ -305,6 +305,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             capEditField.numericalOnly = true;
             capEditField.maxLength = 5;
             capEditField.padding = new RectOffset(2, 2, 9, 2);
+            capEditField.relativePosition = new Vector3(200, 0);
 
             MonoUtils.CreateUIElement(out UITextField wegEditField, panel.transform, "Weg", new Vector4(0, 0, 50, 32));
             MonoUtils.UiTextFieldDefaults(wegEditField);
@@ -315,10 +316,12 @@ namespace TransportLinesManager.WorldInfoPanels.Components
             wegEditField.numericalOnly = true;
             wegEditField.maxLength = 5;
             wegEditField.padding = new RectOffset(2, 2, 9, 2);
+            wegEditField.relativePosition = new Vector3(250, 0);
 
             MonoUtils.CreateUIElement(out UILabel usedCountField, panel.transform, "UsedCount", new Vector4(0, 0, 30, 32));
             usedCountField.padding = new RectOffset(2, 2, 9, 2);
             usedCountField.textAlignment = UIHorizontalAlignment.Center;
+            usedCountField.relativePosition = new Vector3(310, 0);
 
             go.AddComponent<TLMAssetItemLine>();
             TLMUiTemplateUtils.GetTemplateDict()[TEMPLATE_NAME] = panel;
