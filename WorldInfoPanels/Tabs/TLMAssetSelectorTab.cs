@@ -7,6 +7,7 @@ using Commons.Extensions.UI;
 using Commons.UI;
 using Commons.UI.SpriteNames;
 using Commons.Utils;
+using Commons.Utils.UtilitiesClasses;
 using TransportLinesManager.Data.Base;
 using TransportLinesManager.Data.Base.ConfigurationContainers;
 using TransportLinesManager.Data.DataContainers;
@@ -205,7 +206,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             var config = TLMLineUtils.GetEffectiveExtensionForLine(sourceLineId, sourceTsd);
 
-            Instance.m_clipboard[sourceTsd] = XmlUtils.DefaultXmlSerialize(config.GetAssetTransportListForLine(sourceLineId));
+            var assets = config.GetAssetTransportListForLine(sourceLineId);
+          
+            Instance.m_clipboard[sourceTsd] = XmlUtils.DefaultXmlSerialize(assets);
         }
 
         internal static bool PasteAssetConfiguration(ushort targetLineId)
@@ -222,7 +225,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 return false;
             }
 
-            var copiedAssets = XmlUtils.DefaultXmlDeserialize<List<TransportAsset>>(data);
+            var copiedAssets = XmlUtils.DefaultXmlDeserialize<SimpleXmlList<TransportAsset>>(data)?.ToList();
 
             if (copiedAssets == null)
             {
@@ -320,7 +323,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_vehicleCountLabel.autoSize = false;
             m_vehicleCountLabel.width = 50f;
             m_vehicleCountLabel.height = 20f;
-            m_vehicleCountLabel.relativePosition = new Vector3(MainPanel.width - 190f, 85f);
+            m_vehicleCountLabel.relativePosition = new Vector3(MainPanel.width - 210f, 85f);
             m_vehicleCountLabel.textScale = 0.65f;
             m_vehicleCountLabel.textAlignment = UIHorizontalAlignment.Center;
             m_vehicleCountLabel.isVisible = false;
@@ -329,7 +332,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_capacityColumnHeader.autoSize = false;
             m_capacityColumnHeader.width = 50f;
             m_capacityColumnHeader.height = 20f;
-            m_capacityColumnHeader.relativePosition = new Vector3(MainPanel.width - 148f, 85f);
+            m_capacityColumnHeader.relativePosition = new Vector3(MainPanel.width - 170f, 85f);
             m_capacityColumnHeader.textScale = 0.65f;
             m_capacityColumnHeader.textAlignment = UIHorizontalAlignment.Center;
             m_capacityColumnHeader.localeID = "TLM_ASSET_CAPACITY_FIELD_HEADER";
@@ -338,7 +341,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_weightColumnHeader.autoSize = false;
             m_weightColumnHeader.width = 50f;
             m_weightColumnHeader.height = 20f;
-            m_weightColumnHeader.relativePosition = new Vector3(MainPanel.width - 98f, 85f);
+            m_weightColumnHeader.relativePosition = new Vector3(MainPanel.width - 120f, 85f);
             m_weightColumnHeader.textScale = 0.65f;
             m_weightColumnHeader.textAlignment = UIHorizontalAlignment.Center;
             // text set dynamically in UpdateModeIndicator()
@@ -347,7 +350,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_usedCountColumnHeader.autoSize = false;
             m_usedCountColumnHeader.width = 50f;
             m_usedCountColumnHeader.height = 20f;
-            m_usedCountColumnHeader.relativePosition = new Vector3(MainPanel.width - 60f, 85f);
+            m_usedCountColumnHeader.relativePosition = new Vector3(MainPanel.width - 70f, 85f);
             m_usedCountColumnHeader.textScale = 0.65f;
             m_usedCountColumnHeader.textAlignment = UIHorizontalAlignment.Center;
         }
