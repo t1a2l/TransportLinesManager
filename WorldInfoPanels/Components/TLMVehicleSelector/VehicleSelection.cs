@@ -139,7 +139,13 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 TextureAtlasUtils.LoadQuadSpriteAtlas("__Add"),
                 Locale.Get("TLM_ADD_VEHICLE_TIP"));
             m_addButton.isEnabled = false;
-            m_addButton.eventClicked += (c, p) => AddVehicle(m_selectedListVehicle.name);
+            m_addButton.eventClicked += (c, p) =>
+            {
+                if (m_selectedListVehicle != null)
+                {
+                    AddVehicle(m_selectedListVehicle.name);
+                }
+            };
 
             // 'Add all vehicles' button.
             m_addAllButton = UIButtons.AddIconButton(
@@ -161,7 +167,13 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 TextureAtlasUtils.LoadQuadSpriteAtlas("__Remove"),
                 Locale.Get("TLM_REMOVE_VEHICLE_TIP"));
             m_removeButton.isEnabled = false;
-            m_removeButton.eventClicked += (c, p) => RemoveVehicle(m_selectedListVehicle.name);
+            m_removeButton.eventClicked += (c, p) =>
+            {
+                if (m_selectedLineVehicle != null)
+                {
+                    RemoveVehicle(m_selectedLineVehicle.name);
+                }
+            };
 
             // 'Remove all vehicles' button.
             m_removeAllButton = UIButtons.AddIconButton(
@@ -197,7 +209,6 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 CurrentLine = lineID;
                 m_titleLabel.text = Locale.Get("TLM_VEHICLE_MANAGEMENT_TITLE");
 
-                Debug.Log("VehicleSelection - SetTarget CurrentLine: " + CurrentLine);
                 // Regenerate lists and set button states..
                 Refresh();
             }
