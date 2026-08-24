@@ -83,9 +83,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 return;
             }
 
-            var extension = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
-
-            var selectedAssets = extension.GetAssetTransportListForLine(lineId);
+            var selectedAssets = GetSelectedAssets();
 
             // Any selected vehicles?
             if (selectedAssets != null && selectedAssets.Count > 0)
@@ -126,6 +124,16 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 m_buffer = [.. items.OrderBy(x => x.Name)],
                 m_size = items.Count,
             };
+        }
+
+        private List<TransportAsset> GetSelectedAssets()
+        {
+            if (ParentPanel.FromBuilding)
+            {
+                return ParentPanel.TransportSystem.GetTransportExtension().GetAssetTransportListForLine(0) ?? [];
+            }
+
+            return TLMLineUtils.GetEffectiveExtensionForLine(ParentPanel.CurrentLine).GetAssetTransportListForLine(ParentPanel.CurrentLine) ?? [];
         }
     }
 }

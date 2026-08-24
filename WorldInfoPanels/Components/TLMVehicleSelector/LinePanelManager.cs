@@ -62,7 +62,8 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         /// Sets the target to the selected line, creating the panel if necessary.
         /// </summary>
         /// <param name="lineID">New line ID.</param>
-        internal static void SetTarget(ushort lineID)
+        /// <param name="fromBuilding">is fromBuilding.</param>
+        internal static void SetTarget(ushort lineID, bool fromBuilding)
         {
             // If no existing panel, create it.
             if (Panel == null)
@@ -71,7 +72,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             }
 
             // Set the target.
-            Panel.SetTarget(lineID);
+            Panel.SetTarget(lineID, fromBuilding);
         }
 
         /// <summary>
@@ -84,13 +85,13 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 return;
             }
 
-            if (!UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) || fromBuilding || lineId == 0)
+            if (!UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding) || (lineId == 0 && !fromBuilding))
             {
                 Close();
                 return;
             }
 
-            SetTarget(lineId);
+            SetTarget(lineId, fromBuilding);
         }
     }
 }

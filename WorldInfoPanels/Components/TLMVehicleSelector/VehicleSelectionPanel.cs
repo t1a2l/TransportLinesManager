@@ -106,7 +106,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         {
             ushort lineId = ParentPanel.CurrentLine;
 
-            if (lineId == 0)
+            if (lineId == 0 && !ParentPanel.FromBuilding)
             {
                 VehicleList.Data = new FastList<object>
                 {
@@ -117,15 +117,22 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 return;
             }
 
-            var tsd = UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
-
             var extension = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
 
             var selectedAssets = extension.GetAssetTransportListForLine(lineId) ?? [];
 
             var selectedNames =  new HashSet<string>(selectedAssets.Where(x => !string.IsNullOrEmpty(x.name)).Select(x => x.name));
 
-            var allAssets = tsd.GetTransportExtension().GetAllBasicAssetsForLine(lineId).ToList();
+            Dictionary<TransportAsset, string> allAssets;
+
+            if (ParentPanel.FromBuilding)
+            {
+                allAssets = ParentPanel.TransportSystem.GetTransportExtension().GetAllBasicAssetsForLine(lineId);
+            }
+            else
+            {
+                allAssets = extension.GetAllBasicAssetsForLine(lineId);
+            }
 
             var items = new List<VehicleItem>();
 

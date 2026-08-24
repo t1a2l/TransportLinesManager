@@ -104,19 +104,19 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             }
         }
 
-        internal virtual void SetTarget(ushort lineId)
+        internal virtual void SetTarget(ushort lineId, bool fromBuilding)
         {
             // Update selected line ID.
             m_currentLine = lineId;
 
-            m_vehicleSelection.SetTarget(lineId);
+            m_vehicleSelection.SetTarget(lineId, fromBuilding);
             m_vehicleSelection.Show();
 
             // Set panel height.
             height = 400;
 
             // Set name.
-            m_lineLabel.text = Singleton<TransportManager>.instance.GetLineName(lineId);
+            m_lineLabel.text = TLMLineUtils.GetLineName(lineId, fromBuilding);
 
             // Make sure we're fully visible on-screen.
             if (absolutePosition.y + height > Screen.height - 120)
@@ -148,7 +148,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             }
             else if (config is TLMTransportLineConfiguration)
             {
-                m_titleLabel.text = string.Format(Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE"), TLMLineUtils.GetLineStringId(lineId, false));
+                m_titleLabel.text = string.Format(Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE"), TLMLineUtils.GetLineStringId(lineId, fromBuilding));
             }
             else
             {

@@ -6,6 +6,8 @@ using ColossalFramework.UI;
 using Commons.UI;
 using Commons.UI.Components;
 using Commons.Utils;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Interfaces;
 using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.Tabs;
 using UnityEngine;
@@ -63,6 +65,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         // Currently selected vehicles.
         private VehicleInfo m_selectedLineVehicle;
         private VehicleInfo m_selectedListVehicle;
+        private bool m_fromBuilding;
 
         internal VehicleInfo SelectedLineVehicle
         {
@@ -108,6 +111,18 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 // Update button states.
                 UpdateButtonStates();
             }
+        }
+
+        internal bool FromBuilding
+        {
+            get => m_fromBuilding;
+            private set => m_fromBuilding = value;
+        }
+
+        internal TransportSystemDefinition TransportSystem
+        {
+            get;
+            private set;
         }
 
         internal LinePanel ParentPanel { get; set; }
@@ -201,17 +216,22 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             SetPreviewWindow();
         }
 
-        public void SetTarget(ushort lineID)
+        public void SetTarget(ushort lineID, bool fromBuilding)
         {
-            // Ensure valid building.
-            if (lineID != 0)
-            {
-                CurrentLine = lineID;
-                m_titleLabel.text = Locale.Get("TLM_VEHICLE_MANAGEMENT_TITLE");
+            CurrentLine = lineID;
+            FromBuilding = fromBuilding;
+            TransportSystem = UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
 
-                // Regenerate lists and set button states..
-                Refresh();
+            if (TransportSystem == null)
+            {
+                Hide();
+                return;
             }
+
+            m_titleLabel.text = Locale.Get("TLM_VEHICLE_MANAGEMENT_TITLE");
+
+            // Regenerate lists and set button states..
+            Refresh();
         }
 
         public void Refresh()
@@ -242,22 +262,12 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
 
         private void AddVehicle(string assetName)
         {
-            var lineId = CurrentLine;
-            if (lineId == 0)
+            if (string.IsNullOrEmpty(assetName) || (CurrentLine == 0 && !FromBuilding))
             {
                 return;
             }
 
-            var tsd = UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
-
-            var config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
-
-            var currentConfig = TLMLineUtils.GetEffectiveConfigForLine(CurrentLine);
-
-            if (config.GetAssetTransportListForLine(lineId).Any(x => x.name == assetName))
-            {
-                return;
-            }
+            var extension = GetAssetExtension();
 
             var info = PrefabCollection<VehicleInfo>.FindLoaded(assetName);
 
@@ -268,13 +278,16 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
 
             int capacity = VehicleUtils.GetCapacity(info);
 
-            ProfileTarget profile = TLMAssetSelectorTab.Instance.CurrentProfileTarget;
+            extension.AddAssetToLine(CurrentLine, assetName, capacity.ToString(), "100", ProfileTarget.Weekday);
 
-            config.AddAssetToLine(lineId, assetName, capacity.ToString(), "100", ProfileTarget.Weekday);
-
-            if (currentConfig?.UseSeparateWeekendProfile == true)
+            if(!FromBuilding)
             {
-                config.AddAssetToLine(lineId, assetName, capacity.ToString(), "100", ProfileTarget.Weekend);
+                var currentConfig = TLMLineUtils.GetEffectiveConfigForLine(CurrentLine);
+
+                if (currentConfig?.UseSeparateWeekendProfile == true)
+                {
+                    extension.AddAssetToLine(CurrentLine, assetName, capacity.ToString(), "100", ProfileTarget.Weekend);
+                }
             }
 
             Refresh();
@@ -283,17 +296,14 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
 
         private void RemoveVehicle(string assetName)
         {
-            var lineId = CurrentLine;
-            if (lineId == 0)
+            if (string.IsNullOrEmpty(assetName) || (CurrentLine == 0 && !FromBuilding))
             {
                 return;
             }
 
-            var tsd = UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
+            var extension = GetAssetExtension();
 
-            var config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
-
-            config.RemoveAssetFromLine(lineId, assetName);
+            extension.RemoveAssetFromLine(CurrentLine, assetName);
 
             Refresh();
             TLMAssetSelectorTab.MarkDirty();
@@ -301,14 +311,14 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
 
         private void AddAllVehicles()
         {
-            if (CurrentLine == 0)
+            if (CurrentLine == 0 && !FromBuilding)
             {
                 return;
             }
 
-            var extension = TLMLineUtils.GetEffectiveExtensionForLine(CurrentLine);
+            var extension = GetAssetExtension();
 
-            var currentConfig = TLMLineUtils.GetEffectiveConfigForLine(CurrentLine);
+            var currentConfig = FromBuilding ? null : TLMLineUtils.GetEffectiveConfigForLine(CurrentLine);
 
             foreach (object entry in m_vehicleSelectionPanel.VehicleList.Data)
             {
@@ -321,7 +331,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
 
                 extension.AddAssetToLine(CurrentLine, item.Info.name, capacity.ToString(), "100", ProfileTarget.Weekday);
 
-                if (currentConfig?.UseSeparateWeekendProfile == true)
+                if (!FromBuilding && currentConfig?.UseSeparateWeekendProfile == true)
                 {
                     extension.AddAssetToLine(CurrentLine, item.Info.name, capacity.ToString(), "100", ProfileTarget.Weekend);
                 }
@@ -333,12 +343,12 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
 
         private void RemoveAllVehicles()
         {
-            if (CurrentLine == 0)
+            if (CurrentLine == 0 && !FromBuilding)
             {
                 return;
             }
 
-            var extension = TLMLineUtils.GetEffectiveExtensionForLine(CurrentLine);
+            var extension = GetAssetExtension();
 
             var vehiclesToRemove = new List<VehicleInfo>();
 
@@ -374,6 +384,11 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             m_preview.texture = m_previewRenderer.Texture;
             m_previewRenderer.Zoom = 3;
             m_previewRenderer.CameraRotation = 40;
+        }
+
+        private IBasicExtension GetAssetExtension()
+        {
+            return FromBuilding ? TransportSystem.GetTransportExtension() : TLMLineUtils.GetEffectiveExtensionForLine(CurrentLine, TransportSystem);
         }
 
     }

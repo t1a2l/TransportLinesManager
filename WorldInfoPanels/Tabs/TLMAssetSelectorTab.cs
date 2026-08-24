@@ -442,8 +442,8 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void ActionOpenManagementPanel()
         {
-            var lineId = GetLineID();
-            LinePanelManager.SetTarget(lineId);
+            UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding);
+            LinePanelManager.SetTarget(lineId, fromBuilding);
         }
 
         protected static UIButton ConfigureActionButton(UIComponent parent, CommonsSpriteNames spriteName)
@@ -568,11 +568,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             var lineId = GetLineID();
 
-            if (lineId == 0)
-            {
-                return;
-            }
-
             var selectedAssets = config.GetAssetTransportListForLine(lineId) ?? [];
 
             m_lastInfo = default;
@@ -590,7 +585,6 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             }
 
             var slotIndex = GetBudgetSelectedIndex();
-
 
             UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(selectedAssets.Count);
 
