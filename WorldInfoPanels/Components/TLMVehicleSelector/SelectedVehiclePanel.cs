@@ -6,6 +6,8 @@ using Commons.UI.Components;
 using Commons.Utils;
 using TransportLinesManager.Data.DataContainers;
 using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Interfaces;
 using TransportLinesManager.Utils;
 using UnityEngine;
 
@@ -65,10 +67,12 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             var items = new List<VehicleItem>();
 
             ushort lineId = ParentPanel.CurrentLine;
+            bool fromBuilding = ParentPanel.FromBuilding;
+            var tsd = ParentPanel.TransportSystem;
 
             var allowAutoSpawnAllVehicles = TLMBaseConfigXML.CurrentContextConfig.AllowAutoSpawnAllVehicles;
 
-            if (lineId == 0)
+            if (lineId == 0 && !fromBuilding)
             {
                 m_randomPanel.Show();
                 m_randomLabel.text = allowAutoSpawnAllVehicles? Locale.Get("TLM_ANY_COMPATIBLE_VEHICLE") : Locale.Get("TLM_NO_SELECTED_VEHICLES");
@@ -83,7 +87,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 return;
             }
 
-            var selectedAssets = GetSelectedAssets();
+            var extension = GetAssetExtension(lineId, fromBuilding, tsd);
+
+            var selectedAssets = extension.GetAssetTransportListForLine(lineId) ?? [];
 
             // Any selected vehicles?
             if (selectedAssets != null && selectedAssets.Count > 0)
@@ -126,14 +132,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             };
         }
 
-        private List<TransportAsset> GetSelectedAssets()
+        private IBasicExtension GetAssetExtension(ushort lineId, bool fromBuilding, TransportSystemDefinition tsd)
         {
-            if (ParentPanel.FromBuilding)
-            {
-                return ParentPanel.TransportSystem.GetTransportExtension().GetAssetTransportListForLine(0) ?? [];
-            }
-
-            return TLMLineUtils.GetEffectiveExtensionForLine(ParentPanel.CurrentLine).GetAssetTransportListForLine(ParentPanel.CurrentLine) ?? [];
+            return fromBuilding ? tsd.GetTransportExtension() : TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
         }
     }
 }

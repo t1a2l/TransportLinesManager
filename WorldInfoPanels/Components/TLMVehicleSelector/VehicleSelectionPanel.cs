@@ -6,6 +6,8 @@ using ColossalFramework.UI;
 using Commons.UI.Components;
 using Commons.Utils;
 using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Data.Tsd;
+using TransportLinesManager.Interfaces;
 using TransportLinesManager.Utils;
 using UnityEngine;
 
@@ -105,8 +107,10 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         protected virtual void PopulateList()
         {
             ushort lineId = ParentPanel.CurrentLine;
+            bool fromBuilding = ParentPanel.FromBuilding;
+            var tsd = ParentPanel.TransportSystem;
 
-            if (lineId == 0 && !ParentPanel.FromBuilding)
+            if (lineId == 0 && !fromBuilding)
             {
                 VehicleList.Data = new FastList<object>
                 {
@@ -117,7 +121,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 return;
             }
 
-            var extension = TLMLineUtils.GetEffectiveExtensionForLine(lineId);
+            var extension = GetAssetExtension(lineId, fromBuilding, tsd);
 
             var selectedAssets = extension.GetAssetTransportListForLine(lineId) ?? [];
 
@@ -177,5 +181,10 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         /// <param name="displayName">Vehicle display name.</param>
         /// <returns>True if the item should be displayed (empty or matching search result), false otherwise.</returns>
         protected bool NameFilter(string displayName) => m_nameSearch.text.IsNullOrWhiteSpace() || displayName.ToLower().Contains(m_nameSearch.text.ToLower());
+
+        private IBasicExtension GetAssetExtension(ushort lineId, bool fromBuilding, TransportSystemDefinition tsd)
+        {
+            return fromBuilding ? tsd.GetTransportExtension() : TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
+        }
     }
 }

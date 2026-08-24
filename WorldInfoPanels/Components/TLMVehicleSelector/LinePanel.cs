@@ -5,6 +5,7 @@ using ColossalFramework.UI;
 using Commons.UI.Components;
 using Commons.Utils;
 using TransportLinesManager.Data.Base.ConfigurationContainers;
+using TransportLinesManager.Interfaces;
 using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.Tabs;
 using UnityEngine;
@@ -140,15 +141,15 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             }
 
             var tsd = UVMPublicTransportWorldInfoPanel.GetCurrentTSD();
-            var config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
+            var config = fromBuilding ? tsd.GetTransportExtension() : TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
 
-            if (lineId == 0)
+            if (fromBuilding)
             {
                 m_titleLabel.text = Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE_OUTSIDECONNECTION");
             }
             else if (config is TLMTransportLineConfiguration)
             {
-                m_titleLabel.text = string.Format(Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE"), TLMLineUtils.GetLineStringId(lineId, fromBuilding));
+                m_titleLabel.text = string.Format(Locale.Get("TLM_ASSET_SELECT_WINDOW_TITLE"), TLMLineUtils.GetLineStringId(lineId, false));
             }
             else
             {
