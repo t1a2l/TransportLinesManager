@@ -512,10 +512,11 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 return;
             }
 
-            UVMPublicTransportWorldInfoPanel.GetLineID(out ushort lineId, out bool fromBuilding);
-            m_timeBudgetSelect.isVisible = !fromBuilding;
-            m_weightColumnHeader.isVisible = !fromBuilding;
-            m_usedCountColumnHeader.isVisible = !fromBuilding;
+            var lineId = GetLineID();
+
+            m_budgetProfilePanel.isVisible = lineId != 0;
+            m_weightColumnHeader.isVisible = lineId != 0;
+            m_usedCountColumnHeader.isVisible = lineId != 0;
 
             var lineExt = TLMTransportLineExtension.Instance;
             bool isAbsolute = lineExt.IsUsingCustomConfig(lineId) && lineExt.IsDisplayAbsoluteValues(lineId);
