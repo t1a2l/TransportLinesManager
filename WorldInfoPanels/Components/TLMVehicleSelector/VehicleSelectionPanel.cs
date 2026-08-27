@@ -155,7 +155,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
 
             if (fromBuilding)
             {
-                allAssets = tsd.GetTransportExtension().GetAllBasicAssetsForLine(lineId);
+                allAssets = tsd.GetTransportExtension().GetAllBasicAssetsForLine(0);
             }
             else
             {
