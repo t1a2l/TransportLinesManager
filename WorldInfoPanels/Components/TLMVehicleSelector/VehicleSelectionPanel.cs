@@ -123,15 +123,39 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
 
             var extension = GetAssetExtension(lineId, fromBuilding, tsd);
 
-            var selectedAssets = extension.GetAssetTransportListForLine(lineId) ?? [];
+            List<TransportAsset> selectedAssets;
 
-            var selectedNames =  new HashSet<string>(selectedAssets.Where(x => !string.IsNullOrEmpty(x.name)).Select(x => x.name));
+            if (fromBuilding)
+            {
+                var connection = LinePanelManager.CurrentRegionalConnection;
+
+                if (connection == null)
+                {
+                    LogUtils.DoErrorLog($"No regional connection resolved for line {lineId}");
+
+                    VehicleList.Data = new FastList<object>
+                    {
+                        m_buffer = [],
+                        m_size = 0,
+                    };
+                    return;
+                }
+
+                connection.AssetTransportList ??= [];
+                selectedAssets = connection.AssetTransportList;
+            }
+            else
+            {
+                selectedAssets = extension.GetAssetTransportListForLine(lineId) ?? [];
+            }
+
+            var selectedNames = new HashSet<string>(selectedAssets.Where(x => !string.IsNullOrEmpty(x.name)).Select(x => x.name));
 
             Dictionary<TransportAsset, string> allAssets;
 
-            if (ParentPanel.FromBuilding)
+            if (fromBuilding)
             {
-                allAssets = ParentPanel.TransportSystem.GetTransportExtension().GetAllBasicAssetsForLine(lineId);
+                allAssets = tsd.GetTransportExtension().GetAllBasicAssetsForLine(lineId);
             }
             else
             {

@@ -87,12 +87,30 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 return;
             }
 
-            var extension = GetAssetExtension(lineId, fromBuilding, tsd);
+            List<TransportAsset> selectedAssets;
 
-            var selectedAssets = extension.GetAssetTransportListForLine(lineId) ?? [];
+            if (fromBuilding)
+            {
+                var connection = LinePanelManager.CurrentRegionalConnection;
+
+                if (connection == null)
+                {
+                    LogUtils.DoErrorLog($"No regional connection resolved for line {lineId}");
+
+                    selectedAssets = [];
+                }
+                else
+                {
+                    selectedAssets = connection.GetAssetTransportList();
+                }
+            }
+            else
+            {
+                selectedAssets = GetAssetExtension(lineId, fromBuilding, tsd).GetAssetTransportListForLine(lineId) ?? [];
+            }
 
             // Any selected vehicles?
-            if (selectedAssets != null && selectedAssets.Count > 0)
+            if (selectedAssets.Count > 0)
             {
                 // Yes - hide random panel.
                 m_randomPanel.Hide();

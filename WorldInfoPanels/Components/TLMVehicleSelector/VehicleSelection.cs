@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Commons.UI;
@@ -9,6 +10,7 @@ using TransportLinesManager.Interfaces;
 using TransportLinesManager.Utils;
 using TransportLinesManager.WorldInfoPanels.Tabs;
 using UnityEngine;
+using static ColossalFramework.Packaging.Package;
 using static TransportLinesManager.Data.Extensions.ExtensionStaticExtensionMethods;
 
 namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
@@ -258,14 +260,33 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             }
         }
 
+        private List<TransportAsset> GetSelectedAssetList()
+        {
+            if (FromBuilding)
+            {
+                return LinePanelManager.CurrentRegionalConnection.GetAssetTransportList();
+            }
+
+            return GetAssetExtension().GetAssetTransportListForLine(CurrentLine) ?? [];
+        }
+
+        private void SetSelectedAssetList(List<TransportAsset> assets)
+        {
+            if (FromBuilding)
+            {
+                LinePanelManager.CurrentRegionalConnection.SetAssetTransportList(assets);
+                return;
+            }
+
+            GetAssetExtension().SetAssetTransportListForLine(CurrentLine, assets ?? []);
+        }
+
         private void AddVehicle(string assetName)
         {
             if (string.IsNullOrEmpty(assetName) || (CurrentLine == 0 && !FromBuilding))
             {
                 return;
             }
-
-            var extension = GetAssetExtension();
 
             var info = PrefabCollection<VehicleInfo>.FindLoaded(assetName);
 
@@ -274,18 +295,38 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 return;
             }
 
-            int capacity = VehicleUtils.GetCapacity(info);
+            var assets = GetSelectedAssetList();
 
-            extension.AddAssetToLine(CurrentLine, assetName, capacity.ToString(), "100", ProfileTarget.Weekday);
+            if (assets == null || assets.Any(x => x.name == assetName))
+            {
+                return;
+            }
+
+            int capacity = VehicleUtils.GetCapacity(info);
 
             if(!FromBuilding)
             {
+                var extension = GetAssetExtension();
+
+                extension.AddAssetToLine(CurrentLine, assetName, capacity.ToString(), "100", ProfileTarget.Weekday);
+
                 var currentConfig = TLMLineUtils.GetEffectiveConfigForLine(CurrentLine);
 
                 if (currentConfig?.UseSeparateWeekendProfile == true)
                 {
                     extension.AddAssetToLine(CurrentLine, assetName, capacity.ToString(), "100", ProfileTarget.Weekend);
                 }
+            }
+            else
+            {
+                assets.Add(new TransportAsset
+                { 
+                    name = assetName,
+                    capacity = capacity,
+                    count = [],
+                    spawn_percent = []
+                });
+                SetSelectedAssetList(assets);
             }
 
             Refresh();
@@ -299,9 +340,22 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 return;
             }
 
-            var extension = GetAssetExtension();
+            if (FromBuilding)
+            {
+                var assets = GetSelectedAssetList();
 
-            extension.RemoveAssetFromLine(CurrentLine, assetName);
+                if (assets == null)
+                {
+                    return;
+                }
+
+                assets.RemoveAll(x => x.name == assetName);
+                SetSelectedAssetList(assets);
+            }
+            else
+            {
+                GetAssetExtension().RemoveAssetFromLine(CurrentLine, assetName);
+            }
 
             Refresh();
             TLMAssetSelectorTab.MarkDirty();
@@ -314,24 +368,60 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 return;
             }
 
-            var extension = GetAssetExtension();
-
-            var currentConfig = FromBuilding ? null : TLMLineUtils.GetEffectiveConfigForLine(CurrentLine);
-
-            foreach (object entry in m_vehicleSelectionPanel.VehicleList.Data)
+            if (FromBuilding)
             {
-                if (entry is not VehicleItem item || item.Info == null)
+                var assets = GetSelectedAssetList();
+
+                if (assets == null)
                 {
-                    continue;
+                    return;
                 }
 
-                int capacity = VehicleUtils.GetCapacity(item.Info);
-
-                extension.AddAssetToLine(CurrentLine, item.Info.name, capacity.ToString(), "100", ProfileTarget.Weekday);
-
-                if (!FromBuilding && currentConfig?.UseSeparateWeekendProfile == true)
+                foreach (object entry in m_vehicleSelectionPanel.VehicleList.Data)
                 {
-                    extension.AddAssetToLine(CurrentLine, item.Info.name, capacity.ToString(), "100", ProfileTarget.Weekend);
+                    if (entry is not VehicleItem item || item.Info == null)
+                    {
+                        continue;
+                    }
+
+                    if (assets.Any(x => x.name == item.Info.name))
+                    {
+                        continue;
+                    }
+
+                    assets.Add(new TransportAsset
+                    {
+                        name = item.Info.name,
+                        capacity =
+                        VehicleUtils.GetCapacity(item.Info),
+                        count = [],
+                        spawn_percent = []
+                    });
+                }
+
+                SetSelectedAssetList(assets);
+            }
+            else
+            {
+                var extension = GetAssetExtension();
+
+                var currentConfig = TLMLineUtils.GetEffectiveConfigForLine(CurrentLine);
+
+                foreach (object entry in m_vehicleSelectionPanel.VehicleList.Data)
+                {
+                    if (entry is not VehicleItem item || item.Info == null)
+                    {
+                        continue;
+                    }
+
+                    int capacity = VehicleUtils.GetCapacity(item.Info);
+
+                    extension.AddAssetToLine(CurrentLine, item.Info.name, capacity.ToString(), "100", ProfileTarget.Weekday);
+
+                    if (!FromBuilding && currentConfig?.UseSeparateWeekendProfile == true)
+                    {
+                        extension.AddAssetToLine(CurrentLine, item.Info.name, capacity.ToString(), "100", ProfileTarget.Weekend);
+                    }
                 }
             }
 
@@ -346,23 +436,38 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 return;
             }
 
-            var extension = GetAssetExtension();
-
-            var vehiclesToRemove = new List<VehicleInfo>();
-
-            foreach (object entry in m_selectedVehiclePanel.VehicleList.Data)
+            if (FromBuilding)
             {
-                if (entry is VehicleItem item && item.Info != null)
+                var assets = GetSelectedAssetList();
+
+                if (assets == null)
                 {
-                    vehiclesToRemove.Add(item.Info);
+                    return;
+                }
+
+                assets.Clear();
+                SetSelectedAssetList(assets);
+            }
+            else
+            {
+                var extension = GetAssetExtension();
+
+                var vehiclesToRemove = new List<VehicleInfo>();
+
+                foreach (object entry in m_selectedVehiclePanel.VehicleList.Data)
+                {
+                    if (entry is VehicleItem item && item.Info != null)
+                    {
+                        vehiclesToRemove.Add(item.Info);
+                    }
+                }
+
+                foreach (VehicleInfo vehicle in vehiclesToRemove)
+                {
+                    extension.RemoveAssetFromLine(CurrentLine, vehicle.name);
                 }
             }
-
-            foreach (VehicleInfo vehicle in vehiclesToRemove)
-            {
-                extension.RemoveAssetFromLine(CurrentLine, vehicle.name);
-            }
-
+            
             Refresh();
             TLMAssetSelectorTab.MarkDirty();
         }

@@ -1,9 +1,11 @@
-﻿using Commons.Interfaces;
+﻿using System;
+using System.Xml.Serialization;
+using Commons.Interfaces;
 using Commons.UI.SpriteNames;
 using Commons.Utils.StructExtensions;
+using Commons.Utils.UtilitiesClasses;
 using TransportLinesManager.ModShared;
-using System;
-using System.Xml.Serialization;
+using TransportLinesManager.Utils;
 using UnityEngine;
 
 namespace TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections
@@ -33,6 +35,9 @@ namespace TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnect
 
         [XmlAttribute("segmentStationToVirtual")]
         public ushort m_segmentStationToVirtual;
+
+        [XmlElement("AssetsTransportList")]
+        public SimpleXmlList<TransportAsset> AssetTransportList { get; set; } = [];
 
         [XmlAttribute("stringIdentifier")]
         public string Identifier

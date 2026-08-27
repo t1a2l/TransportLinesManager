@@ -1,6 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using ColossalFramework.UI;
 using Commons.Utils;
+using Commons.Utils.UtilitiesClasses;
+using TransportLinesManager.Data.Base.ConfigurationContainers;
+using TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
+using TransportLinesManager.Data.Extensions;
+using TransportLinesManager.Utils;
 using UnityEngine;
 
 namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
@@ -15,6 +22,13 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         /// Gets the active panel instance.
         /// </summary>
         internal static LinePanel Panel => s_panel;
+
+        /// <summary>
+        /// Gets the Current Regional Connection.
+        /// </summary>
+        public static OutsideConnectionLineInfo CurrentRegionalConnection { get; private set; }
+
+        public static bool IsRegionalConnectionTarget => CurrentRegionalConnection != null;
 
         /// <summary>
         /// Creates the panel object in-game and displays it.
@@ -61,9 +75,9 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
         /// <summary>
         /// Sets the target to the selected line, creating the panel if necessary.
         /// </summary>
-        /// <param name="lineID">New line ID.</param>
-        /// <param name="fromBuilding">is fromBuilding.</param>
-        internal static void SetTarget(ushort lineID, bool fromBuilding)
+        /// <param name="lineId">the id of the line.</param>
+        /// <param name="fromBuilding">true for regional connection otherwsie false.</param>
+        internal static void SetTarget(ushort lineId, bool fromBuilding)
         {
             // If no existing panel, create it.
             if (Panel == null)
@@ -71,8 +85,16 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                 Create();
             }
 
+            CurrentRegionalConnection = null;
+
+            if (fromBuilding && !SetRegionalConnection(lineId))
+            {
+                Close();
+                return;
+            }
+
             // Set the target.
-            Panel.SetTarget(lineID, fromBuilding);
+            Panel.SetTarget(lineId, fromBuilding);
         }
 
         /// <summary>
@@ -92,6 +114,27 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
             }
 
             SetTarget(lineId, fromBuilding);
+        }
+
+        private static bool SetRegionalConnection(ushort lineId)
+        {
+            ushort stationBuildingId = WorldInfoPanel.GetCurrentInstanceID().Building;
+            var stationData = TransportLinesManagerMod.Controller.BuildingLines.SafeGet(stationBuildingId);
+
+            if (stationData == null || !stationData.TryGetRegionalConnection(lineId, out _, out OutsideConnectionLineInfo connection))
+            {
+                LogUtils.DoErrorLog("Could not resolve regional vehicle target: station={0}; line={1}", stationBuildingId, lineId);
+                return false;
+            }
+
+            LogUtils.DoLog("Regional vehicle target resolved: station={0}; line={1}; outsideNode={2}; virtualNode={3}",
+               stationBuildingId,
+               lineId,
+               connection.m_nodeOutsideConnection,
+               connection.m_nodeVirtual);
+
+            CurrentRegionalConnection = connection;
+            return true;
         }
     }
 }

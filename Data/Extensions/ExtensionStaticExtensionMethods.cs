@@ -1,14 +1,15 @@
-﻿using Commons.Utils.UtilitiesClasses;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Commons.Utils.UtilitiesClasses;
 using TransportLinesManager.Data.Base;
+using TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
+using TransportLinesManager.Data.DataContainers;
 using TransportLinesManager.Data.Tsd;
 using TransportLinesManager.Interfaces;
 using TransportLinesManager.ModShared;
 using TransportLinesManager.Utils;
-using System.Collections.Generic;
-using UnityEngine;
-using TransportLinesManager.Data.DataContainers;
 using TransportLinesManager.WorldInfoPanels.Tabs;
-using System.Linq;
+using UnityEngine;
 
 namespace TransportLinesManager.Data.Extensions
 {
@@ -193,6 +194,21 @@ namespace TransportLinesManager.Data.Extensions
         }
 
         public static void UseDefaultAssetsAtLine<T>(this T it, ushort lineId) where T : IAssetSelectorExtension => it.GetAssetListForLine(lineId).Clear();
+
+        public static List<TransportAsset> GetAssetTransportList(this OutsideConnectionLineInfo connection)
+        {
+            return connection?.AssetTransportList?.ToList() ?? [];
+        }
+
+        public static void SetAssetTransportList(this OutsideConnectionLineInfo connection, List<TransportAsset> assets)
+        {
+            if (connection == null)
+            {
+                return;
+            }
+
+            connection.AssetTransportList = [.. assets ?? []];
+        }
 
         #endregion
 

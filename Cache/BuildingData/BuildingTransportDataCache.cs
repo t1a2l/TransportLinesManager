@@ -16,8 +16,11 @@ namespace TransportLinesManager.Cache.BuildingData
     public class BuildingTransportDataCache
     {
         internal NonSequentialList<InnerBuildingLine> RegionalLines { get; } = [];
+
         private ushort BuildingId { get; }
+
         public int RegionalLinesCount => RegionalLines.Count;
+
         public StopPointDescriptorLanes[] StopPoints { get; private set; }
 
         public TLMBuildingsConfiguration BuildingData => TLMBuildingDataContainer.Instance.SafeGet(BuildingId);
@@ -71,6 +74,7 @@ namespace TransportLinesManager.Cache.BuildingData
                    -1, 1280f, false, true);
             }
         }
+        
         public void RenderLines(RenderManager.CameraInfo cameraInfo)
         {
             foreach (var line in RegionalLines.Values)
@@ -78,7 +82,6 @@ namespace TransportLinesManager.Cache.BuildingData
                 line.RenderLine(cameraInfo);
             }
         }
-
 
         private void MapBuildingLines(ushort buildingIdKey, ushort buildingId)
         {
@@ -411,6 +414,42 @@ namespace TransportLinesManager.Cache.BuildingData
             GetPlatformData(platformId, out PlatformConfig dataObj);
             dataObj.RemoveDestination(BuildingId, outsideConnectionId);
             RemapLines();
+        }
+
+        public bool TryGetRegionalConnection(ushort regionalLineId, out PlatformConfig matchedPlatform, out OutsideConnectionLineInfo matchedConnection)
+        {
+            matchedPlatform = null;
+            matchedConnection = null;
+
+            foreach (var platformEntry in BuildingData.PlatformMappings)
+            {
+                PlatformConfig platform = platformEntry.Value;
+
+                foreach (var connectionEntry in
+                    platform.TargetOutsideConnections)
+                {
+                    OutsideConnectionLineInfo connection =
+                        connectionEntry.Value;
+
+                    if (connection == null)
+                    {
+                        continue;
+                    }
+
+                    if (connection.m_nodeStation != regionalLineId
+                        && connection.m_nodeOutsideConnection != regionalLineId
+                        && connection.m_nodeVirtual != regionalLineId)
+                    {
+                        continue;
+                    }
+
+                    matchedPlatform = platform;
+                    matchedConnection = connection;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private IEnumerator RemapLinesNextFrame()

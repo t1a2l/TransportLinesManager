@@ -514,9 +514,20 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             var lineId = GetLineID();
 
-            m_budgetProfilePanel.isVisible = lineId != 0;
-            m_weightColumnHeader.isVisible = lineId != 0;
-            m_usedCountColumnHeader.isVisible = lineId != 0;
+            if(lineId == 0)
+            {
+                m_timeBudgetSelectLabelSprite.Hide();
+                m_timeBudgetSelect.Hide();
+                m_weightColumnHeader.Hide();
+                m_usedCountColumnHeader.Hide();
+            }
+            else
+            {
+                m_timeBudgetSelectLabelSprite.Show();
+                m_timeBudgetSelect.Show();
+                m_weightColumnHeader.Show();
+                m_usedCountColumnHeader.Show();
+            }
 
             var lineExt = TLMTransportLineExtension.Instance;
             bool isAbsolute = lineExt.IsUsingCustomConfig(lineId) && lineExt.IsDisplayAbsoluteValues(lineId);
@@ -553,7 +564,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             var cfg = TLMLineUtils.GetEffectiveConfigForLine(lineId);
 
-            if (cfg != null)
+            if (cfg != null && lineId != 0)
             {
                 enabled = cfg?.UseSeparateWeekendProfile == true;
             }
