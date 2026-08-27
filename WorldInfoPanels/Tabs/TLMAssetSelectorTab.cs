@@ -252,9 +252,9 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_nameFilter.relativePosition = new Vector3(5f, 75f);
             m_nameFilter.height = 23;
             m_nameFilter.width = 170f;
-            m_nameFilter.eventKeyUp += (x, y) => UpdateAssetList(TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem));
-            m_nameFilter.eventTextSubmitted += (x, y) => UpdateAssetList(TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem));
-            m_nameFilter.eventTextCancelled += (x, y) => UpdateAssetList(TLMLineUtils.GetEffectiveExtensionForLine(GetLineID(), TransportSystem));
+            m_nameFilter.eventKeyUp += (x, y) => RefreshAssetFilter();
+            m_nameFilter.eventTextSubmitted += (x, y) => RefreshAssetFilter();
+            m_nameFilter.eventTextCancelled += (x, y) => RefreshAssetFilter();
             m_nameFilter.horizontalAlignment = UIHorizontalAlignment.Left;
             m_nameFilter.padding = new RectOffset(2, 2, 4, 2);
 
@@ -434,6 +434,13 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void ActionDelete()
         {
+            if (LinePanelManager.CurrentRegionalConnection != null)
+            {
+                LinePanelManager.CurrentRegionalConnection.SetAssetTransportList([]);
+                RefreshSelectedAssetRows();
+                return;
+            }
+
             var lineId = GetLineID();
             IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem);
             config.SetAssetTransportListForLine(lineId, []);
@@ -578,25 +585,30 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void UpdateAssetList(IBasicExtension config)
         {
-            var lineId = GetLineID();
+            UVMPublicTransportWorldInfoPanel.GetLineID(out ushort actualLineId, out bool fromBuilding);
 
-            var selectedAssets = config.GetAssetTransportListForLine(lineId) ?? [];
+            ushort lineId = fromBuilding ? (ushort)0 : actualLineId;
+
+            var selectedAssets = GetCurrentSelectedAssets(TransportSystem);
 
             m_lastInfo = default;
 
-            var budgetEntries = config.GetBudgetsMultiplierForLine(lineId, CurrentProfileTarget);
-
-            if (lineId != 0 && (budgetEntries == null || budgetEntries.Count == 0))
+            if(!fromBuilding)
             {
-                TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineId); // triggers lazy init
-                config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem); // re-fetch
+                var budgetEntries = config.GetBudgetsMultiplierForLine(lineId, CurrentProfileTarget);
 
-                selectedAssets = config.GetAssetTransportListForLine(lineId) ?? [];
+                if (budgetEntries == null || budgetEntries.Count == 0)
+                {
+                    TLMLineUtils.GetBudgetMultiplierLineWithIndexes(lineId); // triggers lazy init
+                    config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem); // re-fetch
 
-                budgetEntries = config.GetBudgetsMultiplierForLine(lineId, CurrentProfileTarget);
+                    selectedAssets = config.GetAssetTransportListForLine(lineId) ?? [];
+
+                    budgetEntries = config.GetBudgetsMultiplierForLine(lineId, CurrentProfileTarget);
+                }
             }
 
-            var slotIndex = GetBudgetSelectedIndex();
+            var slotIndex = fromBuilding ? 0 : GetBudgetSelectedIndex();
 
             UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(selectedAssets.Count);
 
@@ -627,8 +639,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             int selectedBudgetIndex = GetBudgetSelectedIndex();
 
-            IBasicExtension config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem);
-            List<TransportAsset> selectedAssets = config.GetAssetTransportListForLine(lineId);
+            List<TransportAsset> selectedAssets = GetCurrentSelectedAssets(TransportSystem);
 
             UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(selectedAssets.Count);
                   
@@ -781,6 +792,50 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             cfg = TLMLineUtils.GetEffectiveConfigForLine(lineId);
             return cfg != null;
-        } 
+        }
+
+        private static bool TryGetRegionalAssets(out List<TransportAsset> assets)
+        {
+            assets = null;
+
+            if (!UVMPublicTransportWorldInfoPanel.GetLineID(out ushort _, out bool fromBuilding) || !fromBuilding)
+            {
+                return false;
+            }
+
+            var connection = LinePanelManager.CurrentRegionalConnection;
+
+            if (connection == null)
+            {
+                return false;
+            }
+
+            assets = connection.AssetTransportList?.ToList()  ?? [];
+
+            return true;
+        }
+
+        private static List<TransportAsset> GetCurrentSelectedAssets(TransportSystemDefinition tsd)
+        {
+            if (TryGetRegionalAssets(out List<TransportAsset> regionalAssets))
+            {
+                return regionalAssets;
+            }
+
+            ushort lineId = GetLineID();
+
+            var config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, tsd);
+
+            return config.GetAssetTransportListForLine(lineId) ?? [];
+        }
+
+        private void RefreshAssetFilter()
+        {
+            ushort lineId = GetLineID();
+
+            var config = TLMLineUtils.GetEffectiveExtensionForLine(lineId, TransportSystem);
+
+            UpdateAssetList(config);
+        }
     }
 }
