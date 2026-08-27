@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using ColossalFramework.UI;
 using Commons.Utils;
-using Commons.Utils.UtilitiesClasses;
-using TransportLinesManager.Data.Base.ConfigurationContainers;
 using TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
-using TransportLinesManager.Data.Extensions;
-using TransportLinesManager.Utils;
 using UnityEngine;
 
 namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
@@ -118,9 +112,24 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
 
         private static bool SetRegionalConnection(ushort lineId)
         {
-            ushort stationBuildingId = WorldInfoPanel.GetCurrentInstanceID().Building;
-            var stationData = TransportLinesManagerMod.Controller.BuildingLines.SafeGet(stationBuildingId);
+            var lineObj = TransportLinesManagerMod.Controller.BuildingLines[lineId];
 
+            if (lineObj == null)
+            {
+                LogUtils.DoErrorLog("Could not find regional line object: line={0}", lineId);
+                return false;
+            }
+
+            var stationBuildingId = lineObj.DstBuildingId;
+
+            if (stationBuildingId == 0)
+            {
+                LogUtils.DoErrorLog("Regional line has no destination station: line={0}", lineId);
+                return false;
+            }
+
+            var stationData = TransportLinesManagerMod.Controller.BuildingLines.SafeGet(stationBuildingId);
+            
             if (stationData == null || !stationData.TryGetRegionalConnection(lineId, out _, out OutsideConnectionLineInfo connection))
             {
                 LogUtils.DoErrorLog("Could not resolve regional vehicle target: station={0}; line={1}", stationBuildingId, lineId);
@@ -134,6 +143,7 @@ namespace TransportLinesManager.WorldInfoPanels.Components.TLMVehicleSelector
                connection.m_nodeVirtual);
 
             CurrentRegionalConnection = connection;
+
             return true;
         }
     }
