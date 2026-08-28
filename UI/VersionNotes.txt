@@ -32,7 +32,7 @@
 	- Add weekend profile to support RealTime mod to have different budget and ticket prices for weekends.
 	- Add near lines to show lines near buildings. if it is a transport asset it will show how many people are waiting in each stop.
 
-<color #9999FF>TLM 14.7 - 21/AUG/26</color>
+<color #9999FF>TLM 14.7 - 28/AUG/26</color>
 	- Added a global option to hide the weekend-profile info-bar checkbox for players who do not use the Real Time mod.
 	- Added an Auto-spawn compatible vehicles global option: when no vehicles are selected, TLM can choose randomly from compatible vehicle types.
 	- Added per-save version tracking so data migrations run only when a save is loaded from an older version.
