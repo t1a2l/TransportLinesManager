@@ -33,9 +33,12 @@
 	- Add near lines to show lines near buildings. if it is a transport asset it will show how many people are waiting in each stop.
 
 <color #9999FF>TLM 14.7 - 21/AUG/26</color>
-	- Add weekend profile global option to hide info bar checkbox for people not using the real time mod.
-	- Auto spawn all vehicles types randomly when none is selected - global option.
-	- Per save version check support to migrate only from old versions.
-	- Auto adjust absolute lines option.
-	- TLM internal spawn delay mod - must disable algernon's mod, with new fairness per depot and line option.
+	- Added a global option to hide the weekend-profile info-bar checkbox for players who do not use the Real Time mod.
+	- Added an Auto-spawn compatible vehicles global option: when no vehicles are selected, TLM can choose randomly from compatible vehicle types.
+	- Added per-save version tracking so data migrations run only when a save is loaded from an older version.
+	- Added an option to automatically rebalance vehicle counts for lines using absolute vehicle counts.
+	- Integrated TLM’s internal spawn-delay system. Disable Algernon’s Transit Vehicle Spawn Delay mod when using it. New fairness options are available per depot and per line.
+	- Improved vehicle selection and management, using a UI based on Algernon’s Vehicle Selector mod.
+	- Added separate vehicle selections for individual regional/outside connections. Each enabled station-platform-to-outside-connection route can now have its own selected intercity vehicles instead of sharing one list with every regional connection of the same transport type.
+
 
