@@ -256,6 +256,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
             m_nameFilter.eventKeyUp += (x, y) => RefreshAssetFilter();
             m_nameFilter.eventTextSubmitted += (x, y) => RefreshAssetFilter();
             m_nameFilter.eventTextCancelled += (x, y) => RefreshAssetFilter();
+            m_nameFilter.eventTextChanged += (x, y) => RefreshAssetFilter();
             m_nameFilter.horizontalAlignment = UIHorizontalAlignment.Left;
             m_nameFilter.padding = new RectOffset(2, 2, 4, 2);
 
@@ -611,11 +612,34 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
             var slotIndex = fromBuilding ? 0 : GetBudgetSelectedIndex();
 
-            UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(selectedAssets.Count);
+            string filter = m_nameFilter?.text?.Trim();
+
+            IEnumerable<TransportAsset> filteredAssets = selectedAssets;
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                filteredAssets = selectedAssets.Where(asset =>
+                {
+                    if (string.IsNullOrEmpty(asset.name))
+                    {
+                        return false;
+                    }
+
+                    var info = PrefabCollection<VehicleInfo>.FindLoaded(asset.name);
+
+                    string displayName = info != null ? PrefabUtils.GetDisplayName(info) : asset.name;
+
+                    return displayName.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0;
+                });
+            }
+
+            List<TransportAsset> visibleAssets = [.. filteredAssets];
+
+            UIPanel[] assetsCheck = m_checkboxTemplateList.SetItemCount(visibleAssets.Count);
 
             for (int i = 0; i < assetsCheck.Length; i++)
             {
-                var asset = selectedAssets[i];
+                var asset = visibleAssets[i];
                 var controller = assetsCheck[i].GetComponent<TLMAssetItemLine>();
                 controller.SetAsset(asset, lineId, slotIndex);
                 controller.OnMouseEnter = () =>
