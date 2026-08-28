@@ -608,6 +608,54 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
                     budgetEntries = config.GetBudgetsMultiplierForLine(lineId, CurrentProfileTarget);
                 }
+
+                BudgetEntryXml previouslySelectedEntry = null;
+
+                if (lineId > 0 && m_timeBudgetSelect != null)
+                {
+                    int oldUiIndex = m_timeBudgetSelect.selectedIndex;
+
+                    if (oldUiIndex >= 0 && oldUiIndex < m_budgetEntriesInUiOrder.Count)
+                    {
+                        previouslySelectedEntry = m_budgetEntriesInUiOrder[oldUiIndex];
+                    }
+                }
+
+                m_budgetEntriesInUiOrder.Clear();
+
+                var entriesInUiOrder = budgetEntries.Cast<BudgetEntryXml>().OrderBy(x => x.HourOfDay).ToList();
+
+                m_budgetEntriesInUiOrder.AddRange(entriesInUiOrder);
+
+                m_timeBudgetSelect.items = [.. entriesInUiOrder.Select(x => x.HourOfDay.ToString())];
+
+                int selectedUiIndex = -1;
+
+                // Preserve the same backing object selection if it still exists.
+                if (previouslySelectedEntry != null)
+                {
+                    selectedUiIndex = m_budgetEntriesInUiOrder.FindIndex(x => ReferenceEquals(x, previouslySelectedEntry));
+                }
+
+                // Otherwise select the budget entry active at the current game time.
+                if (selectedUiIndex < 0)
+                {
+                    var currentExact = budgetEntries.GetAtHourExact(TLMLineUtils.ReferenceTimer);
+
+                    int backingIndex = currentExact.Second;
+
+                    if (backingIndex >= 0 && currentExact.First is BudgetEntryXml currentEntry)
+                    {
+                        selectedUiIndex = m_budgetEntriesInUiOrder.FindIndex(x => ReferenceEquals(x, currentEntry));
+                    }
+                }
+
+                if (selectedUiIndex < 0)
+                {
+                    selectedUiIndex = 0;
+                }
+
+                m_timeBudgetSelect.selectedIndex = selectedUiIndex;
             }
 
             var slotIndex = fromBuilding ? 0 : GetBudgetSelectedIndex();
