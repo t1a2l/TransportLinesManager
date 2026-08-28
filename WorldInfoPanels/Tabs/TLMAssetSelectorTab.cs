@@ -10,6 +10,7 @@ using Commons.Utils;
 using Commons.Utils.UtilitiesClasses;
 using TransportLinesManager.Data.Base;
 using TransportLinesManager.Data.Base.ConfigurationContainers;
+using TransportLinesManager.Data.Base.ConfigurationContainers.OutsideConnections;
 using TransportLinesManager.Data.DataContainers;
 using TransportLinesManager.Data.Extensions;
 using TransportLinesManager.Data.Tsd;
@@ -434,7 +435,7 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
 
         private void ActionDelete()
         {
-            if (LinePanelManager.CurrentRegionalConnection != null)
+            if (TryGetRegionalAssets(out _))
             {
                 LinePanelManager.CurrentRegionalConnection.SetAssetTransportList([]);
                 RefreshSelectedAssetRows();
@@ -624,7 +625,16 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
                 };
             }
 
-            UpdateModeIndicator(lineId, slotIndex);
+            if (fromBuilding)
+            {
+                m_vehicleCountLabel.Hide();
+                m_weightColumnHeader.Hide();
+                m_usedCountColumnHeader.Hide();
+            }
+            else
+            {
+                UpdateModeIndicator(lineId, slotIndex);
+            }
         }
 
         private void ChangeBudgetTime(int idxSel)
@@ -798,15 +808,27 @@ namespace TransportLinesManager.WorldInfoPanels.Tabs
         {
             assets = null;
 
-            if (!UVMPublicTransportWorldInfoPanel.GetLineID(out ushort _, out bool fromBuilding) || !fromBuilding)
+            if (!UVMPublicTransportWorldInfoPanel.GetLineID(out ushort regionalLineId, out bool fromBuilding) || !fromBuilding)
             {
                 return false;
             }
 
-            var connection = LinePanelManager.CurrentRegionalConnection;
+            var lineObj = TransportLinesManagerMod.Controller.BuildingLines[regionalLineId];
 
-            if (connection == null)
+            if (lineObj == null)
             {
+                LogUtils.DoErrorLog("Asset selector: regional line object not found: line={0}", regionalLineId);
+
+                return false;
+            }
+
+            ushort stationBuildingId = lineObj.DstBuildingId;
+
+            var stationData = TransportLinesManagerMod.Controller.BuildingLines.SafeGet(stationBuildingId);
+
+            if (stationData == null || !stationData.TryGetRegionalConnection(regionalLineId, out _, out OutsideConnectionLineInfo connection))
+            {
+                LogUtils.DoErrorLog("Asset selector: regional connection not found: station={0}; line={1}", stationBuildingId, regionalLineId);
                 return false;
             }
 
