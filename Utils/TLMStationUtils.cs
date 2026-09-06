@@ -102,32 +102,84 @@ namespace TransportLinesManager.Utils
             NetManager nm = Singleton<NetManager>.instance;
             ref NetNode nn = ref nm.m_nodes.m_buffer[stopId];
             Vector3 location = nn.m_position;
+
             if (tsd.VehicleType == VehicleInfo.VehicleType.Car || tsd.VehicleType == VehicleInfo.VehicleType.Tram || tsd.VehicleType == VehicleInfo.VehicleType.Trolleybus)
             {
-                List<ushort> nearStops = StopSearchUtils.FindNearStops(location, nn.Info.GetService(), true, 50f, out _, out _);
+                const float nearbyStopNameRadius = 50f;
 
-                foreach (ushort otherStop in nearStops)
+                // Resolve the station for the current stop first.
+                // A zero value means this is not associated with a valid station building.
+                ushort currentStationBuildingId = GetStationBuilding(stopId, ss, excludeCargo, restrictToTransportType: true);
+
+                // Do not copy names between ordinary roadside stops.
+                // Shared naming is now only allowed inside one station building.
+                if (currentStationBuildingId != 0)
                 {
-                    if (otherStop != stopId)
-                    {
-                        savedName = GetStopName(otherStop);
-                        ;
-                        if (savedName != null)
-                        {
-                            ushort targetLineId = NetManager.instance.m_nodes.m_buffer[otherStop].m_transportLine;
-                            var tsd2 = TransportSystemDefinition.FromLineId(targetLineId, false);
+                    List<ushort> nearStops = StopSearchUtils.FindNearStops(location, nn.Info.GetService(), true, nearbyStopNameRadius, out _, out _);
 
-                            serviceFound = ItemClass.Service.PublicTransport;
-                            subserviceFound = Singleton<TransportManager>.instance.m_lines.m_buffer[targetLineId].Info.m_class.m_subService;
-                            prefix = tsd2.GetConfig().NamingPrefix?.TrimStart();
-                            buildingID = 0;
-                            resultNamingType = NamingTypeExtensions.From(tsd2);
-                            return savedName;
+                    foreach (ushort otherStopId in nearStops)
+                    {
+                        if (otherStopId == 0 || otherStopId == stopId || otherStopId >= nm.m_nodes.m_buffer.Length)
+                        {
+                            continue;
                         }
+
+                        ref NetNode otherStopNode = ref nm.m_nodes.m_buffer[otherStopId];
+
+                        ushort otherLineId = otherStopNode.m_transportLine;
+
+                        // A nearby node without a valid local transport line cannot
+                        // safely provide its line type, naming prefix, or saved name.
+                        if (otherLineId == 0 || otherLineId >= TransportManager.MAX_LINE_COUNT)
+                        {
+                            continue;
+                        }
+
+                        TransportInfo otherLineInfo = Singleton<TransportManager>.instance.m_lines.m_buffer[otherLineId].Info;
+
+                        if (otherLineInfo == null)
+                        {
+                            continue;
+                        }
+
+                        // Do not make nearby but unrelated services share a name.
+                        // For example, a bus stop should not inherit a tram-stop name.
+                        if (otherLineInfo.m_class.m_subService != nn.Info.m_class.m_subService)
+                        {
+                            continue;
+                        }
+
+                        ushort otherStationBuildingId = GetStationBuilding(otherStopId, otherLineInfo.m_class.m_subService, excludeCargo, restrictToTransportType: true);
+
+                        // The critical check: proximity alone is not enough.
+                        if (otherStationBuildingId != currentStationBuildingId)
+                        {
+                            continue;
+                        }
+
+                        string nearbySavedName = GetStopName(otherStopId);
+
+                        if (nearbySavedName.IsNullOrWhiteSpace())
+                        {
+                            continue;
+                        }
+
+                        var otherTsd = TransportSystemDefinition.FromLineId(otherLineId, false);
+
+                        serviceFound = ItemClass.Service.PublicTransport;
+
+                        subserviceFound = otherLineInfo.m_class.m_subService;
+
+                        prefix = otherTsd.GetConfig().NamingPrefix?.TrimStart();
+
+                        buildingID = 0;
+
+                        resultNamingType = NamingTypeExtensions.From(otherTsd);
+
+                        return nearbySavedName;
                     }
                 }
             }
-
 
             buildingID = GetStationBuilding(stopId, ss, excludeCargo);
 
