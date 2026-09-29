@@ -263,7 +263,7 @@ namespace TransportLinesManager.Overrides
                 TLMTransportLineStatusesManager.instance.AddToVehicle(entry.Key, 0, cost, ref refNull);
                 amount += cost;
             }
-            LogUtils.DoLog($"DoTransportLineEconomyManagement : line {lineId} ({tsd} {tl.m_lineNumber}) ;amount = {amount}");
+            LogUtils.DoLog($"DoTransportLineEconomyManagement : line {lineId} ({tsd} {tl.m_lineNumber}); vehicles={capacities.Count}; amount = {amount}; frame={SimulationManager.instance.m_currentFrameIndex};");
             TLMTransportLineStatusesManager.instance.AddToLine(lineId, 0, amount, ref refNull, 0);
             EconomyManager.instance.FetchResource(Resource.Maintenance, amount, tl.Info.m_class);
         }
